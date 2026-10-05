@@ -1,0 +1,72 @@
+/**
+ * This file was generated automatically by Supernova Mitosis Exporter. Do not edit directly.
+ */
+
+/**
+ * Duplicate token names disambiguated during export:
+ *   css --shadow-raised -> --shadow-raised-2 (token 128f5ccc-e873-4fe2-9c0a-c5a75a6590e1, conflicts with 6e128191-c46a-4281-91ed-1f688ec62fdc)
+ *   key shadowRaised -> shadowRaised2 (token 128f5ccc-e873-4fe2-9c0a-c5a75a6590e1, conflicts with 6e128191-c46a-4281-91ed-1f688ec62fdc)
+ *   theme --shadow-raised -> --shadow-raised-2 (token 128f5ccc-e873-4fe2-9c0a-c5a75a6590e1, conflicts with 6e128191-c46a-4281-91ed-1f688ec62fdc)
+ */
+
+/**
+ * Tailwind CSS v4 Theme Configuration
+ * Usage in main css:
+ *   @import "tailwindcss";
+ *   @import "./tokens/theme.css";
+ */
+
+@theme {
+  --color-base-gray-200: rgba(246, 247, 249, 1);
+  --color-base-gray-300: rgba(230, 232, 239, 1);
+  --color-base-gray-500: rgba(198, 204, 219, 1);
+  --color-base-gray-600: rgba(127, 133, 148, 1);
+  --color-base-gray-700: rgba(96, 105, 129, 1);
+  --color-base-purple-200: rgba(245, 242, 253, 1);
+  --color-base-purple-300: rgba(217, 200, 245, 1);
+  --color-base-purple-500: rgba(190, 159, 240, 1);
+  --color-base-purple-600: rgba(162, 117, 234, 1);
+  --color-base-purple-700: rgba(135, 76, 230, 1);
+  --color-base-blue-200: rgba(236, 245, 255, 1);
+  --color-base-blue-300: rgba(209, 226, 255, 1);
+  --color-base-blue-500: rgba(82, 146, 255, 1);
+  --color-base-blue-600: rgba(16, 98, 254, 1);
+  --color-base-blue-700: rgba(1, 78, 225, 1);
+  --color-base-green-200: rgba(235, 254, 246, 1);
+  --color-base-green-300: rgba(180, 233, 197, 1);
+  --color-base-green-500: rgba(106, 200, 131, 1);
+  --color-base-green-600: rgba(53, 162, 79, 1);
+  --color-base-green-700: rgba(0, 122, 28, 1);
+  --color-base-black: rgba(0, 0, 0, 1);
+  --color-base-white: rgba(255, 255, 255, 1);
+  --color-background-blur: rgba(255, 255, 255, 0.800000011920929);
+  --color-background-blur-neutral: rgba(96, 105, 129, 0.800000011920929);
+  --color-foreground-neutral: rgba(0, 0, 0, 1);
+  --color-border-neutral: rgba(230, 232, 239, 1);
+  --color-foreground-neutral-faded: rgba(96, 105, 129, 1);
+  --color-border-focus: rgba(82, 146, 255, 1);
+  --color-border-primary: rgba(1, 78, 225, 1);
+  --color-foreground-primary: rgba(1, 78, 225, 1);
+  --color-foreground-secondary: rgba(135, 76, 230, 1);
+  --color-foreground-positive: rgba(0, 122, 28, 1);
+  --color-foreground-disabled: rgba(198, 204, 219, 1);
+  --color-border-primary-faded: rgba(209, 226, 255, 1);
+  --color-background-neutral: rgba(246, 247, 249, 1);
+  --color-border-positive: rgba(0, 122, 28, 1);
+  --color-border-positive-faded: rgba(180, 233, 197, 1);
+  --color-border-secondary-faded: rgba(217, 200, 245, 1);
+  --color-border-secondary: rgba(135, 76, 230, 1);
+  --color-background-page: rgba(255, 255, 255, 1);
+  --color-background-primary: rgba(1, 78, 225, 1);
+  --color-background-primary-highlighted: rgba(16, 98, 254, 1);
+  --color-background-primary-faded: rgba(236, 245, 255, 1);
+  --color-background-secondary: rgba(135, 76, 230, 1);
+  --color-background-secondary-highlighted: rgba(162, 117, 234, 1);
+  --color-background-secondary-faded: rgba(245, 242, 253, 1);
+  --color-background-positive-highlighted: rgba(53, 162, 79, 1);
+  --color-background-positive-faded: rgba(235, 254, 246, 1);
+  --color-background-positive: rgba(0, 122, 28, 1);
+  --shadow-raised: 0px 1px 3px -1px rgba(20, 23, 31, 0.05999999865889549), 0px 2px 3px -3px rgba(20, 23, 31, 0.1000000014901161);
+  --shadow-raised-2: 0px 1px 3px -1px rgba(20, 23, 31, 0.05999999865889549), 0px 2px 3px -3px rgba(20, 23, 31, 0.1000000014901161);
+  --shadow-overlay: 0px 15px 25px 0px rgba(20, 23, 31, 0.07000000029802322), 0px 5px 10px 0px rgba(20, 23, 31, 0.05000000074505806);
+}
