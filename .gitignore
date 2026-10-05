@@ -11,3 +11,6 @@ docs/.vitepress/cache/
 !exporter/dist/
 exporter/dist/*
 !exporter/dist/index.js
+
+# Local mock/dev export destination (npm run export:mock). Never a CI build input.
+output/
