@@ -5,7 +5,7 @@
   "private": true,
   "main": "dist/index.js",
   "scripts": {
-    "build": "tsup",
+    "build": "tsup && node scripts/validate-package.js",
     "dev": "tsup --watch",
     "mock": "node mock/runner.js",
     "mock:watch": "node mock/runner.js --watch",

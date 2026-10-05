@@ -34,6 +34,9 @@ jobs:
       - name: Build Exporter
         run: npm run build:exporter
 
+      - name: Verify committed exporter bundle
+        run: git diff --exit-code -- exporter/dist/index.js
+
       - name: Run Supernova Exporter
         env:
           SUPERNOVA_API_KEY: ${{ secrets.SUPERNOVA_API_KEY }}

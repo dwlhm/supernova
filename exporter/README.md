@@ -204,3 +204,11 @@ Token export supports colors, dimensions, strings, numbers, booleans, shadows, t
 Catalog names and imported Figma property names are normalized with the shared PascalCase/camelCase utilities; identity joins still use exact IDs. Invalid or colliding normalized identifiers fail with their component context. Component directories must be nonempty safe relative paths; TypeScript Mitosis output supports `.lite.tsx` only.
 
 Token names retain unique leaf names within each category. When leaf names collide, every colliding token uses its full group path to qualify its exported TypeScript key and CSS variable name. Consumers must update imports and CSS references when a new collision changes these names; unresolved qualified-name collisions fail explicitly.
+
+## Installing this exporter in Supernova
+
+Use the exporter subdirectory URL: **https://github.com/dwlhm/supernova/tree/main/exporter**. The whole repository root URL is incorrect for this monorepo because `exporter.json` lives inside `exporter/`. Supernova treats the selected directory as the exporter package root. See [installing exporters](https://developers.supernova.io/latest/exporters/installing-exporters-GT7tr0qA) and [exporter anatomy](https://developers.supernova.io/latest/exporters/building-exporters-101/exporter-anatomy-HvQzZtsO).
+
+Before importer refresh or an exporter version update, run `npm run build:exporter` from the repository root, then commit and push `exporter/dist/index.js` together with the matching sources, `exporter/exporter.json` and `exporter/config.json`. The build validates the package automatically; `npm run validate:exporter-package` runs that check separately. After any exporter source change, rebuild and stage the bundled executable in the same commit; CI rejects a bundle that differs from a fresh build. The compiled executable is an intentional installation artifact; TypeScript sources remain authoritative. Other `dist/` files stay ignored. Validation checks manifest/config presence, safe executable paths, nonempty bundled JavaScript at the expected path; rebuilding is required to keep the committed executable current. Bundling dependencies remains the responsibility of the `noExternal` setting in `exporter/tsup.config.ts`.
+
+Cloud installation has not been verified by the local package validation.

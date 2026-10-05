@@ -6,3 +6,8 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 docs/.vitepress/cache/
+
+# Supernova installs this committed executable; other build outputs stay ignored.
+!exporter/dist/
+exporter/dist/*
+!exporter/dist/index.js

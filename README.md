@@ -220,3 +220,11 @@ npm run build:packages
 MIT © dwlhm
 
 Engineering owns the versioned `mitosisDefinition` Text custom property on Supernova catalog components; designers retain the Figma workflow. The exporter validates that contract, emits Mitosis using typed AST construction, and emits ordinary TypeScript runtime helpers separately. `scripts/generate-components.js` generates all four framework targets and copies runtime helpers. See [exporter architecture and setup](exporter/README.md#component-architecture-and-ownership). Supernova cloud setup remains a prerequisite; local fixtures use the same SDK property shape.
+
+## Installing this exporter in Supernova
+
+Use the exporter subdirectory URL: **https://github.com/dwlhm/supernova/tree/main/exporter**. The whole repository root URL is incorrect for this monorepo because `exporter.json` lives inside `exporter/`. Supernova treats the selected directory as the exporter package root. See [installing exporters](https://developers.supernova.io/latest/exporters/installing-exporters-GT7tr0qA) and [exporter anatomy](https://developers.supernova.io/latest/exporters/building-exporters-101/exporter-anatomy-HvQzZtsO).
+
+Before importer refresh or an exporter version update, run `npm run build:exporter` from the repository root, then commit and push `exporter/dist/index.js` together with the matching sources, `exporter/exporter.json` and `exporter/config.json`. The build validates the package automatically; `npm run validate:exporter-package` runs that check separately. After any exporter source change, rebuild and stage the bundled executable in the same commit; CI rejects a bundle that differs from a fresh build. The compiled executable is an intentional installation artifact; TypeScript sources remain authoritative. Other `dist/` files stay ignored. Validation checks manifest/config presence, safe executable paths, nonempty bundled JavaScript at the expected path; rebuilding is required to keep the committed executable current. Bundling dependencies remains the responsibility of the `noExternal` setting in `exporter/tsup.config.ts`.
+
+Cloud installation has not been verified by the local package validation.

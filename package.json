@@ -24,7 +24,8 @@
     "docs:build": "vitepress build docs",
     "docs:preview": "vitepress preview docs",
     "build:packages": "npm run build --workspaces --if-present",
-    "clean": "node scripts/clean.js"
+    "clean": "node scripts/clean.js",
+    "validate:exporter-package": "node exporter/scripts/validate-package.js"
   },
   "devDependencies": {
     "@builder.io/mitosis": "^0.14.1",
