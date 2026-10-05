@@ -1,6 +1,6 @@
 {
   "name": "@dwlhm/ui-svelte",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Svelte UI components for dwlhm Design System",
   "type": "module",
   "main": "./src/index.ts",
