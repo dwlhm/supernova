@@ -7,6 +7,19 @@ const componentsSourceDir = paths.componentsDir;
 const tokensSourceDir = paths.tokensDir;
 const docsDir = path.join(rootDir, 'docs');
 const docsComponentsDir = path.join(docsDir, 'components');
+const componentsManifestPath = path.join(docsDir, '.vitepress', 'components.generated.json');
+
+function readComponentsManifest() {
+  try {
+    const parsed = JSON.parse(fs.readFileSync(componentsManifestPath, 'utf8'));
+    if (parsed && Array.isArray(parsed.components)) {
+      return parsed;
+    }
+  } catch (e) {
+    // Missing or unparseable manifest: treat as an empty component set.
+  }
+  return { components: [] };
+}
 
 function ensureDir(dir) {
   if (!fs.existsSync(dir)) {
@@ -368,48 +381,73 @@ function parseComponentFile(filePath) {
 }
 
 // 3. Generate docs/index.md
-function generateIndexDoc() {
+function generateIndexDoc(components) {
+  const hasComponents = components.length > 0;
+
+  const heroActions = hasComponents
+    ? `    - theme: brand
+      text: Components Catalog
+      link: /components/
+    - theme: alt
+      text: Design Tokens
+      link: /tokens`
+    : `    - theme: brand
+      text: Design Tokens
+      link: /tokens`;
+
+  const features = hasComponents
+    ? `  - title: Multi-Framework Compilation
+    details: Write once in Mitosis, compile natively to React, Svelte, Vue 3, and Vue 2 with zero runtime overhead.
+  - title: Automated Pipeline
+    details: Webhook-driven export from Supernova cloud directly into monorepo packages and documentation.
+  - title: First-Class TypeScript
+    details: Fully typed props, Tailwind CSS v4 design tokens, and interactive sandbox components.`
+    : `  - title: Automated Pipeline
+    details: Webhook-driven export from Supernova cloud directly into monorepo packages and documentation.
+  - title: Design Tokens
+    details: Every Supernova token exported as CSS variables and typed TypeScript.`;
+
+  const packagesIntro = hasComponents
+    ? 'The Supernova UI ecosystem consists of five synchronized packages:'
+    : 'The Supernova design system is published as a single design-tokens package:';
+
+  const frameworkPackageRows = hasComponents
+    ? `| **\`@dwlhm/ui-react\`** | \`1.0.0\` | React 18 / 19 Native Components | \`npm install @dwlhm/ui-react\` |
+| **\`@dwlhm/ui-svelte\`** | \`1.0.0\` | Svelte 4 / 5 Native Components | \`npm install @dwlhm/ui-svelte\` |
+| **\`@dwlhm/ui-vue\`** | \`1.0.0\` | Vue 3 Native Components (Composition API) | \`npm install @dwlhm/ui-vue\` |
+| **\`@dwlhm/ui-vue2\`** | \`1.0.0\` | Vue 2 Native Components (Webpack 4 Compatible) | \`npm install @dwlhm/ui-vue2\` |
+`
+    : '';
+
+  const tokensSectionNumber = hasComponents ? 5 : 1;
+
   return `---
 layout: home
 
 hero:
   name: "Supernova"
   text: "Design System"
-  tagline: Multi-framework UI components and tokens compiled from Supernova and Mitosis
+  tagline: ${hasComponents ? 'Multi-framework UI components and tokens compiled from Supernova and Mitosis' : 'Design tokens compiled from Supernova.'}
   actions:
-    - theme: brand
-      text: Components Catalog
-      link: /components/
-    - theme: alt
-      text: Design Tokens
-      link: /tokens
+${heroActions}
 
 features:
-  - title: Multi-Framework Compilation
-    details: Write once in Mitosis, compile natively to React, Svelte, Vue 3, and Vue 2 with zero runtime overhead.
-  - title: Automated Pipeline
-    details: Webhook-driven export from Supernova cloud directly into monorepo packages and documentation.
-  - title: First-Class TypeScript
-    details: Fully typed props, Tailwind CSS v4 design tokens, and interactive sandbox components.
+${features}
 ---
 
 ## Packages Overview
 
-The Supernova UI ecosystem consists of five synchronized packages:
+${packagesIntro}
 
 | Package | Version | Ecosystem | Install Command |
 | :--- | :--- | :--- | :--- |
 | **\`@dwlhm/design-tokens\`** | \`1.0.0\` | CSS Variables, Tailwind v4, TS Tokens | \`npm install @dwlhm/design-tokens\` |
-| **\`@dwlhm/ui-react\`** | \`1.0.0\` | React 18 / 19 Native Components | \`npm install @dwlhm/ui-react\` |
-| **\`@dwlhm/ui-svelte\`** | \`1.0.0\` | Svelte 4 / 5 Native Components | \`npm install @dwlhm/ui-svelte\` |
-| **\`@dwlhm/ui-vue\`** | \`1.0.0\` | Vue 3 Native Components (Composition API) | \`npm install @dwlhm/ui-vue\` |
-| **\`@dwlhm/ui-vue2\`** | \`1.0.0\` | Vue 2 Native Components (Webpack 4 Compatible) | \`npm install @dwlhm/ui-vue2\` |
-
+${frameworkPackageRows}
 ---
 
 ## Quick Start
 
-### 1. React Setup
+${hasComponents ? `### 1. React Setup
 
 Install the React component package and tokens:
 
@@ -547,7 +585,7 @@ export default {
 
 ---
 
-### 3. Tokens Only (Framework Agnostic)
+` : ''}### ${tokensSectionNumber}. Tokens Only (Framework Agnostic)
 
 Use design tokens directly in any web project:
 
@@ -786,18 +824,21 @@ export default {
 function run() {
   console.log('--- Generating Documentation ---');
   ensureDir(docsDir);
-  ensureDir(docsComponentsDir);
 
   const tokens = parseTokens();
   console.log('Parsed tokens:', Object.keys(tokens));
 
+  const manifest = readComponentsManifest();
+  const components = [];
+
   // Parse components
-  if (paths.hasComponents) {
+  if (manifest.components.length > 0) {
+    ensureDir(docsComponentsDir);
+
     const componentFiles = fs.readdirSync(componentsSourceDir)
       .filter(file => file.endsWith('.lite.tsx'))
       .sort();
 
-    const components = [];
     for (const file of componentFiles) {
       const fullPath = path.join(componentsSourceDir, file);
       const comp = parseComponentFile(fullPath);
@@ -815,12 +856,25 @@ function run() {
     const catalogDoc = generateComponentsCatalogDoc(components);
     fs.writeFileSync(path.join(docsComponentsDir, 'index.md'), catalogDoc, 'utf8');
     console.log('Generated docs/components/index.md');
+
+    // Prune orphan component pages no longer present in the manifest.
+    const validSlugs = new Set(manifest.components.map((c) => c.slug));
+    for (const entry of fs.readdirSync(docsComponentsDir)) {
+      if (!entry.endsWith('.md') || entry === 'index.md') continue;
+      const slug = entry.slice(0, -'.md'.length);
+      if (validSlugs.has(slug)) continue;
+      fs.rmSync(path.join(docsComponentsDir, entry));
+      console.log(`Pruned orphan component page: docs/components/${entry}`);
+    }
   } else {
-    console.warn('[generate-docs] WARNING: components artifact not found at ' + componentsSourceDir + '; leaving docs/components/* as-is.');
+    if (fs.existsSync(docsComponentsDir)) {
+      fs.rmSync(docsComponentsDir, { recursive: true, force: true });
+    }
+    console.warn('[generate-docs] WARNING: no components in the manifest; removed docs/components/ so no stale component pages are published.');
   }
 
   // Write docs/index.md
-  const indexDoc = generateIndexDoc();
+  const indexDoc = generateIndexDoc(components);
   fs.writeFileSync(path.join(docsDir, 'index.md'), indexDoc, 'utf8');
   console.log('Generated docs/index.md');
 
