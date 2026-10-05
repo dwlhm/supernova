@@ -182,7 +182,17 @@ export const tokens = {
   "shadows": {
     "shadowRaised": "0px 1px 3px -1px rgba(20, 23, 31, 0.05999999865889549), 0px 2px 3px -3px rgba(20, 23, 31, 0.1000000014901161)",
     "shadowRaised2": "0px 1px 3px -1px rgba(20, 23, 31, 0.05999999865889549), 0px 2px 3px -3px rgba(20, 23, 31, 0.1000000014901161)",
-    "overlay": "0px 15px 25px 0px rgba(20, 23, 31, 0.07000000029802322), 0px 5px 10px 0px rgba(20, 23, 31, 0.05000000074505806)"
+    "overlay": "0px 15px 25px 0px rgba(20, 23, 31, 0.07000000029802322), 0px 5px 10px 0px rgba(20, 23, 31, 0.05000000074505806)",
+    "2xs": "0px 1px 0px 0px rgba(0, 0, 0, 0.05000000074505806)",
+    "xs": "0px 1px 2px 0px rgba(0, 0, 0, 0.05000000074505806)",
+    "sm": "0px 1px 3px 0px rgba(0, 0, 0, 0.1000000014901161), 0px 1px 2px -1px rgba(0, 0, 0, 0.1000000014901161)",
+    "md": "0px 4px 6px -1px rgba(0, 0, 0, 0.1000000014901161), 0px 2px 4px -2px rgba(0, 0, 0, 0.1000000014901161)",
+    "lg": "0px 10px 15px -3px rgba(0, 0, 0, 0.1000000014901161), 0px 4px 6px -4px rgba(0, 0, 0, 0.1000000014901161)",
+    "xl": "0px 20px 25px -5px rgba(0, 0, 0, 0.1000000014901161), 0px 8px 10px -6px rgba(0, 0, 0, 0.1000000014901161)",
+    "2xl": "0px 25px 50px 12px rgba(0, 0, 0, 0.25)",
+    "primary": "0px 0px 0px 3px rgba(255, 176, 136, 1)",
+    "default": "0px 0px 0px 3px rgba(212, 212, 212, 1)",
+    "error": "0px 0px 0px 3px rgba(253, 164, 175, 1)"
   },
   "typography": {
     "body1": {
@@ -199,21 +209,21 @@ export const tokens = {
       "lineHeight": "20px",
       "letterSpacing": "0px"
     },
-    "heading1": {
+    "typographyHeadingHeading1": {
       "fontFamily": "Inter",
       "fontSize": "36px",
       "fontWeight": "600",
       "lineHeight": "44px",
       "letterSpacing": "0px"
     },
-    "heading2": {
+    "typographyHeadingHeading2": {
       "fontFamily": "Inter",
       "fontSize": "28px",
       "fontWeight": "600",
       "lineHeight": "36px",
       "letterSpacing": "0px"
     },
-    "heading3": {
+    "typographyHeadingHeading3": {
       "fontFamily": "Inter",
       "fontSize": "18px",
       "fontWeight": "600",
@@ -225,6 +235,118 @@ export const tokens = {
       "fontSize": "12px",
       "fontWeight": "400",
       "lineHeight": "16px",
+      "letterSpacing": "0px"
+    },
+    "typographyHeading1": {
+      "fontFamily": "Plus Jakarta Sans",
+      "fontSize": "48px",
+      "fontWeight": "600",
+      "lineHeight": "48px",
+      "letterSpacing": "-1.5px"
+    },
+    "typographyHeading2": {
+      "fontFamily": "Plus Jakarta Sans",
+      "fontSize": "30px",
+      "fontWeight": "600",
+      "lineHeight": "30px",
+      "letterSpacing": "-1px"
+    },
+    "typographyHeading3": {
+      "fontFamily": "Plus Jakarta Sans",
+      "fontSize": "24px",
+      "fontWeight": "600",
+      "lineHeight": "28.8px",
+      "letterSpacing": "-1px"
+    },
+    "heading4": {
+      "fontFamily": "Plus Jakarta Sans",
+      "fontSize": "20px",
+      "fontWeight": "600",
+      "lineHeight": "24px",
+      "letterSpacing": "0px"
+    },
+    "typographyTitleRegular": {
+      "fontFamily": "Plus Jakarta Sans",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "lineHeight": "24px",
+      "letterSpacing": "0px"
+    },
+    "typographyTitleMedium": {
+      "fontFamily": "Plus Jakarta Sans",
+      "fontSize": "16px",
+      "fontWeight": "500",
+      "lineHeight": "24px",
+      "letterSpacing": "0px"
+    },
+    "typographyTitleBold": {
+      "fontFamily": "Plus Jakarta Sans",
+      "fontSize": "16px",
+      "fontWeight": "600",
+      "lineHeight": "24px",
+      "letterSpacing": "0px"
+    },
+    "typographyBodyRegular": {
+      "fontFamily": "Plus Jakarta Sans",
+      "fontSize": "14px",
+      "fontWeight": "400",
+      "lineHeight": "21px",
+      "letterSpacing": "0px"
+    },
+    "typographyBodyMedium": {
+      "fontFamily": "Plus Jakarta Sans",
+      "fontSize": "14px",
+      "fontWeight": "500",
+      "lineHeight": "21px",
+      "letterSpacing": "0px"
+    },
+    "typographyBodyBold": {
+      "fontFamily": "Plus Jakarta Sans",
+      "fontSize": "14px",
+      "fontWeight": "600",
+      "lineHeight": "21px",
+      "letterSpacing": "0px"
+    },
+    "typographyCaptionRegular": {
+      "fontFamily": "Plus Jakarta Sans",
+      "fontSize": "12px",
+      "fontWeight": "400",
+      "lineHeight": "16px",
+      "letterSpacing": "0px"
+    },
+    "typographyCaptionMedium": {
+      "fontFamily": "Plus Jakarta Sans",
+      "fontSize": "12px",
+      "fontWeight": "500",
+      "lineHeight": "16px",
+      "letterSpacing": "0px"
+    },
+    "typographyCaptionBold": {
+      "fontFamily": "Plus Jakarta Sans",
+      "fontSize": "12px",
+      "fontWeight": "600",
+      "lineHeight": "16px",
+      "letterSpacing": "0px"
+    },
+    "typographyLabelRegular": {
+      "fontFamily": "Plus Jakarta Sans",
+      "fontSize": "11px",
+      "fontWeight": "400",
+      "lineHeight": "14px",
+      "letterSpacing": "0px"
+    },
+    "typographyLabelMedium": {
+      "fontFamily": "Plus Jakarta Sans",
+      "fontSize": "11px",
+      "fontWeight": "500",
+      "lineHeight": "14px",
+      "letterSpacing": "0px"
+    },
+    "typographyLabelBold": {
+      "fontFamily": "Plus Jakarta Sans",
+      "fontSize": "11px",
+      "fontWeight": "600",
+      "lineHeight": "14px",
       "letterSpacing": "0px"
     }
   },
