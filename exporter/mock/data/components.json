@@ -1,0 +1,556 @@
+[
+  {
+    "id": "comp-button",
+    "name": "Button",
+    "description": "Interactive button component",
+    "properties": [
+      {
+        "id": "prop-btn-variant",
+        "name": "variant",
+        "codeName": "variant",
+        "type": "Variant",
+        "options": [
+          "primary",
+          "secondary",
+          "outline",
+          "ghost",
+          "danger"
+        ],
+        "defaultValue": "primary"
+      },
+      {
+        "id": "prop-btn-size",
+        "name": "size",
+        "codeName": "size",
+        "type": "Variant",
+        "options": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "defaultValue": "md"
+      },
+      {
+        "id": "prop-btn-disabled",
+        "name": "disabled",
+        "codeName": "disabled",
+        "type": "Boolean",
+        "defaultValue": false
+      },
+      {
+        "id": "prop-btn-fullwidth",
+        "name": "fullWidth",
+        "codeName": "fullWidth",
+        "type": "Boolean",
+        "defaultValue": false
+      },
+      {
+        "id": "prop-btn-type",
+        "name": "type",
+        "codeName": "type",
+        "type": "Select",
+        "options": [
+          "button",
+          "submit",
+          "reset"
+        ],
+        "defaultValue": "button"
+      }
+    ],
+    "behaviors": {
+      "clickable": true,
+      "disabled": true,
+      "inputable": "none",
+      "variantStyles": {
+        "size": {
+          "sm": "px-3 py-1.5 text-xs rounded-sm gap-1.5",
+          "lg": "px-6 py-3 text-base rounded-lg gap-2.5",
+          "md": "px-4 py-2 text-sm rounded-md gap-2"
+        },
+        "variant": {
+          "secondary": "bg-slate-100 text-slate-900 hover:bg-slate-200 border-slate-300 dark:bg-slate-800 dark:text-slate-100",
+          "outline": "bg-transparent text-blue-600 border-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950/30",
+          "ghost": "bg-transparent text-blue-600 border-transparent hover:bg-blue-50 dark:hover:bg-blue-950/30",
+          "danger": "bg-red-600 text-white hover:bg-red-700 border-transparent",
+          "primary": "bg-blue-600 text-white hover:bg-blue-700 border-transparent"
+        }
+      }
+    },
+    "root": {
+      "tag": "button",
+      "className": "inline-flex items-center justify-center font-medium transition-colors duration-150 border focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:opacity-60 disabled:cursor-not-allowed",
+      "dynamicClasses": [
+        "${props.fullWidth ? 'w-full' : 'w-auto'}",
+        {
+          "kind": "state",
+          "name": "sizeClass"
+        },
+        {
+          "kind": "state",
+          "name": "variantClass"
+        }
+      ],
+      "attributes": {
+        "type": "{props.type || 'button'}",
+        "disabled": {
+          "kind": "prop",
+          "name": "disabled"
+        }
+      },
+      "childrenSlot": true
+    }
+  },
+  {
+    "id": "comp-card",
+    "name": "Card",
+    "description": "Card container component with header and body",
+    "properties": [
+      {
+        "id": "prop-card-title",
+        "name": "title",
+        "codeName": "title",
+        "type": "Text",
+        "defaultValue": ""
+      },
+      {
+        "id": "prop-card-subtitle",
+        "name": "subtitle",
+        "codeName": "subtitle",
+        "type": "Text",
+        "defaultValue": ""
+      },
+      {
+        "id": "prop-card-padding",
+        "name": "padding",
+        "codeName": "padding",
+        "type": "Variant",
+        "options": [
+          "none",
+          "sm",
+          "md",
+          "lg"
+        ],
+        "defaultValue": "md"
+      },
+      {
+        "id": "prop-card-shadow",
+        "name": "shadow",
+        "codeName": "shadow",
+        "type": "Variant",
+        "options": [
+          "none",
+          "sm",
+          "md",
+          "lg"
+        ],
+        "defaultValue": "md"
+      },
+      {
+        "id": "prop-card-bordered",
+        "name": "bordered",
+        "codeName": "bordered",
+        "type": "Boolean",
+        "defaultValue": false
+      },
+      {
+        "id": "prop-card-testid",
+        "name": "testId",
+        "codeName": "testId",
+        "type": "Text",
+        "isCustomAttribute": true
+      }
+    ],
+    "behaviors": {
+      "clickable": true,
+      "inputable": "none",
+      "variantStyles": {
+        "padding": {
+          "none": "p-0",
+          "sm": "p-3",
+          "lg": "p-6",
+          "md": "p-4"
+        },
+        "shadow": {
+          "none": "shadow-none",
+          "sm": "shadow-sm",
+          "lg": "shadow-lg",
+          "md": "shadow-md"
+        }
+      }
+    },
+    "root": {
+      "tag": "div",
+      "className": "bg-white rounded-lg overflow-hidden transition-shadow duration-150",
+      "dynamicClasses": [
+        "${props.bordered ? 'border border-slate-200' : 'border-0'}",
+        {
+          "kind": "state",
+          "name": "shadowClass"
+        },
+        {
+          "kind": "state",
+          "name": "paddingClass"
+        },
+        "${props.onClick ? 'cursor-pointer hover:shadow-lg' : ''}"
+      ],
+      "attributes": {
+        "data-testid": {
+          "kind": "prop",
+          "name": "testId"
+        }
+      },
+      "children": [
+        {
+          "role": "container",
+          "condition": {
+            "kind": "prop",
+            "name": "title"
+          },
+          "className": "{props.subtitle ? 'mb-1' : 'mb-3'}",
+          "children": [
+            {
+              "tag": "h3",
+              "role": "text",
+              "className": "m-0 text-lg font-semibold text-slate-900 leading-snug",
+              "content": "{props.title}"
+            }
+          ]
+        },
+        {
+          "role": "container",
+          "condition": {
+            "kind": "prop",
+            "name": "subtitle"
+          },
+          "className": "mb-3",
+          "children": [
+            {
+              "tag": "p",
+              "role": "text",
+              "className": "m-0 text-sm text-slate-500 leading-relaxed",
+              "content": "{props.subtitle}"
+            }
+          ]
+        }
+      ],
+      "childrenSlot": true
+    }
+  },
+  {
+    "id": "comp-status-badge",
+    "name": "StatusBadge",
+    "description": "Multi-element status badge with icon and label",
+    "properties": [
+      {
+        "id": "prop-sb-icon",
+        "name": "icon",
+        "codeName": "icon",
+        "type": "InstanceSwap",
+        "defaultValue": ""
+      },
+      {
+        "id": "prop-sb-text",
+        "name": "text",
+        "codeName": "text",
+        "type": "Text",
+        "defaultValue": ""
+      },
+      {
+        "id": "prop-sb-variant",
+        "name": "variant",
+        "codeName": "variant",
+        "type": "Variant",
+        "options": [
+          "success",
+          "warning",
+          "danger",
+          "info"
+        ],
+        "defaultValue": "success"
+      },
+      {
+        "id": "prop-sb-testid",
+        "name": "testId",
+        "codeName": "testId",
+        "type": "Text",
+        "isCustomAttribute": true
+      }
+    ],
+    "behaviors": {
+      "clickable": true,
+      "inputable": "none",
+      "variantStyles": {
+        "variant": {
+          "warning": "bg-amber-100 text-amber-800 border-amber-300",
+          "danger": "bg-red-100 text-red-800 border-red-300",
+          "info": "bg-blue-100 text-blue-800 border-blue-300",
+          "success": "bg-green-100 text-green-800 border-green-300"
+        }
+      }
+    },
+    "root": {
+      "tag": "div",
+      "role": "container",
+      "className": "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-xs font-medium",
+      "dynamicClasses": [
+        {
+          "kind": "state",
+          "name": "variantClass"
+        },
+        "${props.onClick ? 'cursor-pointer hover:opacity-90' : ''}"
+      ],
+      "attributes": {
+        "data-testid": {
+          "kind": "prop",
+          "name": "testId"
+        }
+      },
+      "children": [
+        {
+          "tag": "p",
+          "role": "icon",
+          "condition": {
+            "kind": "prop",
+            "name": "icon"
+          },
+          "className": "m-0 leading-none",
+          "content": "{props.icon}"
+        },
+        {
+          "tag": "p",
+          "role": "text",
+          "condition": {
+            "kind": "prop",
+            "name": "text"
+          },
+          "className": "m-0 leading-none",
+          "content": "{props.text}"
+        }
+      ],
+      "childrenSlot": true
+    }
+  },
+  {
+    "id": "comp-badge",
+    "name": "Badge",
+    "description": "Compact status badge",
+    "properties": [
+      {
+        "id": "prop-badge-variant",
+        "name": "variant",
+        "codeName": "variant",
+        "type": "Variant",
+        "options": [
+          "primary",
+          "secondary",
+          "success",
+          "warning",
+          "danger",
+          "outline"
+        ],
+        "defaultValue": "primary"
+      },
+      {
+        "id": "prop-badge-size",
+        "name": "size",
+        "codeName": "size",
+        "type": "Variant",
+        "options": [
+          "sm",
+          "md"
+        ],
+        "defaultValue": "md"
+      },
+      {
+        "id": "prop-badge-rounded",
+        "name": "rounded",
+        "codeName": "rounded",
+        "type": "Boolean",
+        "defaultValue": false
+      }
+    ],
+    "behaviors": {
+      "inputable": "none",
+      "variantStyles": {
+        "size": {
+          "sm": "px-1.5 py-0.5 text-[11px]",
+          "md": "px-2 py-0.5 text-xs"
+        },
+        "variant": {
+          "secondary": "bg-slate-100 text-slate-700 border-transparent",
+          "success": "bg-green-100 text-green-700 border-transparent",
+          "warning": "bg-amber-100 text-amber-800 border-transparent",
+          "danger": "bg-red-100 text-red-700 border-transparent",
+          "outline": "bg-transparent text-slate-700 border-slate-300",
+          "primary": "bg-blue-100 text-blue-700 border-transparent"
+        }
+      }
+    },
+    "root": {
+      "tag": "span",
+      "className": "inline-flex items-center justify-center font-semibold leading-none border",
+      "dynamicClasses": [
+        "${props.rounded ? 'rounded-full' : 'rounded'}",
+        {
+          "kind": "state",
+          "name": "sizeClass"
+        },
+        {
+          "kind": "state",
+          "name": "variantClass"
+        }
+      ],
+      "childrenSlot": true
+    }
+  },
+  {
+    "id": "comp-input",
+    "name": "Input",
+    "description": "Form input field with label and helper text",
+    "properties": [],
+    "behaviors": {
+      "inputable": "text",
+      "disabled": true
+    },
+    "root": {
+      "tag": "div",
+      "className": "flex flex-col gap-1 w-full",
+      "childrenSlot": false,
+      "children": [
+        {
+          "tag": "label",
+          "condition": {
+            "kind": "prop",
+            "name": "label"
+          },
+          "className": "text-xs font-medium text-slate-700",
+          "content": "{props.label}{props.required && <span className=\"text-red-500 ml-0.5\">*</span>}"
+        },
+        {
+          "tag": "input",
+          "className": "w-full px-3 py-2 text-sm rounded-md border outline-none transition-colors duration-150 box-border disabled:bg-slate-50 disabled:text-slate-400 disabled:cursor-not-allowed",
+          "dynamicClasses": [
+            "${props.error ? 'border-red-500 focus:border-red-500 focus:ring-1 focus:ring-red-500' : 'border-slate-300 focus:border-blue-600 focus:ring-1 focus:ring-blue-600'}"
+          ]
+        },
+        {
+          "tag": "span",
+          "condition": {
+            "kind": "prop",
+            "name": "error"
+          },
+          "className": "text-xs text-red-600",
+          "content": "{props.error}"
+        },
+        {
+          "tag": "span",
+          "condition": "!props.error && props.helperText",
+          "className": "text-xs text-slate-500",
+          "content": "{props.helperText}"
+        }
+      ]
+    }
+  },
+  {
+    "id": "comp-typography",
+    "name": "Typography",
+    "description": "Universal typography text component",
+    "properties": [
+      {
+        "id": "prop-typo-variant",
+        "name": "variant",
+        "codeName": "variant",
+        "type": "Variant",
+        "options": [
+          "h1",
+          "h2",
+          "h3",
+          "h4",
+          "h5",
+          "h6",
+          "body",
+          "body-sm",
+          "caption"
+        ],
+        "defaultValue": "body"
+      },
+      {
+        "id": "prop-typo-col",
+        "name": "color",
+        "codeName": "color",
+        "type": "Text"
+      },
+      {
+        "id": "prop-typo-align",
+        "name": "align",
+        "codeName": "align",
+        "type": "Variant",
+        "options": [
+          "left",
+          "center",
+          "right"
+        ],
+        "defaultValue": "left"
+      },
+      {
+        "id": "prop-typo-weight",
+        "name": "weight",
+        "codeName": "weight",
+        "type": "Variant",
+        "options": [
+          "normal",
+          "medium",
+          "semibold",
+          "bold"
+        ]
+      }
+    ],
+    "behaviors": {
+      "inputable": "none",
+      "variantStyles": {
+        "variant": {
+          "h1": "text-4xl font-bold tracking-tight",
+          "h2": "text-3xl font-semibold tracking-tight",
+          "h3": "text-2xl font-semibold",
+          "h4": "text-xl font-semibold",
+          "h5": "text-lg font-semibold",
+          "h6": "text-base font-semibold",
+          "body-sm": "text-xs leading-normal",
+          "caption": "text-[11px] leading-tight text-slate-500",
+          "body": "text-sm leading-relaxed"
+        },
+        "align": {
+          "center": "text-center",
+          "right": "text-right",
+          "left": "text-left"
+        },
+        "weight": {
+          "bold": "font-bold",
+          "semibold": "font-semibold",
+          "medium": "font-medium",
+          "normal": "font-normal"
+        }
+      }
+    },
+    "root": {
+      "tag": "div",
+      "className": "m-0 text-slate-900",
+      "dynamicClasses": [
+        {
+          "kind": "state",
+          "name": "variantClass"
+        },
+        {
+          "kind": "state",
+          "name": "alignClass"
+        },
+        {
+          "kind": "state",
+          "name": "weightClass"
+        },
+        "${props.color || ''}"
+      ],
+      "childrenSlot": true
+    }
+  }
+]

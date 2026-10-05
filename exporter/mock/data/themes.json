@@ -1,0 +1,85 @@
+[
+  {
+    "id": "theme-light",
+    "name": "Light Theme",
+    "isDefault": true,
+    "overrides": {}
+  },
+  {
+    "id": "theme-dark",
+    "name": "Dark Theme",
+    "isDefault": false,
+    "overrides": {
+      "token-color-bg-page": {
+        "hex": "#0f172a",
+        "r": 15,
+        "g": 23,
+        "b": 42,
+        "a": 1
+      },
+      "token-color-bg-neutral": {
+        "hex": "#1e293b",
+        "r": 30,
+        "g": 41,
+        "b": 59,
+        "a": 1
+      },
+      "token-color-bg-secondary": {
+        "hex": "#334155",
+        "r": 51,
+        "g": 65,
+        "b": 85,
+        "a": 1
+      },
+      "token-color-bg-secondary-highlighted": {
+        "hex": "#475569",
+        "r": 71,
+        "g": 85,
+        "b": 105,
+        "a": 1
+      },
+      "token-color-fg-primary": {
+        "hex": "#ffffff",
+        "r": 255,
+        "g": 255,
+        "b": 255,
+        "a": 1
+      },
+      "token-color-fg-secondary": {
+        "hex": "#94a3b8",
+        "r": 148,
+        "g": 163,
+        "b": 184,
+        "a": 1
+      },
+      "token-color-fg-neutral": {
+        "hex": "#f8fafc",
+        "r": 248,
+        "g": 250,
+        "b": 252,
+        "a": 1
+      },
+      "token-color-fg-neutral-faded": {
+        "hex": "#cbd5e1",
+        "r": 203,
+        "g": 213,
+        "b": 225,
+        "a": 1
+      },
+      "token-color-border-secondary": {
+        "hex": "#334155",
+        "r": 51,
+        "g": 65,
+        "b": 85,
+        "a": 1
+      },
+      "token-color-border-neutral": {
+        "hex": "#475569",
+        "r": 71,
+        "g": 85,
+        "b": 105,
+        "a": 1
+      }
+    }
+  }
+]

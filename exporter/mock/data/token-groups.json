@@ -1,0 +1,72 @@
+[
+  {
+    "id": "group-color",
+    "name": "color",
+    "parentGroupId": null
+  },
+  {
+    "id": "group-color-base",
+    "name": "base",
+    "parentGroupId": "group-color"
+  },
+  {
+    "id": "group-color-base-gray",
+    "name": "gray",
+    "parentGroupId": "group-color-base"
+  },
+  {
+    "id": "group-color-base-blue",
+    "name": "blue",
+    "parentGroupId": "group-color-base"
+  },
+  {
+    "id": "group-color-base-green",
+    "name": "green",
+    "parentGroupId": "group-color-base"
+  },
+  {
+    "id": "group-color-base-purple",
+    "name": "purple",
+    "parentGroupId": "group-color-base"
+  },
+  {
+    "id": "group-color-background",
+    "name": "background",
+    "parentGroupId": "group-color"
+  },
+  {
+    "id": "group-color-foreground",
+    "name": "foreground",
+    "parentGroupId": "group-color"
+  },
+  {
+    "id": "group-color-border",
+    "name": "border",
+    "parentGroupId": "group-color"
+  },
+  {
+    "id": "group-typography",
+    "name": "typography",
+    "parentGroupId": null
+  },
+  {
+    "id": "group-spacing",
+    "name": "spacing",
+    "parentGroupId": null
+  },
+  {
+    "id": "group-radii",
+    "name": "radii",
+    "parentGroupId": null
+  },
+  {
+    "id": "group-shadows",
+    "name": "shadows",
+    "parentGroupId": null
+  },
+  {
+    "id": "group-borders",
+    "name": "border",
+    "parentGroupId": null
+  }
+]

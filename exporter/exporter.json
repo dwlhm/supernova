@@ -1,0 +1,14 @@
+{
+  "id": "io.dwlhm.exporter-mitosis",
+  "name": "Mitosis",
+  "description": "Export your design system tokens and components into universal Mitosis JS (.lite.tsx) components and theme tokens",
+  "author": "dwlhm",
+  "organization": "dwlhm",
+  "homepage": "https://github.com/dwlhm",
+  "version": "1.0.0",
+  "usesBrands": false,
+  "usesThemes": true,
+  "executable": "dist/index.js",
+  "engine": "latest",
+  "tags": ["Mitosis", "Tokens", "Components", "React", "Vue", "Svelte"]
+}

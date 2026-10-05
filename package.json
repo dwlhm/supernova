@@ -1,0 +1,42 @@
+{
+  "name": "supernova-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Monorepo for Supernova Custom Exporters and tooling",
+  "workspaces": [
+    "exporter",
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "npm run build --workspace=exporter",
+    "dev": "npm run dev --workspace=exporter",
+    "build:exporter": "npm run build --workspace=exporter",
+    "export:mock": "node exporter/mock/runner.js",
+    "dev:mock": "node exporter/mock/runner.js --watch",
+    "export:mock:dark": "node exporter/mock/runner.js --theme theme-dark",
+    "test:exporter": "node exporter/mock/test.js",
+    "generate": "npm run generate:tokens && npm run generate:components && npm run generate:docs",
+    "generate:mock": "npm run export:mock && npm run generate",
+    "generate:tokens": "node scripts/sync-tokens.js",
+    "generate:components": "node scripts/generate-components.js",
+    "generate:docs": "node scripts/generate-docs.js",
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs",
+    "build:packages": "npm run build --workspaces --if-present",
+    "clean": "node scripts/clean.js"
+  },
+  "devDependencies": {
+    "@builder.io/mitosis": "^0.14.1",
+    "@builder.io/mitosis-cli": "^0.14.1",
+    "vitepress": "^1.5.0"
+  },
+  "keywords": [
+    "supernova",
+    "mitosis",
+    "exporter",
+    "design-tokens"
+  ],
+  "author": "dwlhm",
+  "license": "MIT"
+}

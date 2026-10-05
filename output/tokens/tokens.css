@@ -1,0 +1,72 @@
+/**
+ * This file was generated automatically by Supernova Mitosis Exporter. Do not edit directly.
+ */
+
+:root {
+  --color-base-black: #000000;
+  --color-base-white: #ffffff;
+  --color-base-gray-200: #e5e7eb;
+  --color-base-gray-300: #d1d5db;
+  --color-base-gray-500: #6b7280;
+  --color-base-gray-600: #4b5563;
+  --color-base-gray-700: #374151;
+  --color-base-blue-200: #bfdbfe;
+  --color-base-blue-300: #93c5fd;
+  --color-base-blue-500: #3b82f6;
+  --color-base-blue-600: #2563eb;
+  --color-base-blue-700: #1d4ed8;
+  --color-base-purple-200: #e9d5ff;
+  --color-base-purple-300: #d8b4fe;
+  --color-base-purple-500: #a855f7;
+  --color-base-purple-600: #9333ea;
+  --color-base-purple-700: #7e22ce;
+  --color-base-green-200: #bbf7d0;
+  --color-base-green-300: #86efac;
+  --color-base-green-500: #22c55e;
+  --color-base-green-600: #16a34a;
+  --color-base-green-700: #15803d;
+  --color-background-page: #ffffff;
+  --color-background-neutral: #f9fafb;
+  --color-background-primary: #2563eb;
+  --color-background-primary-highlighted: #1d4ed8;
+  --color-background-primary-faded: #dbeafe;
+  --color-background-secondary: #f3f4f6;
+  --color-background-secondary-highlighted: #e5e7eb;
+  --color-background-blur: rgba(255, 255, 255, 0.8);
+  --color-background-blur-neutral: rgba(243, 244, 246, 0.8);
+  --color-foreground-primary: #ffffff;
+  --color-foreground-secondary: #4b5563;
+  --color-foreground-neutral: #111827;
+  --color-foreground-neutral-faded: #6b7280;
+  --color-foreground-positive: #16a34a;
+  --color-foreground-disabled: #9ca3af;
+  --color-border-primary: #2563eb;
+  --color-border-primary-faded: rgba(147, 197, 253, 0.5);
+  --color-border-secondary: #e5e7eb;
+  --color-border-secondary-faded: rgba(243, 244, 246, 0.6);
+  --color-border-neutral: #d1d5db;
+  --color-border-focus: #3b82f6;
+  --color-border-positive: #22c55e;
+  --color-border-positive-faded: rgba(134, 239, 172, 0.5);
+  --typography-heading1: 600 36px/44px Inter;
+  --typography-heading2: 600 28px/36px Inter;
+  --typography-heading3: 600 18px/28px Inter;
+  --typography-body1: 400 16px/24px Inter;
+  --typography-body2: 500 14px/20px Inter;
+  --typography-body3: 400 12px/16px Inter;
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-2xl: 48px;
+  --radii-none: 0px;
+  --radii-sm: 4px;
+  --radii-md: 8px;
+  --radii-lg: 16px;
+  --radii-full: 9999px;
+  --shadows-raised: 0px 1px 3px -1px rgba(0, 0, 0, 0.1), 0px 2px 3px -3px rgba(0, 0, 0, 0.1);
+  --shadows-overlay: 0px 15px 25px 0px rgba(0, 0, 0, 0.15), 0px 5px 10px 0px rgba(0, 0, 0, 0.1);
+  --border-subtle: 1px solid #e5e7eb;
+  --border-focus: 2px solid #2563eb;
+}

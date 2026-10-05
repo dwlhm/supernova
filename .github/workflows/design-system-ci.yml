@@ -1,0 +1,93 @@
+name: Sync Design System & Build Packages
+
+on:
+  repository_dispatch:
+    types: [supernova-release] # Dipicu via webhook Supernova saat ada rilis versi baru
+  workflow_dispatch:           # Manual trigger via tombol di GitHub Actions tab
+
+jobs:
+  build-and-test:
+    name: Sync, Generate, and Build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+      id-token: write
+      pages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Install Supernova CLI
+        run: npm install -g @supernovaio/cli
+
+      - name: Build Exporter
+        run: npm run build:exporter
+
+      - name: Run Supernova Exporter
+        env:
+          SUPERNOVA_API_KEY: ${{ secrets.SUPERNOVA_API_KEY }}
+          SUPERNOVA_DESIGN_SYSTEM_ID: ${{ secrets.SUPERNOVA_DESIGN_SYSTEM_ID }}
+        run: |
+          supernova run-local-exporter \
+            --apiKey="$SUPERNOVA_API_KEY" \
+            --designSystemId="$SUPERNOVA_DESIGN_SYSTEM_ID" \
+            --exporterDir="./exporter" \
+            --outputDir="./output"
+
+      - name: Generate Components & Sync Tokens
+        run: npm run generate
+
+      - name: Build Packages (React, Svelte, Tokens)
+        run: npm run build:packages
+
+      - name: Build Documentation Site
+        run: npm run docs:build
+
+      - name: Automated Version Bump & Git Commit
+        id: versioning
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Naikkan patch version otomatis untuk seluruh packages
+          npm version patch --workspaces --no-git-tag-version
+
+          NEW_VERSION=$(node -p "require('./packages/tokens/package.json').version")
+          echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_OUTPUT
+
+          git add output/ packages/ docs/
+          git commit -m "chore(release): update design system artifacts v$NEW_VERSION [skip ci]" || echo "No changes to commit"
+          git tag "v$NEW_VERSION"
+          git push origin main --tags
+
+      - name: Upload Docs Artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs/.vitepress/dist
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+      # =========================================================================
+      # FLOW PUBLISH KE NPM (DINONAKTIFKAN SEMENTARA - DIKOMENTAR DULU)
+      # =========================================================================
+      # Uncomment blok di bawah ini saat sudah siap mem-publish package ke NPM:
+      #
+      # - name: Publish to NPM Registry
+      #   env:
+      #     NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      #   run: |
+      #     npm publish --workspaces --access public
+      # =========================================================================

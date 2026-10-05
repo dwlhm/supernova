@@ -1,0 +1,72 @@
+[
+  {
+    "key": "exportTokens",
+    "type": "boolean",
+    "default": true,
+    "title": "Export Tokens",
+    "description": "Whether to export design tokens as Mitosis theme and CSS variables."
+  },
+  {
+    "key": "exportComponents",
+    "type": "boolean",
+    "default": true,
+    "title": "Export Components",
+    "description": "Whether to export components into Mitosis universal JSX (.lite.tsx) files."
+  },
+  {
+    "key": "componentExtension",
+    "type": "string",
+    "default": ".lite.tsx",
+    "title": "Component File Extension",
+    "description": "File extension for generated Mitosis components (.lite.tsx only)."
+  },
+  {
+    "key": "useCssVariables",
+    "type": "boolean",
+    "default": true,
+    "title": "Use CSS Variables",
+    "description": "Generate tokens.css file with CSS Custom Properties for style integration."
+  },
+  {
+    "key": "generateIndexFile",
+    "type": "boolean",
+    "default": true,
+    "title": "Generate Index File",
+    "description": "Generate a root index.ts barrel exporting all components and tokens."
+  },
+  {
+    "key": "showDisclaimer",
+    "type": "boolean",
+    "default": true,
+    "title": "Show Disclaimer",
+    "description": "Add an automated generation warning banner to the top of every generated file."
+  },
+  {
+    "key": "disclaimerText",
+    "type": "string",
+    "default": "This file was generated automatically by Supernova Mitosis Exporter. Do not edit directly.",
+    "title": "Disclaimer Text",
+    "description": "Custom text for the file disclaimer."
+  },
+  {
+    "key": "tokensDir",
+    "type": "string",
+    "default": "tokens",
+    "title": "Tokens Directory",
+    "description": "Directory relative to export destination where tokens will be written."
+  },
+  {
+    "key": "componentsDir",
+    "type": "string",
+    "default": "components",
+    "title": "Components Directory",
+    "description": "Directory relative to export destination where Mitosis components will be written."
+  },
+  {
+    "key": "indent",
+    "type": "number",
+    "default": 2,
+    "title": "Token Indentation Spaces",
+    "description": "Spaces for token JSON and CSS indentation. Mitosis components use the TypeScript AST printer standard four-space formatting."
+  }
+]
