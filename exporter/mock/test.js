@@ -147,6 +147,37 @@ async function runTests() {
     console.log('  ✓ Bundle loaded and exported 11 artifacts without reading filename globals\n');
   }
 
+  // Test 6: duplicate token names are disambiguated, not fatal
+  console.log('Test 6: Duplicate token names are disambiguated and reported');
+  const duplicatePackageRoot = path.resolve(__dirname, '../..');
+  const duplicateOutDir = fs.mkdtempSync(path.join(os.tmpdir(), 'supernova-mock-dup-out-'));
+  const duplicateDataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'supernova-mock-dup-data-'));
+  try {
+    const sourceDataDir = path.join(duplicatePackageRoot, 'exporter/mock/data');
+    for (const name of ['tokens.json', 'token-groups.json', 'themes.json', 'components.json']) {
+      fs.copyFileSync(path.join(sourceDataDir, name), path.join(duplicateDataDir, name));
+    }
+    const duplicateTokens = JSON.parse(fs.readFileSync(path.join(duplicateDataDir, 'tokens.json'), 'utf-8'));
+    const baseShadow = duplicateTokens.find(token => token.id === 'token-shadow-raised');
+    assert(baseShadow, 'Duplicate-name fixture requires the base token token-shadow-raised');
+    duplicateTokens.push({ ...JSON.parse(JSON.stringify(baseShadow)), id: 'token-shadow-raised-duplicate', name: 'Raised' });
+    fs.writeFileSync(path.join(duplicateDataDir, 'tokens.json'), JSON.stringify(duplicateTokens, null, 2));
+
+    await runMockExport({ outDir: duplicateOutDir, dataDir: duplicateDataDir, skipBuild: true, theme: null, clean: true });
+
+    const duplicateCss = fs.readFileSync(path.join(duplicateOutDir, 'tokens/tokens.css'), 'utf-8');
+    const duplicateTs = fs.readFileSync(path.join(duplicateOutDir, 'tokens/tokens.ts'), 'utf-8');
+    assert(duplicateCss.includes('--shadows-raised:'), 'First occurrence must keep the unsuffixed CSS name');
+    assert(duplicateCss.includes('--shadows-raised-2:'), 'Duplicate CSS name must receive a deterministic numeric suffix');
+    assert(duplicateTs.includes('"shadowsRaised2"'), 'Duplicate TypeScript key must receive a deterministic numeric suffix');
+    assert(duplicateCss.includes('Duplicate token names disambiguated'), 'Disambiguation must be reported in tokens.css');
+    assert(duplicateTs.includes('Duplicate token names disambiguated'), 'Disambiguation must be reported in tokens.ts');
+    console.log('  ✓ Duplicate token names disambiguated deterministically and reported in generated output\n');
+  } finally {
+    fs.rmSync(duplicateOutDir, { recursive: true, force: true });
+    fs.rmSync(duplicateDataDir, { recursive: true, force: true });
+  }
+
   console.log('🎉 All Mock Exporter tests passed successfully!\n');
 }
 

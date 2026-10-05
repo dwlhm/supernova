@@ -211714,26 +211714,38 @@ function normalizeTokens(tokens, groups) {
     } catch (cause) {
       throw new Error(`Token ${token.id} (${token.name}): value resolution failed`, { cause });
     }
-    return { ...value, id: token.id, category: categories.get(token.tokenType) ?? "other", key, cssName: `--${cssName}`, themeName: themeName(token.tokenType, cssName), fullName };
+    return { ...value, id: token.id, name: token.name, category: categories.get(token.tokenType) ?? "other", key, cssName: `--${cssName}`, themeName: themeName(token.tokenType, cssName), fullName };
   });
   const counts = /* @__PURE__ */ new Map();
   for (const token of candidates) {
     const key = `${token.category}:${token.key}`;
     counts.set(key, (counts.get(key) ?? 0) + 1);
   }
-  const seen = /* @__PURE__ */ new Map();
-  function unique(key, id2) {
-    const existing = seen.get(key);
-    if (existing !== void 0) throw new Error(`Normalized token collision ${key}: ${existing} and ${id2}`);
-    seen.set(key, id2);
+  const reserved = /* @__PURE__ */ new Map();
+  const collisions = [];
+  function reserve(kind, namespace, token, requested, suffixed) {
+    const owner = reserved.get(`${namespace}:${requested}`);
+    if (owner === void 0) {
+      reserved.set(`${namespace}:${requested}`, token.id);
+      return requested;
+    }
+    for (let index = 2; ; index++) {
+      const candidate = suffixed(index);
+      if (!reserved.has(`${namespace}:${candidate}`)) {
+        reserved.set(`${namespace}:${candidate}`, token.id);
+        collisions.push({ kind, id: token.id, name: token.name, requested, assigned: candidate, conflictsWith: owner });
+        return candidate;
+      }
+    }
   }
-  return candidates.map(({ fullName, ...token }) => {
+  const tokens_ = candidates.map(({ fullName, ...token }) => {
     if (counts.get(`${token.category}:${token.key}`) > 1) token.key = camelCase(fullName);
-    unique(`css:${token.cssName}`, token.id);
-    unique(`category:${token.category}:${token.key}`, token.id);
-    if (token.themeName) unique(`theme:${token.themeName}`, token.id);
+    token.cssName = reserve("css", "css", token, token.cssName, (index) => `${token.cssName}-${index}`);
+    token.key = reserve("key", `key:${token.category}`, token, token.key, (index) => `${token.key}${index}`);
+    if (token.themeName !== null) token.themeName = reserve("theme", "theme", token, token.themeName, (index) => `${token.themeName}-${index}`);
     return token;
   });
+  return { tokens: tokens_, collisions };
 }
 
 // src/generators/token-generator.ts
@@ -211766,7 +211778,24 @@ async function generateTokenFiles(sdk, context, config, remoteVersionIdentifier)
       throw new Error(`Unable to apply token themes: ${themeIds.join(", ")}`, { cause });
     }
   }
-  const normalized = normalizeTokens(tokens, groups);
+  const { tokens: normalized, collisions } = normalizeTokens(tokens, groups);
+  if (collisions.length > 0 && typeof console !== "undefined") {
+    console.warn(`[supernova-mitosis-exporter] ${collisions.length} duplicate token name(s) disambiguated:`);
+    for (const collision of collisions) {
+      console.warn(`  ${collision.kind} ${collision.requested} -> ${collision.assigned} (${collision.name}, token ${collision.id}, conflicts with ${collision.conflictsWith})`);
+    }
+  }
+  const collisionLines = collisions.map((collision) => `${collision.kind} ${collision.requested} -> ${collision.assigned} (token ${collision.id}, conflicts with ${collision.conflictsWith})`);
+  const slashNotice = collisions.length === 0 ? "" : `// Duplicate token names disambiguated during export:
+${collisionLines.map((line) => `//   ${line}`).join("\n")}
+
+`;
+  const blockNotice = collisions.length === 0 ? "" : `/**
+ * Duplicate token names disambiguated during export:
+${collisionLines.map((line) => ` *   ${line}`).join("\n")}
+ */
+
+`;
   const categorized = /* @__PURE__ */ Object.create(null);
   for (const token of normalized) {
     categorized[token.category] ??= /* @__PURE__ */ Object.create(null);
@@ -211775,7 +211804,7 @@ async function generateTokenFiles(sdk, context, config, remoteVersionIdentifier)
   const files = [createFormattedTextFile(
     config.tokensDir,
     "tokens.ts",
-    `export const tokens = ${JSON.stringify(categorized, null, config.indent)} as const;
+    `${slashNotice}export const tokens = ${JSON.stringify(categorized, null, config.indent)} as const;
 
 export type Tokens = typeof tokens;
 export default tokens;
@@ -211788,7 +211817,7 @@ export default tokens;
     files.push(createFormattedTextFile(
       config.tokensDir,
       "tokens.css",
-      `:root {
+      `${blockNotice}:root {
 ${normalized.map((token) => `${indent}${token.cssName}: ${token.css};`).join("\n")}
 }
 `,
@@ -211801,7 +211830,7 @@ ${normalized.map((token) => `${indent}${token.cssName}: ${token.css};`).join("\n
     files.push(createFormattedTextFile(
       config.tokensDir,
       "theme.css",
-      `/**
+      `${blockNotice}/**
  * Tailwind CSS v4 Theme Configuration
  * Usage in main css:
  *   @import "tailwindcss";

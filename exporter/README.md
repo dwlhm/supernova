@@ -201,7 +201,7 @@ Token export supports colors, gradients, blur, dimensions, strings, numbers, boo
 
 Catalog names and imported Figma property names are normalized with the shared PascalCase/camelCase utilities; identity joins still use exact IDs. Invalid or colliding normalized identifiers fail with their component context. Component directories must be nonempty safe relative paths; TypeScript Mitosis output supports `.lite.tsx` only.
 
-Token names retain unique leaf names within each category. When leaf names collide, every colliding token uses its full group path to qualify its exported TypeScript key and CSS variable name. Consumers must update imports and CSS references when a new collision changes these names; unresolved qualified-name collisions fail explicitly.
+Token names retain unique leaf names within each category. When leaf names collide, every colliding token uses its full group path to qualify its exported TypeScript key and CSS variable name. Consumers must update imports and CSS references when a new collision changes these names. When two distinct tokens still normalize to the same name, the exporter keeps both, as Supernova's own exporters do: the first occurrence in export order retains the name and later ones receive a deterministic numeric suffix (`--shadow-raised`, `--shadow-raised-2`; TypeScript `shadowRaised`, `shadowRaised2`). Every rename is listed in a header comment in `tokens.ts`, `tokens.css` and `theme.css` and in the export log, so nothing changes silently.
 
 ## Installing this exporter in Supernova
 

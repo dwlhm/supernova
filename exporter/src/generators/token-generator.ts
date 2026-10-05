@@ -39,7 +39,16 @@ export async function generateTokenFiles(
       throw new Error(`Unable to apply token themes: ${themeIds.join(', ')}`, { cause })
     }
   }
-  const normalized = normalizeTokens(tokens, groups)
+  const { tokens: normalized, collisions } = normalizeTokens(tokens, groups)
+  if (collisions.length > 0 && typeof console !== 'undefined') {
+    console.warn(`[supernova-mitosis-exporter] ${collisions.length} duplicate token name(s) disambiguated:`)
+    for (const collision of collisions) {
+      console.warn(`  ${collision.kind} ${collision.requested} -> ${collision.assigned} (${collision.name}, token ${collision.id}, conflicts with ${collision.conflictsWith})`)
+    }
+  }
+  const collisionLines = collisions.map(collision => `${collision.kind} ${collision.requested} -> ${collision.assigned} (token ${collision.id}, conflicts with ${collision.conflictsWith})`)
+  const slashNotice = collisions.length === 0 ? '' : `// Duplicate token names disambiguated during export:\n${collisionLines.map(line => `//   ${line}`).join('\n')}\n\n`
+  const blockNotice = collisions.length === 0 ? '' : `/**\n * Duplicate token names disambiguated during export:\n${collisionLines.map(line => ` *   ${line}`).join('\n')}\n */\n\n`
   const categorized: Record<string, Record<string, JsonValue>> = Object.create(null)
   for (const token of normalized) {
     categorized[token.category] ??= Object.create(null)
@@ -47,18 +56,18 @@ export async function generateTokenFiles(
   }
   const files: OutputTextFile[] = [createFormattedTextFile(
     config.tokensDir, 'tokens.ts',
-    `export const tokens = ${JSON.stringify(categorized, null, config.indent)} as const;\n\nexport type Tokens = typeof tokens;\nexport default tokens;\n`,
+    `${slashNotice}export const tokens = ${JSON.stringify(categorized, null, config.indent)} as const;\n\nexport type Tokens = typeof tokens;\nexport default tokens;\n`,
     config, 'slash'
   )]
   const indent = ' '.repeat(config.indent)
   if (config.useCssVariables) {
     files.push(createFormattedTextFile(config.tokensDir, 'tokens.css',
-      `:root {\n${normalized.map(token => `${indent}${token.cssName}: ${token.css};`).join('\n')}\n}\n`, config, 'block'))
+      `${blockNotice}:root {\n${normalized.map(token => `${indent}${token.cssName}: ${token.css};`).join('\n')}\n}\n`, config, 'block'))
   }
   const themeVariables = normalized.filter(token => token.themeName !== null)
   if (themeVariables.length > 0) {
     files.push(createFormattedTextFile(config.tokensDir, 'theme.css',
-      `/**\n * Tailwind CSS v4 Theme Configuration\n * Usage in main css:\n *   @import "tailwindcss";\n *   @import "./${config.tokensDir}/theme.css";\n */\n\n@theme {\n${themeVariables.map(token => `${indent}${token.themeName}: ${token.css};`).join('\n')}\n}\n`,
+      `${blockNotice}/**\n * Tailwind CSS v4 Theme Configuration\n * Usage in main css:\n *   @import "tailwindcss";\n *   @import "./${config.tokensDir}/theme.css";\n */\n\n@theme {\n${themeVariables.map(token => `${indent}${token.themeName}: ${token.css};`).join('\n')}\n}\n`,
       config, 'block'))
   }
   return files
