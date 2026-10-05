@@ -176,6 +176,8 @@ npm run build:packages
 │   ├── generate-components.js # Mitosis multi-target compiler script
 │   ├── generate-docs.js       # VitePress docs generator
 │   └── clean.js               # Cleans generated artifacts across packages
+├── exporter.json              # Root Supernova manifest; executable exporter/dist/index.js
+├── config.json                # Root Supernova configuration parameters
 ├── output/                    # Exporter output directory
 │   ├── components/            # Mitosis .lite.tsx components
 │   └── tokens/                # Generated tokens (tokens.ts, tokens.css, theme.css)
@@ -189,8 +191,6 @@ npm run build:packages
     ├── package.json
     ├── tsconfig.json
     ├── tsup.config.ts
-    ├── exporter.json          # Supernova exporter manifest
-    ├── config.json            # Supernova exporter configuration parameters
     ├── README.md              # Mitosis exporter documentation
     ├── mock/                  # 100% Offline Mock Development Engine
     │   ├── runner.js          # Mock runner & live file watcher CLI
@@ -223,8 +223,8 @@ Engineering owns the versioned `mitosisDefinition` Text custom property on Super
 
 ## Installing this exporter in Supernova
 
-Use the exporter subdirectory URL: **https://github.com/dwlhm/supernova/tree/main/exporter**. The whole repository root URL is incorrect for this monorepo because `exporter.json` lives inside `exporter/`. Supernova treats the selected directory as the exporter package root. See [installing exporters](https://developers.supernova.io/latest/exporters/installing-exporters-GT7tr0qA) and [exporter anatomy](https://developers.supernova.io/latest/exporters/building-exporters-101/exporter-anatomy-HvQzZtsO).
+Use the repository URL: **https://github.com/dwlhm/supernova**. The repository root contains the authoritative `exporter.json` and `config.json`; its manifest selects `exporter/dist/index.js` as the executable. Supernova treats the repository root as the exporter package root. See [installing exporters](https://developers.supernova.io/latest/exporters/installing-exporters-GT7tr0qA) and [exporter anatomy](https://developers.supernova.io/latest/exporters/building-exporters-101/exporter-anatomy-HvQzZtsO).
 
-Before importer refresh or an exporter version update, run `npm run build:exporter` from the repository root, then commit and push `exporter/dist/index.js` together with the matching sources, `exporter/exporter.json` and `exporter/config.json`. The build validates the package automatically; `npm run validate:exporter-package` runs that check separately. After any exporter source change, rebuild and stage the bundled executable in the same commit; CI rejects a bundle that differs from a fresh build. The compiled executable is an intentional installation artifact; TypeScript sources remain authoritative. Other `dist/` files stay ignored. Validation checks manifest/config presence, safe executable paths, nonempty bundled JavaScript at the expected path; rebuilding is required to keep the committed executable current. Bundling dependencies remains the responsibility of the `noExternal` setting in `exporter/tsup.config.ts`.
+Before importer refresh or an exporter version update, run `npm run build:exporter` from the repository root, then commit and push `exporter/dist/index.js` together with the matching sources, root `exporter.json` and `config.json`. The build validates the package automatically; `npm run validate:exporter-package` runs that check separately. After any exporter source change, rebuild and stage the bundled executable in the same commit; CI rejects a bundle that differs from a fresh build. The compiled executable is an intentional installation artifact; TypeScript sources remain authoritative. Other `dist/` files stay ignored. Validation checks manifest/config presence, safe executable paths, nonempty bundled JavaScript at the expected path; rebuilding is required to keep the committed executable current. Bundling dependencies remains the responsibility of the `noExternal` setting in `exporter/tsup.config.ts`.
 
 Cloud installation has not been verified by the local package validation.

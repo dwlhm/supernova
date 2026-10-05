@@ -19,26 +19,24 @@ Mitosis components can be compiled to any frontend framework: **React**, **Vue (
 
 ## Anatomy of the Exporter
 
-```
-exporter/
-├── exporter.json        # Supernova manifest (id, name, version, tags, executable path)
-├── config.json          # Exporter settings definition presented in Supernova UI
-├── package.json         # Workspace manifest with dependencies and build scripts
-├── tsconfig.json        # TypeScript configuration
-├── tsup.config.ts       # Bundler config targeting Node.js CommonJS
-└── src/
-    ├── index.ts         # Pulsar entrypoint registering exporter logic
-    ├── config.ts        # Typed interface for exporter configuration
-    ├── generators/
-    │   ├── token-generator.ts      # Resolves tokens and produces tokens.ts & tokens.css
-    │   ├── component-generator.ts  # Builds universal Mitosis .lite.tsx components
-    │   └── index-generator.ts      # Generates index.ts root barrel export
-    └── utils/
-        ├── file-helper.ts          # File creation and automated disclaimer formatting
-        └── naming.ts               # Case formatting (camelCase, kebabCase, pascalCase)
-```
+The repository root is the deployment package. `exporter.json` and `config.json` live there. Sources and build tooling remain in the `exporter/` workspace:
+
+| Path from repository root | Purpose |
+| --- | --- |
+| `exporter.json` | Supernova manifest, selecting `exporter/dist/index.js` |
+| `config.json` | Supernova settings definitions |
+| `exporter/package.json` | Source workspace dependencies and build scripts |
+| `exporter/tsup.config.ts` | CommonJS bundler configuration |
+| `exporter/src/index.ts` | Pulsar entry point |
+| `exporter/src/components/` | Typed contract, SDK adapter and Mitosis AST generation |
+| `exporter/src/runtime/` | Static framework independent helpers |
+| `exporter/src/generators/` | Output artifact orchestration |
+| `exporter/dist/index.js` | Committed installation executable |
+
 
 ---
+
+All CLI install, local export and publish commands below run from the repository root. If currently inside `exporter/`, run `cd ..` first.
 
 ## Configuration Options
 
@@ -95,7 +93,7 @@ To test the exporter locally against a real Supernova workspace:
    supernova run-local-exporter \
      --apiKey="<YOUR_SUPERNOVA_API_KEY>" \
      --designSystemId="<YOUR_DESIGN_SYSTEM_ID>" \
-     --exporterDir="./exporter" \
+     --exporterDir="." \
      --outputDir="./output"
    ```
 
@@ -168,7 +166,7 @@ npx mitosis build --target=svelte
 To publish this exporter for your organization or publicly in the Supernova Store:
 
 ```bash
-supernova publish-exporter --apiKey="<YOUR_SUPERNOVA_API_KEY>" --exporterDir="./exporter"
+supernova publish-exporter --apiKey="<YOUR_SUPERNOVA_API_KEY>" --exporterDir="."
 ```
 
 ## License
@@ -207,8 +205,8 @@ Token names retain unique leaf names within each category. When leaf names colli
 
 ## Installing this exporter in Supernova
 
-Use the exporter subdirectory URL: **https://github.com/dwlhm/supernova/tree/main/exporter**. The whole repository root URL is incorrect for this monorepo because `exporter.json` lives inside `exporter/`. Supernova treats the selected directory as the exporter package root. See [installing exporters](https://developers.supernova.io/latest/exporters/installing-exporters-GT7tr0qA) and [exporter anatomy](https://developers.supernova.io/latest/exporters/building-exporters-101/exporter-anatomy-HvQzZtsO).
+Use the repository URL: **https://github.com/dwlhm/supernova**. The repository root contains the authoritative `exporter.json` and `config.json`; its manifest selects `exporter/dist/index.js` as the executable. Supernova treats the repository root as the exporter package root. See [installing exporters](https://developers.supernova.io/latest/exporters/installing-exporters-GT7tr0qA) and [exporter anatomy](https://developers.supernova.io/latest/exporters/building-exporters-101/exporter-anatomy-HvQzZtsO).
 
-Before importer refresh or an exporter version update, run `npm run build:exporter` from the repository root, then commit and push `exporter/dist/index.js` together with the matching sources, `exporter/exporter.json` and `exporter/config.json`. The build validates the package automatically; `npm run validate:exporter-package` runs that check separately. After any exporter source change, rebuild and stage the bundled executable in the same commit; CI rejects a bundle that differs from a fresh build. The compiled executable is an intentional installation artifact; TypeScript sources remain authoritative. Other `dist/` files stay ignored. Validation checks manifest/config presence, safe executable paths, nonempty bundled JavaScript at the expected path; rebuilding is required to keep the committed executable current. Bundling dependencies remains the responsibility of the `noExternal` setting in `exporter/tsup.config.ts`.
+Before importer refresh or an exporter version update, run `npm run build:exporter` from the repository root, then commit and push `exporter/dist/index.js` together with the matching sources, root `exporter.json` and `config.json`. The build validates the package automatically; `npm run validate:exporter-package` runs that check separately. After any exporter source change, rebuild and stage the bundled executable in the same commit; CI rejects a bundle that differs from a fresh build. The compiled executable is an intentional installation artifact; TypeScript sources remain authoritative. Other `dist/` files stay ignored. Validation checks manifest/config presence, safe executable paths, nonempty bundled JavaScript at the expected path; rebuilding is required to keep the committed executable current. Bundling dependencies remains the responsibility of the `noExternal` setting in `exporter/tsup.config.ts`.
 
 Cloud installation has not been verified by the local package validation.

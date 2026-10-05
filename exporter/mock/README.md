@@ -138,3 +138,5 @@ npm run generate
 npm run build:packages
 ```
 Dengan alur ini, kamu dapat mengembangkan, memodifikasi styling, menambahkan generator format baru (misal SCSS, JSON schema, dsb.), dan memvalidasi hasilnya tanpa perlu login ke Supernova Cloud sama sekali.
+
+The repository root `exporter.json` and `config.json` are authoritative. The mock runner loads the executable selected by that manifest and watches both metadata files. Exporter sources remain in `exporter/src/`.

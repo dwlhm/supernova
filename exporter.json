@@ -8,7 +8,14 @@
   "version": "1.0.0",
   "usesBrands": false,
   "usesThemes": true,
-  "executable": "dist/index.js",
+  "executable": "exporter/dist/index.js",
   "engine": "latest",
-  "tags": ["Mitosis", "Tokens", "Components", "React", "Vue", "Svelte"]
+  "tags": [
+    "Mitosis",
+    "Tokens",
+    "Components",
+    "React",
+    "Vue",
+    "Svelte"
+  ]
 }

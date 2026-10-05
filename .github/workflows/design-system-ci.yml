@@ -45,7 +45,7 @@ jobs:
           supernova run-local-exporter \
             --apiKey="$SUPERNOVA_API_KEY" \
             --designSystemId="$SUPERNOVA_DESIGN_SYSTEM_ID" \
-            --exporterDir="./exporter" \
+            --exporterDir="." \
             --outputDir="./output"
 
       - name: Generate Components & Sync Tokens

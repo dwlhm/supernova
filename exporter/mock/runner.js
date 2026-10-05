@@ -13,8 +13,9 @@ const { MockSupernova, createMockContext, loadMockData } = require('./mock-sdk')
 const exporterDir = path.resolve(__dirname, '..');
 const rootDir = path.resolve(exporterDir, '..');
 const defaultOutputDir = path.join(rootDir, 'output');
-const distIndexPath = path.join(exporterDir, 'dist', 'index.js');
-const configJsonPath = path.join(exporterDir, 'config.json');
+const manifestJsonPath = path.join(rootDir, 'exporter.json');
+const configJsonPath = path.join(rootDir, 'config.json');
+const { validateExporterPackage } = require('../scripts/validate-package');
 
 // Parse CLI options
 function parseArgs() {
@@ -97,19 +98,10 @@ function loadExporterConfig() {
     indent: 2,
   };
 
-  if (fs.existsSync(configJsonPath)) {
-    try {
-      const raw = JSON.parse(fs.readFileSync(configJsonPath, 'utf-8'));
-      if (Array.isArray(raw)) {
-        for (const item of raw) {
-          if (item.key && item.default !== undefined) {
-            config[item.key] = item.default;
-          }
-        }
-      }
-    } catch (err) {
-      console.warn(`[Mock Runner] Failed to parse config.json, using defaults:`, err.message);
-    }
+  const raw = JSON.parse(fs.readFileSync(configJsonPath, 'utf-8'));
+  if (!Array.isArray(raw)) throw new Error('Root config.json must contain exporter configuration entries');
+  for (const item of raw) {
+    if (item.key && item.default !== undefined) config[item.key] = item.default;
   }
 
   return config;
@@ -158,6 +150,10 @@ async function runMockExport(options) {
     const buildDuration = buildExporter();
     console.log(`✓ (${buildDuration}ms)`);
   }
+
+  validateExporterPackage(rootDir);
+  const manifest = JSON.parse(fs.readFileSync(manifestJsonPath, 'utf-8'));
+  const distIndexPath = path.resolve(rootDir, manifest.executable);
 
   // Step 2: Initialize Mock SDK & Context
   const mockSdk = new MockSupernova({ dataDir: options.dataDir });
@@ -240,6 +236,7 @@ function startWatcher(options) {
     path.join(exporterDir, 'src'),
     options.dataDir || path.join(__dirname, 'data'),
     configJsonPath,
+    manifestJsonPath,
   ];
 
   console.log(`\n👀 Watching for changes in:`);

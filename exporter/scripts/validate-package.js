@@ -16,7 +16,6 @@ function validateExporterPackage(packageRoot) {
   if (typeof executable !== 'string' || !executable || path.isAbsolute(executable) || /^[A-Za-z]:/.test(executable) || executable.split(/[\\/]/).some(part => !part || part === '.' || part === '..')) {
     throw new Error('exporter.json executable must be a safe relative file path');
   }
-  if (executable !== 'dist/index.js') throw new Error('This exporter package expects executable dist/index.js');
   const filename = path.join(root, executable);
   if (!fs.existsSync(filename) || !fs.statSync(filename).isFile() || fs.statSync(filename).size === 0) {
     throw new Error(`Missing or empty executable ${filename}; run npm run build:exporter and commit the bundled executable before refreshing Supernova`);
@@ -27,7 +26,7 @@ function validateExporterPackage(packageRoot) {
 }
 
 if (require.main === module) {
-  try { validateExporterPackage(process.argv[2] || path.resolve(__dirname, '..')); }
+  try { validateExporterPackage(process.argv[2] || path.resolve(__dirname, '../..')); }
   catch (error) { console.error(`Exporter package validation failed: ${error.message}`); process.exitCode = 1; }
 }
 module.exports = { validateExporterPackage };
