@@ -2,8 +2,9 @@ const fs = require('fs');
 const path = require('path');
 
 const rootDir = path.resolve(__dirname, '..');
-const componentsSourceDir = path.join(rootDir, 'output', 'components');
-const tokensSourceDir = path.join(rootDir, 'output', 'tokens');
+const paths = require('./export-source').resolveExportPaths();
+const componentsSourceDir = paths.componentsDir;
+const tokensSourceDir = paths.tokensDir;
 const docsDir = path.join(rootDir, 'docs');
 const docsComponentsDir = path.join(docsDir, 'components');
 
@@ -17,7 +18,8 @@ function ensureDir(dir) {
 function parseTokens() {
   const tokensTsPath = path.join(tokensSourceDir, 'tokens.ts');
   if (!fs.existsSync(tokensTsPath)) {
-    return { colors: {}, typography: {}, shadows: {} };
+    console.error(`[generate-docs] FATAL: tokens artifact not found at ${tokensTsPath}`);
+    process.exit(1);
   }
   const content = fs.readFileSync(tokensTsPath, 'utf8');
   const match = content.match(/export const tokens\s*=\s*({[\s\S]*});?\s*$/);
@@ -790,22 +792,31 @@ function run() {
   console.log('Parsed tokens:', Object.keys(tokens));
 
   // Parse components
-  const componentFiles = fs.readdirSync(componentsSourceDir)
-    .filter(file => file.endsWith('.lite.tsx'))
-    .sort();
+  if (paths.hasComponents) {
+    const componentFiles = fs.readdirSync(componentsSourceDir)
+      .filter(file => file.endsWith('.lite.tsx'))
+      .sort();
 
-  const components = [];
-  for (const file of componentFiles) {
-    const fullPath = path.join(componentsSourceDir, file);
-    const comp = parseComponentFile(fullPath);
-    components.push(comp);
-    console.log(`Parsed component: ${comp.name} (${comp.props.length} props)`);
+    const components = [];
+    for (const file of componentFiles) {
+      const fullPath = path.join(componentsSourceDir, file);
+      const comp = parseComponentFile(fullPath);
+      components.push(comp);
+      console.log(`Parsed component: ${comp.name} (${comp.props.length} props)`);
 
-    // Write component doc
-    const compDoc = generateComponentDoc(comp);
-    const destPath = path.join(docsComponentsDir, `${comp.name.toLowerCase()}.md`);
-    fs.writeFileSync(destPath, compDoc, 'utf8');
-    console.log(`Generated docs/components/${comp.name.toLowerCase()}.md`);
+      // Write component doc
+      const compDoc = generateComponentDoc(comp);
+      const destPath = path.join(docsComponentsDir, `${comp.name.toLowerCase()}.md`);
+      fs.writeFileSync(destPath, compDoc, 'utf8');
+      console.log(`Generated docs/components/${comp.name.toLowerCase()}.md`);
+    }
+
+    // Write docs/components/index.md
+    const catalogDoc = generateComponentsCatalogDoc(components);
+    fs.writeFileSync(path.join(docsComponentsDir, 'index.md'), catalogDoc, 'utf8');
+    console.log('Generated docs/components/index.md');
+  } else {
+    console.warn('[generate-docs] WARNING: components artifact not found at ' + componentsSourceDir + '; leaving docs/components/* as-is.');
   }
 
   // Write docs/index.md
@@ -817,11 +828,6 @@ function run() {
   const tokensDoc = generateTokensDoc(tokens);
   fs.writeFileSync(path.join(docsDir, 'tokens.md'), tokensDoc, 'utf8');
   console.log('Generated docs/tokens.md');
-
-  // Write docs/components/index.md
-  const catalogDoc = generateComponentsCatalogDoc(components);
-  fs.writeFileSync(path.join(docsComponentsDir, 'index.md'), catalogDoc, 'utf8');
-  console.log('Generated docs/components/index.md');
 
   console.log('Documentation generated successfully!\n');
 }

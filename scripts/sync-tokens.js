@@ -2,7 +2,8 @@ const fs = require('fs');
 const path = require('path');
 
 const rootDir = path.resolve(__dirname, '..');
-const sourceTokensDir = path.join(rootDir, 'output', 'tokens');
+const paths = require('./export-source').resolveExportPaths();
+const sourceTokensDir = paths.tokensDir;
 const targetTokensDir = path.join(rootDir, 'packages', 'tokens');
 const targetSrcDir = path.join(targetTokensDir, 'src');
 const targetCssDir = path.join(targetTokensDir, 'css');
@@ -24,19 +25,33 @@ function copyFileIfExists(src, dest) {
   }
 }
 
+function fatalMissingArtifact(artifactPath) {
+  console.error(`[sync-tokens] FATAL: tokens artifact not found at ${artifactPath}. Expected the Supernova-synced directory under the export root ${paths.root}. Use --source=<dir> to point at a different export root.`);
+  process.exit(1);
+}
+
 function syncTokens() {
   console.log('--- Syncing Tokens ---');
+  if (!paths.hasTokens) {
+    fatalMissingArtifact(paths.tokensDir);
+  }
   ensureDir(targetSrcDir);
   ensureDir(targetCssDir);
 
-  // Sync TS tokens
+  // Sync TS tokens (required)
   const srcTs = path.join(sourceTokensDir, 'tokens.ts');
   const destTs = path.join(targetSrcDir, 'tokens.ts');
+  if (!fs.existsSync(srcTs)) {
+    fatalMissingArtifact(srcTs);
+  }
   copyFileIfExists(srcTs, destTs);
 
-  // Sync CSS tokens
+  // Sync CSS tokens (required)
   const srcCss = path.join(sourceTokensDir, 'tokens.css');
   const destCss = path.join(targetCssDir, 'tokens.css');
+  if (!fs.existsSync(srcCss)) {
+    fatalMissingArtifact(srcCss);
+  }
   copyFileIfExists(srcCss, destCss);
 
   const srcTheme = path.join(sourceTokensDir, 'theme.css');

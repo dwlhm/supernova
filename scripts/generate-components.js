@@ -3,7 +3,8 @@ const path = require('path');
 const mitosis = require('@builder.io/mitosis');
 
 const rootDir = path.resolve(__dirname, '..');
-const componentsDir = path.join(rootDir, 'output', 'components');
+const paths = require('./export-source').resolveExportPaths();
+const componentsDir = paths.componentsDir;
 
 const targets = {
   react: {
@@ -50,6 +51,13 @@ const targets = {
 
 console.log('--- Generating Multi-Framework Components via Mitosis ---');
 
+if (!paths.hasComponents) {
+  console.warn(`\n[generate-components] WARNING: components artifact not found at ${paths.componentsDir}`);
+  console.warn('  Skipping multi-framework generation. Existing packages/*/src files are left untouched.');
+  console.warn('  This is expected until Supernova syncs the components directory into the export root.\n');
+  process.exit(0);
+}
+
 const componentFiles = fs.readdirSync(componentsDir).filter((file) => file.endsWith('.lite.tsx'));
 const componentNames = componentFiles.map((file) => file.replace('.lite.tsx', ''));
 
@@ -76,9 +84,13 @@ for (const [targetName, config] of Object.entries(targets)) {
   }
 
   if (needsRuntime) {
+    if (!paths.hasRuntime) {
+      console.error(`[generate-components] FATAL: components import ../runtime/component-runtime but ${paths.runtimeDir} is missing`);
+      process.exit(1);
+    }
     const runtimeDir = path.join(config.dir, 'runtime');
     fs.mkdirSync(runtimeDir, { recursive: true });
-    fs.copyFileSync(path.join(componentsDir, '..', 'runtime', 'component-runtime.ts'), path.join(runtimeDir, 'component-runtime.ts'));
+    fs.copyFileSync(path.join(paths.runtimeDir, 'component-runtime.ts'), path.join(runtimeDir, 'component-runtime.ts'));
   }
 
   // Write barrel file
