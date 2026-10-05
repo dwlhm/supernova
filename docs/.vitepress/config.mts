@@ -1,11 +1,13 @@
 import { defineConfig } from 'vitepress'
 
+const base = process.env.BASE_URL || '/'
+
 export default defineConfig({
   title: 'Supernova Design System',
   description: 'Multi-framework UI components and tokens compiled from Supernova and Mitosis',
-  base: process.env.BASE_URL || '/',
+  base,
   head: [
-    ['link', { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' }]
+    ['link', { rel: 'icon', type: 'image/svg+xml', href: `${base}favicon.svg` }]
   ],
   themeConfig: {
     siteTitle: 'Supernova UI',
