@@ -211748,6 +211748,18 @@ function normalizeTokens(tokens, groups) {
   return { tokens: tokens_, collisions };
 }
 
+// src/utils/report.ts
+function reportToHost(lines) {
+  if (lines.length === 0) return;
+  try {
+    if (typeof console === "undefined") return;
+    const emit = typeof console.warn === "function" ? console.warn : typeof console.log === "function" ? console.log : null;
+    if (!emit) return;
+    for (const line of lines) emit.call(console, line);
+  } catch {
+  }
+}
+
 // src/generators/token-generator.ts
 async function generateTokenFiles(sdk, context, config, remoteVersionIdentifier) {
   if (!Number.isInteger(config.indent) || config.indent < 0 || config.indent > 10) {
@@ -211779,21 +211791,13 @@ async function generateTokenFiles(sdk, context, config, remoteVersionIdentifier)
     }
   }
   const { tokens: normalized, collisions } = normalizeTokens(tokens, groups);
-  if (collisions.length > 0) {
-    try {
-      if (typeof console !== "undefined") {
-        const emit = typeof console.warn === "function" ? console.warn : typeof console.log === "function" ? console.log : null;
-        if (emit) {
-          emit.call(console, `[supernova-mitosis-exporter] ${collisions.length} duplicate token name(s) disambiguated:`);
-          for (const collision of collisions) {
-            emit.call(console, `  ${collision.kind} ${collision.requested} -> ${collision.assigned} (${collision.name}, token ${collision.id}, conflicts with ${collision.conflictsWith})`);
-          }
-        }
-      }
-    } catch {
-    }
-  }
   const collisionLines = collisions.map((collision) => `${collision.kind} ${collision.requested} -> ${collision.assigned} (token ${collision.id}, conflicts with ${collision.conflictsWith})`);
+  if (collisions.length > 0) {
+    reportToHost([
+      `[supernova-mitosis-exporter] ${collisions.length} duplicate token name(s) disambiguated:`,
+      ...collisionLines.map((line) => `  ${line}`)
+    ]);
+  }
   const slashNotice = collisions.length === 0 ? "" : `// Duplicate token names disambiguated during export:
 ${collisionLines.map((line) => `//   ${line}`).join("\n")}
 
@@ -212022,8 +212026,13 @@ async function loadComponentDefinitions(sdk, context, version) {
   const catalog = await sdk.components.getComponents(version, filter);
   let designs;
   const definitions = [];
+  const skipped = [];
   for (const component of catalog) {
     const properties = component.properties.filter((property) => property.codeName === MITOSIS_DEFINITION_PROPERTY);
+    if (properties.length === 0) {
+      skipped.push(component.name);
+      continue;
+    }
     if (properties.length !== 1 || properties[0].propertyType !== "Text") throw new Error(`${component.name}: configure one Supernova Text component property with codeName ${MITOSIS_DEFINITION_PROPERTY}; engineering must supply its versioned implementation definition`);
     const raw = component.propertyValues[properties[0].id];
     if (typeof raw !== "string" || !raw.trim()) throw new Error(`${component.name}: ${MITOSIS_DEFINITION_PROPERTY} must contain schemaVersion 1 JSON`);
@@ -212053,6 +212062,12 @@ async function loadComponentDefinitions(sdk, context, version) {
       merged.push(property);
     }
     definitions.push({ ...payload, id: component.id, name: pascalCase(component.name), description: component.description, designComponentId: void 0, properties: merged });
+  }
+  if (skipped.length > 0) {
+    reportToHost([
+      `[supernova-mitosis-exporter] ${skipped.length} component(s) skipped, no ${MITOSIS_DEFINITION_PROPERTY} Text property so no implementation contract is available:`,
+      ...skipped.map((name) => `  ${name}`)
+    ]);
   }
   return parseDefinitions(definitions);
 }

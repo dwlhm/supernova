@@ -2,14 +2,17 @@ import { Supernova, PulsarContext, RemoteVersionIdentifier } from '@supernovaio/
 import { ComponentDefinition, ComponentProperty, parseDefinitions } from './schema'
 
 import { camelCase, pascalCase } from '../utils/naming'
+import { reportToHost } from '../utils/report'
 export const MITOSIS_DEFINITION_PROPERTY = 'mitosisDefinition'
 export async function loadComponentDefinitions(sdk: Supernova, context: PulsarContext, version: RemoteVersionIdentifier): Promise<ComponentDefinition[]> {
   const filter = context.brandId ? { brandId: context.brandId } : undefined
   const catalog = await sdk.components.getComponents(version, filter)
   let designs: Awaited<ReturnType<typeof sdk.components.getDesignComponents>> | undefined
   const definitions: unknown[] = []
+  const skipped: string[] = []
   for (const component of catalog) {
     const properties = component.properties.filter(property => property.codeName === MITOSIS_DEFINITION_PROPERTY)
+    if (properties.length === 0) { skipped.push(component.name); continue }
     if (properties.length !== 1 || properties[0].propertyType !== 'Text') throw new Error(`${component.name}: configure one Supernova Text component property with codeName ${MITOSIS_DEFINITION_PROPERTY}; engineering must supply its versioned implementation definition`)
     const raw = component.propertyValues[properties[0].id]
     if (typeof raw !== 'string' || !raw.trim()) throw new Error(`${component.name}: ${MITOSIS_DEFINITION_PROPERTY} must contain schemaVersion 1 JSON`)
@@ -35,6 +38,12 @@ export async function loadComponentDefinitions(sdk: Supernova, context: PulsarCo
       merged.push(property)
     }
     definitions.push({ ...payload, id: component.id, name: pascalCase(component.name), description: component.description, designComponentId: undefined, properties: merged })
+  }
+  if (skipped.length > 0) {
+    reportToHost([
+      `[supernova-mitosis-exporter] ${skipped.length} component(s) skipped, no ${MITOSIS_DEFINITION_PROPERTY} Text property so no implementation contract is available:`,
+      ...skipped.map(name => `  ${name}`)
+    ])
   }
   return parseDefinitions(definitions)
 }

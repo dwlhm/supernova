@@ -3,6 +3,7 @@ import { ExporterConfiguration } from '../config'
 import { createFormattedTextFile } from '../utils/file-helper'
 import { normalizeTokens } from '../tokens/normalize'
 import { JsonValue } from '../tokens/values'
+import { reportToHost } from '../utils/report'
 
 /** SDK I/O boundary; rendering consumes the same normalized values for every output. */
 export async function generateTokenFiles(
@@ -40,21 +41,13 @@ export async function generateTokenFiles(
     }
   }
   const { tokens: normalized, collisions } = normalizeTokens(tokens, groups)
-  if (collisions.length > 0) {
-    // Pulsar's sandbox console is optional and may expose neither warn nor log; the report is always written into the generated files.
-    try {
-      if (typeof console !== 'undefined') {
-        const emit = typeof console.warn === 'function' ? console.warn : typeof console.log === 'function' ? console.log : null
-        if (emit) {
-          emit.call(console, `[supernova-mitosis-exporter] ${collisions.length} duplicate token name(s) disambiguated:`)
-          for (const collision of collisions) {
-            emit.call(console, `  ${collision.kind} ${collision.requested} -> ${collision.assigned} (${collision.name}, token ${collision.id}, conflicts with ${collision.conflictsWith})`)
-          }
-        }
-      }
-    } catch { /* a host console lacking the expected methods must never abort an export */ }
-  }
   const collisionLines = collisions.map(collision => `${collision.kind} ${collision.requested} -> ${collision.assigned} (token ${collision.id}, conflicts with ${collision.conflictsWith})`)
+  if (collisions.length > 0) {
+    reportToHost([
+      `[supernova-mitosis-exporter] ${collisions.length} duplicate token name(s) disambiguated:`,
+      ...collisionLines.map(line => `  ${line}`)
+    ])
+  }
   const slashNotice = collisions.length === 0 ? '' : `// Duplicate token names disambiguated during export:\n${collisionLines.map(line => `//   ${line}`).join('\n')}\n\n`
   const blockNotice = collisions.length === 0 ? '' : `/**\n * Duplicate token names disambiguated during export:\n${collisionLines.map(line => ` *   ${line}`).join('\n')}\n */\n\n`
   const categorized: Record<string, Record<string, JsonValue>> = Object.create(null)

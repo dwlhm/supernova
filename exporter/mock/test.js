@@ -211,6 +211,42 @@ async function runTests() {
     console.log('  ✓ Export completed without console.warn and reported through console.log\n');
   }
 
+  // Test 8: components without a mitosisDefinition property are skipped and reported
+  console.log('Test 8: Components without a definition are skipped, not fatal');
+  {
+    const packageRoot = path.resolve(__dirname, '../..');
+    const manifest = JSON.parse(fs.readFileSync(path.join(packageRoot, 'exporter.json'), 'utf8'));
+    const settings = JSON.parse(fs.readFileSync(path.join(packageRoot, 'config.json'), 'utf8'));
+    const config = Object.fromEntries(settings.map(setting => [setting.key, setting.default]));
+    const mock = new MockSupernova();
+    const version = { designSystemId: 'mock-design-system-id', versionId: 'mock-version-id' };
+    const catalog = [
+      ...await mock.components.getComponents(version),
+      { id: 'component-alert', name: 'Alert', description: '', brandId: 'mock-brand', properties: [], propertyValues: {} }
+    ];
+    const sdk = {
+      tokens: mock.tokens,
+      components: { getComponents: async () => catalog, getDesignComponents: async () => [] }
+    };
+
+    let handler;
+    const moduleBridge = { exports: {} };
+    const captured = [];
+    const sandbox = {
+      process, require, module: moduleBridge, exports: moduleBridge.exports,
+      console: { log: (...args) => captured.push(args.join(' ')) },
+      Pulsar: { exportConfig: () => config, export: callback => { handler = callback; } }
+    };
+    vm.runInNewContext(fs.readFileSync(path.join(packageRoot, manifest.executable), 'utf8'), sandbox, { filename: 'pulsar-exporter-bundle.js' });
+    const files = await handler(sdk, createMockContext());
+    const componentFiles = files.filter(file => file.name.endsWith('.lite.tsx'));
+    assert(!componentFiles.some(file => file.name === 'Alert.lite.tsx'), 'Alert must not be generated without a definition');
+    assert.strictEqual(componentFiles.length, 6, 'Every component that carries a definition must still be exported');
+    assert(captured.some(line => line.includes('skipped')), 'Skipped component count must be reported');
+    assert(captured.some(line => line.includes('Alert')), 'Each skipped component must be named in the export log');
+    console.log('  ✓ Definition-less components skipped and reported without failing the export\n');
+  }
+
   console.log('🎉 All Mock Exporter tests passed successfully!\n');
 }
 
