@@ -212223,7 +212223,7 @@ function generateComponentSource(component) {
   return { runtimeImports: helpers, code: import_typescript2.default.createPrinter({ newLine: import_typescript2.default.NewLineKind.LineFeed }).printFile(f.createSourceFile(statements, f.createToken(import_typescript2.default.SyntaxKind.EndOfFileToken), import_typescript2.default.NodeFlags.None)) };
 }
 
-// runtime-source:/Users/dwlhm/komerce/supernova/exporter/src/runtime/component-runtime.ts
+// runtime-source:../runtime/component-runtime.ts
 var component_runtime_default = "/** Static framework independent behavior. Generated components supply all design values. */\nexport function resolveVariantClass(styles: Record<string, string>, value: unknown, fallback: unknown): string {\n  const key = value === undefined ? fallback : value\n  return typeof key === 'string' && Object.prototype.hasOwnProperty.call(styles, key) ? styles[key] : ''\n}\n\nexport function dispatchEvent(handler: ((event: unknown) => void) | undefined, event: unknown, disabled = false): void {\n  if (!disabled && typeof handler === 'function') handler(event)\n}\n";
 
 // src/generators/component-generator.ts

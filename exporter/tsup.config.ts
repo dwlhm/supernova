@@ -23,8 +23,15 @@ export default defineConfig({
       return { contents: result.code, loader: 'js' }
     })
   } }, { name: 'runtime-source', setup(build) {
-    build.onResolve({ filter: /\.ts\?raw$/ }, args => ({ path: resolve(args.resolveDir, args.path.replace(/\?raw$/, '')), namespace: 'runtime-source' }))
-    build.onLoad({ filter: /.*/, namespace: 'runtime-source' }, async (args) => ({ contents: await (await import('node:fs/promises')).readFile(args.path.replace(/\?raw$/, ''), 'utf8'), loader: 'text' }))
+    build.onResolve({ filter: /\.ts\?raw$/ }, args => {
+      const absolute = resolve(args.resolveDir, args.path.replace(/\?raw$/, ''))
+      // Return the bare specifier as the resolved path: esbuild writes a
+      // `// <namespace>:<path>` header into the bundle, so an absolute path would
+      // bake the build machine into the executable. The specifier is stable across
+      // machines, and pluginData carries the real location for onLoad to read.
+      return { path: args.path.replace(/\?raw$/, ''), namespace: 'runtime-source', pluginData: { absolute } }
+    })
+    build.onLoad({ filter: /.*/, namespace: 'runtime-source' }, async args => ({ contents: await readFile(args.pluginData.absolute, 'utf8'), loader: 'text' }))
   } }],
   noExternal: [/.*/]
 })
