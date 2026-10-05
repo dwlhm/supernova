@@ -5,7 +5,7 @@
   "author": "dwlhm",
   "organization": "dwlhm",
   "homepage": "https://github.com/dwlhm",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "usesBrands": false,
   "usesThemes": true,
   "executable": "exporter/dist/index.js",

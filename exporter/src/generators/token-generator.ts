@@ -40,11 +40,19 @@ export async function generateTokenFiles(
     }
   }
   const { tokens: normalized, collisions } = normalizeTokens(tokens, groups)
-  if (collisions.length > 0 && typeof console !== 'undefined') {
-    console.warn(`[supernova-mitosis-exporter] ${collisions.length} duplicate token name(s) disambiguated:`)
-    for (const collision of collisions) {
-      console.warn(`  ${collision.kind} ${collision.requested} -> ${collision.assigned} (${collision.name}, token ${collision.id}, conflicts with ${collision.conflictsWith})`)
-    }
+  if (collisions.length > 0) {
+    // Pulsar's sandbox console is optional and may expose neither warn nor log; the report is always written into the generated files.
+    try {
+      if (typeof console !== 'undefined') {
+        const emit = typeof console.warn === 'function' ? console.warn : typeof console.log === 'function' ? console.log : null
+        if (emit) {
+          emit.call(console, `[supernova-mitosis-exporter] ${collisions.length} duplicate token name(s) disambiguated:`)
+          for (const collision of collisions) {
+            emit.call(console, `  ${collision.kind} ${collision.requested} -> ${collision.assigned} (${collision.name}, token ${collision.id}, conflicts with ${collision.conflictsWith})`)
+          }
+        }
+      }
+    } catch { /* a host console lacking the expected methods must never abort an export */ }
   }
   const collisionLines = collisions.map(collision => `${collision.kind} ${collision.requested} -> ${collision.assigned} (token ${collision.id}, conflicts with ${collision.conflictsWith})`)
   const slashNotice = collisions.length === 0 ? '' : `// Duplicate token names disambiguated during export:\n${collisionLines.map(line => `//   ${line}`).join('\n')}\n\n`

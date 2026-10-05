@@ -178,6 +178,39 @@ async function runTests() {
     fs.rmSync(duplicateDataDir, { recursive: true, force: true });
   }
 
+  // Test 7: the duplicate-name report must survive a host console without warn
+  console.log('Test 7: Duplicate-name report survives a host console without warn');
+  {
+    const packageRoot = path.resolve(__dirname, '../..');
+    const manifest = JSON.parse(fs.readFileSync(path.join(packageRoot, 'exporter.json'), 'utf8'));
+    const settings = JSON.parse(fs.readFileSync(path.join(packageRoot, 'config.json'), 'utf8'));
+    const config = Object.fromEntries(settings.map(setting => [setting.key, setting.default]));
+    const { tokens: baseTokens, groups: baseGroups, themes: baseThemes } = loadMockData();
+    const baseShadow = baseTokens.find(token => token.id === 'token-shadow-raised');
+    assert(baseShadow, 'Duplicate-name fixture requires the base token token-shadow-raised');
+    const collidingTokens = [
+      ...JSON.parse(JSON.stringify(baseTokens)),
+      { ...JSON.parse(JSON.stringify(baseShadow)), id: 'token-shadow-raised-duplicate', name: 'Raised' }
+    ];
+
+    let handler;
+    const moduleBridge = { exports: {} };
+    const captured = [];
+    const sandbox = {
+      process, require, module: moduleBridge, exports: moduleBridge.exports,
+      console: { log: (...args) => captured.push(args.join(' ')) },
+      Pulsar: { exportConfig: () => config, export: callback => { handler = callback; } }
+    };
+    vm.runInNewContext(fs.readFileSync(path.join(packageRoot, manifest.executable), 'utf8'), sandbox, { filename: 'pulsar-exporter-bundle.js' });
+    const files = await handler(new MockSupernova({ tokens: collidingTokens, groups: baseGroups, themes: baseThemes }), createMockContext());
+    const cssFile = files.find(file => file.name === 'tokens.css');
+    assert(cssFile, 'Warn-less export must still emit tokens.css');
+    assert(cssFile.content.includes('--shadows-raised-2:'), 'Disambiguation must still run with a warn-less console');
+    assert(cssFile.content.includes('Duplicate token names disambiguated'), 'Report must still be written into tokens.css');
+    assert(captured.some(line => line.includes('duplicate token name')), 'Report must fall back to console.log when warn is unavailable');
+    console.log('  ✓ Export completed without console.warn and reported through console.log\n');
+  }
+
   console.log('🎉 All Mock Exporter tests passed successfully!\n');
 }
 

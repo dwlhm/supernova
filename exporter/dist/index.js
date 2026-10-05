@@ -211779,10 +211779,18 @@ async function generateTokenFiles(sdk, context, config, remoteVersionIdentifier)
     }
   }
   const { tokens: normalized, collisions } = normalizeTokens(tokens, groups);
-  if (collisions.length > 0 && typeof console !== "undefined") {
-    console.warn(`[supernova-mitosis-exporter] ${collisions.length} duplicate token name(s) disambiguated:`);
-    for (const collision of collisions) {
-      console.warn(`  ${collision.kind} ${collision.requested} -> ${collision.assigned} (${collision.name}, token ${collision.id}, conflicts with ${collision.conflictsWith})`);
+  if (collisions.length > 0) {
+    try {
+      if (typeof console !== "undefined") {
+        const emit = typeof console.warn === "function" ? console.warn : typeof console.log === "function" ? console.log : null;
+        if (emit) {
+          emit.call(console, `[supernova-mitosis-exporter] ${collisions.length} duplicate token name(s) disambiguated:`);
+          for (const collision of collisions) {
+            emit.call(console, `  ${collision.kind} ${collision.requested} -> ${collision.assigned} (${collision.name}, token ${collision.id}, conflicts with ${collision.conflictsWith})`);
+          }
+        }
+      }
+    } catch {
     }
   }
   const collisionLines = collisions.map((collision) => `${collision.kind} ${collision.requested} -> ${collision.assigned} (token ${collision.id}, conflicts with ${collision.conflictsWith})`);
