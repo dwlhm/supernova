@@ -9218,7 +9218,7 @@ ${lanes.join("\n")}
           const platform = _os.platform();
           const useCaseSensitiveFileNames2 = isFileSystemCaseSensitive();
           const fsRealpath = !!_fs.realpathSync.native ? (void 0).platform === "win32" ? fsRealPathHandlingLongPath : _fs.realpathSync.native : _fs.realpathSync;
-          const executingFilePath = __filename.endsWith("sys.js") ? _path.join(_path.dirname(__dirname), "__fake__.js") : __filename;
+          const executingFilePath = "pulsar-exporter-bundle.js".endsWith("sys.js") ? _path.join(_path.dirname("."), "__fake__.js") : "pulsar-exporter-bundle.js";
           const fsSupportsRecursiveFsWatch = (void 0).platform === "win32" || isMacOs;
           const getCurrentDirectory = memoize(() => (void 0).cwd());
           const { watchFile: watchFile2, watchDirectory } = createSystemWatchFunctions({
@@ -9423,7 +9423,7 @@ ${lanes.join("\n")}
             if (platform === "win32" || platform === "win64") {
               return false;
             }
-            return !fileExists(swapCase(__filename));
+            return !fileExists(swapCase("pulsar-exporter-bundle.js"));
           }
           function swapCase(s) {
             return s.replace(/\w/g, (ch) => {

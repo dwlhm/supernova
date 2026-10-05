@@ -116,6 +116,26 @@ async function runTests() {
   assert.strictEqual(process.browser, originalBrowser, 'Themed export must leave host process unchanged');
   console.log('  ✓ VM loaded and exported all 11 artifacts without filename globals or host process mutation\n');
 
+  // Second defense layer: tripwire any read of CommonJS filename globals so a future
+  // TypeScript regression fails loudly instead of crashing at bundle load time.
+  console.log('Test 5: Exporter bundle never reads filename globals at runtime');
+  {
+    const packageRoot = path.resolve(__dirname, '../..');
+    const manifest = JSON.parse(fs.readFileSync(path.join(packageRoot, 'exporter.json'), 'utf8'));
+    const settings = JSON.parse(fs.readFileSync(path.join(packageRoot, 'config.json'), 'utf8'));
+    const config = Object.fromEntries(settings.map(setting => [setting.key, setting.default]));
+    let handler;
+    const moduleBridge = { exports: {} };
+    const sandbox = { process, require, module: moduleBridge, exports: moduleBridge.exports, console,
+      Pulsar: { exportConfig: () => config, export: callback => { handler = callback; } } };
+    Object.defineProperty(sandbox, '__filename', { configurable: true, get() { throw new Error('Exporter bundle read __filename at runtime'); } });
+    Object.defineProperty(sandbox, '__dirname', { configurable: true, get() { throw new Error('Exporter bundle read __dirname at runtime'); } });
+    vm.runInNewContext(fs.readFileSync(path.join(packageRoot, manifest.executable), 'utf8'), sandbox, { filename: 'pulsar-exporter-bundle.js' });
+    const files = await handler(new MockSupernova(), createMockContext());
+    assert.strictEqual(files.length, 11, 'Sandbox export must include components, tokens, runtime and barrel');
+    console.log('  ✓ Bundle loaded and exported 11 artifacts without reading filename globals\n');
+  }
+
   console.log('🎉 All Mock Exporter tests passed successfully!\n');
 }
 

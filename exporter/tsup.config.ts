@@ -14,10 +14,11 @@ export default defineConfig({
   minify: false,
   esbuildPlugins: [{ name: 'typescript-pure-compiler', setup(build) {
     // AST construction and printing need no filesystem host. Pulsar exposes process
-    // without CommonJS filename globals, so disable Node detection only in TypeScript.
+    // without CommonJS filename globals; this dependency-scoped transform neutralizes
+    // both process and the filename globals so TypeScript's Node detection stays off.
     build.onLoad({ filter: /[\\/]typescript[\\/]lib[\\/]typescript\.js$/ }, async (args) => {
       const result = await transform(await readFile(args.path, 'utf8'), {
-        loader: 'js', target: 'node18', define: { process: 'undefined' }
+        loader: 'js', target: 'node18', define: { process: 'undefined', __filename: '"pulsar-exporter-bundle.js"', __dirname: '"."' }
       })
       return { contents: result.code, loader: 'js' }
     })
