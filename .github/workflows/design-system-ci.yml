@@ -1,9 +1,15 @@
 name: Sync Design System & Build Packages
 
 on:
+  push:
+    branches: [main]
+  workflow_dispatch:
   repository_dispatch:
-    types: [supernova-release] # Dipicu via webhook Supernova saat ada rilis versi baru
-  workflow_dispatch:           # Manual trigger via tombol di GitHub Actions tab
+    types: [supernova-release]
+
+concurrency:
+  group: design-system-main
+  cancel-in-progress: false
 
 jobs:
   build-and-test:
@@ -22,14 +28,11 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 22
           registry-url: 'https://registry.npmjs.org'
 
       - name: Install Dependencies
         run: npm ci
-
-      - name: Install Supernova CLI
-        run: npm install -g @supernovaio/cli
 
       - name: Build Exporter
         run: npm run build:exporter
@@ -37,24 +40,16 @@ jobs:
       - name: Verify committed exporter bundle
         run: git diff --exit-code -- exporter/dist/index.js
 
-      - name: Run Supernova Exporter
-        env:
-          SUPERNOVA_API_KEY: ${{ secrets.SUPERNOVA_API_KEY }}
-          SUPERNOVA_DESIGN_SYSTEM_ID: ${{ secrets.SUPERNOVA_DESIGN_SYSTEM_ID }}
-        run: |
-          supernova run-local-exporter \
-            --apiKey="$SUPERNOVA_API_KEY" \
-            --designSystemId="$SUPERNOVA_DESIGN_SYSTEM_ID" \
-            --exporterDir="." \
-            --outputDir="./output"
-
       - name: Generate Components & Sync Tokens
         run: npm run generate
 
       - name: Build Packages (React, Svelte, Tokens)
         run: npm run build:packages
 
+      # Project Pages site is served from https://dwlhm.github.io/supernova/
       - name: Build Documentation Site
+        env:
+          BASE_URL: /supernova/
         run: npm run docs:build
 
       - name: Automated Version Bump & Git Commit
@@ -69,9 +64,13 @@ jobs:
           NEW_VERSION=$(node -p "require('./packages/tokens/package.json').version")
           echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_OUTPUT
 
-          git add output/ packages/ docs/
+          git add packages/ docs/
           git commit -m "chore(release): update design system artifacts v$NEW_VERSION [skip ci]" || echo "No changes to commit"
-          git tag "v$NEW_VERSION"
+          if git rev-parse -q --verify "refs/tags/v$NEW_VERSION" >/dev/null; then
+            echo "Tag v$NEW_VERSION already exists; skipping tag creation."
+          else
+            git tag "v$NEW_VERSION"
+          fi
           git push origin main --tags
 
       - name: Upload Docs Artifact
