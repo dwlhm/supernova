@@ -1,4 +1,4 @@
-import { TokenType, Unit } from '@supernovaio/sdk-exporters'
+import { GradientType, TokenType, Unit } from '@supernovaio/sdk-exporters'
 
 export type JsonValue = string | number | boolean | null | JsonValue[] | { [key: string]: JsonValue }
 export type ResolvedValue = { css: string; js: JsonValue }
@@ -46,6 +46,32 @@ export function color(value: unknown): string {
   if (data.color !== undefined) return rgba(record(data.color), number(record(data.opacity).measure))
   return legacyColor(data)
 }
+function option(value: unknown): string {
+  if (typeof value === 'string') return value
+  const result = record(value).value
+  if (typeof result !== 'string') throw new Error('Expected an option value')
+  return result
+}
+const textCaseCss: Record<string, string> = { Original: 'none', Upper: 'uppercase', Lower: 'lowercase', Camel: 'capitalize', SmallCaps: 'small-caps' }
+const textDecorationCss: Record<string, string> = { None: 'none', Underline: 'underline', Strikethrough: 'line-through' }
+/** Clockwise angle from the CSS `to top` origin; mathematically identical to Supernova's branching conversion. */
+function gradientAngle(from: Record<string, unknown>, to: Record<string, unknown>): number {
+  const angle = Math.atan2(number(to.x) - number(from.x), number(from.y) - number(to.y)) * (180 / Math.PI)
+  return Math.round(angle * 100) / 100
+}
+function gradientLayer(value: unknown): string {
+  const layer = record(value)
+  if (!Array.isArray(layer.stops) || layer.stops.length === 0) throw new Error('Gradient requires at least one stop')
+  const stops = layer.stops.map(stop => {
+    const data = record(stop)
+    return `${color(data.color)} ${Math.round(number(data.position) * 10000) / 100}%`
+  }).join(', ')
+  switch (layer.type) {
+    case GradientType.radial: return `radial-gradient(circle, ${stops})`
+    case GradientType.angular: return `conic-gradient(${stops})`
+    default: return `linear-gradient(${gradientAngle(record(layer.from), record(layer.to))}deg, ${stops})`
+  }
+}
 const familyCss = (family: string) => family.includes(' ') ? JSON.stringify(family) : family
 const scalar = (css: string): ResolvedValue => ({ css, js: css })
 
@@ -88,6 +114,20 @@ export function resolveTokenValue(type: TokenType, value: unknown): ResolvedValu
       const resolvedColor = color(data.color)
       return { css: `${width} ${style} ${resolvedColor}`, js: { width, style, color: resolvedColor } }
     }
+    case TokenType.gradient:
+      return scalar((Array.isArray(value) ? value : [value]).map(gradientLayer).join(', '))
+    case TokenType.blur:
+      return scalar(`blur(${measure(record(value).radius)})`)
+    case TokenType.textCase: {
+      const result = option(value)
+      return scalar(textCaseCss[result] ?? result.toLowerCase())
+    }
+    case TokenType.textDecoration: {
+      const result = option(value)
+      return scalar(textDecorationCss[result] ?? result.toLowerCase())
+    }
+    case TokenType.visibility:
+      return scalar(option(value).toLowerCase())
     case TokenType.shadow: {
       const layers = Array.isArray(value) ? value : [value]
       return scalar(layers.map(layer => {

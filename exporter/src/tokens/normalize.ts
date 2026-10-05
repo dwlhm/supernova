@@ -7,7 +7,9 @@ const categories = new Map<TokenType, string>([
   [TokenType.color, 'colors'], [TokenType.typography, 'typography'], [TokenType.fontSize, 'typography'],
   [TokenType.fontWeight, 'typography'], [TokenType.fontFamily, 'typography'], [TokenType.lineHeight, 'typography'],
   [TokenType.dimension, 'spacing'], [TokenType.size, 'spacing'], [TokenType.space, 'spacing'],
-  [TokenType.radius, 'radii'], [TokenType.border, 'borders'], [TokenType.shadow, 'shadows']
+  [TokenType.radius, 'radii'], [TokenType.border, 'borders'], [TokenType.shadow, 'shadows'],
+  [TokenType.gradient, 'gradients'], [TokenType.blur, 'blurs'],
+  [TokenType.textCase, 'typography'], [TokenType.textDecoration, 'typography'], [TokenType.visibility, 'typography']
 ])
 function groupPaths(groups: TokenGroup[]): Map<string, string[]> {
   const index = new Map<string, TokenGroup>()

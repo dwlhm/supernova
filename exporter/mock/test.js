@@ -72,6 +72,17 @@ async function runTests() {
       assert(content.length > 20, `File is empty or truncated: ${file}`);
     }
 
+    // Verify every supported token type resolves into tokens.ts / tokens.css
+    const tokensTs = fs.readFileSync(path.join(tempDir, 'tokens/tokens.ts'), 'utf-8');
+    const tokensCss = fs.readFileSync(path.join(tempDir, 'tokens/tokens.css'), 'utf-8');
+    assert(tokensTs.includes('"gradients"'), 'Gradient tokens must be categorized under gradients');
+    assert(tokensCss.includes('--gradient-brand: linear-gradient('), 'Gradient token must emit a linear-gradient CSS value');
+    assert(tokensCss.includes('--blur-sm: blur(4px)'), 'Blur token must emit blur(radius)');
+    assert(tokensCss.includes('--typography-upper: uppercase'), 'Text case token must emit uppercase');
+    assert(tokensCss.includes('--typography-underline: underline'), 'Text decoration token must emit underline');
+    assert(tokensCss.includes('--typography-hidden: hidden'), 'Visibility token must emit hidden');
+    console.log('  ✓ Gradient, blur, text case, text decoration and visibility tokens resolve\n');
+
     // Verify custom attribute injection on Card
     const cardContent = fs.readFileSync(path.join(tempDir, 'components/Card.lite.tsx'), 'utf-8');
     assert(cardContent.includes('testId?: string'), 'CardProps should include injected testId prop');

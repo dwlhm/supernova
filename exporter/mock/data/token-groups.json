@@ -68,5 +68,15 @@
     "id": "group-borders",
     "name": "border",
     "parentGroupId": null
+  },
+  {
+    "id": "group-gradients",
+    "name": "gradient",
+    "parentGroupId": null
+  },
+  {
+    "id": "group-blurs",
+    "name": "blur",
+    "parentGroupId": null
   }
 ]

@@ -197,7 +197,7 @@ export default defineComponentDefinition({
 
 Run `node scripts/serialize-component-definition.js definition.ts` to emit validated JSON property values keyed by catalog ID. It executes the trusted engineering module locally and performs no remote writes. Typed bindings support literal/prop/state values, prop/not/and/or conditions and conditional classes. Legacy raw expressions are deprecated isolated compatibility input; they are syntax checked, not a security sandbox. Prefer typed records for editor support. The six mock definitions are engineering fixtures returned through the same SDK-shaped catalog property boundary as production.
 
-Token export supports colors, dimensions, strings, numbers, booleans, shadows, typography, font families, weights and line heights. Gradients and blur currently fail as unsupported; they are not silently dropped.
+Token export supports colors, gradients, blur, dimensions, strings, numbers, booleans, shadows, typography, font families, weights, text case, text decoration, visibility and line heights. Gradients resolve to CSS linear-gradient/radial-gradient/conic-gradient values and blur resolves to blur(...); a token type the exporter does not implement still fails explicitly instead of being silently dropped.
 
 Catalog names and imported Figma property names are normalized with the shared PascalCase/camelCase utilities; identity joins still use exact IDs. Invalid or colliding normalized identifiers fail with their component context. Component directories must be nonempty safe relative paths; TypeScript Mitosis output supports `.lite.tsx` only.
 

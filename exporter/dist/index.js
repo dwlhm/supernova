@@ -23411,8 +23411,8 @@ ${lanes.join("\n")}
       function compilerOptionsAffectDeclarationPath(newOptions, oldOptions) {
         return optionsHaveChanges(oldOptions, newOptions, affectsDeclarationPathOptionDeclarations);
       }
-      function getCompilerOptionValue(options, option) {
-        return option.strictFlag ? getStrictOptionValue(options, option.name) : option.allowJsFlag ? getAllowJSCompilerOption(options) : options[option.name];
+      function getCompilerOptionValue(options, option2) {
+        return option2.strictFlag ? getStrictOptionValue(options, option2.name) : option2.allowJsFlag ? getAllowJSCompilerOption(options) : options[option2.name];
       }
       function getJSXTransformEnabled(options) {
         const jsx = options.jsx;
@@ -45839,22 +45839,22 @@ ${lanes.join("\n")}
         ...commonOptionsWithBuild,
         ...commandOptionsWithoutBuild
       ];
-      var semanticDiagnosticsOptionDeclarations = optionDeclarations.filter((option) => !!option.affectsSemanticDiagnostics);
-      var affectsEmitOptionDeclarations = optionDeclarations.filter((option) => !!option.affectsEmit);
-      var affectsDeclarationPathOptionDeclarations = optionDeclarations.filter((option) => !!option.affectsDeclarationPath);
-      var moduleResolutionOptionDeclarations = optionDeclarations.filter((option) => !!option.affectsModuleResolution);
-      var sourceFileAffectingCompilerOptions = optionDeclarations.filter((option) => !!option.affectsSourceFile || !!option.affectsBindDiagnostics);
-      var optionsAffectingProgramStructure = optionDeclarations.filter((option) => !!option.affectsProgramStructure);
-      var transpileOptionValueCompilerOptions = optionDeclarations.filter((option) => hasProperty(option, "transpileOptionValue"));
+      var semanticDiagnosticsOptionDeclarations = optionDeclarations.filter((option2) => !!option2.affectsSemanticDiagnostics);
+      var affectsEmitOptionDeclarations = optionDeclarations.filter((option2) => !!option2.affectsEmit);
+      var affectsDeclarationPathOptionDeclarations = optionDeclarations.filter((option2) => !!option2.affectsDeclarationPath);
+      var moduleResolutionOptionDeclarations = optionDeclarations.filter((option2) => !!option2.affectsModuleResolution);
+      var sourceFileAffectingCompilerOptions = optionDeclarations.filter((option2) => !!option2.affectsSourceFile || !!option2.affectsBindDiagnostics);
+      var optionsAffectingProgramStructure = optionDeclarations.filter((option2) => !!option2.affectsProgramStructure);
+      var transpileOptionValueCompilerOptions = optionDeclarations.filter((option2) => hasProperty(option2, "transpileOptionValue"));
       var configDirTemplateSubstitutionOptions = optionDeclarations.filter(
-        (option) => option.allowConfigDirTemplateSubstitution || !option.isCommandLineOnly && option.isFilePath
+        (option2) => option2.allowConfigDirTemplateSubstitution || !option2.isCommandLineOnly && option2.isFilePath
       );
       var configDirTemplateSubstitutionWatchOptions = optionsForWatch.filter(
-        (option) => option.allowConfigDirTemplateSubstitution || !option.isCommandLineOnly && option.isFilePath
+        (option2) => option2.allowConfigDirTemplateSubstitution || !option2.isCommandLineOnly && option2.isFilePath
       );
       var commandLineOptionOfCustomType = optionDeclarations.filter(isCommandLineOptionOfCustomType);
-      function isCommandLineOptionOfCustomType(option) {
-        return !isString(option.type);
+      function isCommandLineOptionOfCustomType(option2) {
+        return !isString(option2.type);
       }
       var tscBuildOption = {
         name: "build",
@@ -45941,10 +45941,10 @@ ${lanes.join("\n")}
       function createOptionNameMap(optionDeclarations2) {
         const optionsNameMap = /* @__PURE__ */ new Map();
         const shortOptionNames = /* @__PURE__ */ new Map();
-        forEach(optionDeclarations2, (option) => {
-          optionsNameMap.set(option.name.toLowerCase(), option);
-          if (option.shortName) {
-            shortOptionNames.set(option.shortName, option.name);
+        forEach(optionDeclarations2, (option2) => {
+          optionsNameMap.set(option2.name.toLowerCase(), option2);
+          if (option2.shortName) {
+            shortOptionNames.set(option2.shortName, option2.name);
           }
         });
         return { optionsNameMap, shortOptionNames };
@@ -46000,8 +46000,8 @@ ${lanes.join("\n")}
             return mapDefined(values, (v) => parseCustomTypeOption(opt.element, v, errors));
         }
       }
-      function getOptionName(option) {
-        return option.name;
+      function getOptionName(option2) {
+        return option2.name;
       }
       function createUnknownOptionError(unknownOption, diagnostics, unknownOptionErrorText, node, sourceFile) {
         var _a;
@@ -46462,13 +46462,13 @@ ${lanes.join("\n")}
             }
             const textOfKey = isComputedNonLiteralName(element.name) ? void 0 : getTextOfPropertyName(element.name);
             const keyText = textOfKey && unescapeLeadingUnderscores(textOfKey);
-            const option = keyText ? (_a = objectOption == null ? void 0 : objectOption.elementOptions) == null ? void 0 : _a.get(keyText) : void 0;
-            const value = convertPropertyValueToJson(element.initializer, option);
+            const option2 = keyText ? (_a = objectOption == null ? void 0 : objectOption.elementOptions) == null ? void 0 : _a.get(keyText) : void 0;
+            const value = convertPropertyValueToJson(element.initializer, option2);
             if (typeof keyText !== "undefined") {
               if (returnValue) {
                 result[keyText] = value;
               }
-              jsonConversionNotifier == null ? void 0 : jsonConversionNotifier.onPropertySet(keyText, value, element, objectOption, option);
+              jsonConversionNotifier == null ? void 0 : jsonConversionNotifier.onPropertySet(keyText, value, element, objectOption, option2);
             }
           }
           return result;
@@ -46480,7 +46480,7 @@ ${lanes.join("\n")}
           }
           return filter(elements.map((element) => convertPropertyValueToJson(element, elementOption)), (v) => v !== void 0);
         }
-        function convertPropertyValueToJson(valueExpression, option) {
+        function convertPropertyValueToJson(valueExpression, option2) {
           switch (valueExpression.kind) {
             case 112:
               return true;
@@ -46503,15 +46503,15 @@ ${lanes.join("\n")}
               return -Number(valueExpression.operand.text);
             case 211:
               const objectLiteralExpression = valueExpression;
-              return convertObjectLiteralExpressionToJson(objectLiteralExpression, option);
+              return convertObjectLiteralExpressionToJson(objectLiteralExpression, option2);
             case 210:
               return convertArrayLiteralExpressionToJson(
                 valueExpression.elements,
-                option && option.element
+                option2 && option2.element
               );
           }
-          if (option) {
-            errors.push(createDiagnosticForNodeInSourceFile(sourceFile, valueExpression, Diagnostics.Compiler_option_0_requires_a_value_of_type_1, option.name, getCompilerOptionValueTypeString(option)));
+          if (option2) {
+            errors.push(createDiagnosticForNodeInSourceFile(sourceFile, valueExpression, Diagnostics.Compiler_option_0_requires_a_value_of_type_1, option2.name, getCompilerOptionValueTypeString(option2)));
           } else {
             errors.push(createDiagnosticForNodeInSourceFile(sourceFile, valueExpression, Diagnostics.Property_value_can_only_be_string_literal_numeric_literal_true_false_null_object_literal_or_array_literal));
           }
@@ -46521,19 +46521,19 @@ ${lanes.join("\n")}
           return isStringLiteral(node) && isStringDoubleQuoted(node, sourceFile);
         }
       }
-      function getCompilerOptionValueTypeString(option) {
-        return option.type === "listOrElement" ? `${getCompilerOptionValueTypeString(option.element)} or Array` : option.type === "list" ? "Array" : isString(option.type) ? option.type : "string";
+      function getCompilerOptionValueTypeString(option2) {
+        return option2.type === "listOrElement" ? `${getCompilerOptionValueTypeString(option2.element)} or Array` : option2.type === "list" ? "Array" : isString(option2.type) ? option2.type : "string";
       }
-      function isCompilerOptionsValue(option, value) {
-        if (option) {
-          if (isNullOrUndefined(value)) return !option.disallowNullOrUndefined;
-          if (option.type === "list") {
+      function isCompilerOptionsValue(option2, value) {
+        if (option2) {
+          if (isNullOrUndefined(value)) return !option2.disallowNullOrUndefined;
+          if (option2.type === "list") {
             return isArray(value);
           }
-          if (option.type === "listOrElement") {
-            return isArray(value) || isCompilerOptionsValue(option.element, value);
+          if (option2.type === "listOrElement") {
+            return isArray(value) || isCompilerOptionsValue(option2.element, value);
           }
-          const expectedType = isString(option.type) ? option.type : "string";
+          const expectedType = isString(option2.type) ? option2.type : "string";
           return typeof value === expectedType;
         }
         return false;
@@ -46581,25 +46581,25 @@ ${lanes.join("\n")}
         };
         const providedKeys = new Set(optionMap.keys());
         const impliedCompilerOptions = {};
-        for (const option in computedOptions) {
-          if (!providedKeys.has(option) && optionDependsOn(option, providedKeys)) {
-            const implied = computedOptions[option].computeValue(configParseResult.options);
-            const defaultValue = computedOptions[option].computeValue({});
+        for (const option2 in computedOptions) {
+          if (!providedKeys.has(option2) && optionDependsOn(option2, providedKeys)) {
+            const implied = computedOptions[option2].computeValue(configParseResult.options);
+            const defaultValue = computedOptions[option2].computeValue({});
             if (implied !== defaultValue) {
-              impliedCompilerOptions[option] = computedOptions[option].computeValue(configParseResult.options);
+              impliedCompilerOptions[option2] = computedOptions[option2].computeValue(configParseResult.options);
             }
           }
         }
         assign(config.compilerOptions, optionMapToObject(serializeCompilerOptions(impliedCompilerOptions, pathOptions)));
         return config;
       }
-      function optionDependsOn(option, dependsOn) {
+      function optionDependsOn(option2, dependsOn) {
         const seen = /* @__PURE__ */ new Set();
-        return optionDependsOnRecursive(option);
-        function optionDependsOnRecursive(option2) {
+        return optionDependsOnRecursive(option2);
+        function optionDependsOnRecursive(option22) {
           var _a;
-          if (addToSeen(seen, option2)) {
-            return some((_a = computedOptions[option2]) == null ? void 0 : _a.dependencies, (dep) => dependsOn.has(dep) || optionDependsOnRecursive(dep));
+          if (addToSeen(seen, option22)) {
+            return some((_a = computedOptions[option22]) == null ? void 0 : _a.dependencies, (dep) => dependsOn.has(dep) || optionDependsOnRecursive(dep));
           }
           return false;
         }
@@ -46857,11 +46857,11 @@ ${lanes.join("\n")}
           }
         }
         function formatValueOrArray(settingName, value) {
-          const option = optionDeclarations.filter((c) => c.name === settingName)[0];
-          if (!option) Debug.fail(`No option named ${settingName}?`);
-          const map2 = option.type instanceof Map ? option.type : void 0;
+          const option2 = optionDeclarations.filter((c) => c.name === settingName)[0];
+          if (!option2) Debug.fail(`No option named ${settingName}?`);
+          const map2 = option2.type instanceof Map ? option2.type : void 0;
           if (isArray(value)) {
-            const map3 = "element" in option && option.element.type instanceof Map ? option.element.type : void 0;
+            const map3 = "element" in option2 && option2.element.type instanceof Map ? option2.element.type : void 0;
             return `[${value.map((v) => formatSingleValue(v, map3)).join(", ")}]`;
           } else {
             return formatSingleValue(value, map2);
@@ -46895,17 +46895,17 @@ ${lanes.join("\n")}
         }
         return result;
       }
-      function convertToOptionValueWithAbsolutePaths(option, value, toAbsolutePath) {
-        if (option && !isNullOrUndefined(value)) {
-          if (option.type === "list") {
+      function convertToOptionValueWithAbsolutePaths(option2, value, toAbsolutePath) {
+        if (option2 && !isNullOrUndefined(value)) {
+          if (option2.type === "list") {
             const values = value;
-            if (option.element.isFilePath && values.length) {
+            if (option2.element.isFilePath && values.length) {
               return values.map(toAbsolutePath);
             }
-          } else if (option.isFilePath) {
+          } else if (option2.isFilePath) {
             return toAbsolutePath(value);
           }
-          Debug.assert(option.type !== "listOrElement");
+          Debug.assert(option2.type !== "listOrElement");
         }
         return value;
       }
@@ -47129,25 +47129,25 @@ ${lanes.join("\n")}
       function handleOptionConfigDirTemplateSubstitution(options, optionDeclarations2, basePath) {
         if (!options) return options;
         let result;
-        for (const option of optionDeclarations2) {
-          if (options[option.name] !== void 0) {
-            const value = options[option.name];
-            switch (option.type) {
+        for (const option2 of optionDeclarations2) {
+          if (options[option2.name] !== void 0) {
+            const value = options[option2.name];
+            switch (option2.type) {
               case "string":
-                Debug.assert(option.isFilePath);
+                Debug.assert(option2.isFilePath);
                 if (startsWithConfigDirTemplate(value)) {
-                  setOptionValue(option, getSubstitutedPathWithConfigDirTemplate(value, basePath));
+                  setOptionValue(option2, getSubstitutedPathWithConfigDirTemplate(value, basePath));
                 }
                 break;
               case "list":
-                Debug.assert(option.element.isFilePath);
+                Debug.assert(option2.element.isFilePath);
                 const listResult = getSubstitutedStringArrayWithConfigDirTemplate(value, basePath);
-                if (listResult) setOptionValue(option, listResult);
+                if (listResult) setOptionValue(option2, listResult);
                 break;
               case "object":
-                Debug.assert(option.name === "paths");
+                Debug.assert(option2.name === "paths");
                 const objectResult = getSubstitutedMapLikeOfStringArrayWithConfigDirTemplate(value, basePath);
-                if (objectResult) setOptionValue(option, objectResult);
+                if (objectResult) setOptionValue(option2, objectResult);
                 break;
               default:
                 Debug.fail("option type not supported");
@@ -47155,8 +47155,8 @@ ${lanes.join("\n")}
           }
         }
         return result || options;
-        function setOptionValue(option, value) {
-          (result ?? (result = assign({}, options)))[option.name] = value;
+        function setOptionValue(option2, value) {
+          (result ?? (result = assign({}, options)))[option2.name] = value;
         }
       }
       var configDirTemplate = `\${configDir}`;
@@ -47349,16 +47349,16 @@ ${lanes.join("\n")}
           errors.push(createDiagnosticForNodeInSourceFile(sourceFile, rootCompilerOptions[0], Diagnostics._0_should_be_set_inside_the_compilerOptions_object_of_the_config_json_file, getTextOfPropertyName(rootCompilerOptions[0])));
         }
         return { raw: json, options, watchOptions, typeAcquisition, extendedConfigPath };
-        function onPropertySet(keyText, value, propertyAssignment, parentOption, option) {
-          if (option && option !== extendsOptionDeclaration) value = convertJsonOption(option, value, basePath, errors, propertyAssignment, propertyAssignment.initializer, sourceFile);
+        function onPropertySet(keyText, value, propertyAssignment, parentOption, option2) {
+          if (option2 && option2 !== extendsOptionDeclaration) value = convertJsonOption(option2, value, basePath, errors, propertyAssignment, propertyAssignment.initializer, sourceFile);
           if (parentOption == null ? void 0 : parentOption.name) {
-            if (option) {
+            if (option2) {
               let currentOption;
               if (parentOption === compilerOptionsDeclaration) currentOption = options;
               else if (parentOption === watchOptionsDeclaration) currentOption = watchOptions ?? (watchOptions = {});
               else if (parentOption === typeAcquisitionDeclaration) currentOption = typeAcquisition ?? (typeAcquisition = getDefaultTypeAcquisition(configFileName));
               else Debug.fail("Unknown option");
-              currentOption[option.name] = value;
+              currentOption[option2.name] = value;
             } else if (keyText && (parentOption == null ? void 0 : parentOption.extraKeyDiagnostics)) {
               if (parentOption.elementOptions) {
                 errors.push(createUnknownOptionError(
@@ -47374,9 +47374,9 @@ ${lanes.join("\n")}
               }
             }
           } else if (parentOption === rootOptions) {
-            if (option === extendsOptionDeclaration) {
+            if (option2 === extendsOptionDeclaration) {
               extendedConfigPath = getExtendsConfigPathOrArray(value, host, basePath, configFileName, errors, propertyAssignment, propertyAssignment.initializer, sourceFile);
-            } else if (!option) {
+            } else if (!option2) {
               if (keyText === "excludes") {
                 errors.push(createDiagnosticForNodeInSourceFile(sourceFile, propertyAssignment.name, Diagnostics.Unknown_option_excludes_Did_you_mean_exclude));
               }
@@ -47540,8 +47540,8 @@ ${lanes.join("\n")}
           errors.push(createDiagnosticForNodeInSourceFileOrCompilerDiagnostic(sourceFile, valueExpression, Diagnostics.Compiler_option_0_requires_a_value_of_type_1, opt.name, getCompilerOptionValueTypeString(opt)));
         }
       }
-      function normalizeNonListOptionValue(option, basePath, value) {
-        if (option.isFilePath) {
+      function normalizeNonListOptionValue(option2, basePath, value) {
+        if (option2.isFilePath) {
           value = normalizeSlashes(value);
           value = !startsWithConfigDirTemplate(value) ? getNormalizedAbsolutePath(value, basePath) : value;
           if (value === "") {
@@ -47568,8 +47568,8 @@ ${lanes.join("\n")}
           errors.push(createDiagnosticForInvalidCustomType(opt, (message, ...args) => createDiagnosticForNodeInSourceFileOrCompilerDiagnostic(sourceFile, valueExpression, message, ...args)));
         }
       }
-      function convertJsonOptionOfListType(option, values, basePath, errors, propertyAssignment, valueExpression, sourceFile) {
-        return filter(map(values, (v, index) => convertJsonOption(option.element, v, basePath, errors, propertyAssignment, valueExpression == null ? void 0 : valueExpression.elements[index], sourceFile)), (v) => option.listPreserveFalsyValues ? true : !!v);
+      function convertJsonOptionOfListType(option2, values, basePath, errors, propertyAssignment, valueExpression, sourceFile) {
+        return filter(map(values, (v, index) => convertJsonOption(option2.element, v, basePath, errors, propertyAssignment, valueExpression == null ? void 0 : valueExpression.elements[index], sourceFile)), (v) => option2.listPreserveFalsyValues ? true : !!v);
       }
       var invalidTrailingRecursionPattern = /(?:^|\/)\*\*\/?$/;
       var wildcardDirectoryPattern = /^[^*?]*(?=\/[^/]*[*?])/;
@@ -47815,9 +47815,9 @@ ${lanes.join("\n")}
         }
         return out;
       }
-      function getOptionValueWithEmptyStrings(value, option) {
+      function getOptionValueWithEmptyStrings(value, option2) {
         if (value === void 0) return value;
-        switch (option.type) {
+        switch (option2.type) {
           case "object":
             return "";
           case "string":
@@ -47827,13 +47827,13 @@ ${lanes.join("\n")}
           case "boolean":
             return typeof value === "boolean" ? value : "";
           case "listOrElement":
-            if (!isArray(value)) return getOptionValueWithEmptyStrings(value, option.element);
+            if (!isArray(value)) return getOptionValueWithEmptyStrings(value, option2.element);
           // fall through to list
           case "list":
-            const elementType = option.element;
+            const elementType = option2.element;
             return isArray(value) ? mapDefined(value, (v) => getOptionValueWithEmptyStrings(v, elementType)) : "";
           default:
-            return forEachEntry(option.type, (optionEnumValue, optionStringValue) => {
+            return forEachEntry(option2.type, (optionEnumValue, optionStringValue) => {
               if (optionEnumValue === value) {
                 return optionStringValue;
               }
@@ -48392,7 +48392,7 @@ ${lanes.join("\n")}
         return str + "}";
       }
       function getKeyForCompilerOptions(options, affectingOptionDeclarations) {
-        return affectingOptionDeclarations.map((option) => compilerOptionValueToString(getCompilerOptionValue(options, option))).join("|") + `|${options.pathsBasePath}`;
+        return affectingOptionDeclarations.map((option2) => compilerOptionValueToString(getCompilerOptionValue(options, option2))).join("|") + `|${options.pathsBasePath}`;
       }
       function createCacheWithRedirects(ownOptions, optionsToRedirectsKey) {
         const redirectsMap = /* @__PURE__ */ new Map();
@@ -54534,8 +54534,8 @@ ${lanes.join("\n")}
               }
               const relative = getRelativePathFromDirectory(realPathDirectory, target, getCanonicalFileName);
               for (const symlinkDirectory of symlinkDirectories) {
-                const option = resolvePath(symlinkDirectory, relative);
-                const result2 = cb(option, target === referenceRedirect);
+                const option2 = resolvePath(symlinkDirectory, relative);
+                const result2 = cb(option2, target === referenceRedirect);
                 shouldFilterIgnoredPaths = true;
                 if (result2) return result2;
               }
@@ -136696,10 +136696,10 @@ ${lanes.join("\n")}
         let { oldProgram } = _createProgramOptions;
         _createProgramOptions = void 0;
         _rootNamesOrOptions = void 0;
-        for (const option of commandLineOptionOfCustomType) {
-          if (hasProperty(options, option.name)) {
-            if (typeof options[option.name] === "string") {
-              throw new Error(`${option.name} is a string value; tsconfig JSON must be parsed with parseJsonSourceFileConfigFileContent or getParsedCommandLineOfConfigFile before passing to createProgram`);
+        for (const option2 of commandLineOptionOfCustomType) {
+          if (hasProperty(options, option2.name)) {
+            if (typeof options[option2.name] === "string") {
+              throw new Error(`${option2.name} is a string value; tsconfig JSON must be parsed with parseJsonSourceFileConfigFileContent or getParsedCommandLineOfConfigFile before passing to createProgram`);
             }
           }
         }
@@ -139710,8 +139710,8 @@ ${lanes.join("\n")}
         }
         return { diagnostics, sourceMaps: void 0, emittedFiles, emitSkipped: true };
       }
-      function filterSemanticDiagnostics(diagnostic, option) {
-        return filter(diagnostic, (d) => !d.skippedOn || !option[d.skippedOn]);
+      function filterSemanticDiagnostics(diagnostic, option2) {
+        return filter(diagnostic, (d) => !d.skippedOn || !option2[d.skippedOn]);
       }
       function parseConfigHostFromCompilerHostLike(host, directoryStructureHost = host) {
         return {
@@ -141245,15 +141245,15 @@ ${lanes.join("\n")}
           }
           return result;
         }
-        function toReusableCompilerOptionValue(option, value) {
-          if (option) {
-            Debug.assert(option.type !== "listOrElement");
-            if (option.type === "list") {
+        function toReusableCompilerOptionValue(option2, value) {
+          if (option2) {
+            Debug.assert(option2.type !== "listOrElement");
+            if (option2.type === "list") {
               const values = value;
-              if (option.element.isFilePath && values.length) {
+              if (option2.element.isFilePath && values.length) {
                 return values.map(relativeToBuildInfoEnsuringAbsolutePath);
               }
-            } else if (option.isFilePath) {
+            } else if (option2.isFilePath) {
               return relativeToBuildInfoEnsuringAbsolutePath(value);
             }
           }
@@ -144663,8 +144663,8 @@ ${lanes.join("\n")}
       }
       function getCompilerOptionsOfBuildOptions(buildOptions) {
         const result = {};
-        commonOptionsWithBuild.forEach((option) => {
-          if (hasProperty(buildOptions, option.name)) result[option.name] = buildOptions[option.name];
+        commonOptionsWithBuild.forEach((option2) => {
+          if (hasProperty(buildOptions, option2.name)) result[option2.name] = buildOptions[option2.name];
         });
         result.tscBuild = true;
         return result;
@@ -146508,24 +146508,24 @@ ${lanes.join("\n")}
           blueBackground
         };
       }
-      function getDisplayNameTextOfOption(option) {
-        return `--${option.name}${option.shortName ? `, -${option.shortName}` : ""}`;
+      function getDisplayNameTextOfOption(option2) {
+        return `--${option2.name}${option2.shortName ? `, -${option2.shortName}` : ""}`;
       }
-      function generateOptionOutput(sys2, option, rightAlignOfLeft, leftAlignOfRight) {
+      function generateOptionOutput(sys2, option2, rightAlignOfLeft, leftAlignOfRight) {
         var _a;
         const text2 = [];
         const colors = createColors(sys2);
-        const name = getDisplayNameTextOfOption(option);
-        const valueCandidates = getValueCandidate(option);
-        const defaultValueDescription = typeof option.defaultValueDescription === "object" ? getDiagnosticText(option.defaultValueDescription) : formatDefaultValue(
-          option.defaultValueDescription,
-          option.type === "list" || option.type === "listOrElement" ? option.element.type : option.type
+        const name = getDisplayNameTextOfOption(option2);
+        const valueCandidates = getValueCandidate(option2);
+        const defaultValueDescription = typeof option2.defaultValueDescription === "object" ? getDiagnosticText(option2.defaultValueDescription) : formatDefaultValue(
+          option2.defaultValueDescription,
+          option2.type === "list" || option2.type === "listOrElement" ? option2.element.type : option2.type
         );
         const terminalWidth = ((_a = sys2.getWidthOfTerminal) == null ? void 0 : _a.call(sys2)) ?? 0;
         if (terminalWidth >= 80) {
           let description3 = "";
-          if (option.description) {
-            description3 = getDiagnosticText(option.description);
+          if (option2.description) {
+            description3 = getDiagnosticText(option2.description);
           }
           text2.push(...getPrettyOutput(
             name,
@@ -146536,7 +146536,7 @@ ${lanes.join("\n")}
             /*colorLeft*/
             true
           ), sys2.newLine);
-          if (showAdditionalInfoOutput(valueCandidates, option)) {
+          if (showAdditionalInfoOutput(valueCandidates, option2)) {
             if (valueCandidates) {
               text2.push(...getPrettyOutput(
                 valueCandidates.valueType,
@@ -146563,12 +146563,12 @@ ${lanes.join("\n")}
           text2.push(sys2.newLine);
         } else {
           text2.push(colors.blue(name), sys2.newLine);
-          if (option.description) {
-            const description3 = getDiagnosticText(option.description);
+          if (option2.description) {
+            const description3 = getDiagnosticText(option2.description);
             text2.push(description3);
           }
           text2.push(sys2.newLine);
-          if (showAdditionalInfoOutput(valueCandidates, option)) {
+          if (showAdditionalInfoOutput(valueCandidates, option2)) {
             if (valueCandidates) {
               text2.push(`${valueCandidates.valueType} ${valueCandidates.possibleValues}`);
             }
@@ -146585,11 +146585,11 @@ ${lanes.join("\n")}
         function formatDefaultValue(defaultValue, type2) {
           return defaultValue !== void 0 && typeof type2 === "object" ? arrayFrom(type2.entries()).filter(([, value]) => value === defaultValue).map(([name2]) => name2).join("/") : String(defaultValue);
         }
-        function showAdditionalInfoOutput(valueCandidates2, option2) {
+        function showAdditionalInfoOutput(valueCandidates2, option22) {
           const ignoreValues = ["string"];
           const ignoredDescriptions = [void 0, "false", "n/a"];
-          const defaultValueDescription2 = option2.defaultValueDescription;
-          if (option2.category === Diagnostics.Command_line_Options) return false;
+          const defaultValueDescription2 = option22.defaultValueDescription;
+          if (option22.category === Diagnostics.Command_line_Options) return false;
           if (contains(ignoreValues, valueCandidates2 == null ? void 0 : valueCandidates2.possibleValues) && contains(ignoredDescriptions, defaultValueDescription2)) {
             return false;
           }
@@ -146616,13 +146616,13 @@ ${lanes.join("\n")}
           }
           return res;
         }
-        function getValueCandidate(option2) {
-          if (option2.type === "object") {
+        function getValueCandidate(option22) {
+          if (option22.type === "object") {
             return void 0;
           }
           return {
-            valueType: getValueType(option2),
-            possibleValues: getPossibleValues(option2)
+            valueType: getValueType(option22),
+            possibleValues: getPossibleValues(option22)
           };
           function getValueType(option3) {
             Debug.assert(option3.type !== "listOrElement");
@@ -146668,15 +146668,15 @@ ${lanes.join("\n")}
       }
       function generateGroupOptionOutput(sys2, optionsList) {
         let maxLength2 = 0;
-        for (const option of optionsList) {
-          const curLength = getDisplayNameTextOfOption(option).length;
+        for (const option2 of optionsList) {
+          const curLength = getDisplayNameTextOfOption(option2).length;
           maxLength2 = maxLength2 > curLength ? maxLength2 : curLength;
         }
         const rightAlignOfLeftPart = maxLength2 + 2;
         const leftAlignOfRightPart = rightAlignOfLeftPart + 2;
         let lines = [];
-        for (const option of optionsList) {
-          const tmp = generateOptionOutput(sys2, option, rightAlignOfLeftPart, leftAlignOfRightPart);
+        for (const option2 of optionsList) {
+          const tmp = generateOptionOutput(sys2, option2, rightAlignOfLeftPart, leftAlignOfRightPart);
           lines = [...lines, ...tmp];
         }
         if (lines[lines.length - 2] !== sys2.newLine) {
@@ -146698,13 +146698,13 @@ ${lanes.join("\n")}
           return res;
         }
         const categoryMap = /* @__PURE__ */ new Map();
-        for (const option of options) {
-          if (!option.category) {
+        for (const option2 of options) {
+          if (!option2.category) {
             continue;
           }
-          const curCategory = getDiagnosticText(option.category);
+          const curCategory = getDiagnosticText(option2.category);
           const optionsOfCurCategory = categoryMap.get(curCategory) ?? [];
-          optionsOfCurCategory.push(option);
+          optionsOfCurCategory.push(option2);
           categoryMap.set(curCategory, optionsOfCurCategory);
         }
         categoryMap.forEach((value, key) => {
@@ -146787,7 +146787,7 @@ ${lanes.join("\n")}
         output = [...output, ...generateSectionOptionsOutput(
           sys2,
           getDiagnosticText(Diagnostics.BUILD_OPTIONS),
-          filter(buildOptions, (option) => option !== tscBuildOption),
+          filter(buildOptions, (option2) => option2 !== tscBuildOption),
           /*subCategory*/
           false,
           formatMessage(Diagnostics.Using_build_b_will_make_tsc_behave_more_like_a_build_orchestrator_than_a_compiler_This_is_used_to_trigger_building_composite_projects_which_you_can_learn_more_about_at_0, "https://aka.ms/tsc-composite-builds")
@@ -146801,7 +146801,7 @@ ${lanes.join("\n")}
         output = [...output, ...generateSectionOptionsOutput(
           sys2,
           getDiagnosticText(Diagnostics.BUILD_OPTIONS),
-          filter(buildOptions, (option) => option !== tscBuildOption),
+          filter(buildOptions, (option2) => option2 !== tscBuildOption),
           /*subCategory*/
           false,
           formatMessage(Diagnostics.Using_build_b_will_make_tsc_behave_more_like_a_build_orchestrator_than_a_compiler_This_is_used_to_trigger_building_composite_projects_which_you_can_learn_more_about_at_0, "https://aka.ms/tsc-composite-builds")
@@ -154554,9 +154554,9 @@ ${lanes.join("\n")}
             }
             case "compilerOptions":
               forEachProperty(property.initializer, (property2, propertyName2) => {
-                const option = getOptionFromName(propertyName2);
-                Debug.assert((option == null ? void 0 : option.type) !== "listOrElement");
-                if (option && (option.isFilePath || option.type === "list" && option.element.isFilePath)) {
+                const option2 = getOptionFromName(propertyName2);
+                Debug.assert((option2 == null ? void 0 : option2.type) !== "listOrElement");
+                if (option2 && (option2.isFilePath || option2.type === "list" && option2.element.isFilePath)) {
                   updatePaths(property2);
                 } else if (propertyName2 === "paths") {
                   forEachProperty(property2.initializer, (pathsProperty) => {
@@ -155790,11 +155790,11 @@ interface Symbol {
             options[key] = defaultOptions[key];
           }
         }
-        for (const option of transpileOptionValueCompilerOptions) {
-          if (options.verbatimModuleSyntax && optionsRedundantWithVerbatimModuleSyntax.has(option.name)) {
+        for (const option2 of transpileOptionValueCompilerOptions) {
+          if (options.verbatimModuleSyntax && optionsRedundantWithVerbatimModuleSyntax.has(option2.name)) {
             continue;
           }
-          options[option.name] = option.transpileOptionValue;
+          options[option2.name] = option2.transpileOptionValue;
         }
         options.suppressOutputPathCheck = true;
         options.allowNonTsExtensions = true;
@@ -202341,13 +202341,13 @@ ${options.prefix}` : "\n" : options.prefix
       var ensureProjectForOpenFileSchedule = "*ensureProjectForOpenFiles*";
       function prepareConvertersForEnumLikeCompilerOptions(commandLineOptions) {
         const map2 = /* @__PURE__ */ new Map();
-        for (const option of commandLineOptions) {
-          if (typeof option.type === "object") {
-            const optionMap = option.type;
+        for (const option2 of commandLineOptions) {
+          if (typeof option2.type === "object") {
+            const optionMap = option2.type;
             optionMap.forEach((value) => {
               Debug.assert(typeof value === "number");
             });
-            map2.set(option.name, optionMap);
+            map2.set(option2.name, optionMap);
           }
         }
         return map2;
@@ -202414,20 +202414,20 @@ ${options.prefix}` : "\n" : options.prefix
       function convertWatchOptions(protocolOptions, currentDirectory) {
         let watchOptions;
         let errors;
-        optionsForWatch.forEach((option) => {
-          const propertyValue = protocolOptions[option.name];
+        optionsForWatch.forEach((option2) => {
+          const propertyValue = protocolOptions[option2.name];
           if (propertyValue === void 0) return;
-          const mappedValues = watchOptionsConverters.get(option.name);
-          (watchOptions || (watchOptions = {}))[option.name] = mappedValues ? isString(propertyValue) ? mappedValues.get(propertyValue.toLowerCase()) : propertyValue : convertJsonOption(option, propertyValue, currentDirectory || "", errors || (errors = []));
+          const mappedValues = watchOptionsConverters.get(option2.name);
+          (watchOptions || (watchOptions = {}))[option2.name] = mappedValues ? isString(propertyValue) ? mappedValues.get(propertyValue.toLowerCase()) : propertyValue : convertJsonOption(option2, propertyValue, currentDirectory || "", errors || (errors = []));
         });
         return watchOptions && { watchOptions, errors };
       }
       function convertTypeAcquisition(protocolOptions) {
         let result;
-        typeAcquisitionDeclarations.forEach((option) => {
-          const propertyValue = protocolOptions[option.name];
+        typeAcquisitionDeclarations.forEach((option2) => {
+          const propertyValue = protocolOptions[option2.name];
           if (propertyValue === void 0) return;
-          (result || (result = {}))[option.name] = propertyValue;
+          (result || (result = {}))[option2.name] = propertyValue;
         });
         return result;
       }
@@ -211528,6 +211528,34 @@ function color(value) {
   if (data.color !== void 0) return rgba(record(data.color), number(record(data.opacity).measure));
   return legacyColor(data);
 }
+function option(value) {
+  if (typeof value === "string") return value;
+  const result = record(value).value;
+  if (typeof result !== "string") throw new Error("Expected an option value");
+  return result;
+}
+var textCaseCss = { Original: "none", Upper: "uppercase", Lower: "lowercase", Camel: "capitalize", SmallCaps: "small-caps" };
+var textDecorationCss = { None: "none", Underline: "underline", Strikethrough: "line-through" };
+function gradientAngle(from, to) {
+  const angle = Math.atan2(number(to.x) - number(from.x), number(from.y) - number(to.y)) * (180 / Math.PI);
+  return Math.round(angle * 100) / 100;
+}
+function gradientLayer(value) {
+  const layer = record(value);
+  if (!Array.isArray(layer.stops) || layer.stops.length === 0) throw new Error("Gradient requires at least one stop");
+  const stops = layer.stops.map((stop) => {
+    const data = record(stop);
+    return `${color(data.color)} ${Math.round(number(data.position) * 1e4) / 100}%`;
+  }).join(", ");
+  switch (layer.type) {
+    case import_sdk_exporters2.GradientType.radial:
+      return `radial-gradient(circle, ${stops})`;
+    case import_sdk_exporters2.GradientType.angular:
+      return `conic-gradient(${stops})`;
+    default:
+      return `linear-gradient(${gradientAngle(record(layer.from), record(layer.to))}deg, ${stops})`;
+  }
+}
 var familyCss = (family) => family.includes(" ") ? JSON.stringify(family) : family;
 var scalar = (css) => ({ css, js: css });
 function resolveTokenValue(type2, value) {
@@ -211574,6 +211602,20 @@ function resolveTokenValue(type2, value) {
       const resolvedColor = color(data.color);
       return { css: `${width} ${style} ${resolvedColor}`, js: { width, style, color: resolvedColor } };
     }
+    case import_sdk_exporters2.TokenType.gradient:
+      return scalar((Array.isArray(value) ? value : [value]).map(gradientLayer).join(", "));
+    case import_sdk_exporters2.TokenType.blur:
+      return scalar(`blur(${measure(record(value).radius)})`);
+    case import_sdk_exporters2.TokenType.textCase: {
+      const result = option(value);
+      return scalar(textCaseCss[result] ?? result.toLowerCase());
+    }
+    case import_sdk_exporters2.TokenType.textDecoration: {
+      const result = option(value);
+      return scalar(textDecorationCss[result] ?? result.toLowerCase());
+    }
+    case import_sdk_exporters2.TokenType.visibility:
+      return scalar(option(value).toLowerCase());
     case import_sdk_exporters2.TokenType.shadow: {
       const layers = Array.isArray(value) ? value : [value];
       return scalar(layers.map((layer) => {
@@ -211614,7 +211656,12 @@ var categories = /* @__PURE__ */ new Map([
   [import_sdk_exporters3.TokenType.space, "spacing"],
   [import_sdk_exporters3.TokenType.radius, "radii"],
   [import_sdk_exporters3.TokenType.border, "borders"],
-  [import_sdk_exporters3.TokenType.shadow, "shadows"]
+  [import_sdk_exporters3.TokenType.shadow, "shadows"],
+  [import_sdk_exporters3.TokenType.gradient, "gradients"],
+  [import_sdk_exporters3.TokenType.blur, "blurs"],
+  [import_sdk_exporters3.TokenType.textCase, "typography"],
+  [import_sdk_exporters3.TokenType.textDecoration, "typography"],
+  [import_sdk_exporters3.TokenType.visibility, "typography"]
 ]);
 function groupPaths(groups) {
   const index = /* @__PURE__ */ new Map();
@@ -211824,7 +211871,7 @@ function parseDefinitions(value, allowImportedReferences = false) {
         text2(prop2.name, `${context}.${key}.name`);
         if (prop2.options !== void 0) {
           if (!Array.isArray(prop2.options) || !prop2.options.length) throw new Error(`${context}.${key}.options: expected nonempty array`);
-          const opts = prop2.options.map((option) => typeof option === "string" ? option : text2(record2(option, context).value ?? record2(option, context).name, context));
+          const opts = prop2.options.map((option2) => typeof option2 === "string" ? option2 : text2(record2(option2, context).value ?? record2(option2, context).name, context));
           if (new Set(opts).size !== opts.length) throw new Error(`${context}.${key}: duplicate option`);
           if (prop2.defaultValue !== void 0 && !opts.includes(prop2.defaultValue)) throw new Error(`${context}.${key}: default is not an option`);
         }
@@ -212048,7 +212095,7 @@ function generateComponentSource(component) {
   const members = /* @__PURE__ */ new Map();
   if (input === "none" && component.root?.childrenSlot !== false && !voidTags.has(component.root?.tag || "div")) members.set("children", type("any"));
   for (const property of component.properties || []) {
-    const options = property.options?.map((option) => typeof option === "string" ? option : option.value ?? option.name ?? "");
+    const options = property.options?.map((option2) => typeof option2 === "string" ? option2 : option2.value ?? option2.name ?? "");
     members.set(property.codeName || property.name, options?.length ? f.createUnionTypeNode(options.map((value) => f.createLiteralTypeNode(f.createStringLiteral(value)))) : type({ boolean: "boolean", number: "number", instanceswap: "any", node: "any" }[property.type.toLowerCase()] || "string"));
   }
   if (input !== "none") {
