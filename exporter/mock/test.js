@@ -6,6 +6,7 @@ const assert = require('assert');
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
+const vm = require('vm');
 const { runMockExport } = require('./runner');
 const { MockSupernova, createMockContext, loadMockData } = require('./mock-sdk');
 
@@ -86,6 +87,34 @@ async function runTests() {
   } finally {
     fs.rmSync(tempDir, { recursive: true, force: true });
   }
+
+  // Reproduce cloud startup failure with Node host APIs but no filename globals.
+  console.log('Test 4: Export inside Pulsar-like VM without filename globals');
+  const packageRoot = path.resolve(__dirname, '../..');
+  const manifest = JSON.parse(fs.readFileSync(path.join(packageRoot, 'exporter.json'), 'utf8'));
+  const settings = JSON.parse(fs.readFileSync(path.join(packageRoot, 'config.json'), 'utf8'));
+  const config = Object.fromEntries(settings.map(setting => [setting.key, setting.default]));
+  const originalBrowser = process.browser;
+  let handler;
+  const moduleBridge = { exports: {} };
+  const sandbox = { process, require, module: moduleBridge, exports: moduleBridge.exports, console,
+    Pulsar: { exportConfig: () => config, export: callback => { handler = callback; } } };
+  assert(!('__filename' in sandbox) && !('__dirname' in sandbox));
+  vm.runInNewContext(fs.readFileSync(path.join(packageRoot, manifest.executable), 'utf8'), sandbox, { filename: 'pulsar-exporter-bundle.js' });
+  assert.strictEqual(sandbox.process, process, 'Compiler isolation must not replace host process');
+  assert.strictEqual(process.browser, originalBrowser, 'Compiler isolation must not mutate process.browser');
+  assert.strictEqual(typeof handler, 'function', 'Bundle must register Pulsar export');
+  const files = await handler(new MockSupernova(), createMockContext());
+  assert.strictEqual(files.length, 11, 'Sandbox export must include components, tokens, runtime and barrel');
+  for (const name of ['Button', 'Card', 'StatusBadge', 'Badge', 'Input', 'Typography']) {
+    assert(files.some(file => file.name === `${name}.lite.tsx` && file.content.includes('export default function')), `Missing generated sandbox component ${name}`);
+  }
+  for (const name of ['tokens.ts', 'tokens.css', 'theme.css', 'component-runtime.ts', 'index.ts']) assert(files.some(file => file.name === name), `Missing sandbox artifact ${name}`);
+  const themedFiles = await handler(new MockSupernova(), createMockContext({ themeId: 'theme-dark' }));
+  assert.strictEqual(themedFiles.length, 11, 'Dark-theme sandbox must retain all artifacts');
+  assert(themedFiles.find(file => file.name === 'tokens.ts').content.includes('#0f172a'), 'Dark-theme token override must be emitted inside VM');
+  assert.strictEqual(process.browser, originalBrowser, 'Themed export must leave host process unchanged');
+  console.log('  ✓ VM loaded and exported all 11 artifacts without filename globals or host process mutation\n');
 
   console.log('🎉 All Mock Exporter tests passed successfully!\n');
 }

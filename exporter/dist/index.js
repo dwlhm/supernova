@@ -661,7 +661,7 @@ var require_typescript = __commonJS({
   "../node_modules/typescript/lib/typescript.js"(exports2, module2) {
     "use strict";
     var ts3 = {};
-    ((module3) => {
+    ((module22) => {
       "use strict";
       var __defProp2 = Object.defineProperty;
       var __getOwnPropDesc2 = Object.getOwnPropertyDescriptor;
@@ -2927,7 +2927,7 @@ var require_typescript = __commonJS({
         writeFileEnsuringDirectories: () => writeFileEnsuringDirectories,
         zipWith: () => zipWith
       });
-      module3.exports = __toCommonJS2(typescript_exports);
+      module22.exports = __toCommonJS2(typescript_exports);
       var versionMajorMinor = "5.9";
       var version = "5.9.3";
       var Comparison = /* @__PURE__ */ ((Comparison3) => {
@@ -4416,7 +4416,7 @@ var require_typescript = __commonJS({
         }
       }
       function isNodeLikeSystem() {
-        return typeof process !== "undefined" && !!process.nextTick && !process.browser && typeof require !== "undefined";
+        return false;
       }
       var LogLevel = /* @__PURE__ */ ((LogLevel3) => {
         LogLevel3[LogLevel3["Off"] = 0] = "Off";
@@ -5916,7 +5916,7 @@ ${lanes.join("\n")}
           if (!fs.existsSync(traceDir)) {
             fs.mkdirSync(traceDir, { recursive: true });
           }
-          const countPart = mode === "build" ? `.${process.pid}-${++traceCount}` : mode === "server" ? `.${process.pid}` : ``;
+          const countPart = mode === "build" ? `.${(void 0).pid}-${++traceCount}` : mode === "server" ? `.${(void 0).pid}` : ``;
           const tracePath = combinePaths(traceDir, `trace${countPart}.json`);
           const typesPath = combinePaths(traceDir, `types${countPart}.json`);
           legend.push({
@@ -9212,15 +9212,15 @@ ${lanes.join("\n")}
           }
           let activeSession;
           let profilePath = "./profile.cpuprofile";
-          const isMacOs = process.platform === "darwin";
-          const isLinuxOrMacOs = process.platform === "linux" || isMacOs;
+          const isMacOs = (void 0).platform === "darwin";
+          const isLinuxOrMacOs = (void 0).platform === "linux" || isMacOs;
           const statSyncOptions = { throwIfNoEntry: false };
           const platform = _os.platform();
           const useCaseSensitiveFileNames2 = isFileSystemCaseSensitive();
-          const fsRealpath = !!_fs.realpathSync.native ? process.platform === "win32" ? fsRealPathHandlingLongPath : _fs.realpathSync.native : _fs.realpathSync;
+          const fsRealpath = !!_fs.realpathSync.native ? (void 0).platform === "win32" ? fsRealPathHandlingLongPath : _fs.realpathSync.native : _fs.realpathSync;
           const executingFilePath = __filename.endsWith("sys.js") ? _path.join(_path.dirname(__dirname), "__fake__.js") : __filename;
-          const fsSupportsRecursiveFsWatch = process.platform === "win32" || isMacOs;
-          const getCurrentDirectory = memoize(() => process.cwd());
+          const fsSupportsRecursiveFsWatch = (void 0).platform === "win32" || isMacOs;
+          const getCurrentDirectory = memoize(() => (void 0).cwd());
           const { watchFile: watchFile2, watchDirectory } = createSystemWatchFunctions({
             pollingWatchFileWorker: fsWatchFileWorker,
             getModifiedTime: getModifiedTime3,
@@ -9235,25 +9235,25 @@ ${lanes.join("\n")}
             fsSupportsRecursiveFsWatch,
             getAccessibleSortedChildDirectories: (path) => getAccessibleFileSystemEntries(path).directories,
             realpath,
-            tscWatchFile: process.env.TSC_WATCHFILE,
-            useNonPollingWatchers: !!process.env.TSC_NONPOLLING_WATCHER,
-            tscWatchDirectory: process.env.TSC_WATCHDIRECTORY,
+            tscWatchFile: (void 0).env.TSC_WATCHFILE,
+            useNonPollingWatchers: !!(void 0).env.TSC_NONPOLLING_WATCHER,
+            tscWatchDirectory: (void 0).env.TSC_WATCHDIRECTORY,
             inodeWatching: isLinuxOrMacOs,
             fsWatchWithTimestamp: isMacOs,
             sysLog
           });
           const nodeSystem = {
-            args: process.argv.slice(2),
+            args: (void 0).argv.slice(2),
             newLine: _os.EOL,
             useCaseSensitiveFileNames: useCaseSensitiveFileNames2,
             write(s) {
-              process.stdout.write(s);
+              (void 0).stdout.write(s);
             },
             getWidthOfTerminal() {
-              return process.stdout.columns;
+              return (void 0).stdout.columns;
             },
             writeOutputIsTTY() {
-              return process.stdout.isTTY;
+              return (void 0).stdout.isTTY;
             },
             readFile,
             writeFile: writeFile2,
@@ -9281,7 +9281,7 @@ ${lanes.join("\n")}
             getCurrentDirectory,
             getDirectories,
             getEnvironmentVariable(name) {
-              return process.env[name] || "";
+              return (void 0).env[name] || "";
             },
             readDirectory,
             getModifiedTime: getModifiedTime3,
@@ -9293,7 +9293,7 @@ ${lanes.join("\n")}
               if (global.gc) {
                 global.gc();
               }
-              return process.memoryUsage().heapUsed;
+              return (void 0).memoryUsage().heapUsed;
             },
             getFileSize(path) {
               const stat = statSync(path);
@@ -9303,13 +9303,13 @@ ${lanes.join("\n")}
               return 0;
             },
             exit(exitCode) {
-              disableCPUProfiler(() => process.exit(exitCode));
+              disableCPUProfiler(() => (void 0).exit(exitCode));
             },
             enableCPUProfiler,
             disableCPUProfiler,
-            cpuProfilingEnabled: () => !!activeSession || contains(process.execArgv, "--cpu-prof") || contains(process.execArgv, "--prof"),
+            cpuProfilingEnabled: () => !!activeSession || contains((void 0).execArgv, "--cpu-prof") || contains((void 0).execArgv, "--prof"),
             realpath,
-            debugMode: !!process.env.NODE_INSPECTOR_IPC || !!process.env.VSCODE_INSPECTOR_OPTIONS || some(process.execArgv, (arg) => /^--(?:inspect|debug)(?:-brk)?(?:=\d+)?$/i.test(arg)) || !!process.recordreplay,
+            debugMode: !!(void 0).env.NODE_INSPECTOR_IPC || !!(void 0).env.VSCODE_INSPECTOR_OPTIONS || some((void 0).execArgv, (arg) => /^--(?:inspect|debug)(?:-brk)?(?:=\d+)?$/i.test(arg)) || !!(void 0).recordreplay,
             tryEnableSourceMapsForHost() {
               try {
                 require("source-map-support").install();
@@ -9319,11 +9319,11 @@ ${lanes.join("\n")}
             setTimeout,
             clearTimeout,
             clearScreen: () => {
-              process.stdout.write("\x1B[2J\x1B[3J\x1B[H");
+              (void 0).stdout.write("\x1B[2J\x1B[3J\x1B[H");
             },
             setBlocking: () => {
               var _a;
-              const handle = (_a = process.stdout) == null ? void 0 : _a._handle;
+              const handle = (_a = (void 0).stdout) == null ? void 0 : _a._handle;
               if (handle && handle.setBlocking) {
                 handle.setBlocking(true);
               }
@@ -9400,7 +9400,7 @@ ${lanes.join("\n")}
                 var _a;
                 if (!err) {
                   if ((_a = statSync(profilePath)) == null ? void 0 : _a.isDirectory()) {
-                    profilePath = _path.join(profilePath, `${(/* @__PURE__ */ new Date()).toISOString().replace(/:/g, "-")}+P${process.pid}.cpuprofile`);
+                    profilePath = _path.join(profilePath, `${(/* @__PURE__ */ new Date()).toISOString().replace(/:/g, "-")}+P${(void 0).pid}.cpuprofile`);
                   }
                   try {
                     _fs.mkdirSync(_path.dirname(profilePath), { recursive: true });
@@ -9540,7 +9540,7 @@ ${lanes.join("\n")}
             }
           }
           function readDirectory(path, extensions, excludes, includes, depth) {
-            return matchFiles(path, extensions, excludes, includes, useCaseSensitiveFileNames2, process.cwd(), depth, getAccessibleFileSystemEntries, realpath);
+            return matchFiles(path, extensions, excludes, includes, useCaseSensitiveFileNames2, (void 0).cwd(), depth, getAccessibleFileSystemEntries, realpath);
           }
           function fileSystemEntryExists(path, entryKind) {
             const stat = statSync(path);
@@ -17551,8 +17551,8 @@ ${lanes.join("\n")}
         }
         return node;
       }
-      function getSourceFileOfModule(module22) {
-        return getSourceFileOfNode(module22.valueDeclaration || getNonAugmentationDeclaration(module22));
+      function getSourceFileOfModule(module222) {
+        return getSourceFileOfNode(module222.valueDeclaration || getNonAugmentationDeclaration(module222));
       }
       function isPlainJsFile(file, checkJs) {
         return !!file && (file.scriptKind === 1 || file.scriptKind === 2) && !file.checkJsDirective && checkJs === void 0;
@@ -18420,8 +18420,8 @@ ${lanes.join("\n")}
       function isBlockScopedContainerTopLevel(node) {
         return node.kind === 308 || node.kind === 268 || isFunctionLikeOrClassStaticBlockDeclaration(node);
       }
-      function isGlobalScopeAugmentation(module22) {
-        return !!(module22.flags & 2048);
+      function isGlobalScopeAugmentation(module222) {
+        return !!(module222.flags & 2048);
       }
       function isExternalModuleAugmentation(node) {
         return isAmbientModule(node) && isModuleAugmentationExternal(node);
@@ -56817,7 +56817,7 @@ ${lanes.join("\n")}
             }
             mainModule = resolveExternalModuleSymbol(mainModule);
             if (mainModule.flags & 1920) {
-              if (some(patternAmbientModules, (module22) => mainModule === module22.symbol)) {
+              if (some(patternAmbientModules, (module222) => mainModule === module222.symbol)) {
                 const merged = mergeSymbol(
                   moduleAugmentation.symbol,
                   mainModule,
@@ -148962,12 +148962,12 @@ ${lanes.join("\n")}
           getTypingNamesFromSourceFileNames(fileNames);
         }
         if (unresolvedImports) {
-          const module22 = deduplicate(
+          const module222 = deduplicate(
             unresolvedImports.map(nonRelativeModuleNameForTypingCache),
             equateStringsCaseSensitive,
             compareStringsCaseSensitive
           );
-          addInferredTypings(module22, "Inferred typings from unresolved imports");
+          addInferredTypings(module222, "Inferred typings from unresolved imports");
         }
         for (const excludeTypingName of exclude) {
           const didDelete = inferredTypings.delete(excludeTypingName);
@@ -152610,8 +152610,8 @@ ${lanes.join("\n")}
         var _a, _b;
         const useCaseSensitiveFileNames2 = hostUsesCaseSensitiveFileNames(host);
         const excludePatterns = preferences.autoImportFileExcludePatterns && getIsExcludedPatterns(preferences, useCaseSensitiveFileNames2);
-        forEachExternalModule(program.getTypeChecker(), program.getSourceFiles(), excludePatterns, host, (module22, file) => cb(
-          module22,
+        forEachExternalModule(program.getTypeChecker(), program.getSourceFiles(), excludePatterns, host, (module222, file) => cb(
+          module222,
           file,
           program,
           /*isFromPackageJson*/
@@ -152621,9 +152621,9 @@ ${lanes.join("\n")}
         if (autoImportProvider) {
           const start = timestamp();
           const checker = program.getTypeChecker();
-          forEachExternalModule(autoImportProvider.getTypeChecker(), autoImportProvider.getSourceFiles(), excludePatterns, host, (module22, file) => {
+          forEachExternalModule(autoImportProvider.getTypeChecker(), autoImportProvider.getSourceFiles(), excludePatterns, host, (module222, file) => {
             if (file && !program.getSourceFile(file.fileName) || !file && !checker.resolveName(
-              module22.name,
+              module222.name,
               /*location*/
               void 0,
               1536,
@@ -152631,7 +152631,7 @@ ${lanes.join("\n")}
               false
             )) {
               cb(
-                module22,
+                module222,
                 file,
                 autoImportProvider,
                 /*isFromPackageJson*/
@@ -155545,8 +155545,8 @@ ${lanes.join("\n")}
             )) continue;
             const name = importNameForConvertToDefaultImport(importNode);
             if (!name) continue;
-            const module22 = (_a = program.getResolvedModuleFromModuleSpecifier(moduleSpecifier, sourceFile)) == null ? void 0 : _a.resolvedModule;
-            const resolvedFile = module22 && program.getSourceFile(module22.resolvedFileName);
+            const module222 = (_a = program.getResolvedModuleFromModuleSpecifier(moduleSpecifier, sourceFile)) == null ? void 0 : _a.resolvedModule;
+            const resolvedFile = module222 && program.getSourceFile(module222.resolvedFileName);
             if (resolvedFile && resolvedFile.externalModuleIndicator && resolvedFile.externalModuleIndicator !== true && isExportAssignment(resolvedFile.externalModuleIndicator) && resolvedFile.externalModuleIndicator.isExportEquals) {
               diags.push(createDiagnosticForNode(name, Diagnostics.Import_may_be_converted_to_a_default_import));
             }
@@ -182522,8 +182522,8 @@ ${newComment.split("\n").map((c) => ` * ${c}`).join("\n")}
         }
       }
       function getSupportedExtensionsForModuleResolution(compilerOptions, typeChecker) {
-        const ambientModulesExtensions = !typeChecker ? [] : mapDefined(typeChecker.getAmbientModules(), (module22) => {
-          const name = module22.name.slice(1, -1);
+        const ambientModulesExtensions = !typeChecker ? [] : mapDefined(typeChecker.getAmbientModules(), (module222) => {
+          const name = module222.name.slice(1, -1);
           if (!name.startsWith("*.") || name.includes("/")) return;
           return name.slice(1);
         });
