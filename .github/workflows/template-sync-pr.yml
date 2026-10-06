@@ -41,13 +41,8 @@ jobs:
         run: |
           npm run generate:tokens
           if [ -n "$FIGMA_ACCESS_TOKEN" ]; then
-            echo "FIGMA_ACCESS_TOKEN detected. Running figma:import..."
-            if npm run figma:import; then
-              echo "figma:import completed successfully."
-            else
-              echo "figma:import failed; falling back to sync:components..."
-              npm run sync:components
-            fi
+            echo "FIGMA_ACCESS_TOKEN detected. Running figma:sync..."
+            npm run figma:sync
           else
             echo "No FIGMA_ACCESS_TOKEN detected. Falling back to sync:components..."
             npm run sync:components
