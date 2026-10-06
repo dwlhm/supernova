@@ -27,7 +27,7 @@ function ensureDir(dir) {
   }
 }
 
-// 1. Parse tokens from output/tokens/tokens.ts
+// 1. Parse tokens from tokens.ts
 function parseTokens() {
   const tokensTsPath = path.join(tokensSourceDir, 'tokens.ts');
   if (!fs.existsSync(tokensTsPath)) {

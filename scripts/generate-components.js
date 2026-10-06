@@ -116,7 +116,7 @@ if (current.length === 0) {
   console.warn(`\n[generate-components] WARNING: components artifact not found at ${componentsDir}`);
   console.warn('  Previously generated component files were pruned.');
   console.warn('  This is expected until Supernova syncs a components/ directory.');
-  console.warn('  Run `npm run generate:mock` to restore the mock set for local development.\n');
+  console.warn('  Run `npm run mock:generate` to restore the mock set for local development.\n');
 }
 
 // Always write barrels and ambient declarations so every package keeps a valid

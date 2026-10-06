@@ -100,13 +100,31 @@ npm run dev:mock
 npm run export:mock:dark
 
 # 4. Pipeline komplit: Mock Export -> Token Sync -> Mitosis Compilation -> Docs
-npm run generate:mock
+npm run mock:generate
 
 # 5. Jalankan automated test untuk mock exporter
 npm run test:exporter
 ```
 
 Lihat [dokumentasi lengkap mock engine](file:///Users/dwlhm/komerce/supernova/exporter/mock/README.md) untuk detail memodifikasi atau menambahkan token mock di `exporter/mock/data/tokens.json`.
+
+### Fetch Data dari Supernova Cloud (Opsional)
+
+Jika memiliki akun dan API Key Supernova Cloud, kamu dapat menarik data asli (tokens, token groups, themes, components) langsung dari cloud ke direktori `reference/` atau memperbarui mock fixtures lokal:
+
+1. Salin `.env.example` ke `.env` lalu masukkan API token Supernova milikmu:
+```bash
+cp .env.example .env
+```
+
+2. Jalankan perintah fetch:
+```bash
+# Fetch real data directly from Supernova Cloud using API Key (saves to reference/)
+npm run fetch:data
+
+# Fetch real data and update local mock fixtures in one command
+npm run fetch:data -- --sync-mock
+```
 
 ---
 
@@ -152,14 +170,23 @@ npm install
 
 ### Full Offline Build & Verify
 
-```bash
-# 1. Export tokens & components via mock Supernova
-npm run export:mock
+Offline (mock) — full pipeline without Supernova Cloud:
 
-# 2. Sync tokens, compile Mitosis components, and build docs
+```bash
+# 1. Full offline pipeline: mock export → token sync → Mitosis compilation → docs
+npm run mock:generate
+
+# 2. Build all consumer packages (React, Svelte, Vue, Tokens)
+npm run build:packages
+```
+
+Supernova-synced — when `tokens/` and `components/` are committed from Supernova:
+
+```bash
+# 1. Sync tokens, compile Mitosis components, and build docs
 npm run generate
 
-# 3. Build all consumer packages (React, Svelte, Vue, Tokens)
+# 2. Build all consumer packages (React, Svelte, Vue, Tokens)
 npm run build:packages
 ```
 
@@ -170,7 +197,6 @@ npm run build:packages
 ```tree
 .
 ├── package.json               # Root monorepo configuration (npm workspaces)
-├── mitosis.config.js          # Mitosis multi-target compiler configuration
 ├── scripts/
 │   ├── sync-tokens.js         # Syncs tokens from output/tokens to packages/tokens
 │   ├── generate-components.js # Mitosis multi-target compiler script

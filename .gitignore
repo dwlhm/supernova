@@ -14,3 +14,11 @@ exporter/dist/*
 
 # Local mock/dev export destination (npm run export:mock). Never a CI build input.
 output/
+
+# Environment variables & API keys
+.env
+.env.local
+.env.*.local
+!.env.example
+
+.agents/
