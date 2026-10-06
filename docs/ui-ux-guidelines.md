@@ -1,6 +1,8 @@
 # Panduan Desain Komponen (UI/UX $\leftrightarrow$ Codebase)
 
-Dokumen ini adalah **kontrak resmi dan panduan praktis bagi tim UI/UX** dalam merancang komponen di **Figma** dan **Supernova**, agar otomatis ter-generate menjadi komponen multi-framework (**React, Svelte, Vue 3, Vue 2**) tanpa perlu menulis kode frontend secara manual.
+Dokumen ini adalah **kontrak resmi dan panduan praktis bagi tim UI/UX** dalam merancang komponen di **Figma** dan **Supernova**, untuk menghasilkan presentasi multi-framework (**React, Svelte, Vue 3, Vue 2**). Engineering tetap memiliki kontrak HTML, state, event, validasi, dan accessibility.
+
+See the [shared component contract](component-contract.md) for the approved content, appearance, behavior and accessibility framework. This guide distinguishes design intent from exporter guarantees; earlier automatic-interaction claims did not match the implementation.
 
 ---
 
@@ -24,8 +26,8 @@ Saat membuat komponen di Figma, gunakan penamaan atau peran layer berikut:
 | :--- | :--- | :--- |
 | **Container** | Frame pembungkus, Auto-layout Frame | Menjadi kontainer tata letak (`div`) |
 | **Text** | Layer teks (`title`, `subtitle`, `label`, `text`) | Otomatis menjadi teks semantik (`p` / `span`) |
-| **Icon** | Instance component icon, vector | Menjadi slot icon (`{props.icon}`) |
-| **Slot / Children** | Area konten kosong di dalam card/modal | Menerima elemen anak apa pun (`{props.children}`) |
+| **Icon** | Instance component icon, vector | Figma import mempertahankan struktur visual; slot icon harus memakai binding/property atau definisi engineering eksplisit |
+| **Slot / Children** | Area konten kosong di dalam card/modal | `children` root tersedia sesuai pipeline; slot internal perlu binding/definisi eksplisit |
 
 ---
 
@@ -48,7 +50,7 @@ Gunakan fitur bawaan Figma **Component Properties** di panel kanan Figma:
    * `title`: "Judul Kartu"
    * `subtitle`: "Deskripsi singkat"
    * `placeholder`: "Masukkan email..."
-   * *Otomatis menjadi prop string dan conditional rendering jika teks diisi.*
+   * *Menjadi prop string dengan default desain. Figma TEXT tanpa property juga mendapat prop dari nama layer; string kosong menghapus teks, sedangkan visibility perlu boolean terpisah.*
 
 4. **Instance Swap** (Slot Komponen Lain):
    * `icon`: Pilihan icon panah, ceklis, dll.
@@ -64,8 +66,8 @@ Behavior adalah cara kita memberi tahu exporter mengenai kemampuan interaktif ko
 * **Kapan digunakan**: Untuk tombol, kartu yang bisa diklik, atau tag interaktif.
 * **Hasil di Kode**:
   * Otomatis menginjeksi prop `onClick?: (event) => void`.
-  * Menambahkan kursor pointer dan hover feedback.
-  * Memiliki guard otomatis: jika komponen `disabled: true`, klik tidak akan tertrigger.
+  * Styling cursor/hover berasal dari definisi; `clickable` typed behavior tidak menginjeksi styling.
+  * Guard callback berlaku jika behavior `disabled` juga dikonfigurasi. Native button memerlukan atribut `disabled` yang terikat; klik pada `div` tidak otomatis memiliki keyboard semantics.
 
 ---
 
@@ -87,11 +89,7 @@ Untuk komponen form input, tentukan jenis `inputable`:
 ### Kasus 1: Komponen Multi-Element (`StatusBadge`)
 Misalkan UI/UX ingin membuat badge status yang memiliki icon dan teks berdampingan:
 
-```
-+-----------------------------------+
-|  [Icon]  Pendaftaran Berhasil     |
-+-----------------------------------+
-```
+Target: an explicitly defined icon slot beside editable status text.
 
 * **Struktur di Figma**:
   * Root Auto-layout Frame: `StatusBadge`
@@ -101,7 +99,7 @@ Misalkan UI/UX ingin membuat badge status yang memiliki icon dan teks berdamping
   * `variant`: `success` | `warning` | `danger` | `info`
   * `clickable`: `true`
   * `inputable`: `"none"`
-* **Hasil Komponen Universal**:
+* **Target engineering ilustratif** (slot dan kondisi harus didefinisikan eksplisit; bukan jaminan output otomatis):
   ```tsx
   <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-xs font-medium ...">
     {props.icon && <p className="m-0 leading-none">{props.icon}</p>}
@@ -122,7 +120,7 @@ Misalkan UI/UX ingin membuat badge status yang memiliki icon dan teks berdamping
 * **Behavior**:
   * `inputable`: `"text"`
 * **Hasil Komponen Universal**:
-  * Desainer tidak perlu mendefinisikan event `onChange`, `onFocus`, `isFocused` satu per satu. Semua interaksi form terpasang otomatis dengan validasi error border class!
+  * Desainer tidak perlu mendefinisikan event `onChange`, `onFocus`, `isFocused` satu per satu. Typed behavior menyediakan atribut native dan meneruskan event asli. Label, helper, error, hubungan ID, validasi dan error border harus didefinisikan oleh engineering; lihat shared contract.
 
 ---
 
@@ -134,23 +132,16 @@ Jika QA atau Developer membutuhkan atribut tambahan untuk testing otomasi (seper
 2. Tambahkan kolom property baru, misal:
    * **Name**: `testId`
    * **Type**: `Text`
-3. Exporter otomatis menginjeksi property tersebut ke dalam interface tipe dan menyematkan atribut `data-testid={props.testId}` pada elemen root HTML.
+3. Property saja tidak otomatis menambahkan atribut DOM. Engineering mendeklarasikan prop `testId` dan binding atribut root `"data-testid": { "kind": "prop", "name": "testId" }` pada `mitosisDefinition`.
 
 ---
 
 ## 🔄 5. Alur Kerja Sinkronisasi (Workflow)
 
-```
-[Desain di Figma]
-       │
-       ▼ (Publish Library)
-[Sync ke Supernova Cloud]
-       │
-       ▼ (Export via Monorepo Runner: npm run export:mock)
-[Universal Mitosis Component (.lite.tsx)]
-       │
-       ▼ (Mitosis Compile: npm run generate)
-[Production Packages: React, Svelte, Vue 3, Vue 2]
-```
+1. Publish the Figma library and synchronize design metadata with Supernova.
+2. Import Figma presentation with `npm run figma:import`, or export engineering-authored Supernova definitions (local fixture mode: `npm run export:mock`). These are separate component sources.
+3. Review the generated Mitosis source and component contract.
+4. Compile current sources with `npm run generate:components` into React, Svelte, Vue 3 and Vue 2 packages.
+5. Verify native DOM, controlled events and accessibility in consuming applications. Unchanged design fingerprints may preserve previous source; use the individual converter refresh procedure in the shared contract when converter policy changes.
 
-Dengan sistem ini, tim UI/UX memiliki kendali penuh atas evolusi Design System dengan kebebasan visual, tanpa terbebani kerumitan kode frontend!
+Tim UI/UX mengatur konten, varian dan token; engineering memastikan semantics, interaksi dan accessibility sesuai kontrak pada DOM hasil compile.

@@ -95,6 +95,12 @@ The automated build and sync pipeline follows a unidirectional dataflow from des
    Tokens are maintained in Supernova Cloud and exported into `tokens/` as TypeScript constants (`tokens.ts`) and CSS custom properties (`tokens.css`, `theme.css`).
 2. **Figma Component Transpilation (`Figma -> components/*.lite.tsx`)**:
    `scripts/import-figma-components.js` fetches component set nodes via the Figma REST API. `scripts/figma-to-mitosis.js` transpiles Figma autolayout, variant combinations, and design token references into universal Mitosis `.lite.tsx` templates.
+
+   Import the exported `tokens/theme.css` alongside Tailwind CSS v4 in the consuming app. Canonical color-token matches emit named utilities such as `bg-background-primary`, `text-foreground-neutral`, and `border-white`. RGBA and hex values are normalized together, including alpha and paint opacity; unmatched colors retain their exact value through arbitrary utilities. Variant colors come from actual Figma paints, without fabricated palettes based on option names.
+
+   CSS exports provide authoritative names, including group paths and collision suffixes. Explicit TS/JSON token sources use sibling CSS/theme exports to recover those names and report ambiguous records. Without sibling exports, TS/JSON color keys can only be reconstructed directly; group paths absent from those keys cannot be recovered.
+   Text layers are editable string props with preserved design defaults; explicit Figma text properties win, and `??` permits empty-string overrides. Inferred names depend on layer names and traversal order. Root `id`/`ariaDescribedby` hooks and native-button naming hooks support explicit caller associations; they do not implement form labels or calendar interaction. See the [shared component contract](docs/component-contract.md) for content, appearance, behavior, accessibility and readiness requirements.
+
 3. **Drift Detection & Lifecycle Control (`scripts/process-pr-components.js`)**:
    Tracks component SHA-256 fingerprints in `.components-manifest.json`. Automatically detects when Figma definitions drift from Git base branches, generates fresh templates, and protects custom code modifications.
 4. **Token Distribution (`npm run generate:tokens`)**:

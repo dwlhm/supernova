@@ -8,7 +8,7 @@ Mitosis components can be compiled to any frontend framework: **React**, **Vue (
 
 ## Features
 
-- **Universal Mitosis Components (`.lite.tsx`)**: Generates production-ready components (`Button`, `Card`, `Badge`, `Input`, `Typography`) following Builder.io Mitosis syntax (`useStore`, typed interfaces, universal JSX).
+- **Universal Mitosis Components (`.lite.tsx`)**: Generates component templates (`Button`, `Card`, `Badge`, `Input`, `Typography`) following Builder.io Mitosis syntax (`useStore`, typed interfaces, universal JSX).
 - **TypeScript Design Tokens**: Exports structured `tokens.ts` typed with `as const` and categorized by token type (`colors`, `typography`, `spacing`, `radii`, `borders`, `shadows`).
 - **CSS Custom Properties**: Generates `tokens.css` with CSS variables formatted from token group hierarchy (e.g., `--color-primary`, `--space-4`).
 - **Multi-Brand & Theme Aware**: Supports Supernova brands and themes via `computeTokensByApplyingThemes`.
@@ -174,6 +174,8 @@ supernova publish-exporter --apiKey="<YOUR_SUPERNOVA_API_KEY>" --exporterDir="."
 MIT © dwlhm
 
 ## Component architecture and ownership
+
+See the [shared component contract](../docs/component-contract.md) for the reusable content, appearance, behavior and accessibility framework. Typed definitions support explicit native elements and attributes; input behavior forwards original events, while labels, helper/error associations, validation and composite-widget focus/keyboard behavior require engineering definitions. The Figma converter has separate inferred-text and root-hook policies; these are not automatically applied to typed definitions.
 
 Approved dataflow: Figma -> Supernova -> CI/CD -> exporter -> Mitosis `.lite.tsx` -> Svelte, React, Vue 2 and Vue 3. `scripts/generate-components.js` invokes Mitosis APIs for all four targets.
 

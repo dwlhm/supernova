@@ -155,7 +155,7 @@ function createTempWorkspace() {
       const generatedFile = path.join(ws.componentsDir, 'Button.lite.tsx');
       assert(fs.existsSync(generatedFile), 'Button.lite.tsx must exist on disk');
       const fileContent = fs.readFileSync(generatedFile, 'utf8');
-      assert(fileContent.includes("import { useStore } from '@builder.io/mitosis';"));
+      assert(!fileContent.includes('useStore'), 'Stateless Figma output must not include an unused store');
       assert(fileContent.includes('export interface ButtonProps'));
       assert(fileContent.includes('export default function Button'));
 
