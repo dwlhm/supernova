@@ -104,7 +104,7 @@ export const tokens = {
     "purple500": "rgba(190, 159, 240, 1)",
     "purple600": "rgba(162, 117, 234, 1)",
     "purple700": "rgba(135, 76, 230, 1)",
-    "colorWhite": "rgba(254, 254, 254, 1)",
+    "colorWhite": "rgba(255, 255, 255, 1)",
     "colorBlack": "rgba(0, 0, 0, 1)",
     "colorBaseGray200": "rgba(246, 247, 249, 1)",
     "colorBaseGray300": "rgba(230, 232, 239, 1)",
