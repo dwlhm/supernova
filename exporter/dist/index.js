@@ -212021,47 +212021,178 @@ function validateCondition(value, path) {
 
 // src/components/adapter.ts
 var MITOSIS_DEFINITION_PROPERTY = "mitosisDefinition";
-async function loadComponentDefinitions(sdk, context, version) {
+function findLinkedDesignComponent(component, designs, explicitDesignComponentId) {
+  if (explicitDesignComponentId) {
+    const match = designs.find((d) => d.id === explicitDesignComponentId || d.idInVersion === explicitDesignComponentId);
+    if (match) return match;
+  }
+  for (const prop2 of component.properties || []) {
+    const isFigmaLink = prop2.linkElementType === "FigmaComponent" || prop2.codeName === "figmaComponent" || prop2.codeName === "designComponent" || prop2.codeName === "figma";
+    if (isFigmaLink) {
+      const val = component.propertyValues?.[prop2.id] ?? component.propertyValues?.[prop2.codeName];
+      if (typeof val === "string" && val) {
+        const match = designs.find((d) => d.id === val || d.idInVersion === val);
+        if (match) return match;
+      }
+    }
+  }
+  const directId = component.designComponentId || component.figmaComponentId;
+  if (typeof directId === "string" && directId) {
+    const match = designs.find((d) => d.id === directId || d.idInVersion === directId);
+    if (match) return match;
+  }
+  const idMatch = designs.find((d) => d.id === component.id || d.idInVersion === component.id);
+  if (idMatch) return idMatch;
+  const nameMatch = designs.find((d) => d.name && d.name.trim().toLowerCase() === component.name.trim().toLowerCase());
+  if (nameMatch) return nameMatch;
+  return void 0;
+}
+function extractFigmaOrigin(component, linkedDesign) {
+  if (!linkedDesign) {
+    const compUpdatedAt = component.updatedAt ? component.updatedAt instanceof Date ? component.updatedAt.toISOString() : String(component.updatedAt) : null;
+    return {
+      fileId: null,
+      nodeId: null,
+      sourceId: null,
+      componentPropertyDefinitions: [],
+      variantPropertyValues: null,
+      updatedAt: compUpdatedAt,
+      figma: null
+    };
+  }
+  const fileId = linkedDesign.origin?.fileId ?? linkedDesign.fileId ?? null;
+  const nodeId = linkedDesign.origin?.nodeId ?? linkedDesign.nodeId ?? null;
+  const sourceId = linkedDesign.origin?.sourceId ?? linkedDesign.sourceId ?? null;
+  const rawDefs = linkedDesign.componentPropertyDefinitions;
+  const propList = Array.isArray(rawDefs) ? rawDefs : rawDefs && typeof rawDefs === "object" ? Object.values(rawDefs) : [];
+  const componentPropertyDefinitions = propList.map((p) => ({
+    id: p.id,
+    name: p.name,
+    codeName: camelCase(p.name),
+    type: p.type,
+    defaultValue: p.defaultValue,
+    ...p.options ? { options: p.options } : {}
+  }));
+  const variantPropertyValues = linkedDesign.variantPropertyValues ?? (Array.isArray(linkedDesign.children) ? linkedDesign.children.find((c) => c.variantPropertyValues)?.variantPropertyValues ?? null : null);
+  const figmaUpdatedAt = linkedDesign.updatedAt ? linkedDesign.updatedAt instanceof Date ? linkedDesign.updatedAt.toISOString() : String(linkedDesign.updatedAt) : component.updatedAt ? component.updatedAt instanceof Date ? component.updatedAt.toISOString() : String(component.updatedAt) : null;
+  const variants = Array.isArray(linkedDesign.children) ? linkedDesign.children.map((child) => ({
+    id: child.id,
+    name: child.name,
+    variantPropertyValues: child.variantPropertyValues || null,
+    origin: child.origin ? {
+      fileId: child.origin.fileId ?? null,
+      nodeId: child.origin.nodeId ?? null,
+      sourceId: child.origin.sourceId ?? null
+    } : null,
+    updatedAt: child.updatedAt ? child.updatedAt instanceof Date ? child.updatedAt.toISOString() : String(child.updatedAt) : null
+  })) : [];
+  const figma = {
+    fileId,
+    nodeId,
+    sourceId,
+    componentPropertyDefinitions,
+    variantPropertyValues,
+    variants,
+    updatedAt: figmaUpdatedAt
+  };
+  return {
+    fileId,
+    nodeId,
+    sourceId,
+    componentPropertyDefinitions,
+    variantPropertyValues,
+    updatedAt: figmaUpdatedAt,
+    figma
+  };
+}
+async function exportComponentCatalog(sdk, context, version, indent = 2) {
   const filter = context.brandId ? { brandId: context.brandId } : void 0;
   const catalog = await sdk.components.getComponents(version, filter);
-  let designs;
+  let designs = [];
+  try {
+    designs = await sdk.components.getDesignComponents(version, filter) || [];
+  } catch {
+    designs = [];
+  }
   const definitions = [];
+  const catalogEntries = [];
   const skipped = [];
   for (const component of catalog) {
-    const properties = component.properties.filter((property) => property.codeName === MITOSIS_DEFINITION_PROPERTY);
+    const properties = (component.properties || []).filter((property) => property.codeName === MITOSIS_DEFINITION_PROPERTY);
+    let explicitDesignComponentId;
+    let hasMitosisDefinition = false;
     if (properties.length === 0) {
       skipped.push(component.name);
-      continue;
+    } else {
+      if (properties.length !== 1 || properties[0].propertyType !== "Text") {
+        throw new Error(`${component.name}: configure one Supernova Text component property with codeName ${MITOSIS_DEFINITION_PROPERTY}; engineering must supply its versioned implementation definition`);
+      }
+      const raw = component.propertyValues?.[properties[0].id];
+      if (typeof raw !== "string" || !raw.trim()) {
+        throw new Error(`${component.name}: ${MITOSIS_DEFINITION_PROPERTY} must contain schemaVersion 1 JSON`);
+      }
+      let payload;
+      try {
+        payload = JSON.parse(raw);
+      } catch {
+        throw new Error(`${component.name}: invalid ${MITOSIS_DEFINITION_PROPERTY} JSON`);
+      }
+      if (!payload || typeof payload !== "object" || Array.isArray(payload) || payload.schemaVersion !== 1) {
+        throw new Error(`${component.name}: unsupported component schemaVersion`);
+      }
+      hasMitosisDefinition = true;
+      let imported = [];
+      if (payload.designComponentId !== void 0) {
+        if (typeof payload.designComponentId !== "string") throw new Error(`${component.name}: designComponentId must be a string`);
+        explicitDesignComponentId = payload.designComponentId;
+        const matches = designs.filter((design) => design.id === payload.designComponentId || design.idInVersion === payload.designComponentId);
+        if (matches.length !== 1) throw new Error(`${component.name}: designComponentId must match exactly one imported Figma component id`);
+        const rawDefs = matches[0].componentPropertyDefinitions;
+        const propList = Array.isArray(rawDefs) ? rawDefs : rawDefs && typeof rawDefs === "object" ? Object.values(rawDefs) : [];
+        imported = propList.map((property) => ({
+          id: property.id,
+          name: property.name,
+          codeName: camelCase(property.name),
+          type: property.type,
+          defaultValue: property.defaultValue,
+          ...property.options ? { options: property.options } : {}
+        }));
+      }
+      const custom = payload.properties === void 0 ? [] : payload.properties;
+      if (!Array.isArray(custom)) throw new Error(`${component.name}: properties must be an array`);
+      const merged = [...imported];
+      for (const property of custom) {
+        if (!property || typeof property !== "object") throw new Error(`${component.name}: invalid custom property`);
+        const key = property.codeName || property.name;
+        const match = imported.find((existing) => (existing.codeName || existing.name) === key);
+        if (match) throw new Error(`${component.name}: duplicate imported/custom property ${key}; keep imported property authoritative and remove custom duplicate`);
+        merged.push(property);
+      }
+      definitions.push({
+        ...payload,
+        id: component.id,
+        name: pascalCase(component.name),
+        description: component.description,
+        designComponentId: void 0,
+        properties: merged
+      });
     }
-    if (properties.length !== 1 || properties[0].propertyType !== "Text") throw new Error(`${component.name}: configure one Supernova Text component property with codeName ${MITOSIS_DEFINITION_PROPERTY}; engineering must supply its versioned implementation definition`);
-    const raw = component.propertyValues[properties[0].id];
-    if (typeof raw !== "string" || !raw.trim()) throw new Error(`${component.name}: ${MITOSIS_DEFINITION_PROPERTY} must contain schemaVersion 1 JSON`);
-    let payload;
-    try {
-      payload = JSON.parse(raw);
-    } catch {
-      throw new Error(`${component.name}: invalid ${MITOSIS_DEFINITION_PROPERTY} JSON`);
-    }
-    if (!payload || typeof payload !== "object" || Array.isArray(payload) || payload.schemaVersion !== 1) throw new Error(`${component.name}: unsupported component schemaVersion`);
-    let imported = [];
-    if (payload.designComponentId !== void 0) {
-      if (typeof payload.designComponentId !== "string") throw new Error(`${component.name}: designComponentId must be a string`);
-      designs ??= await sdk.components.getDesignComponents(version, filter);
-      const matches = designs.filter((design) => design.id === payload.designComponentId);
-      if (matches.length !== 1) throw new Error(`${component.name}: designComponentId must match exactly one imported Figma component id`);
-      imported = (matches[0].componentPropertyDefinitions || []).map((property) => ({ id: property.id, name: property.name, codeName: camelCase(property.name), type: property.type, defaultValue: property.defaultValue, ...property.options ? { options: property.options } : {} }));
-    }
-    const custom = payload.properties === void 0 ? [] : payload.properties;
-    if (!Array.isArray(custom)) throw new Error(`${component.name}: properties must be an array`);
-    const merged = [...imported];
-    for (const property of custom) {
-      if (!property || typeof property !== "object") throw new Error(`${component.name}: invalid custom property`);
-      const key = property.codeName || property.name;
-      const match = imported.find((existing) => (existing.codeName || existing.name) === key);
-      if (match) throw new Error(`${component.name}: duplicate imported/custom property ${key}; keep imported property authoritative and remove custom duplicate`);
-      merged.push(property);
-    }
-    definitions.push({ ...payload, id: component.id, name: pascalCase(component.name), description: component.description, designComponentId: void 0, properties: merged });
+    const linkedDesign = findLinkedDesignComponent(component, designs, explicitDesignComponentId);
+    const figmaOrigin = extractFigmaOrigin(component, linkedDesign);
+    catalogEntries.push({
+      id: component.id,
+      name: component.name,
+      description: component.description || "",
+      brandId: component.brandId || null,
+      hasMitosisDefinition,
+      fileId: figmaOrigin.fileId,
+      nodeId: figmaOrigin.nodeId,
+      sourceId: figmaOrigin.sourceId,
+      componentPropertyDefinitions: figmaOrigin.componentPropertyDefinitions,
+      variantPropertyValues: figmaOrigin.variantPropertyValues,
+      updatedAt: figmaOrigin.updatedAt,
+      figma: figmaOrigin.figma
+    });
   }
   if (skipped.length > 0) {
     reportToHost([
@@ -212069,7 +212200,11 @@ async function loadComponentDefinitions(sdk, context, version) {
       ...skipped.map((name) => `  ${name}`)
     ]);
   }
-  return parseDefinitions(definitions);
+  const catalogJson = JSON.stringify(catalogEntries, null, indent);
+  return {
+    catalogJson,
+    definitions: parseDefinitions(definitions)
+  };
 }
 
 // src/components/ast.ts
@@ -212230,7 +212365,7 @@ var component_runtime_default = "/** Static framework independent behavior. Gene
 async function generateComponentFiles(sdk, context, config, remoteVersionIdentifier) {
   if (!config.componentsDir) throw new Error("componentsDir must be a nonempty safe relative directory");
   if (config.componentExtension && config.componentExtension !== ".lite.tsx") throw new Error("Mitosis componentExtension must be .lite.tsx");
-  const definitions = await loadComponentDefinitions(sdk, context, remoteVersionIdentifier);
+  const { catalogJson, definitions } = await exportComponentCatalog(sdk, context, remoteVersionIdentifier, config.indent);
   const sources = definitions.map((definition) => ({ definition, source: generateComponentSource(definition) }));
   const componentFiles = sources.map(({ definition, source }) => createFormattedTextFile(config.componentsDir, `${definition.name}.lite.tsx`, source.code, config));
   if (sources.some(({ source }) => source.runtimeImports.length > 0)) {
@@ -212238,7 +212373,8 @@ async function generateComponentFiles(sdk, context, config, remoteVersionIdentif
     parts.pop();
     componentFiles.push(createFormattedTextFile([...parts, "runtime"].join("/"), "component-runtime.ts", component_runtime_default, { ...config, showDisclaimer: false }));
   }
-  return { componentFiles, names: definitions.map((definition) => definition.name) };
+  const catalogFile = createFormattedTextFile("", "components.catalog.json", catalogJson, { ...config, showDisclaimer: false });
+  return { componentFiles, names: definitions.map((definition) => definition.name), catalogFile };
 }
 
 // src/generators/index-generator.ts
@@ -212282,8 +212418,11 @@ Pulsar.export(async (sdk, context) => {
   }
   let componentNames = [];
   if (exportConfiguration.exportComponents) {
-    const { componentFiles, names } = await generateComponentFiles(sdk, context, exportConfiguration, remoteVersionIdentifier);
+    const { componentFiles, names, catalogFile } = await generateComponentFiles(sdk, context, exportConfiguration, remoteVersionIdentifier);
     files.push(...componentFiles);
+    if (catalogFile) {
+      files.push(catalogFile);
+    }
     componentNames = names;
   }
   if (exportConfiguration.generateIndexFile) {

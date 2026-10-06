@@ -1,0 +1,50 @@
+{
+  "version": "1.0.0",
+  "lastUpdated": "2026-10-06T03:01:26.537Z",
+  "components": {
+    "AlertDialog": {
+      "name": "AlertDialog",
+      "id": "b169307a591332d47ee55979c04c06e7641cf859",
+      "fingerprint": "847511c5e69738f81e519d74d5814880fb966ca3b6d751bd5ff7ede91f544a2b",
+      "hash": "847511c5e69738f81e519d74d5814880fb966ca3b6d751bd5ff7ede91f544a2b",
+      "file": "components/AlertDialog.lite.tsx",
+      "fileId": "wLWN7FdmqCslghDJPWIweW",
+      "nodeId": "3429:327",
+      "updatedAt": "2026-10-05T01:02:43.832Z",
+      "lastGenerated": "2026-10-06T03:01:26.544Z"
+    },
+    "Checkbox": {
+      "name": "Checkbox",
+      "id": "db4c088e4426fc89013936b329e89b3c6d976b5d",
+      "fingerprint": "1b7fd91f1180714f340ac89d5664575562574a3d5e2b737d5b87925e2c5099ff",
+      "hash": "1b7fd91f1180714f340ac89d5664575562574a3d5e2b737d5b87925e2c5099ff",
+      "file": "components/Checkbox.lite.tsx",
+      "fileId": "wLWN7FdmqCslghDJPWIweW",
+      "nodeId": "2179:474",
+      "updatedAt": "2026-09-29T02:56:03.315Z",
+      "lastGenerated": "2026-10-06T02:58:38.889Z"
+    },
+    "Button": {
+      "name": "Button",
+      "id": "532b6f674222a46e6250fd3a235e43a7646a1c15",
+      "fingerprint": "e8dd7b2d8e93b69bb690e202e655b5c8ff6a6c45aa6971f1b83643c8f0718b04",
+      "hash": "e8dd7b2d8e93b69bb690e202e655b5c8ff6a6c45aa6971f1b83643c8f0718b04",
+      "file": "components/Button.lite.tsx",
+      "fileId": "wLWN7FdmqCslghDJPWIweW",
+      "nodeId": "2266:662",
+      "updatedAt": "2026-10-05T01:02:37.336Z",
+      "lastGenerated": "2026-10-06T02:58:41.104Z"
+    },
+    "Badge": {
+      "name": "Badge",
+      "id": "b52b293561ab2233dd749023df9007fe73925b1f",
+      "fingerprint": "fd3ae3134d307e72097bd6c4c5ee04f1b50a7e864ec36a1ce897619e85f77f32",
+      "hash": "fd3ae3134d307e72097bd6c4c5ee04f1b50a7e864ec36a1ce897619e85f77f32",
+      "file": "components/Badge.lite.tsx",
+      "fileId": "wLWN7FdmqCslghDJPWIweW",
+      "nodeId": "2841:144",
+      "updatedAt": "2026-09-28T09:00:08.412Z",
+      "lastGenerated": "2026-10-06T02:58:41.564Z"
+    }
+  }
+}

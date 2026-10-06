@@ -43,7 +43,7 @@ jobs:
       - name: Generate Components & Sync Tokens
         run: npm run generate
 
-      - name: Build Packages (React, Svelte, Tokens)
+      - name: Build Packages (React, Svelte, Vue, Tokens)
         run: npm run build:packages
 
       # Project Pages site is served from https://dwlhm.github.io/supernova/

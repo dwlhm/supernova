@@ -1,21 +1,32 @@
 # Supernova Exporters Monorepo
 
-Monorepo for custom Supernova exporters, tools, and UI component packages maintained by dwlhm.
+Monorepo for custom Supernova exporters, Figma-to-Mitosis transpilers, and cross-framework UI component packages maintained by dwlhm.
 
 ---
 
 ## Overview & Philosophy
 
-Modern design systems face a fundamental friction: designers define cohesive tokens and components in design tools like Figma and Supernova, but engineering teams must duplicate component logic across diverse frontend frameworks (React, Svelte, Vue, etc.). This leads to visual discrepancies, divergent APIs, and high maintenance costs.
+Modern design systems face a fundamental friction: designers define cohesive tokens and components in design tools like Figma and Supernova, but engineering teams must duplicate component logic across diverse frontend frameworks (React, Svelte, Vue 3, Vue 2, etc.). This leads to visual discrepancies, divergent APIs, and high maintenance costs.
 
-This repository resolves that bottleneck through a single foundational principle:
+This repository resolves that bottleneck through a unified, hybrid architecture:
 
-> **"Write once in Mitosis, compile to any frontend framework."**
+> **"Single source of truth in design, universal Mitosis templates in code, zero-runtime multi-framework compilation."**
 
-1. **Single Source of Truth**: Supernova Cloud and Figma serve as the authoritative origin for all design tokens (colors, typography, spacing, elevations) and component specifications.
-2. **Universal Mitosis Intermediate Layer**: Rather than maintaining divergent component codebases, the Supernova exporter generates framework-agnostic Mitosis (`.lite.tsx`) components. Mitosis represents component state, props, styling, and template logic in a universal TypeScript/JSX AST.
-3. **Deterministic Multi-Target Compilation**: The Mitosis compiler translates the universal AST into idiomatic, framework-native output (e.g., React hooks and TSX, Svelte reactive stores and SFCs) with zero runtime translation overhead.
-4. **Cohesive Token Binding**: Design tokens are compiled simultaneously into TypeScript objects and CSS custom properties (`tokens.css`, `theme.css`), guaranteeing pixel-perfect styling parity across all target frameworks.
+1. **Hybrid Source of Truth**:
+   - **Design Tokens**: Managed in Supernova Cloud and synchronized to `tokens/` (`tokens.ts`, `tokens.css`, `theme.css`).
+   - **Components**: Authored directly as Figma Component Sets, discovered via the Figma REST API, and transpiled into universal Mitosis (`components/*.lite.tsx`) with automated Drift Detection.
+2. **Universal Mitosis Intermediate Layer**:
+   Components are represented in framework-agnostic Mitosis JSX AST (`.lite.tsx`), abstracting state, props, event bindings, and semantic tokens without locking into any single framework runtime.
+3. **Deterministic Multi-Target Compilation**:
+   The Mitosis compiler translates universal ASTs into idiomatic, native framework code:
+   - `@dwlhm/ui-react` (React 18 / 19 hooks and JSX, bundled with `tsup`)
+   - `@dwlhm/ui-svelte` (Svelte reactive components and TypeScript ambient types)
+   - `@dwlhm/ui-vue` (Vue 3 Composition API SFCs)
+   - `@dwlhm/ui-vue2` (Vue 2 Options API SFCs)
+4. **Cohesive Token Binding**:
+   Design tokens are compiled simultaneously into TypeScript contracts and CSS custom properties (`tokens.css`, `theme.css`), guaranteeing pixel-perfect styling parity across all target frameworks.
+5. **Intelligent Drift Detection & PR Automation**:
+   When designers update Figma component sets or tokens, CI computes deterministic SHA-256 fingerprints to safely update templates, flag drift, and protect developer customizations.
 
 ---
 
@@ -24,107 +35,121 @@ This repository resolves that bottleneck through a single foundational principle
 The automated build and sync pipeline follows a unidirectional dataflow from design definition to production-ready npm packages:
 
 ```
-+--------------------------------------------------------------+
-|                Supernova Cloud / Figma                       |
-|         (Design Tokens, Styles & Components)                 |
-|                                                              |
-|        *OR* Offline Local Mock Engine (No Cloud Needed)      |
-|             (exporter/mock/data/{tokens,groups,themes}.json) |
-+--------------------------------------------------------------+
-                               |
-                               | [1] Exporter run:
-                               |     Local: npm run export:mock
-                               |     Cloud: supernova run-local-exporter
-                               v
-+--------------------------------------------------------------+
-|     @dwlhm/supernova-exporter-mitosis (Pulsar Plugin)        |
-+--------------------------------------------------------------+
-             |                                    |
-             | Generates                          | Generates
-             v                                    v
-+-----------------------------+     +-----------------------------+
-|    output/tokens/           |     |    output/components/       |
-|    - tokens.ts              |     |    - Button.lite.tsx        |
-|    - tokens.css             |     |    - Card.lite.tsx          |
-|    - theme.css              |     |    - Badge.lite.tsx         |
-+-----------------------------+     |    - Input.lite.tsx         |
-             |                      |    - Typography.lite.tsx    |
-             | [2] Token Sync:      +-----------------------------+
-             |     npm run                         |
-             |     generate:tokens                 | [3] Mitosis Compilation:
-             v                                     |     npm run generate:components
-+-----------------------------+                    |     (Mitosis code generation APIs + moveToSrcPlugin)
-| @dwlhm/design-tokens        |                    +---------------+---------------+
-| (packages/tokens)           |                                    |               |
-| - src/tokens.ts, index.ts   |                                    v               v
-| - css/tokens.css, theme.css |                       +-------------------+ +-------------------+
-+-----------------------------+                       |  @dwlhm/ui-react  | |  @dwlhm/ui-svelte |
-             ^                                        | (packages/react)  | | (packages/svelte) |
-             |                                        | - src/Button.tsx  | | - src/Button.svelte|
-             +--------------------+-------------------| - src/Card.tsx    | | - src/Card.svelte  |
-                                  | consumes tokens   | - src/index.ts    | | - src/ambient.d.ts |
-                                  +-------------------| - dist/ (esm,cjs) | | - src/index.ts    |
-                                                      +-------------------+ +-------------------+
++------------------------------------+    +------------------------------------+
+|          Supernova Cloud           |    |            Figma Design            |
+|   (Authoritative Design Tokens)    |    |  (Component Sets, Variants, Props) |
+|   *or* Local Mock Engine (Offline) |    |   *or* Local Fixtures (Offline)    |
++------------------------------------+    +------------------------------------+
+                  |                                          |
+                  | [1] Exporter Sync                        | [2] Figma Discovery & Transpilation:
+                  |     Local: npm run export:mock           |     npm run figma:import
+                  |     Cloud: Supernova CLI / Webhook       |     (scripts/figma-to-mitosis.js)
+                  v                                          v
++------------------------------------+    +------------------------------------+
+|              tokens/               |    |            components/             |
+|   - tokens.ts                      |    |   - Button.lite.tsx                |
+|   - tokens.css                     |    |   - Badge.lite.tsx                 |
+|   - theme.css                      |    |   - Checkbox.lite.tsx              |
++------------------------------------+    |   - AlertDialog.lite.tsx           |
+                  |                       +------------------------------------+
+                  |                                          |
+                  | [3] Token Sync:                          | [4] Drift Detection & Lifecycle:
+                  |     npm run generate:tokens              |     npm run sync:components
+                  v                                          v
++------------------------------------+    +------------------------------------+
+|       @dwlhm/design-tokens         |    |     .components-manifest.json      |
+|       (packages/tokens)            |    |     & components.catalog.json      |
+|   - src/tokens.ts, index.ts        |    +------------------------------------+
+|   - css/tokens.css, theme.css      |                       |
++------------------------------------+                       |
+                  ^                                          | [5] Mitosis Multi-Target Compilation:
+                  |                                          |     npm run generate:components
+                  |                                          |     (Mitosis APIs + Framework Adapters)
+                  +-------------------+----------------------+
+                                      |
+         +----------------------------+----------------------------+
+         |                            |                            |
+         v                            v                            v
++------------------+         +------------------+         +------------------+
+|  @dwlhm/ui-react |         | @dwlhm/ui-svelte |         |   @dwlhm/ui-vue  |
+| (packages/react) |         | (packages/svelte)|         |  (packages/vue)  |
+| - Button.tsx     |         | - Button.svelte  |         | - Button.vue     |
+| - Badge.tsx      |         | - Badge.svelte   |         | - Badge.vue      |
+| - Checkbox.tsx   |         | - Checkbox.svelte|         | - Checkbox.vue   |
+| - AlertDialog.tsx|         | - AlertDialog... |         | - AlertDialog.vue|
+| - dist/ (esm,cjs)|         | - ambient.d.ts   |         | - @dwlhm/ui-vue2 |
++------------------+         +------------------+         +------------------+
+         |                            |                            |
+         +----------------------------+----------------------------+
+                                      |
+                                      v
+                        +----------------------------+
+                        |   VitePress Documentation  |
+                        |          (docs/)           |
+                        +----------------------------+
 ```
 
 ### Pipeline Stages
 
-1. **Design System Origin (Supernova Cloud OR Offline Mock Data)**:
-   Tokens and component definitions are maintained in Supernova Cloud or directly simulated via the offline mock engine in `exporter/mock/data/`.
-2. **Pulsar Exporter Execution**:
-   Executing `npm run export:mock` (or `supernova run-local-exporter`) invokes `@dwlhm/supernova-exporter-mitosis`, transforming design tokens and components into structured intermediate files inside `output/`.
-3. **Intermediate Artifact Staging**:
-   - `output/tokens/`: Contains TypeScript token maps (`tokens.ts`) and CSS custom property definitions (`tokens.css`, `theme.css`).
-   - `output/components/`: Universal Mitosis components (`*.lite.tsx`).
-4. **Token Distribution Sync (`npm run generate:tokens`)**:
-   `scripts/sync-tokens.js` mirrors token definitions into `packages/tokens/src/` and `packages/tokens/css/`, auto-generating barrel exports (`index.ts`).
-5. **Mitosis Compilation & Post-Processing (`npm run generate:components`)**:
-   `scripts/generate-components.js` owns the four target configurations and options, reads `output/components/*.lite.tsx`, and invokes Mitosis code generation APIs for React, Svelte, Vue 3 and Vue 2.
-6. **Package Bundling & Distribution (`npm run build:packages`)**:
-   Compiles target packages into production-ready ESM and CommonJS bundles with TypeScript declarations (`.d.ts`).
+1. **Design Token Sync (`Supernova Cloud -> tokens/`)**:
+   Tokens are maintained in Supernova Cloud and exported into `tokens/` as TypeScript constants (`tokens.ts`) and CSS custom properties (`tokens.css`, `theme.css`).
+2. **Figma Component Transpilation (`Figma -> components/*.lite.tsx`)**:
+   `scripts/import-figma-components.js` fetches component set nodes via the Figma REST API. `scripts/figma-to-mitosis.js` transpiles Figma autolayout, variant combinations, and design token references into universal Mitosis `.lite.tsx` templates.
+3. **Drift Detection & Lifecycle Control (`scripts/process-pr-components.js`)**:
+   Tracks component SHA-256 fingerprints in `.components-manifest.json`. Automatically detects when Figma definitions drift from Git base branches, generates fresh templates, and protects custom code modifications.
+4. **Token Distribution (`npm run generate:tokens`)**:
+   Mirrors tokens into `packages/tokens/`, producing `@dwlhm/design-tokens` with TypeScript declarations and CSS bundles.
+5. **Multi-Target Component Compilation (`npm run generate:components`)**:
+   Reads universal `.lite.tsx` components from `components/` and compiles them into idiomatic React (`packages/react`), Svelte (`packages/svelte`), Vue 3 (`packages/vue`), and Vue 2 (`packages/vue2`).
+6. **Package Bundling & Docs (`npm run build:packages` & `npm run docs:build`)**:
+   Bundles all packages into production ESM/CJS libraries and builds the interactive VitePress documentation site.
 
 ---
 
-## Offline Local Development (Mock Supernova)
+## CI/CD & PR Automation Workflow
 
-Kamu dapat mengembangkan, memodifikasi, dan menguji exporter **100% offline tanpa akun Supernova Cloud, tanpa login CLI, dan tanpa API Key**.
+The repository includes GitHub Actions workflows ensuring continuous integration, automated drift tracking, and deployment:
 
-```bash
-# 1. Jalankan mock exporter sekali (output/ langsung ter-generate)
-npm run export:mock
+### 1. PR Component Sync & Drift Detection (`.github/workflows/pr-component-sync.yml`)
+- **Triggers**: Pull requests modifying `components.catalog.json`, `tokens/**`, or `.components-manifest.json`, or manual execution via `workflow_dispatch`.
+- **Workflow**:
+  1. Checks out branch with full git history.
+  2. Runs `scripts/process-pr-components.js --base=origin/main`.
+  3. Compares component SHA-256 hashes against the manifest.
+  4. Automatically stages updated templates and manifests, committing changes back to the PR branch (`[skip ci]`).
 
-# 2. Mode Live Watch: otomatis rebuild dan export saat kode exporter diubah
-npm run dev:mock
+### 2. Design System CI & Release (`.github/workflows/design-system-ci.yml`)
+- **Triggers**: Merges to `main`, manual `workflow_dispatch`, or repository dispatch (`supernova-release`).
+- **Workflow**:
+  1. Validates the committed Supernova exporter executable (`git diff --exit-code -- exporter/dist/index.js`).
+  2. Runs full generation pipeline: `npm run generate`.
+  3. Builds all workspace packages: `npm run build:packages`.
+  4. Builds VitePress documentation site (`npm run docs:build`).
+  5. Bumps patch version across workspaces (`npm version patch --workspaces`).
+  6. Tags git release (`vX.Y.Z`) and deploys static documentation to GitHub Pages.
 
-# 3. Ekspor dengan Dark Theme override
-npm run export:mock:dark
+---
 
-# 4. Pipeline komplit: Mock Export -> Token Sync -> Mitosis Compilation -> Docs
-npm run mock:generate
+## CLI Commands Reference
 
-# 5. Jalankan automated test untuk mock exporter
-npm run test:exporter
-```
-
-Lihat [dokumentasi lengkap mock engine](file:///Users/dwlhm/komerce/supernova/exporter/mock/README.md) untuk detail memodifikasi atau menambahkan token mock di `exporter/mock/data/tokens.json`.
-
-### Fetch Data dari Supernova Cloud (Opsional)
-
-Jika memiliki akun dan API Key Supernova Cloud, kamu dapat menarik data asli (tokens, token groups, themes, components) langsung dari cloud ke direktori `reference/` atau memperbarui mock fixtures lokal:
-
-1. Salin `.env.example` ke `.env` lalu masukkan API token Supernova milikmu:
-```bash
-cp .env.example .env
-```
-
-2. Jalankan perintah fetch:
-```bash
-# Fetch real data directly from Supernova Cloud using API Key (saves to reference/)
-npm run fetch:data
-
-# Fetch real data and update local mock fixtures in one command
-npm run fetch:data -- --sync-mock
-```
+| Command | Script / Target | Description |
+|---|---|---|
+| `npm run figma:discover` | `scripts/import-figma-components.js --dry-run` | Discovers component sets from Figma file, inspects variant properties and token bindings without writing to disk. |
+| `npm run figma:import` | `scripts/import-figma-components.js` | Imports component sets directly from Figma API, transpiles them into universal Mitosis (`components/*.lite.tsx`), and registers them in `components.catalog.json`. |
+| `npm run figma:sync` | `scripts/import-figma-components.js && scripts/process-pr-components.js` | Full end-to-end Figma synchronization: imports component sets and resolves component PR drift in one step. |
+| `npm run sync:components` | `scripts/process-pr-components.js` | Runs drift detection and template lifecycle controller. Compares SHA-256 fingerprints against `.components-manifest.json` to safely manage updates. |
+| `npm run generate` | `generate:tokens` + `generate:components` + `generate:docs` | Master generation command: syncs tokens, compiles Mitosis templates to all 4 framework packages, and regenerates documentation files. |
+| `npm run build:packages` | `npm run build --workspaces --if-present` | Compiles and bundles all framework packages (`@dwlhm/design-tokens`, `@dwlhm/ui-react`, `@dwlhm/ui-svelte`, `@dwlhm/ui-vue`, `@dwlhm/ui-vue2`) with ESM/CJS and TypeScript definitions. |
+| `npm run docs:dev` | `vitepress dev docs` | Launches the interactive VitePress documentation site locally with Hot Module Replacement (HMR). |
+| `npm run docs:build` | `vitepress build docs` | Builds production-ready static VitePress documentation site for deployment (GitHub Pages). |
+| `npm test` | Unified Test Runner | Executes all 4 automated test suites (exporter, figma import, figma-to-mitosis transpiler, drift controller — 34 tests total). |
+| `npm run test:exporter` | `exporter/mock/test.js` | Runs unit and integration tests for the Supernova Pulsar exporter and mock engine. |
+| `npm run test:figma-import` | `scripts/test-import-figma-components.js` | Runs unit tests for Figma component set discovery, name normalization, and catalog generation. |
+| `npm run test:figma-to-mitosis` | `scripts/test-figma-to-mitosis.js` | Runs unit tests for the Figma-to-Mitosis AST transpiler and variant resolution. |
+| `npm run test:pr-components` | `scripts/test-process-pr-components.js` | Runs unit tests for PR drift detection, fingerprint computation, and lifecycle management. |
+| `npm run export:mock` | `exporter/mock/runner.js` | Runs local offline Supernova mock exporter without requiring Supernova Cloud or API keys. |
+| `npm run dev:mock` | `exporter/mock/runner.js --watch` | Runs local mock exporter in watch mode, automatically regenerating output on code changes. |
+| `npm run clean` | `scripts/clean.js` | Cleans build artifacts (`dist/`, generated packages) across all workspaces. |
 
 ---
 
@@ -134,7 +159,7 @@ npm run fetch:data -- --sync-mock
 
 | Workspace | Directory | Role & Description |
 |---|---|---|
-| **`@dwlhm/supernova-exporter-mitosis`** | `exporter/` | Custom Supernova Pulsar exporter plugin. Transforms design tokens into CSS/TypeScript and components into universal Mitosis `.lite.tsx` definitions. |
+| **`@dwlhm/supernova-exporter-mitosis`** | `exporter/` | Custom Supernova Pulsar exporter plugin. Transforms design tokens into CSS/TypeScript contracts. |
 | **`@dwlhm/design-tokens`** | `packages/tokens/` | Standalone design tokens package exporting TypeScript token contracts and CSS stylesheets (`tokens.css`, `theme.css`). |
 | **`@dwlhm/ui-react`** | `packages/react/` | Production React component library (supports React 18 and 19) compiled from universal Mitosis components and bundled with `tsup`. |
 | **`@dwlhm/ui-svelte`** | `packages/svelte/` | Svelte UI component library compiled from Mitosis, complete with ambient Svelte module declarations for type-checking. |
@@ -143,24 +168,23 @@ npm run fetch:data -- --sync-mock
 
 ### Core Component Catalog
 
-Each component is authored as a universal Mitosis template (`output/components/*.lite.tsx`) and compiled across all supported framework packages:
+Each component is authored as a universal Mitosis template (`components/*.lite.tsx`) and compiled across all supported framework packages:
 
-- **`Button`**: Multi-variant interactive button supporting `primary`, `secondary`, `outline`, `ghost`, and `danger` variants, responsive sizes (`sm`, `md`, `lg`), disabled states, and full-width layout.
-- **`Card`**: Structured container component with configurable padding, elevation, hover effects, and bordered styling.
-- **`Badge`**: Visual status tag supporting contextual colors (`primary`, `success`, `warning`, `danger`, `neutral`) and pill styling.
-- **`Input`**: Form input with label, placeholder, helper text, error validation state, disabled mode, and change handlers.
-- **`Typography`**: Design system typography wrapper supporting heading and body scales, font weights, colors, and semantic tags (`h1`-`h6`, `p`, `span`).
+- **`Button`**: Multi-variant interactive button supporting `primary`, `secondary`, `outline`, `ghost`, `destructive`, and `link` styles, responsive sizes (`large`, `regular`, `small`, `mini`), roundness treatments, interaction states (`default`, `hover`, `focus`, `pressed`, `disabled`), and optional leading/trailing icons.
+- **`Badge`**: Visual status indicator supporting contextual semantics (`primary`, `secondary`, `destructive`, `success`, `warning`, `info`, `outline`) and editable text labels.
+- **`Checkbox`**: Form selection control supporting selected (`on`), unselected (`off`), and indeterminate states, responsive sizes (`small`, `medium`, `large`), disabled states, and configurable left/right label placement.
+- **`AlertDialog`**: Accessible modal dialog for high-consequence user actions, supporting customizable heading and description content, safe cancel actions, and destructive/primary confirmation actions.
 
 ---
 
-## Quick Start
+## Environment Setup & Quick Start
 
 ### Prerequisites
 
-- Node.js (>= 18.0.0)
+- Node.js (>= 18.0.0, Node 22 recommended)
 - npm (>= 9.0.0)
 
-### Installation
+### 1. Installation
 
 Install all workspace dependencies from the root directory:
 
@@ -168,27 +192,68 @@ Install all workspace dependencies from the root directory:
 npm install
 ```
 
-### Full Offline Build & Verify
+### 2. Environment Variables Configuration
 
-Offline (mock) — full pipeline without Supernova Cloud:
+Copy `.env.example` to `.env` and configure your API tokens:
 
 ```bash
-# 1. Full offline pipeline: mock export → token sync → Mitosis compilation → docs
-npm run mock:generate
-
-# 2. Build all consumer packages (React, Svelte, Vue, Tokens)
-npm run build:packages
+cp .env.example .env
 ```
 
-Supernova-synced — when `tokens/` and `components/` are committed from Supernova:
+Edit `.env`:
+
+```env
+# Supernova Personal Access Token / API Key
+SUPERNOVA_API_KEY=your_supernova_api_key_here
+
+# Figma Personal Access Token
+# Required scopes: file_content:read, file_metadata:read, library_content:read, team_library_content:read
+FIGMA_ACCESS_TOKEN=your_figma_access_token_here
+
+# Figma File Key (extracted from URL: figma.com/file/<key>/...)
+FIGMA_FILE_KEY=your_figma_file_key_here
+```
+
+### 3. Verification & Build Commands
 
 ```bash
-# 1. Sync tokens, compile Mitosis components, and build docs
+# 1. Run all 34 automated unit and integration tests
+npm test
+
+# 2. Synchronize tokens, compile Mitosis components, and build docs
 npm run generate
 
-# 2. Build all consumer packages (React, Svelte, Vue, Tokens)
+# 3. Build all framework packages (React, Svelte, Vue, Tokens)
 npm run build:packages
+
+# 4. Build documentation site
+npm run docs:build
 ```
+
+---
+
+## Offline Local Development (Mock Engine)
+
+You can develop, modify, and test the exporter and components **100% offline without Supernova Cloud or Figma API credentials**:
+
+```bash
+# 1. Run mock exporter once (emits to output/)
+npm run export:mock
+
+# 2. Watch mode: auto-rebuild on exporter code changes
+npm run dev:mock
+
+# 3. Export with Dark Theme override
+npm run export:mock:dark
+
+# 4. Full mock pipeline: Mock Export -> Token Sync -> Mitosis Compilation -> Docs
+npm run mock:generate
+
+# 5. Run mock exporter automated test suite
+npm run test:exporter
+```
+
+See the [Mock Engine Documentation](exporter/mock/README.md) for details on modifying mock fixtures in `exporter/mock/data/`.
 
 ---
 
@@ -196,61 +261,57 @@ npm run build:packages
 
 ```tree
 .
+├── .env.example               # Environment variables template (Figma + Supernova)
+├── .components-manifest.json  # Component fingerprint tracking for drift detection
+├── components.catalog.json    # Canonical catalog of imported Figma component sets
 ├── package.json               # Root monorepo configuration (npm workspaces)
+├── components/                # Universal Mitosis components (*.lite.tsx)
+│   ├── AlertDialog.lite.tsx
+│   ├── Badge.lite.tsx
+│   ├── Button.lite.tsx
+│   └── Checkbox.lite.tsx
+├── tokens/                    # Design tokens exported from Supernova
+│   ├── tokens.ts              # TypeScript token contracts
+│   ├── tokens.css             # CSS custom properties
+│   └── theme.css              # Theme CSS overrides
 ├── scripts/
-│   ├── sync-tokens.js         # Syncs tokens from output/tokens to packages/tokens
-│   ├── generate-components.js # Mitosis multi-target compiler script
-│   ├── generate-docs.js       # VitePress docs generator
-│   └── clean.js               # Cleans generated artifacts across packages
-├── exporter.json              # Root Supernova manifest; executable exporter/dist/index.js
-├── config.json                # Root Supernova configuration parameters
-├── output/                    # Exporter output directory
-│   ├── components/            # Mitosis .lite.tsx components
-│   └── tokens/                # Generated tokens (tokens.ts, tokens.css, theme.css)
+│   ├── figma-to-mitosis.js          # Figma node to Mitosis universal JSX transpiler
+│   ├── import-figma-components.js   # Figma component sets discovery and import CLI
+│   ├── process-pr-components.js     # Component PR drift detector & lifecycle controller
+│   ├── sync-tokens.js               # Synchronizes tokens into packages/tokens
+│   ├── generate-components.js       # Mitosis multi-target compiler (React, Svelte, Vue)
+│   ├── generate-docs.js             # VitePress documentation generator
+│   └── clean.js                     # Cleans build artifacts across workspaces
 ├── packages/
 │   ├── tokens/                # @dwlhm/design-tokens
 │   ├── react/                 # @dwlhm/ui-react
 │   ├── svelte/                # @dwlhm/ui-svelte
 │   ├── vue/                   # @dwlhm/ui-vue
 │   └── vue2/                  # @dwlhm/ui-vue2
-└── exporter/                  # Mitosis custom exporter workspace
-    ├── package.json
-    ├── tsconfig.json
-    ├── tsup.config.ts
-    ├── README.md              # Mitosis exporter documentation
-    ├── mock/                  # 100% Offline Mock Development Engine
-    │   ├── runner.js          # Mock runner & live file watcher CLI
-    │   ├── mock-sdk.js        # Mock Supernova SDK & Pulsar bridge
-    │   ├── test.js            # Automated test suite
-    │   ├── README.md          # Mock documentation & token guide
-    │   └── data/
-    │       ├── tokens.json    # 66+ Realistic design tokens (colors, typography, etc.)
-    │       ├── token-groups.json # Group hierarchy
-    │       └── themes.json    # Theme overrides (e.g., dark mode)
-    └── src/
-        ├── index.ts           # Main Supernova exporter entrypoint
-        ├── config.ts          # Type definitions for exporter settings
-        ├── generators/
-        │   ├── token-generator.ts      # Generates tokens.ts, tokens.css, theme.css
-        │   ├── component-generator.ts  # Generates Mitosis universal .lite.tsx components
-        │   └── index-generator.ts      # Generates root index.ts barrel file
-        └── utils/
-            ├── file-helper.ts          # File formatting and header helpers
-            └── naming.ts               # Case conversion and identifier sanitization
+├── docs/                      # VitePress interactive documentation site
+├── exporter/                  # Supernova Mitosis custom exporter workspace
+│   ├── package.json
+│   ├── tsconfig.json
+│   ├── tsup.config.ts
+│   ├── README.md              # Exporter architecture and documentation
+│   ├── mock/                  # 100% Offline Mock Development Engine
+│   └── src/                   # Exporter TypeScript source files
+├── exporter.json              # Supernova manifest referencing exporter/dist/index.js
+└── config.json                # Supernova configuration parameters
 ```
 
 ---
 
-## License
-
-MIT © dwlhm
-
-Engineering owns the versioned `mitosisDefinition` Text custom property on Supernova catalog components; designers retain the Figma workflow. The exporter validates that contract, emits Mitosis using typed AST construction, and emits ordinary TypeScript runtime helpers separately. `scripts/generate-components.js` generates all four framework targets and copies runtime helpers. See [exporter architecture and setup](exporter/README.md#component-architecture-and-ownership). Supernova cloud setup remains a prerequisite; local fixtures use the same SDK property shape.
-
-## Installing this exporter in Supernova
+## Installing this Exporter in Supernova
 
 Use the repository URL: **https://github.com/dwlhm/supernova**. The repository root contains the authoritative `exporter.json` and `config.json`; its manifest selects `exporter/dist/index.js` as the executable. Supernova treats the repository root as the exporter package root. See [installing exporters](https://developers.supernova.io/latest/exporters/installing-exporters-GT7tr0qA) and [exporter anatomy](https://developers.supernova.io/latest/exporters/building-exporters-101/exporter-anatomy-HvQzZtsO).
 
 Before importer refresh or an exporter version update, run `npm run build:exporter` from the repository root, then commit and push `exporter/dist/index.js` together with the matching sources, root `exporter.json` and `config.json`. The build validates the package automatically; `npm run validate:exporter-package` runs that check separately. After any exporter source change, rebuild and stage the bundled executable in the same commit; CI rejects a bundle that differs from a fresh build. The compiled executable is an intentional installation artifact; TypeScript sources remain authoritative. Other `dist/` files stay ignored. Validation checks manifest/config presence, safe executable paths, nonempty bundled JavaScript at the expected path; rebuilding is required to keep the committed executable current. Bundling dependencies remains the responsibility of the `noExternal` setting in `exporter/tsup.config.ts`.
 
 Cloud installation has not been verified by the local package validation.
+
+---
+
+## License
+
+MIT © dwlhm

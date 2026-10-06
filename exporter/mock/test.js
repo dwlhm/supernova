@@ -62,7 +62,8 @@ async function runTests() {
       'components/Badge.lite.tsx',
       'components/Input.lite.tsx',
       'components/Typography.lite.tsx',
-      'index.ts'
+      'index.ts',
+      'components.catalog.json'
     ];
 
     for (const file of expectedFiles) {
@@ -94,6 +95,16 @@ async function runTests() {
     assert(sbContent.includes('{props.text}'), 'StatusBadge should render text child');
     assert(sbContent.includes('data-testid={props.testId}'), 'StatusBadge should include custom attribute');
 
+    // Verify components.catalog.json structure
+    const catalogFile = path.join(tempDir, 'components.catalog.json');
+    assert(fs.existsSync(catalogFile), 'Expected components.catalog.json to exist');
+    const catalogData = JSON.parse(fs.readFileSync(catalogFile, 'utf-8'));
+    assert(Array.isArray(catalogData), 'components.catalog.json must be an array');
+    assert.strictEqual(catalogData.length, 6, 'All 6 mock components must be cataloged');
+    for (const name of ['Button', 'Card', 'StatusBadge', 'Badge', 'Input', 'Typography']) {
+      assert(catalogData.some(c => c.name === name), `Component ${name} must be cataloged`);
+    }
+
     console.log(`  ✓ All ${expectedFiles.length} expected output files generated, including multi-element StatusBadge\n`);
   } finally {
     fs.rmSync(tempDir, { recursive: true, force: true });
@@ -116,16 +127,16 @@ async function runTests() {
   assert.strictEqual(process.browser, originalBrowser, 'Compiler isolation must not mutate process.browser');
   assert.strictEqual(typeof handler, 'function', 'Bundle must register Pulsar export');
   const files = await handler(new MockSupernova(), createMockContext());
-  assert.strictEqual(files.length, 11, 'Sandbox export must include components, tokens, runtime and barrel');
+  assert.strictEqual(files.length, 12, 'Sandbox export must include components, tokens, runtime, catalog and barrel');
   for (const name of ['Button', 'Card', 'StatusBadge', 'Badge', 'Input', 'Typography']) {
     assert(files.some(file => file.name === `${name}.lite.tsx` && file.content.includes('export default function')), `Missing generated sandbox component ${name}`);
   }
-  for (const name of ['tokens.ts', 'tokens.css', 'theme.css', 'component-runtime.ts', 'index.ts']) assert(files.some(file => file.name === name), `Missing sandbox artifact ${name}`);
+  for (const name of ['tokens.ts', 'tokens.css', 'theme.css', 'component-runtime.ts', 'index.ts', 'components.catalog.json']) assert(files.some(file => file.name === name), `Missing sandbox artifact ${name}`);
   const themedFiles = await handler(new MockSupernova(), createMockContext({ themeId: 'theme-dark' }));
-  assert.strictEqual(themedFiles.length, 11, 'Dark-theme sandbox must retain all artifacts');
+  assert.strictEqual(themedFiles.length, 12, 'Dark-theme sandbox must retain all artifacts');
   assert(themedFiles.find(file => file.name === 'tokens.ts').content.includes('#0f172a'), 'Dark-theme token override must be emitted inside VM');
   assert.strictEqual(process.browser, originalBrowser, 'Themed export must leave host process unchanged');
-  console.log('  ✓ VM loaded and exported all 11 artifacts without filename globals or host process mutation\n');
+  console.log('  ✓ VM loaded and exported all 12 artifacts without filename globals or host process mutation\n');
 
   // Second defense layer: tripwire any read of CommonJS filename globals so a future
   // TypeScript regression fails loudly instead of crashing at bundle load time.
@@ -143,8 +154,8 @@ async function runTests() {
     Object.defineProperty(sandbox, '__dirname', { configurable: true, get() { throw new Error('Exporter bundle read __dirname at runtime'); } });
     vm.runInNewContext(fs.readFileSync(path.join(packageRoot, manifest.executable), 'utf8'), sandbox, { filename: 'pulsar-exporter-bundle.js' });
     const files = await handler(new MockSupernova(), createMockContext());
-    assert.strictEqual(files.length, 11, 'Sandbox export must include components, tokens, runtime and barrel');
-    console.log('  ✓ Bundle loaded and exported 11 artifacts without reading filename globals\n');
+    assert.strictEqual(files.length, 12, 'Sandbox export must include components, tokens, runtime, catalog and barrel');
+    console.log('  ✓ Bundle loaded and exported 12 artifacts without reading filename globals\n');
   }
 
   // Test 6: duplicate token names are disambiguated, not fatal
@@ -244,7 +255,12 @@ async function runTests() {
     assert.strictEqual(componentFiles.length, 6, 'Every component that carries a definition must still be exported');
     assert(captured.some(line => line.includes('skipped')), 'Skipped component count must be reported');
     assert(captured.some(line => line.includes('Alert')), 'Each skipped component must be named in the export log');
-    console.log('  ✓ Definition-less components skipped and reported without failing the export\n');
+
+    const alertCatalogFile = files.find(file => file.name === 'components.catalog.json');
+    assert(alertCatalogFile, 'components.catalog.json must be emitted');
+    const catalogEntries = JSON.parse(alertCatalogFile.content);
+    assert(catalogEntries.some(c => c.name === 'Alert'), 'Alert must be recorded in components.catalog.json even without mitosisDefinition');
+    console.log('  ✓ Definition-less components skipped and reported without failing the export, but recorded in catalog\n');
   }
 
   console.log('🎉 All Mock Exporter tests passed successfully!\n');

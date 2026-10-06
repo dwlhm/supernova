@@ -29,8 +29,11 @@ Pulsar.export(async (sdk: Supernova, context: PulsarContext): Promise<Array<AnyO
 
   let componentNames: string[] = []
   if (exportConfiguration.exportComponents) {
-    const { componentFiles, names } = await generateComponentFiles(sdk, context, exportConfiguration, remoteVersionIdentifier)
+    const { componentFiles, names, catalogFile } = await generateComponentFiles(sdk, context, exportConfiguration, remoteVersionIdentifier)
     files.push(...componentFiles)
+    if (catalogFile) {
+      files.push(catalogFile)
+    }
     componentNames = names
   }
 

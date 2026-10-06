@@ -12,10 +12,18 @@
     "dev": "npm run dev --workspace=exporter",
     "build:exporter": "npm run build --workspace=exporter",
     "fetch:data": "node scripts/fetch-supernova-data.js",
+    "sync:components": "node scripts/process-pr-components.js",
     "export:mock": "node exporter/mock/runner.js",
     "dev:mock": "node exporter/mock/runner.js --watch",
     "export:mock:dark": "node exporter/mock/runner.js --theme theme-dark",
+    "test": "npm run test:exporter && npm run test:figma-import && npm run test:figma-to-mitosis && npm run test:pr-components",
     "test:exporter": "node exporter/mock/test.js",
+    "figma:discover": "node scripts/import-figma-components.js --dry-run",
+    "figma:import": "node scripts/import-figma-components.js",
+    "figma:sync": "node scripts/import-figma-components.js && node scripts/process-pr-components.js",
+    "test:figma-import": "node scripts/test-import-figma-components.js",
+    "test:figma-to-mitosis": "node scripts/test-figma-to-mitosis.js",
+    "test:pr-components": "node scripts/test-process-pr-components.js",
     "generate": "npm run generate:tokens && npm run generate:components && npm run generate:docs",
     "mock:generate": "npm run export:mock && node scripts/sync-tokens.js --source=output && node scripts/generate-components.js --source=output && node scripts/generate-docs.js --source=output",
     "generate:tokens": "node scripts/sync-tokens.js",
@@ -31,6 +39,7 @@
   "devDependencies": {
     "@builder.io/mitosis": "^0.14.1",
     "@builder.io/mitosis-cli": "^0.14.1",
+    "@supernovaio/supernova-sdk": "^1.10.2",
     "vitepress": "^1.5.0"
   },
   "keywords": [

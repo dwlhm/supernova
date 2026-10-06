@@ -22,3 +22,9 @@ output/
 !.env.example
 
 .agents/
+
+# Supernova cloud data fetch cache
+reference/
+
+# Pnpm lockfile (project uses npm)
+pnpm-lock.yaml

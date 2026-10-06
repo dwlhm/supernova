@@ -1,3 +1,20 @@
 {
-  "components": []
+  "components": [
+    {
+      "name": "AlertDialog",
+      "slug": "alertdialog"
+    },
+    {
+      "name": "Badge",
+      "slug": "badge"
+    },
+    {
+      "name": "Button",
+      "slug": "button"
+    },
+    {
+      "name": "Checkbox",
+      "slug": "checkbox"
+    }
+  ]
 }

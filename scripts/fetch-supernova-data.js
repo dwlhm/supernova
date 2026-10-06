@@ -157,6 +157,213 @@ function safeStringify(data, space = 2) {
   );
 }
 
+const MITOSIS_DEFINITION_PROPERTY = 'mitosisDefinition';
+
+/**
+ * Convert string to camelCase.
+ */
+function toCamelCase(str) {
+  if (!str) return '';
+  const clean = str.replace(/#.*$/, '').trim();
+  return clean
+    .replace(/[^a-zA-Z0-9]+(.)/g, (_, chr) => chr.toUpperCase())
+    .replace(/^[A-Z]/, (chr) => chr.toLowerCase())
+    .replace(/[^a-zA-Z0-9]/g, '');
+}
+
+/**
+ * Find linked Figma design component in designComponents list.
+ */
+function findLinkedDesignComponent(component, designs = [], explicitDesignComponentId) {
+  if (!Array.isArray(designs) || designs.length === 0) {
+    return undefined;
+  }
+
+  if (explicitDesignComponentId) {
+    const match = designs.find(
+      (d) => d.id === explicitDesignComponentId ||
+             d.idInVersion === explicitDesignComponentId ||
+             d.persistentId === explicitDesignComponentId
+    );
+    if (match) return match;
+  }
+
+  for (const prop of component.properties || []) {
+    const isFigmaLink =
+      prop.linkElementType === 'FigmaComponent' ||
+      prop.codeName === 'figmaComponent' ||
+      prop.codeName === 'designComponent' ||
+      prop.codeName === 'figma';
+    if (isFigmaLink) {
+      const val = component.propertyValues?.[prop.id] ?? component.propertyValues?.[prop.codeName];
+      if (typeof val === 'string' && val) {
+        const match = designs.find(
+          (d) => d.id === val || d.idInVersion === val || d.persistentId === val
+        );
+        if (match) return match;
+      }
+    }
+  }
+
+  const directId = component.designComponentId || component.figmaComponentId;
+  if (typeof directId === 'string' && directId) {
+    const match = designs.find(
+      (d) => d.id === directId || d.idInVersion === directId || d.persistentId === directId
+    );
+    if (match) return match;
+  }
+
+  const idMatch = designs.find(
+    (d) => d.id === component.id || d.idInVersion === component.id || d.persistentId === component.id
+  );
+  if (idMatch) return idMatch;
+
+  const nameMatch = designs.find(
+    (d) => d.name && d.name.trim().toLowerCase() === component.name.trim().toLowerCase()
+  );
+  if (nameMatch) return nameMatch;
+
+  return undefined;
+}
+
+/**
+ * Extract Figma origin metadata from linked design component.
+ */
+function extractFigmaOrigin(component, linkedDesign) {
+  if (!linkedDesign) {
+    const compUpdatedAt = component.updatedAt
+      ? (component.updatedAt instanceof Date ? component.updatedAt.toISOString() : String(component.updatedAt))
+      : null;
+
+    return {
+      fileId: component.origin?.fileId ?? component.fileId ?? null,
+      nodeId: component.origin?.nodeId ?? component.nodeId ?? null,
+      sourceId: component.origin?.sourceId ?? component.sourceId ?? null,
+      componentPropertyDefinitions: [],
+      variantPropertyValues: null,
+      updatedAt: compUpdatedAt,
+      figma: null,
+    };
+  }
+
+  const fileId = linkedDesign.origin?.fileId ?? linkedDesign.fileId ?? null;
+  const nodeId = linkedDesign.origin?.nodeId ?? linkedDesign.nodeId ?? null;
+  const sourceId = linkedDesign.origin?.sourceId ?? linkedDesign.sourceId ?? null;
+
+  const rawDefs = linkedDesign.componentPropertyDefinitions;
+  const propList = Array.isArray(rawDefs) ? rawDefs : (rawDefs && typeof rawDefs === 'object' ? Object.values(rawDefs) : []);
+  const componentPropertyDefinitions = propList.map((p) => ({
+    id: p.id,
+    name: p.name,
+    codeName: toCamelCase(p.name),
+    type: p.type,
+    defaultValue: p.defaultValue,
+    ...(p.options ? { options: p.options } : {}),
+  }));
+
+  const variantPropertyValues =
+    linkedDesign.variantPropertyValues ??
+    (Array.isArray(linkedDesign.children)
+      ? linkedDesign.children.find((c) => c.variantPropertyValues)?.variantPropertyValues ?? null
+      : null);
+
+  const figmaUpdatedAt = linkedDesign.updatedAt
+    ? (linkedDesign.updatedAt instanceof Date ? linkedDesign.updatedAt.toISOString() : String(linkedDesign.updatedAt))
+    : (component.updatedAt
+      ? (component.updatedAt instanceof Date ? component.updatedAt.toISOString() : String(component.updatedAt))
+      : null);
+
+  const variants = Array.isArray(linkedDesign.children)
+    ? linkedDesign.children.map((child) => ({
+        id: child.id,
+        name: child.name,
+        variantPropertyValues: child.variantPropertyValues || null,
+        origin: child.origin
+          ? {
+              fileId: child.origin.fileId ?? null,
+              nodeId: child.origin.nodeId ?? null,
+              sourceId: child.origin.sourceId ?? null,
+            }
+          : null,
+        updatedAt: child.updatedAt
+          ? (child.updatedAt instanceof Date ? child.updatedAt.toISOString() : String(child.updatedAt))
+          : null,
+      }))
+    : [];
+
+  const figma = {
+    fileId,
+    nodeId,
+    sourceId,
+    componentPropertyDefinitions,
+    variantPropertyValues,
+    variants,
+    updatedAt: figmaUpdatedAt,
+  };
+
+  return {
+    fileId,
+    nodeId,
+    sourceId,
+    componentPropertyDefinitions,
+    variantPropertyValues,
+    updatedAt: figmaUpdatedAt,
+    figma,
+  };
+}
+
+/**
+ * Build components.catalog.json entries linking components with designComponents.
+ */
+function buildCatalog(components = [], designComponents = []) {
+  const catalogEntries = [];
+
+  for (const component of components) {
+    const properties = (component.properties || []).filter(
+      (property) => property.codeName === MITOSIS_DEFINITION_PROPERTY
+    );
+    let explicitDesignComponentId;
+    let hasMitosisDefinition = false;
+
+    if (properties.length > 0) {
+      const raw = component.propertyValues?.[properties[0].id];
+      if (typeof raw === 'string' && raw.trim()) {
+        try {
+          const payload = JSON.parse(raw);
+          if (payload && typeof payload === 'object' && !Array.isArray(payload) && payload.schemaVersion === 1) {
+            hasMitosisDefinition = true;
+            if (typeof payload.designComponentId === 'string') {
+              explicitDesignComponentId = payload.designComponentId;
+            }
+          }
+        } catch {
+          // ignore invalid JSON
+        }
+      }
+    }
+
+    const linkedDesign = findLinkedDesignComponent(component, designComponents, explicitDesignComponentId);
+    const figmaOrigin = extractFigmaOrigin(component, linkedDesign);
+
+    catalogEntries.push({
+      id: component.id,
+      name: component.name,
+      description: component.description || '',
+      brandId: component.brandId || null,
+      hasMitosisDefinition,
+      fileId: figmaOrigin.fileId,
+      nodeId: figmaOrigin.nodeId,
+      sourceId: figmaOrigin.sourceId,
+      componentPropertyDefinitions: figmaOrigin.componentPropertyDefinitions,
+      variantPropertyValues: figmaOrigin.variantPropertyValues,
+      updatedAt: figmaOrigin.updatedAt,
+      figma: figmaOrigin.figma,
+    });
+  }
+
+  return catalogEntries;
+}
+
 /**
  * Main execution flow.
  */
@@ -294,6 +501,15 @@ async function main() {
     console.log(`  ✓ ${relPath} (${sizeKb} KB)`);
   }
 
+  // Build and write components.catalog.json to repo root
+  const catalogEntries = buildCatalog(components, designComponents);
+  const catalogContent = JSON.stringify(catalogEntries, null, 2);
+  const catalogPath = path.join(repoRoot, 'components.catalog.json');
+  fs.writeFileSync(catalogPath, catalogContent, 'utf8');
+  const catalogRelPath = path.relative(repoRoot, catalogPath);
+  const catalogSizeKb = (Buffer.byteLength(catalogContent, 'utf8') / 1024).toFixed(1);
+  console.log(`  ✓ ${catalogRelPath} (${catalogSizeKb} KB)`);
+
   // If --sync-mock is specified, also write data files to exporter/mock/data/
   if (options.syncMock) {
     const mockDataDir = path.resolve(repoRoot, 'exporter/mock/data');
@@ -313,7 +529,16 @@ async function main() {
   console.log('\n✨ Supernova data fetch completed successfully!');
 }
 
-main().catch((err) => {
-  console.error(`\n❌ Fetch failed: ${err.message}`);
-  process.exit(1);
-});
+if (require.main === module) {
+  main().catch((err) => {
+    console.error(`\n❌ Fetch failed: ${err.message}`);
+    process.exit(1);
+  });
+}
+
+module.exports = {
+  buildCatalog,
+  findLinkedDesignComponent,
+  extractFigmaOrigin,
+  loadEnvFile,
+};
