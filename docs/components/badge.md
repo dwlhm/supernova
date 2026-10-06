@@ -10,6 +10,7 @@ Compact status badge indicator used for categorization, counters, and highlights
 
 ---
 
+
 ## Code Examples
 
 ::: code-group
