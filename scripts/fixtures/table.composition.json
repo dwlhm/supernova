@@ -1,0 +1,38 @@
+{
+  "version": 1,
+  "root": "Table",
+  "parts": [
+    {
+      "name": "Table",
+      "sourceNodeId": "table",
+      "tag": "table",
+      "slot": "replace",
+      "classes": ""
+    },
+    {
+      "name": "TableBody",
+      "sourceNodeId": "body",
+      "tag": "tbody",
+      "slot": "replace",
+      "classes": ""
+    },
+    {
+      "name": "TableRow",
+      "sourceNodeId": "row",
+      "tag": "tr",
+      "slot": "replace",
+      "classes": ""
+    },
+    {
+      "name": "TableCell",
+      "sourceNodeId": "cell",
+      "tag": "td",
+      "slot": "replace",
+      "classes": ""
+    }
+  ],
+  "examples": {
+    "static": "import { Table, TableBody, TableRow, TableCell } from '@dwlhm/ui-react';\n<Table><TableBody><TableRow><TableCell>Value</TableCell></TableRow></TableBody></Table>",
+    "loop": "import { Table, TableBody, TableRow, TableCell } from '@dwlhm/ui-react';\n<Table><TableBody>{rows.map(row => <TableRow key={row.id}>{row.cells.map(cell => <TableCell key={cell.id}>{cell.value}</TableCell>)}</TableRow>)}</TableBody></Table>"
+  }
+}

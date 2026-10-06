@@ -88,7 +88,22 @@ const componentFiles = paths.hasComponents
   ? fs.readdirSync(componentsDir).filter((file) => file.endsWith('.lite.tsx')).sort()
   : [];
 const componentNames = componentFiles.map((file) => file.replace('.lite.tsx', ''));
-const current = sortByName(componentNames.map((name) => ({ name, slug: name.toLowerCase() })));
+const current = sortByName(componentNames.map((name) => {
+  const source = fs.readFileSync(path.join(componentsDir, `${name}.lite.tsx`), 'utf8');
+  const match = source.match(/\/\* @composition (.*?) \*\//);
+  return { name, slug: name.toLowerCase(), ...(match ? { composition: JSON.parse(match[1]) } : {}) };
+}));
+
+// Reject incomplete groups before barrels, package files or the manifest mutate.
+for (const component of current) {
+  const spec = component.composition;
+  if (!spec) continue;
+  if (spec.part !== component.name || !Array.isArray(spec.parts) || !spec.parts.includes(spec.root)) throw new Error(`Invalid composition metadata for ${component.name}`);
+  for (const name of spec.parts) {
+    const peer = current.find(entry => entry.name === name);
+    if (!peer || peer.composition?.root !== spec.root || JSON.stringify(peer.composition.parts) !== JSON.stringify(spec.parts)) throw new Error(`Incomplete composition group ${spec.root}: missing or inconsistent ${name}`);
+  }
+}
 
 // Prune owned artifacts: component files from the previous manifest that are no
 // longer present, plus the runtime copy when the component set is empty. Never
@@ -147,7 +162,11 @@ if (current.length > 0) {
           needsRuntime = true;
         }
       }
-      const outputCode = config.generate(json);
+      let outputCode = config.generate(json);
+      // Mitosis Slot emits a truthy fallback for React. Match native slot
+      // presence semantics: explicitly supplied empty text/zero stays content.
+      const composition = current.find(component => component.name === componentName)?.composition;
+      if (targetName === 'react' && composition?.slot === 'default') outputCode = outputCode.replace(/\bprops\.children\s*\|\|/g, 'props.children ??');
       const destPath = path.join(config.dir, `${componentName}${config.ext}`);
       fs.writeFileSync(destPath, outputCode, 'utf-8');
     }

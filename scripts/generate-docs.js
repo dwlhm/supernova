@@ -324,7 +324,9 @@ export default function Demo() {
 function parseComponentFile(filePath) {
   const content = fs.readFileSync(filePath, 'utf8');
   const baseName = path.basename(filePath, '.lite.tsx');
-  const meta = COMPONENT_METADATA[baseName] || {
+  const compositionMatch = content.match(/\/\* @composition (.*?) \*\//);
+  const composition = compositionMatch ? JSON.parse(compositionMatch[1]) : null;
+  const meta = (composition ? null : COMPONENT_METADATA[baseName]) || {
     description: `${baseName} component generated from Supernova.`,
     defaults: {},
     descriptions: {},
@@ -371,7 +373,8 @@ function parseComponentFile(filePath) {
 
   return {
     name: baseName,
-    description: meta.description,
+    composition,
+    description: composition ? `Composable part of ${composition.root}. Consumer owns content, order and repetition.` : meta.description,
     props: props,
     sampleReact: meta.sampleReact,
     sampleSvelte: meta.sampleSvelte,
@@ -739,17 +742,13 @@ function generateComponentDoc(comp) {
     propsTable += `| \`${p.name}\` | \`${p.type}\` | \`${p.default}\` | ${p.description} |\n`;
   }
 
-  return `# ${comp.name}
+  const compositionDoc = comp.composition ? `\n## Composition\n\nRoot: \`${comp.composition.root}\`. Parts: ${comp.composition.parts.map(name => `\`${name}\``).join(', ')}.\n\nThe default slot ${comp.composition.slot === 'default' ? `uses ${JSON.stringify(comp.composition.defaultContent ?? '')} when no content is supplied` : 'replaces all design example children'}. Consumers own item data, ordering and repetition. There is no composition mode or internal design type prop.\n${comp.name === comp.composition.root && comp.composition.examples ? Object.entries(comp.composition.examples).map(([kind, example]) => `\n### ${kind === 'loop' ? 'Consumer loop' : 'Static composition'}\n\n\`\`\`tsx\n${example}\n\`\`\`\n`).join('') : ''}` : '';
 
-${comp.description}
-
----
-
-## Interactive Preview
-
-<ComponentSandbox name="${comp.name}" />
+  return `# ${comp.name}\n\n${comp.description}${compositionDoc}
 
 ---
+
+${comp.composition ? 'Interactive preview is not available for composition parts; use the examples below.\n' : `## Interactive Preview\n\n<ComponentSandbox name="${comp.name}" />\n\n---\n`}
 
 ## Code Examples
 

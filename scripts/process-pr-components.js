@@ -21,10 +21,12 @@ const { execSync } = require('child_process');
 const {
   fetchFigmaNode,
   fetchFigmaNodesBatch,
-  transpileFigmaNodeToMitosis,
+  transpileFigmaNodeToMitosisArtifacts,
   loadTokens,
   loadEnvFile,
 } = require('./figma-to-mitosis');
+
+const { validateComposition, readCompositionRegistry, sourceHash, validateOwnedRemovals, pruneOwnedOutputs } = require('./component-composition');
 
 // Automatically load .env from repository root if present
 loadEnvFile(path.resolve(__dirname, '..', '.env'));
@@ -109,6 +111,7 @@ function computeFingerprint(component) {
     componentPropertyDefinitions: component.componentPropertyDefinitions || figma.componentPropertyDefinitions || [],
     variantPropertyValues: component.variantPropertyValues || figma.variantPropertyValues || null,
     variants: figma.variants || component.variants || [],
+    ...(component.composition != null ? { composition: component.composition } : {}),
   };
 
   // If explicit scene node or fixture is attached, include it
@@ -474,6 +477,7 @@ function printSummaryReport({
 async function processPrComponents(options = {}) {
   const {
     catalog: catalogArg = 'components.catalog.json',
+    compositionRegistry: compositionRegistryArg = 'components.composition.json',
     manifest: manifestArg = '.components-manifest.json',
     base: baseRef = null,
     componentsDir: componentsDirArg = 'components',
@@ -491,10 +495,17 @@ async function processPrComponents(options = {}) {
   const componentsDir = path.resolve(cwd, componentsDirArg);
 
   // 1. Read catalog
-  const catalog = readCatalog(catalogPath);
+  let catalog = readCatalog(catalogPath);
 
-  // 2. Read baseline manifest
+  // 2. Read baseline manifest. An unavailable catalog is never deletion input.
   const baselineManifest = loadBaselineManifest(manifestPath, baseRef);
+  let authoritativeCatalog = false;
+  try {
+    const parsed = JSON.parse(fs.readFileSync(catalogPath, 'utf8'));
+    authoritativeCatalog = Array.isArray(parsed) || !!(parsed && Array.isArray(parsed.components));
+  } catch (_) { /* Legacy empty-read behavior is safe only without owned files. */ }
+  if (!authoritativeCatalog && Object.values(baselineManifest.components).some(entry => entry.outputs?.length)) throw new Error('Catalog unavailable or invalid; preserving owned outputs and manifest');
+  if (authoritativeCatalog) catalog = readCompositionRegistry(path.resolve(cwd, compositionRegistryArg), catalog, toPascalCase);
 
   // 3. Prepare updated manifest
   const updatedManifest = {
@@ -503,6 +514,26 @@ async function processPrComponents(options = {}) {
     components: { ...baselineManifest.components },
   };
 
+  // Validate the complete output namespace before fetching or writing anything.
+  const outputOwners = new Map();
+  const publicExports = new Map();
+  for (const component of catalog) {
+    if (!component || !component.name) continue;
+    const rootName = toPascalCase(component.name);
+    const names = component.composition != null ? validateComposition(component.composition, rootName).parts.map(part => part.name) : [rootName];
+    for (const name of names) {
+      if (outputOwners.has(name)) throw new Error(`Generated output collision ${name}: ${outputOwners.get(name)} and ${rootName}`);
+      outputOwners.set(name, rootName);
+      for (const symbol of [name, `${name}Props`]) {
+        if (publicExports.has(symbol)) throw new Error(`Generated public export collision ${symbol}`);
+        publicExports.set(symbol, rootName);
+      }
+    }
+  }
+  const catalogRoots = new Set(catalog.filter(c => c && c.name).map(c => toPascalCase(c.name)));
+  for (const [name, entry] of Object.entries(baselineManifest.components)) {
+    if (authoritativeCatalog && !catalogRoots.has(name)) validateOwnedRemovals(entry.outputs, new Set(outputOwners.keys()), componentsDir);
+  }
   const tokens = loadTokens(tokensPath);
   const isMockMode = mock || (!token && !process.env.FIGMA_ACCESS_TOKEN);
   const effectiveToken = token || process.env.FIGMA_ACCESS_TOKEN;
@@ -577,7 +608,8 @@ async function processPrComponents(options = {}) {
     // Baseline manifest lookup
     const baselineEntry = baselineManifest.components[pascalName] || baselineManifest.components[component.name];
     const baselineFingerprint = getManifestFingerprint(baselineEntry);
-    const fileExists = fs.existsSync(componentFilePath);
+    const expectedNames = component.composition != null ? component.composition.parts.map(part => part.name) : [pascalName];
+    const fileExists = expectedNames.every(name => fs.existsSync(path.join(componentsDir, `${name}.lite.tsx`)));
 
     // Determine lifecycle state
     const isNew = !baselineEntry || !baselineFingerprint;
@@ -614,15 +646,26 @@ async function processPrComponents(options = {}) {
         nodeCache,
       });
 
-      const generatedCode = transpileFigmaNodeToMitosis(figmaNode, {
+      const generatedSources = transpileFigmaNodeToMitosisArtifacts(figmaNode, {
         componentName: pascalName,
+        composition: component.composition,
         tokens,
       });
 
+      const priorOutputs = baselineEntry?.outputs || (baselineEntry ? [{ name: pascalName }] : []);
+      for (const name of Object.keys(generatedSources)) {
+        const target = path.join(componentsDir, `${name}.lite.tsx`);
+        if (fs.existsSync(target) && !priorOutputs.some(output => output.name === name)) throw new Error(`Unowned output collision ${name}`);
+        for (const [owner, entry] of Object.entries(baselineManifest.components)) {
+          if (owner !== pascalName && (entry.outputs || [{ name: owner }]).some(output => output.name === name)) throw new Error(`Output ${name} owned by ${owner}`);
+        }
+      }
+      validateOwnedRemovals(priorOutputs, new Set(Object.keys(generatedSources)), componentsDir);
       if (!dryRun) {
         fs.mkdirSync(componentsDir, { recursive: true });
-        fs.writeFileSync(componentFilePath, generatedCode, 'utf8');
+        for (const [name, code] of Object.entries(generatedSources)) fs.writeFileSync(path.join(componentsDir, `${name}.lite.tsx`), code, 'utf8');
       }
+      pruneOwnedOutputs(priorOutputs, new Set(Object.keys(generatedSources)), componentsDir, dryRun);
 
       updatedManifest.components[pascalName] = {
         ...(baselineEntry || {}),
@@ -635,6 +678,8 @@ async function processPrComponents(options = {}) {
         nodeId: component.nodeId || (component.figma && component.figma.nodeId) || null,
         updatedAt: component.updatedAt || (component.figma && component.figma.updatedAt) || null,
         lastGenerated: new Date().toISOString(),
+        composition: component.composition || null,
+        outputs: Object.entries(generatedSources).map(([name, code]) => ({ name, file: path.relative(cwd, path.join(componentsDir, `${name}.lite.tsx`)).replace(/\\/g, '/'), sourceHash: sourceHash(code) })),
       };
 
       if (isNew) {
@@ -669,6 +714,13 @@ async function processPrComponents(options = {}) {
         console.error(`[process-pr-components] Error processing component ${pascalName}: ${err.message}`);
       }
     }
+  }
+
+  // Remove only unchanged, previously owned outputs of removed catalog entries.
+  for (const [name, entry] of Object.entries(baselineManifest.components)) {
+    if (!authoritativeCatalog || catalogRoots.has(name)) continue;
+    pruneOwnedOutputs(entry.outputs, new Set(outputOwners.keys()), componentsDir, dryRun);
+    delete updatedManifest.components[name];
   }
 
   // 4. Save updated manifest if not dry-run
@@ -740,6 +792,10 @@ function parseArgs(argv) {
       result.mock = true;
     } else if (arg === '--silent') {
       result.silent = true;
+    } else if (arg.startsWith('--composition-registry=')) {
+      result.compositionRegistry = arg.slice(23);
+    } else if (arg === '--composition-registry') {
+      result.compositionRegistry = argv[++i];
     } else if (arg.startsWith('--catalog=')) {
       result.catalog = arg.slice(10);
     } else if (arg === '--catalog' || arg === '-c') {

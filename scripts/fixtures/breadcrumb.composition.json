@@ -1,0 +1,74 @@
+{
+  "version": 1,
+  "root": "Breadcrumb",
+  "parts": [
+    {
+      "name": "Breadcrumb",
+      "sourceNodeId": "breadcrumb",
+      "tag": "nav",
+      "attributes": {
+        "aria-label": "Breadcrumb"
+      },
+      "slot": "replace"
+    },
+    {
+      "name": "BreadcrumbList",
+      "sourceNodeId": "list",
+      "tag": "ol",
+      "slot": "replace"
+    },
+    {
+      "name": "BreadcrumbItem",
+      "sourceNodeId": "item",
+      "tag": "li",
+      "slot": "replace"
+    },
+    {
+      "name": "BreadcrumbLink",
+      "sourceNodeId": "link",
+      "tag": "a",
+      "props": {
+        "href": "string"
+      },
+      "attributes": {
+        "href": {
+          "prop": "href"
+        }
+      },
+      "slot": "replace"
+    },
+    {
+      "name": "BreadcrumbPage",
+      "sourceNodeId": "page",
+      "tag": "span",
+      "attributes": {
+        "aria-current": "page"
+      },
+      "slot": "replace"
+    },
+    {
+      "name": "BreadcrumbSeparator",
+      "sourceNodeId": "separator",
+      "tag": "span",
+      "attributes": {
+        "aria-hidden": "true"
+      },
+      "slot": "default",
+      "defaultContent": "/"
+    },
+    {
+      "name": "BreadcrumbEllipsis",
+      "sourceNodeId": "ellipsis",
+      "tag": "span",
+      "attributes": {
+        "aria-hidden": "true"
+      },
+      "slot": "default",
+      "defaultContent": "..."
+    }
+  ],
+  "examples": {
+    "static": "import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbPage, BreadcrumbSeparator } from '@dwlhm/ui-react';\n\n<Breadcrumb>\n  <BreadcrumbList>\n    <BreadcrumbItem><BreadcrumbLink href=\"/\">Home</BreadcrumbLink></BreadcrumbItem>\n    <BreadcrumbItem><BreadcrumbSeparator /><BreadcrumbPage>Products</BreadcrumbPage></BreadcrumbItem>\n  </BreadcrumbList>\n</Breadcrumb>",
+    "loop": "import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbPage, BreadcrumbSeparator } from '@dwlhm/ui-react';\n\n// The consumer supplies paths, including stable IDs and link destinations.\n<Breadcrumb>\n  <BreadcrumbList>\n    {paths.map((path, index) => (\n      <BreadcrumbItem key={path.id}>\n        {index > 0 && <BreadcrumbSeparator />}\n        {index === paths.length - 1\n          ? <BreadcrumbPage>{path.label}</BreadcrumbPage>\n          : <BreadcrumbLink href={path.href}>{path.label}</BreadcrumbLink>}\n      </BreadcrumbItem>\n    ))}\n  </BreadcrumbList>\n</Breadcrumb>"
+  }
+}

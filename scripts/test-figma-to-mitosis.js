@@ -139,7 +139,8 @@ assert.strictEqual(bgPrimary, 'bg-background-primary', 'Must resolve to backgrou
 const borderNeutral = resolveColor({ type: 'SOLID', color: { r: 0.902, g: 0.91, b: 0.937 } }, 'border', tokens);
 assert.strictEqual(borderNeutral, 'border-border-neutral', 'Must resolve to border neutral');
 
-const textWhite = resolveColor({ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }, 'foreground', tokens);
+// Verify the no-token fallback independently of the repository's white token names.
+const textWhite = resolveColor({ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }, 'foreground', []);
 assert.strictEqual(textWhite, 'text-white', 'Must resolve pure white to text-white');
 
 console.log('  ✓ Token resolution and context tie-breaking pass\n');

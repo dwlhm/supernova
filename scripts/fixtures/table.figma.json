@@ -1,0 +1,47 @@
+{
+  "id": "table",
+  "name": "Table",
+  "type": "FRAME",
+  "layoutMode": "HORIZONTAL",
+  "itemSpacing": 8,
+  "children": [
+    {
+      "id": "body",
+      "name": "Example body",
+      "type": "FRAME",
+      "layoutMode": "HORIZONTAL",
+      "itemSpacing": 8,
+      "children": [
+        {
+          "id": "row",
+          "name": "Example row",
+          "type": "FRAME",
+          "layoutMode": "HORIZONTAL",
+          "itemSpacing": 8,
+          "children": [
+            {
+              "id": "cell",
+              "name": "Example cell",
+              "type": "TEXT",
+              "characters": "Example cell content",
+              "style": {
+                "fontSize": 14,
+                "fontWeight": 400
+              },
+              "fills": [
+                {
+                  "type": "SOLID",
+                  "color": {
+                    "r": 0.45,
+                    "g": 0.45,
+                    "b": 0.45
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

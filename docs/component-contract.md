@@ -102,3 +102,48 @@ npm run generate:components
 ```
 
 Replace the angle-bracket placeholders before running the commands. Review the generated source/API changes before compilation; no force-sync flag exists.
+
+## Generation-time composition contract
+
+**Result:** a catalog component plus explicit internal composition metadata selects source nodes and produces one fixed `.lite.tsx` component per part. The existing compiler generates all parts and exports for React, Vue 3, Vue 2 and Svelte. Consumers own item data, order and repetition. Design examples are replaced at the part's slot; no internal design `type`, mode, count or visibility property is automatically exposed.
+
+**Crack:** invalid metadata, missing or duplicate source node IDs, duplicate output names, undeclared attribute bindings, unsupported tags and existing unowned output collisions fail explicitly. The output namespace is checked before writes. Regeneration tracks all owned source files and their hashes; removed parts are deleted only if their source still matches the last generated hash. Modified removed parts block regeneration/removal before any replacement sources are written; review or move those custom files first. Missing parts trigger regeneration. A changed contract changes the design fingerprint. Successful generation does not implement focus, keyboard navigation or stateful widget behavior.
+
+**Need:** engineering-authored metadata with real node IDs from the loaded scene; reviewed semantic tags and native attributes; stable consumer data IDs; explicit state/interaction contracts when applicable. No layer-name guessing decides composition. Components without metadata retain the existing single-component API. `mitosisDefinition` remains a separate explicit-definition pipeline; this composition engine currently applies to the Figma scene converter.
+
+### Metadata source and schema
+
+`components.composition.json` is a repository-owned registry keyed by the exact PascalCase catalog name. It survives Figma/Supernova catalog refreshes. The default registry is empty. Alternatively, attach `composition` to a catalog entry; an entry configured in both places fails as a conflict. Unknown registry keys fail. `sync:components` reads this registry automatically; `--composition-registry=<file>` selects another registry.
+
+Each contract contains `version: 1`, `root` (matching the catalog's generated name), a nonempty `parts` array and optional `examples: { static, loop }` strings for documentation. Each part defines:
+
+| Field | Contract |
+| --- | --- |
+| `name` | Unique PascalCase export/file name; the root must be included |
+| `sourceNodeId` | Exact node ID within the loaded scene, selected before rendering |
+| `tag` | Explicit native semantic tag: nav, ol, ul, li, a, span, div, p, table, thead, tbody, tfoot, tr, th, td, caption, section, button or label |
+| `props` | Public prop names mapped to `string`, `boolean` or `number`; no automatically imported Figma properties |
+| `attributes` | Native attribute names mapped to primitive literals or `{ "prop": "declaredName" }`; no executable expressions, event attributes or raw HTML |
+| `slot` | `replace`: only caller children; `default`: caller children with explicit fallback |
+| `defaultContent` | Optional string fallback for a default slot, independent of example design content |
+| `classes` | Optional string replacing inferred source classes, including `""` to preserve native table layout |
+
+Every part also exposes `children` and `className`. Primitive public props are optional; contracts may map explicit `id`, `aria-label` and other native attributes onto declared props. `slot="replace"` emits no baked design children. Internal variant selection happens through explicit `sourceNodeId`; a design property named `1`, `2` or `deep` is never a consumer switch in this API.
+
+Without a `classes` override, the converter reuses the selected node's token/style mapping. Source flex layout is not automatically suitable for native table parts: the Table fixture explicitly overrides classes to preserve table display. Engineers must review presentation and semantics together.
+
+### Fixtures and migration
+
+`scripts/fixtures/breadcrumb.composition.json` defines Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbPage, BreadcrumbSeparator and BreadcrumbEllipsis. Its nav has a label, the current page has `aria-current="page"`, and separators/ellipsis are decorative. Separators belong inside list items so every direct `ol` child remains an `li`. Consumers can provide zero, one or many paths. `home`, `breadcrumb`, `showEllipsis` and internal `type` disappear from the composed API; content and ellipsis become caller composition.
+
+`scripts/fixtures/table.composition.json` independently demonstrates Table, TableBody, TableRow and TableCell. These are **engine capability fixtures**, not evidence that a production Breadcrumb or Table was migrated. The current production catalog contains neither source. Configure a real scene's reviewed IDs before synchronizing production.
+
+Generate the fixture parts into a temporary directory:
+
+```bash
+node scripts/figma-to-mitosis.js --fixture=scripts/fixtures/breadcrumb.figma.json --name=Breadcrumb --composition=scripts/fixtures/breadcrumb.composition.json --out=/tmp/supernova-breadcrumb
+```
+
+For composition, CLI `--out` is a directory; without composition, it remains the existing single output file. The CLI records its own ownership ledger and rejects existing unowned files. The PR processor records grouped ownership in `.components-manifest.json`. Neither ledger replaces the authoritative generated component-set manifest at `docs/.vitepress/components.generated.json`; that manifest also carries each part's composition documentation metadata.
+
+Compilation and server-rendered structure are verified by automated fixtures. Browser layout, focus, keyboard interactions, screen readers and end-to-end live Figma synchronization remain **UNVERIFIED** until checked against actual production designs.

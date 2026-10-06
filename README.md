@@ -335,3 +335,9 @@ Cloud installation has not been verified by the local package validation.
 ## License
 
 MIT © dwlhm
+
+### Composable Figma components
+
+Use `components.composition.json` for internal, generation-time composition contracts keyed by catalog component name. The generator emits a fixed set of parts; consumers own item ordering and loops. No composition mode or internal Figma `type` is exposed. Catalog entries may instead supply inline `composition`, but configuring both sources is an error.
+
+See [the composition contract](docs/component-contract.md#generation-time-composition-contract) for schema, ownership/migration rules and CLI usage. Breadcrumb and Table examples under `scripts/fixtures` verify engine capability; production catalog sources for those components are not configured.

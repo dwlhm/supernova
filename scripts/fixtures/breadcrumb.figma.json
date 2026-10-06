@@ -1,0 +1,122 @@
+{
+  "id": "breadcrumb",
+  "name": "Breadcrumb",
+  "type": "FRAME",
+  "layoutMode": "HORIZONTAL",
+  "itemSpacing": 8,
+  "children": [
+    {
+      "id": "list",
+      "name": "Example paths",
+      "type": "FRAME",
+      "layoutMode": "HORIZONTAL",
+      "itemSpacing": 8,
+      "children": [
+        {
+          "id": "item",
+          "name": "Example item",
+          "type": "FRAME",
+          "layoutMode": "HORIZONTAL",
+          "itemSpacing": 8,
+          "children": [
+            {
+              "id": "link",
+              "name": "Home",
+              "type": "TEXT",
+              "characters": "Home",
+              "style": {
+                "fontSize": 14,
+                "fontWeight": 400
+              },
+              "fills": [
+                {
+                  "type": "SOLID",
+                  "color": {
+                    "r": 0.45,
+                    "g": 0.45,
+                    "b": 0.45
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "separator",
+          "name": "Separator",
+          "type": "TEXT",
+          "characters": "/",
+          "style": {
+            "fontSize": 14,
+            "fontWeight": 400
+          },
+          "fills": [
+            {
+              "type": "SOLID",
+              "color": {
+                "r": 0.45,
+                "g": 0.45,
+                "b": 0.45
+              }
+            }
+          ]
+        },
+        {
+          "id": "page",
+          "name": "Current",
+          "type": "TEXT",
+          "characters": "Example path",
+          "style": {
+            "fontSize": 14,
+            "fontWeight": 400
+          },
+          "fills": [
+            {
+              "type": "SOLID",
+              "color": {
+                "r": 0.45,
+                "g": 0.45,
+                "b": 0.45
+              }
+            }
+          ]
+        },
+        {
+          "id": "ellipsis",
+          "name": "Ellipsis",
+          "type": "TEXT",
+          "characters": "...",
+          "style": {
+            "fontSize": 14,
+            "fontWeight": 400
+          },
+          "fills": [
+            {
+              "type": "SOLID",
+              "color": {
+                "r": 0.45,
+                "g": 0.45,
+                "b": 0.45
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "componentPropertyDefinitions": {
+    "type": {
+      "type": "VARIANT",
+      "variantOptions": [
+        "1",
+        "2",
+        "deep"
+      ],
+      "defaultValue": "2"
+    },
+    "showEllipsis": {
+      "type": "BOOLEAN",
+      "defaultValue": false
+    }
+  }
+}

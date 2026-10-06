@@ -2,6 +2,7 @@
 
 /**
  * Supernova Figma to Mitosis Transpiler
+ * Composition: --composition=<contract.json> --out=<directory> emits fixed parts.
  *
  * Fetches and transpiles Figma component scene graph data into idiomatic
  * Mitosis universal JSX (.lite.tsx) files.
@@ -1276,6 +1277,28 @@ ${jsxTree}
 // Figma REST API Fetcher
 // ---------------------------------------------------------------------------
 
+/** Emit one source per explicit composition part, or the legacy single root. */
+function transpileFigmaNodeToMitosisArtifacts(figmaNode, options = {}) {
+  const root = normalizeFigmaNode(figmaNode);
+  if (!root) throw new Error('Invalid or empty Figma node provided for transpilation.');
+  const componentName = options.componentName ? toPascalCase(options.componentName) : toPascalCase(root.name || 'FigmaComponent');
+  if (options.composition == null) return { [componentName]: transpileFigmaNodeToMitosis(figmaNode, options) };
+  const { validateComposition, generateCompositionSources } = require('./component-composition');
+  const spec = validateComposition(options.composition, componentName);
+  const tokens = options.tokens || loadTokens();
+  return generateCompositionSources(root, spec, (node, part) => {
+    const classes = part.classes ?? (node.type === 'TEXT' ? mapTextStylesToTailwind(node, { tokens }) : mapAutoLayoutToTailwind(node, { tokens })).join(' ');
+    const properties = Object.entries(part.props || {}).map(([name, type]) => `  ${name}?: ${type};`);
+    properties.push('  children?: any;', '  className?: string;');
+    const attrs = Object.entries(part.attributes || {}).map(([name, value]) => ` ${name}={${value && typeof value === 'object' ? 'props.' + value.prop : JSON.stringify(value)}}`).join('');
+    const content = part.slot === 'default' ? `<Slot>{${JSON.stringify(part.defaultContent ?? '')}}</Slot>` : '{props.children}';
+    // The contract is embedded so package/docs generation consumes exactly the
+    // source contract, without a second competing component-set manifest.
+    const metadata = JSON.stringify({ root: spec.root, part: part.name, parts: spec.parts.map(p => p.name), slot: part.slot, defaultContent: part.defaultContent, examples: spec.examples }).replace(/\*/g, '\\u002a');
+    return `/* @composition ${metadata} */\n${part.slot === 'default' ? 'import { Slot } from "@builder.io/mitosis";\n\n' : ''}export interface ${part.name}Props {\n${properties.join('\n')}\n}\n\nexport default function ${part.name}(props: ${part.name}Props) {\n  return (\n    <${part.tag}${attrs} className={${JSON.stringify(classes)} + (props.className ? " " + props.className : "")}>${content}</${part.tag}>\n  );\n}\n`;
+  });
+}
+
 /**
  * Fetch a component scene node from the Figma REST API.
  *
@@ -1491,6 +1514,7 @@ function parseArgs(args) {
     fixture: null,
     name: null,
     tokens: null,
+    composition: null,
     help: false,
   };
 
@@ -1523,6 +1547,10 @@ function parseArgs(args) {
       result.name = arg.slice(7);
     } else if (arg === '--name') {
       result.name = args[++i];
+    } else if (arg.startsWith('--composition=')) {
+      result.composition = arg.slice(14);
+    } else if (arg === '--composition') {
+      result.composition = args[++i];
     } else if (arg.startsWith('--tokens=')) {
       result.tokens = arg.slice(9);
     } else if (arg === '--tokens') {
@@ -1536,6 +1564,7 @@ function parseArgs(args) {
 function printHelp() {
   console.log(`
 Supernova Figma to Mitosis Transpiler
+Composition: --composition=<contract.json> --out=<directory> emits fixed parts.
 
 Usage:
   node scripts/figma-to-mitosis.js [options]
@@ -1589,10 +1618,15 @@ async function runCli() {
     throw new Error('Either --fixture or both --file and --node are required.');
   }
 
-  const code = transpileFigmaNodeToMitosis(figmaNode, {
-    componentName: args.name,
-    tokens,
-  });
+  const composition = args.composition ? JSON.parse(fs.readFileSync(path.resolve(args.composition), 'utf8')) : null;
+  const artifacts = transpileFigmaNodeToMitosisArtifacts(figmaNode, { componentName: args.name, tokens, composition });
+  if (composition) {
+    if (!args.out) throw new Error('--out=<directory> is required for composition output');
+    require('./component-composition').writeCompositionSources(path.resolve(args.out), artifacts, composition);
+    console.log(`Wrote ${Object.keys(artifacts).length} composition parts to ${args.out}`);
+    return;
+  }
+  const code = Object.values(artifacts)[0];
 
   if (args.out) {
     const outPath = path.resolve(process.cwd(), args.out);
@@ -1612,6 +1646,7 @@ module.exports = {
   fetchFigmaNode,
   fetchFigmaNodesBatch,
   transpileFigmaNodeToMitosis,
+  transpileFigmaNodeToMitosisArtifacts,
   extractComponentProperties,
   createTextBindingRegistry,
   renderTextExpression,
