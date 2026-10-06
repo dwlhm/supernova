@@ -119,206 +119,166 @@ function cleanPropKey(rawKey) {
 // ---------------------------------------------------------------------------
 
 function parseColorString(str) {
-  if (!str || typeof str !== 'string') return null;
+  if (typeof str !== 'string') return null;
   const s = str.trim();
-
-  const rgbaMatch = s.match(/rgba?\(\s*([0-9.]+)\s*,\s*([0-9.]+)\s*,\s*([0-9.]+)(?:\s*,\s*([0-9.]+))?\s*\)/i);
-  if (rgbaMatch) {
+  const hexMatch = s.match(/^#([0-9a-f]{3}|[0-9a-f]{4}|[0-9a-f]{6}|[0-9a-f]{8})$/i);
+  if (hexMatch) {
+    const hex = hexMatch[1].length <= 4
+      ? [...hexMatch[1]].map((c) => c + c).join('') : hexMatch[1];
     return {
-      r: Math.round(parseFloat(rgbaMatch[1])),
-      g: Math.round(parseFloat(rgbaMatch[2])),
-      b: Math.round(parseFloat(rgbaMatch[3])),
-      a: rgbaMatch[4] !== undefined ? parseFloat(rgbaMatch[4]) : 1,
+      r: parseInt(hex.slice(0, 2), 16), g: parseInt(hex.slice(2, 4), 16),
+      b: parseInt(hex.slice(4, 6), 16), a: hex.length === 8 ? parseInt(hex.slice(6), 16) / 255 : 1,
     };
   }
-
-  const hexMatch = s.match(/^#([0-9a-f]{3,8})$/i);
-  if (hexMatch) {
-    let hex = hexMatch[1];
-    if (hex.length === 3) {
-      hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2];
-    }
-    const r = parseInt(hex.substring(0, 2), 16);
-    const g = parseInt(hex.substring(2, 4), 16);
-    const b = parseInt(hex.substring(4, 6), 16);
-    const a = hex.length >= 8 ? parseInt(hex.substring(6, 8), 16) / 255 : 1;
-    return { r, g, b, a };
+  const rgbMatch = s.match(/^rgba?\(([^()]*)\)$/i);
+  if (!rgbMatch) return null;
+  const body = rgbMatch[1].trim();
+  let channels;
+  let alpha;
+  if (body.includes(',')) {
+    if (body.includes('/')) return null;
+    const parts = body.split(',').map((part) => part.trim());
+    if (parts.length !== 3 && parts.length !== 4) return null;
+    channels = parts.slice(0, 3);
+    alpha = parts[3];
+  } else {
+    const parts = body.split('/');
+    if (parts.length > 2) return null;
+    channels = parts[0].trim().split(/\s+/);
+    alpha = parts[1]?.trim();
+    if (channels.length !== 3) return null;
   }
-
-  return null;
+  const parseChannel = (value, maximum) => {
+    if (!/^(?:\d+(?:\.\d+)?|\.\d+)%?$/.test(value)) return null;
+    const number = Number(value.replace(/%$/, ''));
+    const limit = value.endsWith('%') ? 100 : maximum;
+    return number <= limit ? number / limit * maximum : null;
+  };
+  const rgb = channels.map((channel) => parseChannel(channel, 255));
+  const a = alpha === undefined ? 1 : parseChannel(alpha, 1);
+  if (rgb.includes(null) || a === null) return null;
+  return { r: Math.round(rgb[0]), g: Math.round(rgb[1]), b: Math.round(rgb[2]), a };
 }
 
 function normalizeFigmaColor(color, opacity = 1) {
   if (!color || typeof color !== 'object') return null;
-  const r = Math.round((color.r ?? 0) * 255);
-  const g = Math.round((color.g ?? 0) * 255);
-  const b = Math.round((color.b ?? 0) * 255);
-  const rawAlpha = color.a !== undefined ? color.a : opacity;
-  const a = Math.round(rawAlpha * 100) / 100;
-  const hex = `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
+  const channels = [color.r, color.g, color.b, color.a ?? 1, opacity];
+  if (!channels.every((value) => Number.isFinite(value) && value >= 0 && value <= 1)) return null;
+  const [r, g, b] = channels.slice(0, 3).map((value) => Math.round(value * 255));
+  const a = (color.a ?? 1) * opacity;
+  const hex = `#${[r, g, b].map((value) => value.toString(16).padStart(2, '0')).join('')}`;
   return { r, g, b, a, hex };
 }
 
-/**
- * Load tokens from a path or find them in default project locations.
- */
+/** Load exported color records; CSS names are authoritative over reconstructed keys. */
 function loadTokens(tokensPath) {
-  const tokenEntries = [];
-
   const candidates = tokensPath
     ? [path.resolve(process.cwd(), tokensPath)]
-    : [
+    : [...new Set([
         path.resolve(process.cwd(), 'tokens', 'tokens.css'),
-        path.resolve(process.cwd(), 'tokens', 'tokens.ts'),
+        path.resolve(process.cwd(), 'tokens', 'theme.css'),
         path.resolve(__dirname, '..', 'tokens', 'tokens.css'),
+        path.resolve(__dirname, '..', 'tokens', 'theme.css'),
+        path.resolve(process.cwd(), 'tokens', 'tokens.ts'),
         path.resolve(__dirname, '..', 'tokens', 'tokens.ts'),
-      ];
-
+      ])];
+  const readCss = (content) => {
+    const entries = [];
+    const varRegex = /(--color-[a-zA-Z0-9_-]+)\s*:\s*([^;]+);/g;
+    let match;
+    while ((match = varRegex.exec(content)) !== null) {
+      const parsed = parseColorString(match[2]);
+      if (parsed) entries.push({ varName: match[1], cssVar: `var(${match[1]})`, ...parsed });
+    }
+    return entries;
+  };
   for (const candidate of candidates) {
-    if (fs.existsSync(candidate)) {
-      try {
-        const content = fs.readFileSync(candidate, 'utf8');
-        if (candidate.endsWith('.css')) {
-          const varRegex = /(--[a-zA-Z0-9_-]+)\s*:\s*([^;]+);/g;
-          let match;
-          while ((match = varRegex.exec(content)) !== null) {
-            const varName = match[1];
-            const parsed = parseColorString(match[2]);
-            if (parsed) {
-              tokenEntries.push({
-                varName,
-                cssVar: `var(${varName})`,
-                ...parsed,
-              });
-            }
-          }
-        } else if (candidate.endsWith('.ts') || candidate.endsWith('.json')) {
-          const colorRegex = /"([a-zA-Z0-9_-]+)"\s*:\s*"([^"]+)"/g;
-          let match;
-          while ((match = colorRegex.exec(content)) !== null) {
-            const tokenName = match[1];
-            const parsed = parseColorString(match[2]);
-            if (parsed) {
-              tokenEntries.push({
-                varName: `--color-${tokenName.replace(/([A-Z])/g, '-$1').toLowerCase()}`,
-                cssVar: `var(--color-${tokenName.replace(/([A-Z])/g, '-$1').toLowerCase()})`,
-                tokenName,
-                ...parsed,
-              });
-            }
-          }
-        }
-      } catch (err) {
-        // Fall through gracefully if file can't be parsed
+    if (!fs.existsSync(candidate)) continue;
+    try {
+      const content = fs.readFileSync(candidate, 'utf8');
+      if (candidate.endsWith('.css')) {
+        const entries = readCss(content);
+        if (entries.length > 0 || tokensPath) return entries;
+        continue;
       }
+      if (!candidate.endsWith('.ts') && !candidate.endsWith('.json')) continue;
+      // The exporter emits a plain JSON-compatible object, followed by `as const` in TS.
+      const objectStart = content.indexOf('{');
+      const objectEnd = content.lastIndexOf('}');
+      const records = JSON.parse(content.slice(objectStart, objectEnd + 1)).colors;
+      if (!records || typeof records !== 'object') return [];
+      const authoritativeNames = [];
+      for (const fileName of ['tokens.css', 'theme.css']) {
+        const sibling = path.join(path.dirname(candidate), fileName);
+        if (fs.existsSync(sibling)) authoritativeNames.push(...readCss(fs.readFileSync(sibling, 'utf8')));
+      }
+      const uniqueNames = [...new Map(authoritativeNames.map((token) => [token.varName, token])).values()];
+      const unresolved = [];
+      const entries = Object.entries(records).flatMap(([tokenName, value]) => {
+        const parsed = parseColorString(value);
+        if (!parsed) return [];
+        const slug = tokenName.replace(/([A-Z])/g, '-$1').toLowerCase();
+        const reconstructed = `--${slug.startsWith('color-') ? slug : `color-${slug}`}`;
+        const identity = reconstructed.replace(/-/g, '');
+        let authoritative = uniqueNames.find((token) => token.varName.replace(/-/g, '') === identity);
+        if (!authoritative && uniqueNames.length > 0) {
+          const sameValue = (token) => ['r', 'g', 'b'].every((channel) => Math.abs(token[channel] - parsed[channel]) < 0.5) &&
+            Math.abs(token.a - parsed.a) <= 0.5 / 255;
+          const suffixMatches = uniqueNames.filter((token) =>
+            token.varName.replace(/-/g, '').endsWith(tokenName.toLowerCase()));
+          const matches = (suffixMatches.length > 0 ? suffixMatches : uniqueNames).filter(sameValue);
+          if (matches.length !== 1) {
+            unresolved.push(tokenName);
+            return [];
+          }
+          authoritative = matches[0];
+        }
+        const varName = authoritative?.varName || reconstructed;
+        return [{ varName, cssVar: `var(${varName})`, tokenName, ...parsed }];
+      });
+      if (unresolved.length > 0) {
+        console.warn(`[figma-to-mitosis] Unresolved exported color names in ${candidate}: ${unresolved.join(', ')}`);
+      }
+      return entries;
+    } catch (err) {
+      console.warn(`[figma-to-mitosis] Unable to load color tokens from ${candidate}: ${err.message}`);
     }
   }
-
-  return tokenEntries;
+  return [];
 }
 
-/**
- * Resolve a Figma paint object to a CSS variable or Tailwind class.
- * Context can be "background", "border", or "foreground".
- */
+/** Resolve verified token identity or equivalent RGBA to a Tailwind color utility. */
 function resolveColor(paint, context = 'background', tokens = []) {
-  if (!paint || paint.visible === false) return null;
-
-  if (paint.type !== 'SOLID' || !paint.color) {
-    return null;
-  }
-
+  const prefix = { background: 'bg', border: 'border', foreground: 'text' }[context];
+  if (!prefix || !paint || paint.visible === false || paint.type !== 'SOLID') return null;
   const norm = normalizeFigmaColor(paint.color, paint.opacity);
   if (!norm) return null;
-
-  // Check bound variables first if present
-  if (paint.boundVariables && paint.boundVariables.color) {
-    const bound = paint.boundVariables.color;
-    if (bound.name) {
-      const varSlug = bound.name.replace(/[^a-zA-Z0-9]+/g, '-').toLowerCase();
-      const cssVar = `var(--${varSlug})`;
-      if (context === 'background') return `bg-[${cssVar}]`;
-      if (context === 'border') return `border-[${cssVar}]`;
-      if (context === 'foreground') return `text-[${cssVar}]`;
-    }
+  const utility = (token) => /^--color-[a-zA-Z0-9_-]+$/.test(token.varName)
+    ? `${prefix}-${token.varName.slice('--color-'.length)}` : `${prefix}-[${token.cssVar}]`;
+  // Half an 8-bit alpha step accepts equivalent decimal/hex encodings without erasing opacity.
+  const sameColor = (token) => Math.abs(norm.r - token.r) < 0.5 && Math.abs(norm.g - token.g) < 0.5 &&
+    Math.abs(norm.b - token.b) < 0.5 && Math.abs(norm.a - token.a) <= 0.5 / 255;
+  const boundName = paint.boundVariables?.color?.name;
+  if (typeof boundName === 'string') {
+    const slug = boundName.replace(/^--/, '').replace(/([a-z0-9])([A-Z])/g, '$1-$2')
+      .replace(/[^a-zA-Z0-9]+/g, '-').toLowerCase();
+    const names = new Set([`--${slug}`, `--color-${slug}`]);
+    const boundToken = tokens.find((token) => (names.has(token.varName) || token.tokenName === boundName) && sameColor(token));
+    if (boundToken) return utility(boundToken);
   }
-
-  // Exact or near matches in tokens list
-  let bestToken = null;
-  let bestDistance = Infinity;
-
-  for (const t of tokens) {
-    const dr = norm.r - t.r;
-    const dg = norm.g - t.g;
-    const db = norm.b - t.b;
-    const da = Math.abs(norm.a - t.a);
-    const dist = Math.sqrt(dr * dr + dg * dg + db * db) + da * 100;
-
-    if (dist < 3) {
-      // Preference weight if token name matches context
-      const matchesContext =
-        (context === 'background' && (t.varName.includes('background') || t.varName.includes('bg'))) ||
-        (context === 'border' && t.varName.includes('border')) ||
-        (context === 'foreground' && (t.varName.includes('foreground') || t.varName.includes('text')));
-
-      const effectiveDist = dist - (matchesContext ? 1.5 : 0);
-
-      if (effectiveDist < bestDistance) {
-        bestDistance = effectiveDist;
-        bestToken = t;
-      }
-    }
+  const matches = tokens.filter(sameColor);
+  const matchesContext = (token) => {
+    const name = token.varName;
+    return context === 'background' ? /background|(?:^|-)bg(?:-|$)/.test(name)
+      : context === 'border' ? name.includes('border') : /foreground|text/.test(name);
+  };
+  const bestToken = matches.find(matchesContext) || matches[0];
+  if (bestToken) return utility(bestToken);
+  if (norm.a === 1 && norm.r === norm.g && norm.g === norm.b) {
+    if (norm.r === 255) return `${prefix}-white`;
+    if (norm.r === 0) return `${prefix}-black`;
   }
-
-  if (bestToken) {
-    if (context === 'background') {
-      if (bestToken.r === 255 && bestToken.g === 255 && bestToken.b === 255 && bestToken.a === 1) {
-        return 'bg-white';
-      }
-      if (bestToken.r === 0 && bestToken.g === 0 && bestToken.b === 0 && bestToken.a === 1) {
-        return 'bg-black';
-      }
-      return `bg-[${bestToken.cssVar}]`;
-    }
-    if (context === 'border') {
-      return `border-[${bestToken.cssVar}]`;
-    }
-    if (context === 'foreground') {
-      if (bestToken.r === 255 && bestToken.g === 255 && bestToken.b === 255 && bestToken.a === 1) {
-        return 'text-white';
-      }
-      if (bestToken.r === 0 && bestToken.g === 0 && bestToken.b === 0 && bestToken.a === 1) {
-        return 'text-black';
-      }
-      return `text-[${bestToken.cssVar}]`;
-    }
-  }
-
-  // Fallback direct color matching
-  if (norm.r === 255 && norm.g === 255 && norm.b === 255 && norm.a === 1) {
-    if (context === 'background') return 'bg-white';
-    if (context === 'border') return 'border-white';
-    if (context === 'foreground') return 'text-white';
-  }
-
-  if (norm.r === 0 && norm.g === 0 && norm.b === 0 && norm.a === 1) {
-    if (context === 'background') return 'bg-black';
-    if (context === 'border') return 'border-black';
-    if (context === 'foreground') return 'text-black';
-  }
-
-  if (norm.a < 1) {
-    const rgbaStr = `rgba(${norm.r},${norm.g},${norm.b},${norm.a})`;
-    if (context === 'background') return `bg-[${rgbaStr}]`;
-    if (context === 'border') return `border-[${rgbaStr}]`;
-    if (context === 'foreground') return `text-[${rgbaStr}]`;
-  }
-
-  if (context === 'background') return `bg-[${norm.hex}]`;
-  if (context === 'border') return `border-[${norm.hex}]`;
-  if (context === 'foreground') return `text-[${norm.hex}]`;
-
-  return null;
+  return norm.a < 1 ? `${prefix}-[rgba(${norm.r},${norm.g},${norm.b},${norm.a})]` : `${prefix}-[${norm.hex}]`;
 }
 
 // ---------------------------------------------------------------------------
@@ -752,26 +712,10 @@ function generateVariantClassExpressions(rootNode, baselineNode, options = {}) {
         }
       }
 
-      // Fallback heuristics if no explicit styles found
+      // Size defaults remain available; colors require actual variant scene paints.
       if (!optionStyles[optStr]) {
         const lowerOpt = optStr.toLowerCase();
-        if (isStyle) {
-          if (lowerOpt === 'primary') {
-            optionStyles[optStr] = 'bg-[var(--color-background-primary)] text-white';
-          } else if (lowerOpt === 'secondary') {
-            optionStyles[optStr] = 'bg-[var(--color-background-secondary)] text-[var(--color-foreground-neutral)]';
-          } else if (lowerOpt === 'outline') {
-            optionStyles[optStr] = 'border border-[var(--color-border-neutral)] bg-transparent text-[var(--color-foreground-neutral)]';
-          } else if (lowerOpt === 'ghost') {
-            optionStyles[optStr] = 'bg-transparent text-[var(--color-foreground-neutral)]';
-          } else if (lowerOpt === 'danger' || lowerOpt === 'destructive') {
-            optionStyles[optStr] = 'bg-red-600 text-white';
-          } else if (lowerOpt === 'warning') {
-            optionStyles[optStr] = 'bg-yellow-500 text-black';
-          } else if (lowerOpt === 'success') {
-            optionStyles[optStr] = 'bg-green-600 text-white';
-          }
-        } else if (isSize) {
+        if (!isStyle && isSize) {
           if (lowerOpt === 'small' || lowerOpt === 'sm') {
             optionStyles[optStr] = 'px-3 py-1.5 text-xs';
           } else if (lowerOpt === 'large' || lowerOpt === 'lg') {
@@ -850,17 +794,6 @@ function extractComponentProperties(rootNode) {
         defaultValue: def.defaultValue,
       });
 
-      // Also register PascalCase alias if raw key was PascalCase (e.g. Style, Size)
-      const sanitizedRaw = withoutId.replace(/[^a-zA-Z0-9_]/g, '');
-      if (sanitizedRaw && sanitizedRaw !== codeName && /^[A-Z]/.test(sanitizedRaw)) {
-        propsMap.set(sanitizedRaw, {
-          name: sanitizedRaw,
-          rawKey,
-          type,
-          tsType,
-          defaultValue: def.defaultValue,
-        });
-      }
     };
 
     if (Array.isArray(rawDefs)) {
@@ -911,14 +844,16 @@ function extractComponentProperties(rootNode) {
         if (!propsMap.has('onConfirm')) {
           propsMap.set('onConfirm', { name: 'onConfirm', type: 'EVENT', tsType: '() => void' });
         }
-        if (!propsMap.has('confirmText')) {
+        const labels = (node.children || []).filter((child) => child.type === 'TEXT');
+        if (node !== rootNode && (labels.length === 0 || (labels.length === 1 && !labels[0].componentPropertyReferences?.characters)) && !propsMap.has('confirmText')) {
           propsMap.set('confirmText', { name: 'confirmText', type: 'TEXT', tsType: 'string', defaultValue: 'Confirm' });
         }
       } else if (action === 'cancel') {
         if (!propsMap.has('onCancel')) {
           propsMap.set('onCancel', { name: 'onCancel', type: 'EVENT', tsType: '() => void' });
         }
-        if (!propsMap.has('cancelText')) {
+        const labels = (node.children || []).filter((child) => child.type === 'TEXT');
+        if (node !== rootNode && (labels.length === 0 || (labels.length === 1 && !labels[0].componentPropertyReferences?.characters)) && !propsMap.has('cancelText')) {
           propsMap.set('cancelText', { name: 'cancelText', type: 'TEXT', tsType: 'string', defaultValue: 'Cancel' });
         }
       } else {
@@ -948,6 +883,79 @@ function extractComponentProperties(rootNode) {
   return propsMap;
 }
 
+/** Allocate one deterministic text binding per emitted scene node. */
+function createTextBindingRegistry(rootNode, propsMap) {
+  const bindings = new WeakMap();
+  const accessibilityNames = new Set(['id', 'ariaDescribedby', ...(isButtonLikeNode(rootNode) ? ['ariaLabel', 'ariaLabelledby'] : [])]);
+  const existingTextNames = new Set([...propsMap.values()].filter((prop) => prop.type === 'TEXT' && !accessibilityNames.has(prop.name)).map((prop) => prop.name));
+  const reservedNames = new Set([...propsMap.keys()].filter((name) => !existingTextNames.has(name)));
+  const convenienceClaims = new Set();
+  const inferredClaims = new Set();
+  const allocate = (preferred, node, reuse = false) => {
+    if (reuse && propsMap.get(preferred)?.type === 'TEXT') return preferred;
+    let base = preferred;
+    if (reservedNames.has(base)) base += 'Content';
+    let name = base;
+    for (let index = 2; propsMap.has(name); index++) name = `${base}${index}`;
+    propsMap.set(name, { name, type: 'TEXT', tsType: 'string', defaultValue: node.characters ?? '' });
+    return name;
+  };
+  const visit = (node, parent) => {
+    if (!node || typeof node !== 'object') return;
+    if (node.type === 'TEXT') {
+      const explicit = cleanPropKey(node.componentPropertyReferences?.characters);
+      let name;
+      if (explicit) {
+        const definition = propsMap.get(explicit);
+        if (!definition || definition.type !== 'TEXT' || definition.tsType !== 'string') {
+          throw new Error(`Text character binding "${explicit}" must resolve to a TEXT/string definition.`);
+        }
+        name = explicit;
+      } else {
+        const directLabels = (parent?.children || []).filter((child) => child.type === 'TEXT');
+        let convenience = null;
+        if (parent && isButtonLikeNode(parent) && directLabels.length === 1) {
+          if (parent === rootNode) convenience = 'label';
+          else {
+            const action = detectButtonAction(parent);
+            if (action === 'confirm') convenience = 'confirmText';
+            if (action === 'cancel') convenience = 'cancelText';
+          }
+        }
+        if (convenience) {
+          const reuse = !convenienceClaims.has(convenience);
+          name = allocate(convenience, node, reuse);
+          convenienceClaims.add(convenience);
+        } else {
+          const layerName = typeof node.name === 'string' ? cleanPropKey(node.name) : '';
+          const preferred = /^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(layerName) ? layerName : 'text';
+          name = allocate(preferred, node, existingTextNames.has(preferred) && !inferredClaims.has(preferred));
+          inferredClaims.add(preferred);
+        }
+      }
+      bindings.set(node, name);
+    }
+    for (const child of node.children || []) visit(child, node);
+  };
+  visit(rootNode, null);
+  return bindings;
+}
+
+function renderTextExpression(node, context) {
+  const name = context.textBindings.get(node);
+  const fallback = JSON.stringify(node.characters ?? '');
+  const childrenFallback = context.textChildrenFallback ? 'props.children ?? ' : '';
+  return `{props.${name} ?? ${childrenFallback}${fallback}}`;
+}
+
+function renderRootAccessibilityAttributes(context, node) {
+  if (!context.isRoot) return '';
+  const descriptions = ' id={props.id} aria-describedby={props.ariaDescribedby}';
+  return isButtonLikeNode(node)
+    ? `${descriptions} aria-label={props.ariaLabel} aria-labelledby={props.ariaLabelledby}`
+    : descriptions;
+}
+
 // ---------------------------------------------------------------------------
 // JSX Generator
 // ---------------------------------------------------------------------------
@@ -956,6 +964,7 @@ function renderSceneNode(node, depth, context) {
   const indent = '  '.repeat(depth);
   const childIndent = '  '.repeat(depth + 1);
   const { propsMap, tokens, isRoot } = context;
+  const accessibilityAttributes = renderRootAccessibilityAttributes(context, node);
 
   // Visibility toggle condition
   let visibilityCondition = null;
@@ -987,27 +996,9 @@ function renderSceneNode(node, depth, context) {
       tag = 'h3';
     }
 
-    // Determine prop binding for characters
-    let boundProp = null;
-    if (node.componentPropertyReferences && node.componentPropertyReferences.characters) {
-      boundProp = cleanPropKey(node.componentPropertyReferences.characters);
-    } else {
-      // Fuzzy match by name
-      const camel = toCamelCase(node.name);
-      if (propsMap.has(camel) && propsMap.get(camel).type === 'TEXT') {
-        boundProp = camel;
-      }
-    }
+    const content = renderTextExpression(node, context);
 
-    const defaultText = (node.characters || '').trim();
-    let content = '';
-    if (boundProp) {
-      content = `{props.${boundProp} || ${JSON.stringify(defaultText)}}`;
-    } else if (defaultText.length > 0) {
-      content = JSON.stringify(defaultText).slice(1, -1);
-    }
-
-    elementJsx = `${indent}<${tag}${classAttr}>${content}</${tag}>`;
+    elementJsx = `${indent}<${tag}${accessibilityAttributes}${classAttr}>${content}</${tag}>`;
   }
   // 2. Button / Interactive Node
   else if (isButtonLikeNode(node)) {
@@ -1035,7 +1026,7 @@ function renderSceneNode(node, depth, context) {
         );
       }
 
-      buttonClasses.push('cursor-pointer', 'transition-colors', 'focus:outline-none');
+      buttonClasses.push('cursor-pointer', 'transition-colors');
       const staticClasses = buttonClasses.join(' ');
 
       let classAttr = '';
@@ -1047,26 +1038,19 @@ function renderSceneNode(node, depth, context) {
         classAttr = ` className={"${staticClasses}" + (props.className ? " " + props.className : "")}`;
       }
 
-      const nonTextChildren = Array.isArray(node.children) ? node.children.filter((c) => c.type !== 'TEXT') : [];
-
-      if (nonTextChildren.length === 0) {
-        elementJsx = `${indent}<button onClick={(e) => props.onClick?.(e)} disabled={props.disabled || props.state === 'Disabled'}${classAttr}>\n${childIndent}{props.label || props.children || 'Button'}\n${indent}</button>`;
-      } else {
-        const renderedChildren = [];
-        let textRendered = false;
-        for (const child of node.children) {
-          if (child.type === 'TEXT') {
-            renderedChildren.push(`${childIndent}{props.label || props.children || 'Button'}`);
-            textRendered = true;
-          } else {
-            renderedChildren.push(renderSceneNode(child, depth + 1, { ...context, isRoot: false }));
-          }
+      const children = node.children || [];
+      const textChildren = children.filter((child) => child.type === 'TEXT');
+      const soleLabel = textChildren.length === 1;
+      const renderedChildren = children.map((child) => {
+        if (child.type === 'TEXT' && soleLabel && !child.componentPropertyReferences?.visible) {
+          return `${childIndent}${renderTextExpression(child, { ...context, textChildrenFallback: !child.componentPropertyReferences?.characters })}`;
         }
-        if (!textRendered) {
-          renderedChildren.push(`${childIndent}{props.label || props.children || 'Button'}`);
-        }
-        elementJsx = `${indent}<button onClick={(e) => props.onClick?.(e)} disabled={props.disabled || props.state === 'Disabled'}${classAttr}>\n${renderedChildren.join('\n')}\n${indent}</button>`;
-      }
+        return renderSceneNode(child, depth + 1, { ...context, isRoot: false });
+      }).filter(Boolean);
+      if (textChildren.length === 0) renderedChildren.push(`${childIndent}{props.label ?? props.children ?? 'Button'}`);
+      elementJsx = `${indent}<button type="button" onClick={(e) => props.onClick?.(e)} disabled={props.disabled || props.state === 'Disabled'}${accessibilityAttributes}${classAttr}>
+${renderedChildren.join('\n')}
+${indent}</button>`;
     } else {
       const action = detectButtonAction(node);
       let onClickHandler = '() => props.onClick?.()';
@@ -1084,32 +1068,29 @@ function renderSceneNode(node, depth, context) {
 
       // Check children for button text
       const textChildren = Array.isArray(node.children) ? node.children.filter((c) => c.type === 'TEXT') : [];
-      if (textChildren.length === 1 && node.children.length === 1) {
+      if (textChildren.length === 1 && node.children.length === 1 && !textChildren[0].componentPropertyReferences?.visible) {
         const childTextClasses = mapTextStylesToTailwind(textChildren[0], { tokens });
         buttonClasses.push(...childTextClasses);
       }
 
-      buttonClasses.push('cursor-pointer', 'transition-colors', 'focus:outline-none');
+      buttonClasses.push('cursor-pointer', 'transition-colors');
       const classAttr = buttonClasses.length > 0 ? ` className="${buttonClasses.join(' ')}"` : '';
 
-      if (textChildren.length === 1 && node.children.length === 1) {
-        const defaultText = textChildren[0].characters || (action === 'confirm' ? 'Confirm' : 'Cancel');
-        const textExpression = textProp
-          ? `{props.${textProp} || ${JSON.stringify(defaultText)}}`
-          : `{${JSON.stringify(defaultText)}}`;
-        elementJsx = `${indent}<button onClick={${onClickHandler}}${classAttr}>\n${childIndent}${textExpression}\n${indent}</button>`;
+      if (textChildren.length === 1 && node.children.length === 1 && !textChildren[0].componentPropertyReferences?.visible) {
+        const textExpression = renderTextExpression(textChildren[0], context);
+        elementJsx = `${indent}<button type="button" onClick={${onClickHandler}}${classAttr}>\n${childIndent}${textExpression}\n${indent}</button>`;
       } else if (Array.isArray(node.children) && node.children.length > 0) {
         const renderedChildren = node.children
           .map((child) => renderSceneNode(child, depth + 1, { ...context, isRoot: false }))
           .filter(Boolean)
           .join('\n');
-        elementJsx = `${indent}<button onClick={${onClickHandler}}${classAttr}>\n${renderedChildren}\n${indent}</button>`;
+        elementJsx = `${indent}<button type="button" onClick={${onClickHandler}}${classAttr}>\n${renderedChildren}\n${indent}</button>`;
       } else {
         const fallbackText = action === 'confirm' ? 'Confirm' : action === 'cancel' ? 'Cancel' : 'Button';
         const textExpression = textProp
-          ? `{props.${textProp} || ${JSON.stringify(fallbackText)}}`
+          ? `{props.${textProp} ?? ${JSON.stringify(fallbackText)}}`
           : `{${JSON.stringify(fallbackText)}}`;
-        elementJsx = `${indent}<button onClick={${onClickHandler}}${classAttr}>\n${childIndent}${textExpression}\n${indent}</button>`;
+        elementJsx = `${indent}<button type="button" onClick={${onClickHandler}}${classAttr}>\n${childIndent}${textExpression}\n${indent}</button>`;
       }
     }
   }
@@ -1153,7 +1134,7 @@ function renderSceneNode(node, depth, context) {
     const hasChildren = Array.isArray(node.children) && node.children.length > 0;
 
     if (!hasChildren && !isRoot) {
-      elementJsx = `${indent}<div${classAttr} />`;
+      elementJsx = `${indent}<div${accessibilityAttributes}${classAttr} />`;
     } else {
       const renderedChildren = (node.children || [])
         .map((child) => renderSceneNode(child, depth + 1, { ...context, isRoot: false }))
@@ -1164,7 +1145,7 @@ function renderSceneNode(node, depth, context) {
       }
 
       const childrenBlock = renderedChildren.join('\n');
-      elementJsx = `${indent}<div${classAttr}>\n${childrenBlock}\n${indent}</div>`;
+      elementJsx = `${indent}<div${accessibilityAttributes}${classAttr}>\n${childrenBlock}\n${indent}</div>`;
     }
   }
 
@@ -1235,7 +1216,8 @@ function transpileFigmaNodeToMitosis(figmaNode, options = {}) {
     if (!existingDisabled || existingDisabled.tsType !== 'boolean') {
       propsMap.set('disabled', { name: 'disabled', type: 'BOOLEAN', tsType: 'boolean' });
     }
-    if (!propsMap.has('label')) {
+    const labels = (effectiveNode.children || []).filter((child) => child.type === 'TEXT');
+    if ((labels.length === 0 || (labels.length === 1 && !labels[0].componentPropertyReferences?.characters)) && !propsMap.has('label')) {
       propsMap.set('label', { name: 'label', type: 'TEXT', tsType: 'string' });
     }
     if (!propsMap.has('state')) {
@@ -1245,12 +1227,18 @@ function transpileFigmaNodeToMitosis(figmaNode, options = {}) {
       if (stateProp.tsType && stateProp.tsType !== 'string' && !stateProp.tsType.toLowerCase().includes('disabled')) {
         stateProp.tsType += ' | "Disabled"';
       }
-      const pascalStateProp = propsMap.get('State');
-      if (pascalStateProp && pascalStateProp.tsType && pascalStateProp.tsType !== 'string' && !pascalStateProp.tsType.toLowerCase().includes('disabled')) {
-        pascalStateProp.tsType += ' | "Disabled"';
-      }
     }
   }
+
+  const accessibilityProps = ['id', 'ariaDescribedby', ...(isButtonLikeNode(effectiveNode) ? ['ariaLabel', 'ariaLabelledby'] : [])];
+  for (const name of accessibilityProps) {
+    const existing = propsMap.get(name);
+    if (existing && (existing.type !== 'TEXT' || existing.tsType !== 'string')) {
+      throw new Error(`Root accessibility prop "${name}" must be a TEXT/string definition, received ${existing.type}/${existing.tsType}.`);
+    }
+    if (!existing) propsMap.set(name, { name, type: 'ACCESSIBILITY', tsType: 'string' });
+  }
+  const textBindings = createTextBindingRegistry(effectiveNode, propsMap);
 
   // Generate TypeScript interface
   const propsInterfaceLines = [`export interface ${componentName}Props {`];
@@ -1263,6 +1251,7 @@ function transpileFigmaNodeToMitosis(figmaNode, options = {}) {
   // Render JSX tree
   const jsxTree = renderSceneNode(effectiveNode, 2, {
     propsMap,
+    textBindings,
     tokens,
     isRoot: true,
     variantExpressions: variantInfo.variantExpressions,
@@ -1271,13 +1260,9 @@ function transpileFigmaNodeToMitosis(figmaNode, options = {}) {
   });
 
   // Construct complete Mitosis component file
-  const code = `import { useStore } from '@builder.io/mitosis';
-
-${propsInterfaceCode}
+  const code = `${propsInterfaceCode}
 
 export default function ${componentName}(props: ${componentName}Props) {
-  const state = useStore({});
-
   return (
 ${jsxTree}
   );
@@ -1628,12 +1613,16 @@ module.exports = {
   fetchFigmaNodesBatch,
   transpileFigmaNodeToMitosis,
   extractComponentProperties,
+  createTextBindingRegistry,
+  renderTextExpression,
   selectBaselineVariant,
   generateVariantClassExpressions,
   mapAutoLayoutToTailwind,
   mapTextStylesToTailwind,
   loadTokens,
   resolveColor,
+  parseColorString,
+  normalizeFigmaColor,
   parseArgs,
   loadEnvFile,
 };
