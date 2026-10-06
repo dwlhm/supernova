@@ -125,19 +125,18 @@ The repository employs an automated two-pull-request workflow designed to mainta
   3. Tests building tokens and framework packages (`npm run generate:tokens && npm run build:packages`).
   4. **Zero Mutation Guarantee**: Does **not** push or modify templates back into PR 1. Supernova's pull request remains clean and purely token-focused.
 
-### 2. PR 2: Template Confirmation & Multi-Framework Generation (`.github/workflows/template-sync-pr.yml`)
+### 2. PR 2: Template & Documentation Confirmation (`.github/workflows/template-sync-pr.yml`)
 - **Trigger**: Automated on `push` to `main` for `tokens/**`, `components.catalog.json`, `components.composition.json`, and the converter/composition, import, synchronization, package/documentation generation and export-path scripts listed in the workflow. Manual execution remains available via `workflow_dispatch`.
-- **Role**: Regenerates universal Mitosis templates and compiles multi-framework packages, opening a confirmation PR against `main`.
+- **Role**: Regenerates universal Mitosis templates, manifests, and documentation, opening a confirmation PR against `main`. Multi-framework packages are not generated or committed here; they are compiled and released during the release workflow when PR 2 is merged.
 - **Workflow**:
   1. Checks out repository with full git history.
   2. Syncs tokens into packages (`npm run generate:tokens`).
   3. Runs discovery/import and template synchronization together (`npm run figma:sync`) when a Figma token is available, or falls back to template synchronization (`npm run sync:components`).
-  4. Generates multi-framework components for React, Svelte, Vue 3, and Vue 2 (`npm run generate:components`).
-  5. Updates VitePress documentation pages and component manifests (`npm run generate:docs`).
-  6. Detects drift across `components/`, `packages/`, `docs/`, `.components-manifest.json`, and `components.catalog.json`.
-  7. If changes exist, pushes to branch `chore/sync-templates-and-packages` and creates or updates a dedicated confirmation Pull Request against `main`.
-- **Maintainer Confirmation**: Maintainers review the generated Mitosis templates (`components/*.lite.tsx`) and compiled multi-framework packages before merging.
-- **Regeneration boundary**: Composition metadata participates in each component fingerprint, so adding or changing a valid contract regenerates that component and its parts. Existing sources with unchanged fingerprints are preserved, including custom edits. Generator code changes start synchronization and package/docs generation, but do not currently invalidate source fingerprints; a workflow run alone does not refresh unchanged `.lite.tsx` sources. Review regenerated converter output before replacing those sources.
+  4. Updates VitePress documentation pages and component manifests (`npm run generate:docs`).
+  5. Detects drift across `components/`, `docs/`, `.components-manifest.json`, and `components.catalog.json`.
+  6. If changes exist, pushes to branch `chore/sync-templates-and-packages` and creates or updates a dedicated confirmation Pull Request against `main`.
+- **Maintainer Confirmation**: Maintainers review the generated Mitosis templates (`components/*.lite.tsx`), documentation, and component manifests before merging.
+- **Regeneration boundary**: Composition metadata participates in each component fingerprint, so adding or changing a valid contract regenerates that component and its parts. Existing sources with unchanged fingerprints are preserved, including custom edits. Generator code changes start synchronization and documentation generation, but do not currently invalidate source fingerprints; a workflow run alone does not refresh unchanged `.lite.tsx` sources. Review regenerated converter output before replacing those sources.
 
 ### 3. Release & Deployment Lifecycle (`.github/workflows/design-system-ci.yml`)
 - **Trigger**: `push` to `main` with changes to `components/**`, `packages/**`, or `.components-manifest.json` (i.e. when PR 2 is approved and merged into `main`), or manual execution via `workflow_dispatch` / `repository_dispatch`.
