@@ -5,6 +5,10 @@
       "slug": "alertdialog"
     },
     {
+      "name": "Avatar",
+      "slug": "avatar"
+    },
+    {
       "name": "Badge",
       "slug": "badge"
     },
@@ -165,12 +169,100 @@
       }
     },
     {
+      "name": "BubbleChat",
+      "slug": "bubblechat"
+    },
+    {
       "name": "Button",
       "slug": "button"
     },
     {
+      "name": "Chart",
+      "slug": "chart"
+    },
+    {
       "name": "Checkbox",
       "slug": "checkbox"
+    },
+    {
+      "name": "DatePicker",
+      "slug": "datepicker"
+    },
+    {
+      "name": "FAB",
+      "slug": "fab"
+    },
+    {
+      "name": "InputFileDropZone",
+      "slug": "inputfiledropzone"
+    },
+    {
+      "name": "InputFileInput",
+      "slug": "inputfileinput"
+    },
+    {
+      "name": "InputImageUploader",
+      "slug": "inputimageuploader"
+    },
+    {
+      "name": "InputOTP",
+      "slug": "inputotp"
+    },
+    {
+      "name": "InputText",
+      "slug": "inputtext"
+    },
+    {
+      "name": "InputTextArea",
+      "slug": "inputtextarea"
+    },
+    {
+      "name": "LogoBrand",
+      "slug": "logobrand"
+    },
+    {
+      "name": "MainMenu",
+      "slug": "mainmenu"
+    },
+    {
+      "name": "MenuItem",
+      "slug": "menuitem"
+    },
+    {
+      "name": "Pagination",
+      "slug": "pagination"
+    },
+    {
+      "name": "Progressbar",
+      "slug": "progressbar"
+    },
+    {
+      "name": "RadioButton",
+      "slug": "radiobutton"
+    },
+    {
+      "name": "Sidebar",
+      "slug": "sidebar"
+    },
+    {
+      "name": "Slider",
+      "slug": "slider"
+    },
+    {
+      "name": "Spinner",
+      "slug": "spinner"
+    },
+    {
+      "name": "Stepper",
+      "slug": "stepper"
+    },
+    {
+      "name": "SwitchButton",
+      "slug": "switchbutton"
+    },
+    {
+      "name": "TabItem",
+      "slug": "tabitem"
     },
     {
       "name": "Table",
@@ -209,6 +301,10 @@
       }
     },
     {
+      "name": "TableBodyCell",
+      "slug": "tablebodycell"
+    },
+    {
       "name": "TableBodyRow",
       "slug": "tablebodyrow",
       "composition": {
@@ -233,6 +329,18 @@
         ],
         "slot": "replace"
       }
+    },
+    {
+      "name": "TableCellValue",
+      "slug": "tablecellvalue"
+    },
+    {
+      "name": "TableCheckboxBodyCell",
+      "slug": "tablecheckboxbodycell"
+    },
+    {
+      "name": "TableCheckboxHeaderCell",
+      "slug": "tablecheckboxheadercell"
     },
     {
       "name": "TableHeader",
@@ -277,6 +385,38 @@
         ],
         "slot": "replace"
       }
+    },
+    {
+      "name": "TableNoBodyCell",
+      "slug": "tablenobodycell"
+    },
+    {
+      "name": "TableNoHeaderCell",
+      "slug": "tablenoheadercell"
+    },
+    {
+      "name": "Tabs",
+      "slug": "tabs"
+    },
+    {
+      "name": "Toast",
+      "slug": "toast"
+    },
+    {
+      "name": "Toggle",
+      "slug": "toggle"
+    },
+    {
+      "name": "ToggleGroup",
+      "slug": "togglegroup"
+    },
+    {
+      "name": "Tooltip",
+      "slug": "tooltip"
+    },
+    {
+      "name": "Topbar",
+      "slug": "topbar"
     }
   ]
 }
