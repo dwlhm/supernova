@@ -12,6 +12,7 @@ const mitosis = require('@builder.io/mitosis');
 
 const {
   fetchFigmaNode,
+  fetchFigmaNodesBatch,
   transpileFigmaNodeToMitosis,
   extractComponentProperties,
   selectBaselineVariant,
@@ -217,9 +218,84 @@ console.log('Test 5: Verify fetchFigmaNode parameter validation and error handli
   const fetchedNode = await fetchFigmaNode('file123', '1:2', 'valid-token');
   assert.strictEqual(fetchedNode.name, 'MockNode');
 
+  // Batch Fetch Tests: parameter validation & chunking
+  await assert.rejects(
+    async () => fetchFigmaNodesBatch('', ['1:2'], 'token'),
+    /Figma fileId is required/
+  );
+
+  const emptyBatch = await fetchFigmaNodesBatch('file123', [], 'token');
+  assert.deepStrictEqual(emptyBatch, {});
+
+  delete process.env.FIGMA_ACCESS_TOKEN;
+  await assert.rejects(
+    async () => fetchFigmaNodesBatch('file123', ['1:2'], ''),
+    /Figma access token is required/
+  );
+  if (oldEnv) process.env.FIGMA_ACCESS_TOKEN = oldEnv;
+
+  // Batch chunking and merging (3 ids with chunkSize = 2 => 2 requests)
+  const requestedUrls = [];
+  global.fetch = async (url, opts) => {
+    assert(opts.headers['X-Figma-Token'] === 'valid-token', 'X-Figma-Token header must be passed');
+    requestedUrls.push(url);
+    if (url.includes('1%3A1%2C1%3A2')) {
+      return {
+        status: 200,
+        ok: true,
+        json: async () => ({
+          nodes: {
+            '1:1': { document: { id: '1:1', name: 'Node1' } },
+            '1:2': { document: { id: '1:2', name: 'Node2' } },
+          },
+        }),
+      };
+    }
+    if (url.includes('1%3A3')) {
+      return {
+        status: 200,
+        ok: true,
+        json: async () => ({
+          nodes: {
+            '1:3': { document: { id: '1:3', name: 'Node3' } },
+          },
+        }),
+      };
+    }
+    throw new Error(`Unexpected URL: ${url}`);
+  };
+
+  const batchResults = await fetchFigmaNodesBatch('file123', ['1:1', '1:2', '1:3'], 'valid-token', 2);
+  assert.strictEqual(requestedUrls.length, 2, 'Must split 3 nodes into 2 requests with chunkSize=2');
+  assert.strictEqual(Object.keys(batchResults).length, 3, 'Must merge all 3 nodes');
+  assert.strictEqual(batchResults['1:1'].document.name, 'Node1');
+  assert.strictEqual(batchResults['1:2'].document.name, 'Node2');
+  assert.strictEqual(batchResults['1:3'].document.name, 'Node3');
+
+  // Rate limit 429 retry
+  let attemptCount = 0;
+  global.fetch = async () => {
+    attemptCount++;
+    if (attemptCount === 1) {
+      return { status: 429, ok: false, statusText: 'Too Many Requests', headers: { get: () => '0' } };
+    }
+    return {
+      status: 200,
+      ok: true,
+      json: async () => ({
+        nodes: {
+          '1:1': { document: { id: '1:1', name: 'NodeAfterRetry' } },
+        },
+      }),
+    };
+  };
+  const retryResult = await fetchFigmaNodesBatch('file123', ['1:1'], 'valid-token', 50);
+  assert.strictEqual(attemptCount, 2, 'Must retry on 429');
+  assert.strictEqual(retryResult['1:1'].document.name, 'NodeAfterRetry');
+
   global.fetch = originalFetch;
 
-  console.log('  ✓ Parameter validation and HTTP error handling (403, 404, 429, 200) verified\n');
+  console.log('  ✓ Parameter validation, batch chunking, and HTTP error handling (403, 404, 429, 200) verified\n');
 
   // -------------------------------------------------------------------------
   // Test 6: COMPONENT_SET resolution (Button with variants)

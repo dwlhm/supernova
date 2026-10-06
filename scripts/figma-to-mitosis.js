@@ -826,7 +826,15 @@ function extractComponentProperties(rootNode) {
       let tsType = 'string';
       if (type === 'VARIANT') {
         const opts = def.variantOptions || def.options;
-        tsType = Array.isArray(opts) && opts.length > 0 ? opts.map((o) => JSON.stringify(o)).join(' | ') : 'string';
+        const isBooleanVariant =
+          Array.isArray(opts) &&
+          opts.length === 2 &&
+          opts.map((o) => String(o).toLowerCase()).sort().join(',') === 'false,true';
+        if (isBooleanVariant || codeName.toLowerCase() === 'disabled') {
+          tsType = 'boolean';
+        } else {
+          tsType = Array.isArray(opts) && opts.length > 0 ? opts.map((o) => JSON.stringify(o)).join(' | ') : 'string';
+        }
       } else if (type === 'BOOLEAN') {
         tsType = 'boolean';
       } else if (type === 'TEXT') {
@@ -1223,7 +1231,8 @@ function transpileFigmaNodeToMitosis(figmaNode, options = {}) {
     if (!propsMap.has('onClick')) {
       propsMap.set('onClick', { name: 'onClick', type: 'EVENT', tsType: '(event?: any) => void' });
     }
-    if (!propsMap.has('disabled')) {
+    const existingDisabled = propsMap.get('disabled');
+    if (!existingDisabled || existingDisabled.tsType !== 'boolean') {
       propsMap.set('disabled', { name: 'disabled', type: 'BOOLEAN', tsType: 'boolean' });
     }
     if (!propsMap.has('label')) {
@@ -1231,6 +1240,15 @@ function transpileFigmaNodeToMitosis(figmaNode, options = {}) {
     }
     if (!propsMap.has('state')) {
       propsMap.set('state', { name: 'state', type: 'TEXT', tsType: 'string' });
+    } else {
+      const stateProp = propsMap.get('state');
+      if (stateProp.tsType && stateProp.tsType !== 'string' && !stateProp.tsType.toLowerCase().includes('disabled')) {
+        stateProp.tsType += ' | "Disabled"';
+      }
+      const pascalStateProp = propsMap.get('State');
+      if (pascalStateProp && pascalStateProp.tsType && pascalStateProp.tsType !== 'string' && !pascalStateProp.tsType.toLowerCase().includes('disabled')) {
+        pascalStateProp.tsType += ' | "Disabled"';
+      }
     }
   }
 
@@ -1367,6 +1385,114 @@ async function fetchFigmaNode(fileId, nodeId, accessToken) {
   return documentNode;
 }
 
+/**
+ * Fetch multiple component scene nodes from the Figma REST API in batched chunks.
+ *
+ * @param {string} fileId - Figma file ID
+ * @param {string[]} nodeIds - Array of Figma node IDs (e.g. ["123:456", "123:789"])
+ * @param {string} [accessToken] - Figma personal access token
+ * @param {number} [chunkSize=50] - Number of node IDs to fetch per request (default: 50)
+ * @returns {Promise<Record<string, object>>} Merged dictionary mapping nodeId to Figma node object
+ */
+async function fetchFigmaNodesBatch(fileId, nodeIds, accessToken, chunkSize = 50) {
+  if (!fileId || typeof fileId !== 'string') {
+    throw new Error('Figma fileId is required.');
+  }
+  if (!Array.isArray(nodeIds) || nodeIds.length === 0) {
+    return {};
+  }
+
+  const token = accessToken || process.env.FIGMA_ACCESS_TOKEN;
+  if (!token || typeof token !== 'string') {
+    throw new Error('Figma access token is required (pass via argument, --token, or FIGMA_ACCESS_TOKEN env var).');
+  }
+
+  const size = typeof chunkSize === 'number' && chunkSize > 0 ? chunkSize : 50;
+  const uniqueNodeIds = [...new Set(nodeIds.filter(Boolean))];
+  if (uniqueNodeIds.length === 0) {
+    return {};
+  }
+
+  const chunks = [];
+  for (let i = 0; i < uniqueNodeIds.length; i += size) {
+    chunks.push(uniqueNodeIds.slice(i, i + size));
+  }
+
+  const allNodes = {};
+
+  for (const chunk of chunks) {
+    const encodedFile = encodeURIComponent(fileId);
+    const encodedIds = encodeURIComponent(chunk.join(','));
+    const url = `https://api.figma.com/v1/files/${encodedFile}/nodes?ids=${encodedIds}`;
+
+    let response;
+    const maxRetries = 3;
+    let delay = 1000;
+
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+      try {
+        response = await fetch(url, {
+          method: 'GET',
+          headers: {
+            'X-Figma-Token': token,
+          },
+        });
+      } catch (err) {
+        if (attempt === maxRetries) {
+          throw new Error(`Failed to connect to Figma API: ${err.message}`);
+        }
+        await new Promise((resolve) => setTimeout(resolve, delay));
+        delay *= 2;
+        continue;
+      }
+
+      if (response.status === 429) {
+        if (attempt < maxRetries) {
+          const retryAfter =
+            response.headers && typeof response.headers.get === 'function'
+              ? response.headers.get('Retry-After')
+              : null;
+          const waitTime = retryAfter ? parseInt(retryAfter, 10) * 1000 : delay;
+          await new Promise((resolve) => setTimeout(resolve, waitTime));
+          delay *= 2;
+          continue;
+        } else {
+          throw new Error('Figma API rate limit exceeded (HTTP 429). Please retry later.');
+        }
+      }
+
+      if (response.status === 403) {
+        throw new Error(`Invalid or unauthorized Figma access token (HTTP 403) for file "${fileId}".`);
+      }
+      if (response.status === 404) {
+        throw new Error(`Figma file "${fileId}" not found (HTTP 404).`);
+      }
+      if (!response.ok) {
+        throw new Error(`Figma API request failed with HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      break;
+    }
+
+    let data;
+    try {
+      data = await response.json();
+    } catch (err) {
+      throw new Error(`Failed to parse Figma API response as JSON: ${err.message}`);
+    }
+
+    if (data.err || data.status) {
+      throw new Error(`Figma API error: ${data.err || data.message || JSON.stringify(data)}`);
+    }
+
+    if (data.nodes && typeof data.nodes === 'object') {
+      Object.assign(allNodes, data.nodes);
+    }
+  }
+
+  return allNodes;
+}
+
 // ---------------------------------------------------------------------------
 // CLI Argument Parser & Runner
 // ---------------------------------------------------------------------------
@@ -1499,6 +1625,7 @@ async function runCli() {
 
 module.exports = {
   fetchFigmaNode,
+  fetchFigmaNodesBatch,
   transpileFigmaNodeToMitosis,
   extractComponentProperties,
   selectBaselineVariant,

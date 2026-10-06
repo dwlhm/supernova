@@ -1,0 +1,121 @@
+name: "PR 2: Sync Templates & Create Confirmation PR"
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'tokens/**'
+      - 'components.catalog.json'
+  workflow_dispatch:
+
+concurrency:
+  group: template-sync-pr
+  cancel-in-progress: true
+
+jobs:
+  sync-templates-and-create-pr:
+    name: Sync Templates & Create Confirmation PR
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Import or sync components
+        env:
+          FIGMA_ACCESS_TOKEN: ${{ secrets.FIGMA_ACCESS_TOKEN }}
+          FIGMA_FILE_KEY: ${{ secrets.FIGMA_FILE_KEY }}
+        run: |
+          npm run generate:tokens
+          if [ -n "$FIGMA_ACCESS_TOKEN" ]; then
+            echo "FIGMA_ACCESS_TOKEN detected. Running figma:import..."
+            if npm run figma:import; then
+              echo "figma:import completed successfully."
+            else
+              echo "figma:import failed; falling back to sync:components..."
+              npm run sync:components
+            fi
+          else
+            echo "No FIGMA_ACCESS_TOKEN detected. Falling back to sync:components..."
+            npm run sync:components
+          fi
+
+      - name: Generate multi-framework components
+        run: npm run generate:components
+
+      - name: Generate documentation
+        run: npm run generate:docs
+
+      - name: Detect changes and create/update confirmation PR
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ -n "$(git status --porcelain components/ packages/ docs/ .components-manifest.json components.catalog.json)" ]; then
+            echo "Changes detected in components, packages, docs, or manifests."
+
+            git config --global user.name "github-actions[bot]"
+            git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+            # Create or reset branch chore/sync-templates-and-packages to current HEAD
+            git checkout -B chore/sync-templates-and-packages
+
+            # Stage modified, untracked, and deleted files in target paths
+            git add -A components/ packages/ docs/ .components-manifest.json components.catalog.json
+
+            git commit -m "chore(components): sync latest templates and multi-framework packages [skip ci]"
+            git push origin chore/sync-templates-and-packages --force
+
+            PR_TITLE="chore(components): konfirmasi template terbaru dan multi-framework packages"
+            PR_BODY=$(cat << 'EOF'
+## 🤖 Automated Component & Framework Package Sync (PR 2)
+
+Pembaruan token desain atau katalog komponen telah dideteksi di `main`.
+Workflow ini secara otomatis meregenerasi template universal Mitosis dan mengompilasi ke seluruh paket framework yang didukung.
+
+### 📦 Ringkasan Perubahan
+- **Mitosis Templates**: `components/*.lite.tsx`
+- **Multi-Framework Packages**:
+  - `@dwlhm/ui-react` (`packages/react`)
+  - `@dwlhm/ui-svelte` (`packages/svelte`)
+  - `@dwlhm/ui-vue` (`packages/vue`)
+  - `@dwlhm/ui-vue2` (`packages/vue2`)
+  - `@dwlhm/design-tokens` (`packages/tokens`)
+- **Documentation & Manifests**:
+  - `docs/components/` & `docs/.vitepress/components.generated.json`
+  - `.components-manifest.json`
+  - `components.catalog.json`
+
+### 🔍 Langkah Konfirmasi Maintainer
+1. Tinjau diff template Mitosis pada tab **Files changed**.
+2. Pastikan properti variant, token binding, dan kode kustom sesuai dengan spesifikasi desain terbaru.
+3. Setelah disetujui, lakukan **Merge Pull Request** ke branch `main`.
+4. Penggabungan ke `main` akan memicu workflow `Sync Design System & Build Packages` (`design-system-ci.yml`) untuk build akhir, bump version, tagging rilis, dan deployment dokumentasi.
+EOF
+)
+
+            EXISTING_PR=$(gh pr list --head chore/sync-templates-and-packages --base main --state open --json number --jq '.[0].number // empty')
+            if [ -n "$EXISTING_PR" ] && [ "$EXISTING_PR" != "null" ]; then
+              echo "Existing open PR #$EXISTING_PR found. Updating PR..."
+              gh pr edit "$EXISTING_PR" --title "$PR_TITLE" --body "$PR_BODY"
+              echo "PR #$EXISTING_PR updated successfully."
+            else
+              echo "No existing open PR found. Creating new PR..."
+              gh pr create --head chore/sync-templates-and-packages --base main --title "$PR_TITLE" --body "$PR_BODY"
+              echo "New PR created successfully."
+            fi
+          else
+            echo "No component, package, docs, or manifest drift detected. Skipping PR creation."
+          fi

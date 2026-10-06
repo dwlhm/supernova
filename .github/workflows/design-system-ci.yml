@@ -3,6 +3,10 @@ name: Sync Design System & Build Packages
 on:
   push:
     branches: [main]
+    paths:
+      - 'components/**'
+      - 'packages/**'
+      - '.components-manifest.json'
   workflow_dispatch:
   repository_dispatch:
     types: [supernova-release]
@@ -39,6 +43,9 @@ jobs:
 
       - name: Verify committed exporter bundle
         run: git diff --exit-code -- exporter/dist/index.js
+
+      - name: Run Automated Tests
+        run: npm test
 
       - name: Generate Components & Sync Tokens
         run: npm run generate

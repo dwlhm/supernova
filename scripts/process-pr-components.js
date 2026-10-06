@@ -20,6 +20,7 @@ const { execSync } = require('child_process');
 
 const {
   fetchFigmaNode,
+  fetchFigmaNodesBatch,
   transpileFigmaNodeToMitosis,
   loadTokens,
   loadEnvFile,
@@ -311,7 +312,7 @@ function createSyntheticFigmaNode(component) {
  * Resolve Figma node: from fixture file, embedded node, Figma REST API, or synthetic mock.
  */
 async function resolveFigmaNode(component, options = {}) {
-  const { mock = false, token = null, fixturesDir = null } = options;
+  const { mock = false, token = null, fixturesDir = null, nodeCache = null } = options;
 
   // 1. Explicit fixture path on component
   if (component.fixture || component.fixturePath) {
@@ -346,16 +347,50 @@ async function resolveFigmaNode(component, options = {}) {
     }
   }
 
-  // 4. Fetch via Figma REST API if credentials and coordinates exist
-  const effectiveToken = token || process.env.FIGMA_ACCESS_TOKEN;
   const fileId = component.fileId || (component.figma && component.figma.fileId);
   const nodeId = component.nodeId || (component.figma && component.figma.nodeId);
+
+  // 4. Batch cache lookup if available
+  if (nodeCache && nodeId) {
+    const targetNode =
+      nodeCache[nodeId] ||
+      nodeCache[decodeURIComponent(nodeId)] ||
+      nodeCache[encodeURIComponent(nodeId)] ||
+      nodeCache[nodeId.replace(':', '-')] ||
+      nodeCache[nodeId.replace('-', ':')];
+
+    if (targetNode) {
+      if (targetNode.document) {
+        const documentNode = targetNode.document;
+        // Enrich with component metadata if available
+        if (!documentNode.componentPropertyDefinitions) {
+          if (targetNode.componentSets) {
+            const setMeta = targetNode.componentSets[nodeId] || Object.values(targetNode.componentSets)[0];
+            if (setMeta && setMeta.componentPropertyDefinitions) {
+              documentNode.componentPropertyDefinitions = setMeta.componentPropertyDefinitions;
+            }
+          }
+          if (!documentNode.componentPropertyDefinitions && targetNode.components) {
+            const compMeta = targetNode.components[nodeId] || Object.values(targetNode.components)[0];
+            if (compMeta && compMeta.componentPropertyDefinitions) {
+              documentNode.componentPropertyDefinitions = compMeta.componentPropertyDefinitions;
+            }
+          }
+        }
+        return documentNode;
+      }
+      return targetNode;
+    }
+  }
+
+  // 5. Fetch via Figma REST API if credentials and coordinates exist
+  const effectiveToken = token || process.env.FIGMA_ACCESS_TOKEN;
 
   if (!mock && effectiveToken && fileId && nodeId) {
     return await fetchFigmaNode(fileId, nodeId, effectiveToken);
   }
 
-  // 5. Offline / Mock fallback
+  // 6. Offline / Mock fallback
   return createSyntheticFigmaNode(component);
 }
 
@@ -470,6 +505,57 @@ async function processPrComponents(options = {}) {
 
   const tokens = loadTokens(tokensPath);
   const isMockMode = mock || (!token && !process.env.FIGMA_ACCESS_TOKEN);
+  const effectiveToken = token || process.env.FIGMA_ACCESS_TOKEN;
+
+  // Batch pre-fetch remote Figma component nodes (chunk size 50)
+  const nodeCache = {};
+  if (!isMockMode && effectiveToken) {
+    const remoteComponentsByFile = new Map();
+    for (const component of catalog) {
+      if (!component || !component.name) continue;
+
+      const fileId = component.fileId || (component.figma && component.figma.fileId);
+      const nodeId = component.nodeId || (component.figma && component.figma.nodeId);
+      if (!fileId || !nodeId) continue;
+
+      // Skip components that have local fixtures or embedded nodes
+      if (component.fixture || component.fixturePath) continue;
+      if (component.node || component.figmaNode) continue;
+      if (fixturesDir && fs.existsSync(fixturesDir)) {
+        const pascalName = toPascalCase(component.name);
+        const kebabName = toKebabCase(component.name);
+        const lowerName = component.name.toLowerCase();
+        const candidates = [
+          path.join(fixturesDir, `${pascalName}.figma.json`),
+          path.join(fixturesDir, `${kebabName}.figma.json`),
+          path.join(fixturesDir, `${lowerName}.figma.json`),
+          path.join(fixturesDir, `${component.name}.figma.json`),
+        ];
+        if (candidates.some((c) => fs.existsSync(c))) continue;
+      }
+
+      if (!remoteComponentsByFile.has(fileId)) {
+        remoteComponentsByFile.set(fileId, []);
+      }
+      remoteComponentsByFile.get(fileId).push(nodeId);
+    }
+
+    for (const [fileId, nodeIds] of remoteComponentsByFile.entries()) {
+      if (nodeIds.length > 0) {
+        if (!silent) {
+          console.log(`[process-pr-components] Batch fetching ${nodeIds.length} component nodes from Figma file "${fileId}" (chunk size 50)...`);
+        }
+        try {
+          const batchResults = await fetchFigmaNodesBatch(fileId, nodeIds, effectiveToken, 50);
+          Object.assign(nodeCache, batchResults);
+        } catch (err) {
+          if (!silent) {
+            console.warn(`[process-pr-components] Warning: Batch fetch failed (${err.message}). Falling back to individual fetches.`);
+          }
+        }
+      }
+    }
+  }
 
   const results = [];
   let newCount = 0;
@@ -525,6 +611,7 @@ async function processPrComponents(options = {}) {
         mock: isMockMode,
         token: token || process.env.FIGMA_ACCESS_TOKEN,
         fixturesDir,
+        nodeCache,
       });
 
       const generatedCode = transpileFigmaNodeToMitosis(figmaNode, {

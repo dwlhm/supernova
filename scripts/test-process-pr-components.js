@@ -28,6 +28,7 @@ const {
   readCatalog,
   normalizeManifest,
   loadBaselineManifest,
+  resolveFigmaNode,
   loadEnvFile,
 } = require('./process-pr-components');
 const { buildCatalog } = require('./fetch-supernova-data');
@@ -648,6 +649,37 @@ function createTempWorkspace() {
     assert.strictEqual(iconCatalog.figma, null);
 
     console.log('  ✓ buildCatalog correctly links components and extracts Figma origin\n');
+  }
+
+  // -------------------------------------------------------------------------
+  // Test 12: resolveFigmaNode batch cache lookup
+  // -------------------------------------------------------------------------
+  console.log('Test 12: Verify resolveFigmaNode utilizes batch nodeCache');
+  {
+    const cachedDoc = { id: '55:99', name: 'CachedComponent', type: 'COMPONENT', children: [] };
+    const mockCache = {
+      '55:99': {
+        document: cachedDoc,
+        componentSets: {
+          '55:99': {
+            componentPropertyDefinitions: [{ name: 'size', type: 'VARIANT' }],
+          },
+        },
+      },
+    };
+
+    const component = {
+      name: 'CachedComponent',
+      fileId: 'fileXYZ',
+      nodeId: '55:99',
+    };
+
+    const resolved = await resolveFigmaNode(component, { nodeCache: mockCache });
+    assert.strictEqual(resolved.id, '55:99');
+    assert.strictEqual(resolved.name, 'CachedComponent');
+    assert.deepStrictEqual(resolved.componentPropertyDefinitions, [{ name: 'size', type: 'VARIANT' }]);
+
+    console.log('  ✓ resolveFigmaNode successfully resolves from batch nodeCache with metadata\n');
   }
 
   console.log('🎉 All Component PR Drift Detector tests passed successfully!\n');

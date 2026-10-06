@@ -108,25 +108,39 @@ The automated build and sync pipeline follows a unidirectional dataflow from des
 
 ## CI/CD & PR Automation Workflow
 
-The repository includes GitHub Actions workflows ensuring continuous integration, automated drift tracking, and deployment:
+The repository employs an automated two-pull-request workflow designed to maintain token integrity, provide maintainer review over generated templates, and automate multi-framework compilation:
 
-### 1. PR Component Sync & Drift Detection (`.github/workflows/pr-component-sync.yml`)
-- **Triggers**: Pull requests modifying `components.catalog.json`, `tokens/**`, or `.components-manifest.json`, or manual execution via `workflow_dispatch`.
+### 1. PR 1: Supernova Token Sync & Validation (`.github/workflows/pr-component-sync.yml`)
+- **Trigger**: Pull requests targeting `main` from Supernova Cloud modifying `tokens/**` or `components.catalog.json`.
+- **Role**: Validates tokens and package compilation in an isolated, read-only CI check.
 - **Workflow**:
-  1. Checks out branch with full git history.
-  2. Runs `scripts/process-pr-components.js --base=origin/main`.
-  3. Compares component SHA-256 hashes against the manifest.
-  4. Automatically stages updated templates and manifests, committing changes back to the PR branch (`[skip ci]`).
+  1. Checks out the PR branch and installs dependencies.
+  2. Validates design tokens using the mock exporter test suite (`npm run test:exporter`).
+  3. Tests building tokens and framework packages (`npm run generate:tokens && npm run build:packages`).
+  4. **Zero Mutation Guarantee**: Does **not** push or modify templates back into PR 1. Supernova's pull request remains clean and purely token-focused.
 
-### 2. Design System CI & Release (`.github/workflows/design-system-ci.yml`)
-- **Triggers**: Merges to `main`, manual `workflow_dispatch`, or repository dispatch (`supernova-release`).
+### 2. PR 2: Template Confirmation & Multi-Framework Generation (`.github/workflows/template-sync-pr.yml`)
+- **Trigger**: Automated on `push` to `main` with paths `tokens/**` or `components.catalog.json` (e.g. when PR 1 is merged), or manually via `workflow_dispatch`.
+- **Role**: Regenerates universal Mitosis templates and compiles multi-framework packages, opening a confirmation PR against `main`.
 - **Workflow**:
-  1. Validates the committed Supernova exporter executable (`git diff --exit-code -- exporter/dist/index.js`).
-  2. Runs full generation pipeline: `npm run generate`.
-  3. Builds all workspace packages: `npm run build:packages`.
-  4. Builds VitePress documentation site (`npm run docs:build`).
-  5. Bumps patch version across workspaces (`npm version patch --workspaces`).
-  6. Tags git release (`vX.Y.Z`) and deploys static documentation to GitHub Pages.
+  1. Checks out repository with full git history.
+  2. Syncs tokens into packages (`npm run generate:tokens`).
+  3. Runs Figma component discovery and import (`npm run figma:import`), or falls back to template drift synchronization (`npm run sync:components`).
+  4. Generates multi-framework components for React, Svelte, Vue 3, and Vue 2 (`npm run generate:components`).
+  5. Updates VitePress documentation pages and component manifests (`npm run generate:docs`).
+  6. Detects drift across `components/`, `packages/`, `docs/`, `.components-manifest.json`, and `components.catalog.json`.
+  7. If changes exist, pushes to branch `chore/sync-templates-and-packages` and creates or updates a dedicated confirmation Pull Request against `main`.
+- **Maintainer Confirmation**: Maintainers review the generated Mitosis templates (`components/*.lite.tsx`) and compiled multi-framework packages before merging.
+
+### 3. Release & Deployment Lifecycle (`.github/workflows/design-system-ci.yml`)
+- **Trigger**: `push` to `main` with changes to `components/**`, `packages/**`, or `.components-manifest.json` (i.e. when PR 2 is approved and merged into `main`), or manual execution via `workflow_dispatch` / `repository_dispatch`.
+- **Workflow**:
+  1. Validates the committed Supernova exporter bundle (`git diff --exit-code -- exporter/dist/index.js`).
+  2. Executes full automated test suite (`npm test`).
+  3. Runs full generation pipeline (`npm run generate`) and builds all framework packages (`npm run build:packages`).
+  4. Builds static VitePress documentation site (`npm run docs:build`).
+  5. Bumps patch version automatically across workspaces (`npm version patch --workspaces`).
+  6. Tags git release (`vX.Y.Z`) and deploys the static documentation site to GitHub Pages.
 
 ---
 

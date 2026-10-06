@@ -1,40 +1,24 @@
-name: PR Component Sync & Drift Detection
+name: "PR 1: Token Validation & CI Check"
 
 on:
   pull_request:
     branches: [main]
     paths:
-      - 'components.catalog.json'
       - 'tokens/**'
-      - '.components-manifest.json'
-  workflow_dispatch:
-    inputs:
-      sync_mode:
-        description: 'Sync mode: "figma:sync" (full discovery + generation) or "drift" (process PR drift)'
-        required: false
-        default: 'figma:sync'
-        type: choice
-        options:
-          - figma:sync
-          - drift
+      - 'components.catalog.json'
 
 concurrency:
-  group: pr-sync-${{ github.head_ref || github.run_id }}
+  group: pr-token-validation-${{ github.head_ref || github.run_id }}
   cancel-in-progress: true
 
 jobs:
-  sync-components:
-    name: Sync Components & Drift Detection
+  validate-tokens:
+    name: Token Validation & CI Check
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          ref: ${{ github.head_ref || github.ref_name }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -44,52 +28,10 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Run component sync & drift processing
-        env:
-          FIGMA_ACCESS_TOKEN: ${{ secrets.FIGMA_ACCESS_TOKEN }}
-          FIGMA_FILE_KEY: ${{ secrets.FIGMA_FILE_KEY }}
-        run: |
-          RUN_FIGMA_SYNC=false
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            if [ "${{ github.event.inputs.sync_mode }}" != "drift" ]; then
-              RUN_FIGMA_SYNC=true
-            fi
-          fi
+      - name: Validate tokens
+        run: npm run test:exporter
 
-          if [ "$RUN_FIGMA_SYNC" = "true" ]; then
-            echo "Triggered via workflow_dispatch: attempting figma:sync..."
-            if [ -n "$FIGMA_ACCESS_TOKEN" ] && npm run figma:sync; then
-              echo "figma:sync completed successfully."
-            elif [ -f "components.catalog.json" ]; then
-              echo "figma:sync could not complete; falling back to process-pr-components.js with existing catalog..."
-              node scripts/process-pr-components.js --base="origin/${{ github.base_ref || 'main' }}"
-            else
-              echo "Error: figma:sync failed and no components.catalog.json found."
-              exit 1
-            fi
-          else
-            echo "Running drift processing via process-pr-components.js..."
-            node scripts/process-pr-components.js --base="origin/${{ github.base_ref || 'main' }}"
-          fi
-
-      - name: Commit and push changes
+      - name: Test building tokens & packages
         run: |
-          if [ -n "$(git status --porcelain components/ .components-manifest.json components.catalog.json)" ]; then
-            git config --global user.name "github-actions[bot]"
-            git config --global user.email "github-actions[bot]@users.noreply.github.com"
-            if [ -d "components" ]; then
-              git add -A components/
-            fi
-            if [ -f ".components-manifest.json" ]; then
-              git add .components-manifest.json
-            fi
-            if [ -f "components.catalog.json" ]; then
-              git add components.catalog.json
-            fi
-            git add -u components/ .components-manifest.json components.catalog.json 2>/dev/null || true
-            git commit -m "chore(components): sync updated templates from Figma [skip ci]"
-            TARGET_REF="${{ github.head_ref || github.ref_name }}"
-            git push origin "HEAD:${TARGET_REF}"
-          else
-            echo "No component drift or manifest changes detected."
-          fi
+          npm run generate:tokens
+          npm run build:packages
