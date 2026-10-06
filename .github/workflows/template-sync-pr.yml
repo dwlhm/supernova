@@ -80,31 +80,31 @@ jobs:
 
             PR_TITLE="chore(components): konfirmasi template terbaru dan multi-framework packages"
             PR_BODY=$(cat << 'EOF'
-## 🤖 Automated Component & Framework Package Sync (PR 2)
+          ## 🤖 Automated Component & Framework Package Sync (PR 2)
 
-Pembaruan token desain atau katalog komponen telah dideteksi di `main`.
-Workflow ini secara otomatis meregenerasi template universal Mitosis dan mengompilasi ke seluruh paket framework yang didukung.
+          Pembaruan token desain atau katalog komponen telah dideteksi di `main`.
+          Workflow ini secara otomatis meregenerasi template universal Mitosis dan mengompilasi ke seluruh paket framework yang didukung.
 
-### 📦 Ringkasan Perubahan
-- **Mitosis Templates**: `components/*.lite.tsx`
-- **Multi-Framework Packages**:
-  - `@dwlhm/ui-react` (`packages/react`)
-  - `@dwlhm/ui-svelte` (`packages/svelte`)
-  - `@dwlhm/ui-vue` (`packages/vue`)
-  - `@dwlhm/ui-vue2` (`packages/vue2`)
-  - `@dwlhm/design-tokens` (`packages/tokens`)
-- **Documentation & Manifests**:
-  - `docs/components/` & `docs/.vitepress/components.generated.json`
-  - `.components-manifest.json`
-  - `components.catalog.json`
+          ### 📦 Ringkasan Perubahan
+          - **Mitosis Templates**: `components/*.lite.tsx`
+          - **Multi-Framework Packages**:
+            - `@dwlhm/ui-react` (`packages/react`)
+            - `@dwlhm/ui-svelte` (`packages/svelte`)
+            - `@dwlhm/ui-vue` (`packages/vue`)
+            - `@dwlhm/ui-vue2` (`packages/vue2`)
+            - `@dwlhm/design-tokens` (`packages/tokens`)
+          - **Documentation & Manifests**:
+            - `docs/components/` & `docs/.vitepress/components.generated.json`
+            - `.components-manifest.json`
+            - `components.catalog.json`
 
-### 🔍 Langkah Konfirmasi Maintainer
-1. Tinjau diff template Mitosis pada tab **Files changed**.
-2. Pastikan properti variant, token binding, dan kode kustom sesuai dengan spesifikasi desain terbaru.
-3. Setelah disetujui, lakukan **Merge Pull Request** ke branch `main`.
-4. Penggabungan ke `main` akan memicu workflow `Sync Design System & Build Packages` (`design-system-ci.yml`) untuk build akhir, bump version, tagging rilis, dan deployment dokumentasi.
-EOF
-)
+          ### 🔍 Langkah Konfirmasi Maintainer
+          1. Tinjau diff template Mitosis pada tab **Files changed**.
+          2. Pastikan properti variant, token binding, dan kode kustom sesuai dengan spesifikasi desain terbaru.
+          3. Setelah disetujui, lakukan **Merge Pull Request** ke branch `main`.
+          4. Penggabungan ke `main` akan memicu workflow `Sync Design System & Build Packages` (`design-system-ci.yml`) untuk build akhir, bump version, tagging rilis, dan deployment dokumentasi.
+          EOF
+          )
 
             EXISTING_PR=$(gh pr list --head chore/sync-templates-and-packages --base main --state open --json number --jq '.[0].number // empty')
             if [ -n "$EXISTING_PR" ] && [ "$EXISTING_PR" != "null" ]; then
