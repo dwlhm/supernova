@@ -113,7 +113,7 @@ Replace the angle-bracket placeholders before running the commands. Review the g
 
 ### Metadata source and schema
 
-`components.composition.json` is a repository-owned registry keyed by the exact PascalCase catalog name. It survives Figma/Supernova catalog refreshes. The default registry is empty. Alternatively, attach `composition` to a catalog entry; an entry configured in both places fails as a conflict. Unknown registry keys fail. `sync:components` reads this registry automatically; `--composition-registry=<file>` selects another registry.
+`components.composition.json` is a repository-owned registry keyed by the exact PascalCase catalog name. It survives Figma/Supernova catalog refreshes. The committed registry contains reviewed production contracts for Breadcrumb, Table, TableHeaderRow and TableBodyRow. Alternatively, attach `composition` to a catalog entry; an entry configured in both places fails as a conflict. Unknown registry keys fail. `sync:components` reads this registry automatically; `--composition-registry=<file>` selects another registry.
 
 Each contract contains `version: 1`, `root` (matching the catalog's generated name), a nonempty `parts` array and optional `examples: { static, loop }` strings for documentation. Each part defines:
 
@@ -136,7 +136,7 @@ Without a `classes` override, the converter reuses the selected node's token/sty
 
 `scripts/fixtures/breadcrumb.composition.json` defines Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbPage, BreadcrumbSeparator and BreadcrumbEllipsis. Its nav has a label, the current page has `aria-current="page"`, and separators/ellipsis are decorative. Separators belong inside list items so every direct `ol` child remains an `li`. Consumers can provide zero, one or many paths. `home`, `breadcrumb`, `showEllipsis` and internal `type` disappear from the composed API; content and ellipsis become caller composition.
 
-`scripts/fixtures/table.composition.json` independently demonstrates Table, TableBody, TableRow and TableCell. These are **engine capability fixtures**, not evidence that a production Breadcrumb or Table was migrated. The current production catalog contains neither source. Configure a real scene's reviewed IDs before synchronizing production.
+`scripts/fixtures/table.composition.json` independently demonstrates Table, TableBody, TableRow and TableCell. These generic fixtures demonstrate engine capability. The production registry now separately activates reviewed real-source Breadcrumb, Table, TableHeaderRow and TableBodyRow contracts; compact `production-*.figma.json` fixtures preserve their actual IDs, variants and presentation for regression testing. The catalog intentionally includes these reviewed roots alongside the four existing components; it does not bulk-import every scene component.
 
 Generate the fixture parts into a temporary directory:
 
@@ -146,4 +146,13 @@ node scripts/figma-to-mitosis.js --fixture=scripts/fixtures/breadcrumb.figma.jso
 
 For composition, CLI `--out` is a directory; without composition, it remains the existing single output file. The CLI records its own ownership ledger and rejects existing unowned files. The PR processor records grouped ownership in `.components-manifest.json`. Neither ledger replaces the authoritative generated component-set manifest at `docs/.vitepress/components.generated.json`; that manifest also carries each part's composition documentation metadata.
 
-Compilation and server-rendered structure are verified by automated fixtures. Browser layout, focus, keyboard interactions, screen readers and end-to-end live Figma synchronization remain **UNVERIFIED** until checked against actual production designs.
+Compilation and server-rendered structure are verified by automated fixtures. Browser layout, focus, keyboard interactions, screen readers remain **UNVERIFIED**. Production source selection and regeneration are verified offline against the saved real Figma scene; live CI execution remains unverified.
+
+
+### Reviewed production Table composition
+
+The Table group provides `Table` (`table`), `TableHeader` (`thead`) and `TableBody` (`tbody`). Existing design row components keep independent ownership: TableHeaderRow provides `TableHeaderRow` (`tr`) and `TableHeaderCell` (`th`, `scope="col"`); TableBodyRow provides `TableBodyRow` (`tr`) and `TableCell` (`td`). All accept caller content instead of rendering the example rows or ten columns. Native table parts use explicit empty class overrides to preserve native display; callers can provide presentation through `className`.
+
+The former whole-table visual example is not a public state switch. Empty states, checkbox behavior and pagination remain caller-owned surfaces outside these native table parts. Breadcrumb's internal Type=1/2/deep examples likewise select real source presentation during generation; consumer paths, separators and ellipsis decide the rendered structure.
+
+The full source file can be fetched once with `npm run figma:cache -- --file=<file-key>` and reused using `--figma-snapshot=<path>` on import, processing and conversion. The cache is local and gitignored; failed or invalid refreshes preserve the previous valid snapshot. Snapshot mode fails on missing nodes rather than fetching or synthesizing replacements. See README for the complete offline iteration commands.

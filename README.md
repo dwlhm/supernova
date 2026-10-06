@@ -126,17 +126,18 @@ The repository employs an automated two-pull-request workflow designed to mainta
   4. **Zero Mutation Guarantee**: Does **not** push or modify templates back into PR 1. Supernova's pull request remains clean and purely token-focused.
 
 ### 2. PR 2: Template Confirmation & Multi-Framework Generation (`.github/workflows/template-sync-pr.yml`)
-- **Trigger**: Automated on `push` to `main` with paths `tokens/**` or `components.catalog.json` (e.g. when PR 1 is merged), or manually via `workflow_dispatch`.
+- **Trigger**: Automated on `push` to `main` for `tokens/**`, `components.catalog.json`, `components.composition.json`, and the converter/composition, import, synchronization, package/documentation generation and export-path scripts listed in the workflow. Manual execution remains available via `workflow_dispatch`.
 - **Role**: Regenerates universal Mitosis templates and compiles multi-framework packages, opening a confirmation PR against `main`.
 - **Workflow**:
   1. Checks out repository with full git history.
   2. Syncs tokens into packages (`npm run generate:tokens`).
-  3. Runs Figma component discovery and import (`npm run figma:import`), or falls back to template drift synchronization (`npm run sync:components`).
+  3. Runs discovery/import and template synchronization together (`npm run figma:sync`) when a Figma token is available, or falls back to template synchronization (`npm run sync:components`).
   4. Generates multi-framework components for React, Svelte, Vue 3, and Vue 2 (`npm run generate:components`).
   5. Updates VitePress documentation pages and component manifests (`npm run generate:docs`).
   6. Detects drift across `components/`, `packages/`, `docs/`, `.components-manifest.json`, and `components.catalog.json`.
   7. If changes exist, pushes to branch `chore/sync-templates-and-packages` and creates or updates a dedicated confirmation Pull Request against `main`.
 - **Maintainer Confirmation**: Maintainers review the generated Mitosis templates (`components/*.lite.tsx`) and compiled multi-framework packages before merging.
+- **Regeneration boundary**: Composition metadata participates in each component fingerprint, so adding or changing a valid contract regenerates that component and its parts. Existing sources with unchanged fingerprints are preserved, including custom edits. Generator code changes start synchronization and package/docs generation, but do not currently invalidate source fingerprints; a workflow run alone does not refresh unchanged `.lite.tsx` sources. Review regenerated converter output before replacing those sources.
 
 ### 3. Release & Deployment Lifecycle (`.github/workflows/design-system-ci.yml`)
 - **Trigger**: `push` to `main` with changes to `components/**`, `packages/**`, or `.components-manifest.json` (i.e. when PR 2 is approved and merged into `main`), or manual execution via `workflow_dispatch` / `repository_dispatch`.
@@ -340,4 +341,24 @@ MIT © dwlhm
 
 Use `components.composition.json` for internal, generation-time composition contracts keyed by catalog component name. The generator emits a fixed set of parts; consumers own item ordering and loops. No composition mode or internal Figma `type` is exposed. Catalog entries may instead supply inline `composition`, but configuring both sources is an error.
 
-See [the composition contract](docs/component-contract.md#generation-time-composition-contract) for schema, ownership/migration rules and CLI usage. Breadcrumb and Table examples under `scripts/fixtures` verify engine capability; production catalog sources for those components are not configured.
+See [the composition contract](docs/component-contract.md#generation-time-composition-contract) for schema, ownership/migration rules and CLI usage. The committed registry activates reviewed production Breadcrumb, Table, TableHeaderRow and TableBodyRow sources. Their generated API already exposes composable parts, and ordinary synchronization reads those contracts automatically. Other components retain their existing API until their own source mapping is reviewed. Compact real-node fixtures under `scripts/fixtures/production-*.figma.json` verify the registry-driven path. Changes merged into `main` trigger the template confirmation workflow.
+
+### Cache Figma once for offline iteration
+
+Save a complete Figma file locally using `FIGMA_ACCESS_TOKEN` from `.env`:
+
+```bash
+node scripts/cache-figma-file.js --file=<file-key>
+```
+
+The command saves `.cache/figma/<file-key>.json`, including the complete document, component metadata, file version and vector paths. This directory is gitignored. The token is used only in the request header. Running the command again validates and reuses the saved file without requesting Figma; `--refresh` explicitly fetches a replacement and retains the existing cache if the request or validation fails.
+
+Pass the same saved snapshot to each iteration stage:
+
+```bash
+node scripts/import-figma-components.js --figma-snapshot=.cache/figma/<file-key>.json --out=<reviewed-catalog.json>
+node scripts/process-pr-components.js --figma-snapshot=.cache/figma/<file-key>.json --catalog=<reviewed-catalog.json>
+node scripts/figma-to-mitosis.js --figma-snapshot=.cache/figma/<file-key>.json --node=<node-id> --composition=<reviewed-contract.json> --out=<parts-directory>
+```
+
+Replace the placeholders before running. Snapshot discovery reads component sets and standalone components from the saved scene, retaining source IDs, variants and property definitions. Snapshot processing resolves those actual scenes before local example fixtures. Composed contracts and sources generated from snapshots fingerprint the selected node content. Introducing snapshot mode preserves existing legacy fingerprints and custom source edits; it does not alone rewrite those sources. Missing nodes or mismatched file keys fail explicitly, with no network or synthetic-node fallback. Snapshot mode is optional; CI continues to use live synchronization unless a snapshot is explicitly supplied. Caching does not activate composition: the reviewed composition registry/contract is still required.

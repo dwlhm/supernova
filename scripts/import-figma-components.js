@@ -88,9 +88,10 @@ function mapFigmaItemToCatalogEntry(item, fileId) {
     fileId: fileId,
     nodeId: nodeId,
     sourceId: key,
-    componentPropertyDefinitions: [],
-    variantPropertyValues: {},
+    componentPropertyDefinitions: item.componentPropertyDefinitions || [],
+    variantPropertyValues: item.variantPropertyValues || {},
     updatedAt: updatedAt,
+    ...(item.sceneHash ? { sceneHash: item.sceneHash } : {}),
     figma: {
       fileId: fileId,
       nodeId: nodeId,
@@ -98,9 +99,9 @@ function mapFigmaItemToCatalogEntry(item, fileId) {
       key: key,
       name: name,
       thumbnailUrl: item.thumbnail_url || null,
-      componentPropertyDefinitions: [],
-      variantPropertyValues: {},
-      variants: [],
+      componentPropertyDefinitions: item.componentPropertyDefinitions || [],
+      variantPropertyValues: item.variantPropertyValues || {},
+      variants: item.variants || [],
       updatedAt: updatedAt,
     },
   };
@@ -441,7 +442,9 @@ async function discoverFigmaComponentSets(fileId, token, options = {}) {
  * @returns {Promise<object>} Import result summary
  */
 async function importFigmaComponents(options = {}) {
-  const fileId = options.file || options.fileId || process.env.FIGMA_FILE_KEY || DEFAULT_FILE_KEY;
+  const snapshot = options.figmaSnapshot ? require('./figma-snapshot').loadSnapshot(options.figmaSnapshot) : null;
+  const fileId = options.file || options.fileId || snapshot?.fileKey || process.env.FIGMA_FILE_KEY || DEFAULT_FILE_KEY;
+  if (snapshot && fileId !== snapshot.fileKey) throw new Error('Requested Figma file does not match snapshot');
   const token = options.token || process.env.FIGMA_ACCESS_TOKEN;
   const outPath = options.out || options.catalog || DEFAULT_CATALOG_PATH;
   const dryRun = Boolean(options.dryRun || options['dry-run']);
@@ -452,7 +455,7 @@ async function importFigmaComponents(options = {}) {
   const silent = Boolean(options.silent);
 
   // Discovered items may be provided directly (e.g. for offline testing)
-  let discovered = options.discovered || options.items || null;
+  let discovered = snapshot ? require('./figma-snapshot').discoverSnapshotComponents(snapshot, { includeStandalone, includeIcons }) : options.discovered || options.items || null;
 
   if (!discovered) {
     if (!token) {
@@ -611,6 +614,10 @@ function parseCliArgs(argv) {
       options.includeIcons = true;
     } else if (arg === '--silent' || arg === '-s') {
       options.silent = true;
+    } else if (arg.startsWith('--figma-snapshot=')) {
+      options.figmaSnapshot = arg.slice('--figma-snapshot='.length);
+    } else if (arg === '--figma-snapshot') {
+      options.figmaSnapshot = argv[++i];
     } else if (arg.startsWith('--file=')) {
       options.file = arg.slice('--file='.length);
     } else if (arg === '--file' || arg === '-f') {
@@ -641,6 +648,7 @@ Usage:
   node scripts/import-figma-components.js [options]
 
 Options:
+  --figma-snapshot=<path> Discover offline from a complete saved file; no network fallback
   --dry-run               Output summary table without mutating components.catalog.json
   --only=<names>          Filter to import only matching component names (comma-separated)
   --all                   Import all discovered component sets (default)

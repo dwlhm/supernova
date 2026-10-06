@@ -748,7 +748,7 @@ function generateComponentDoc(comp) {
 
 ---
 
-${comp.composition ? 'Interactive preview is not available for composition parts; use the examples below.\n' : `## Interactive Preview\n\n<ComponentSandbox name="${comp.name}" />\n\n---\n`}
+${comp.composition ? 'Interactive preview is not available for composition parts; use the examples below.' : `## Interactive Preview\n\n<ComponentSandbox name="${comp.name}" />\n\n---`}
 
 ## Code Examples
 

@@ -23,7 +23,7 @@ const { execSync } = require('child_process');
 const mitosis = require('@builder.io/mitosis');
 
 const {
-  processPrComponents,
+  processPrComponents: processPrComponentsWithDependencies,
   computeFingerprint,
   readCatalog,
   normalizeManifest,
@@ -32,6 +32,13 @@ const {
   loadEnvFile,
 } = require('./process-pr-components');
 const { buildCatalog } = require('./fetch-supernova-data');
+
+// Each lifecycle fixture owns its catalog and registry; production contracts
+// must not leak into tests that intentionally supply external catalogs.
+const processPrComponents = options => processPrComponentsWithDependencies({
+  compositionRegistry: path.join(path.dirname(options.catalog), 'components.composition.json'),
+  ...options,
+});
 
 const rootDir = path.resolve(__dirname, '..');
 const fixturesDir = path.join(__dirname, 'fixtures');
@@ -531,7 +538,7 @@ function createTempWorkspace() {
       fs.writeFileSync(ws.catalogPath, JSON.stringify(catalogData, null, 2), 'utf8');
 
       const scriptPath = path.join(__dirname, 'process-pr-components.js');
-      const cmd = `node "${scriptPath}" --catalog="${ws.catalogPath}" --manifest="${ws.manifestPath}" --components-dir="${ws.componentsDir}" --mock`;
+      const cmd = `node "${scriptPath}" --catalog="${ws.catalogPath}" --manifest="${ws.manifestPath}" --components-dir="${ws.componentsDir}" --composition-registry="${path.join(ws.tempDir, 'components.composition.json')}" --mock`;
 
       const stdout = execSync(cmd, { encoding: 'utf8' });
 

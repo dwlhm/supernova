@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "lastUpdated": "2026-10-06T03:52:02.937Z",
+  "lastUpdated": "2026-10-06T09:18:17.537Z",
   "components": {
     "AlertDialog": {
       "name": "AlertDialog",
@@ -45,6 +45,297 @@
       "nodeId": "2841:144",
       "updatedAt": "2026-09-28T09:00:08.412Z",
       "lastGenerated": "2026-10-06T02:58:41.564Z"
+    },
+    "Breadcrumb": {
+      "name": "Breadcrumb",
+      "id": "a36bc32c03e4207d699b229b22acd18c7ebdd186",
+      "fingerprint": "37141eb32b85eac32563769fa97c41593b3972f9059883b12e9751b7f88c4060",
+      "hash": "37141eb32b85eac32563769fa97c41593b3972f9059883b12e9751b7f88c4060",
+      "file": "components/Breadcrumb.lite.tsx",
+      "fileId": "wLWN7FdmqCslghDJPWIweW",
+      "nodeId": "2107:63117",
+      "updatedAt": "2026-10-06T08:26:57Z",
+      "lastGenerated": "2026-10-06T09:02:23.221Z",
+      "snapshot": {
+        "fileKey": "wLWN7FdmqCslghDJPWIweW",
+        "version": "2407163521670865233",
+        "lastModified": "2026-10-06T08:26:57Z"
+      },
+      "composition": {
+        "version": 1,
+        "root": "Breadcrumb",
+        "parts": [
+          {
+            "name": "Breadcrumb",
+            "sourceNodeId": "2960:50",
+            "tag": "nav",
+            "classes": "",
+            "attributes": {
+              "aria-label": "Breadcrumb"
+            },
+            "slot": "replace"
+          },
+          {
+            "name": "BreadcrumbList",
+            "sourceNodeId": "2960:50",
+            "tag": "ol",
+            "slot": "replace"
+          },
+          {
+            "name": "BreadcrumbItem",
+            "sourceNodeId": "2960:51",
+            "tag": "li",
+            "slot": "replace"
+          },
+          {
+            "name": "BreadcrumbLink",
+            "sourceNodeId": "2960:52",
+            "tag": "a",
+            "props": {
+              "href": "string"
+            },
+            "attributes": {
+              "href": {
+                "prop": "href"
+              }
+            },
+            "slot": "replace"
+          },
+          {
+            "name": "BreadcrumbPage",
+            "sourceNodeId": "2960:55",
+            "tag": "span",
+            "attributes": {
+              "aria-current": "page"
+            },
+            "slot": "replace"
+          },
+          {
+            "name": "BreadcrumbSeparator",
+            "sourceNodeId": "2961:20761",
+            "tag": "span",
+            "attributes": {
+              "aria-hidden": "true"
+            },
+            "slot": "default",
+            "defaultContent": "/"
+          },
+          {
+            "name": "BreadcrumbEllipsis",
+            "sourceNodeId": "2960:62",
+            "tag": "span",
+            "attributes": {
+              "aria-hidden": "true"
+            },
+            "slot": "default",
+            "defaultContent": "…"
+          }
+        ],
+        "examples": {
+          "static": "import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbPage, BreadcrumbSeparator } from '@dwlhm/ui-react';\n\n<Breadcrumb>\n  <BreadcrumbList>\n    <BreadcrumbItem><BreadcrumbLink href=\"/\">Home</BreadcrumbLink></BreadcrumbItem>\n    <BreadcrumbItem><BreadcrumbSeparator /><BreadcrumbPage>Products</BreadcrumbPage></BreadcrumbItem>\n  </BreadcrumbList>\n</Breadcrumb>",
+          "loop": "import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbPage, BreadcrumbSeparator } from '@dwlhm/ui-react';\n\n// The consumer supplies paths, including stable IDs and link destinations.\n<Breadcrumb>\n  <BreadcrumbList>\n    {paths.map((path, index) => (\n      <BreadcrumbItem key={path.id}>\n        {index > 0 && <BreadcrumbSeparator />}\n        {index === paths.length - 1\n          ? <BreadcrumbPage>{path.label}</BreadcrumbPage>\n          : <BreadcrumbLink href={path.href}>{path.label}</BreadcrumbLink>}\n      </BreadcrumbItem>\n    ))}\n  </BreadcrumbList>\n</Breadcrumb>"
+        }
+      },
+      "outputs": [
+        {
+          "name": "Breadcrumb",
+          "file": "components/Breadcrumb.lite.tsx",
+          "sourceHash": "ef579bd098d0a8e18fb1f05ed1e32fdefd07164798ba6941b7683da2bbbf8356"
+        },
+        {
+          "name": "BreadcrumbList",
+          "file": "components/BreadcrumbList.lite.tsx",
+          "sourceHash": "d072659588d49e1894a1883e0d571387d45cc8432e8ef72ee5f0c7f438e7fe2d"
+        },
+        {
+          "name": "BreadcrumbItem",
+          "file": "components/BreadcrumbItem.lite.tsx",
+          "sourceHash": "be17fa2cee9d8dadba84af9f8eeccd4f233888b4b990a08258efc11d5f20ae03"
+        },
+        {
+          "name": "BreadcrumbLink",
+          "file": "components/BreadcrumbLink.lite.tsx",
+          "sourceHash": "3c7b41acae0696043560649d39998c438e9f9aaad8619517dc64478de6628ff1"
+        },
+        {
+          "name": "BreadcrumbPage",
+          "file": "components/BreadcrumbPage.lite.tsx",
+          "sourceHash": "f03d937316b6dbda87014bfbee406edc26f5906c3a132598d64962f9247f1422"
+        },
+        {
+          "name": "BreadcrumbSeparator",
+          "file": "components/BreadcrumbSeparator.lite.tsx",
+          "sourceHash": "b02e49f2f1114f41e642794f9b74d4779f798d8b2f17bdcec80345791387ae5a"
+        },
+        {
+          "name": "BreadcrumbEllipsis",
+          "file": "components/BreadcrumbEllipsis.lite.tsx",
+          "sourceHash": "990bbb9148aeba91623124017dd2475b9a42a084978ff1d7ef539c639c4b52a3"
+        }
+      ]
+    },
+    "Table": {
+      "name": "Table",
+      "id": "3a820cd7b046dfabaf3b26f49f9055ac1a70e111",
+      "fingerprint": "6aaa33bdc8fbfaebaeb1d51821be519ba0ee75ca554cb6be87b2d21f00d37948",
+      "hash": "6aaa33bdc8fbfaebaeb1d51821be519ba0ee75ca554cb6be87b2d21f00d37948",
+      "file": "components/Table.lite.tsx",
+      "fileId": "wLWN7FdmqCslghDJPWIweW",
+      "nodeId": "2571:20661",
+      "updatedAt": "2026-10-06T08:26:57Z",
+      "lastGenerated": "2026-10-06T09:02:23.226Z",
+      "snapshot": {
+        "fileKey": "wLWN7FdmqCslghDJPWIweW",
+        "version": "2407163521670865233",
+        "lastModified": "2026-10-06T08:26:57Z"
+      },
+      "composition": {
+        "version": 1,
+        "root": "Table",
+        "parts": [
+          {
+            "name": "Table",
+            "sourceNodeId": "2299:120",
+            "tag": "table",
+            "classes": "",
+            "slot": "replace"
+          },
+          {
+            "name": "TableHeader",
+            "sourceNodeId": "2308:312",
+            "tag": "thead",
+            "classes": "",
+            "slot": "replace"
+          },
+          {
+            "name": "TableBody",
+            "sourceNodeId": "2308:338",
+            "tag": "tbody",
+            "classes": "",
+            "slot": "replace"
+          }
+        ],
+        "examples": {
+          "static": "import { Table, TableHeader, TableBody, TableHeaderRow, TableHeaderCell, TableBodyRow, TableCell } from '@dwlhm/ui-react';\n<Table><TableHeader><TableHeaderRow><TableHeaderCell>Name</TableHeaderCell></TableHeaderRow></TableHeader><TableBody><TableBodyRow><TableCell>Product</TableCell></TableBodyRow></TableBody></Table>",
+          "loop": "import { Table, TableHeader, TableBody, TableHeaderRow, TableHeaderCell, TableBodyRow, TableCell } from '@dwlhm/ui-react';\n<Table>\n  <TableHeader><TableHeaderRow>{columns.map(column => <TableHeaderCell key={column.id}>{column.label}</TableHeaderCell>)}</TableHeaderRow></TableHeader>\n  <TableBody>{rows.map(row => <TableBodyRow key={row.id}>{columns.map(column => <TableCell key={column.id}>{row[column.id]}</TableCell>)}</TableBodyRow>)}</TableBody>\n</Table>"
+        }
+      },
+      "outputs": [
+        {
+          "name": "Table",
+          "file": "components/Table.lite.tsx",
+          "sourceHash": "2810f6b635244d08da3fb1442e99c9a4dd285ca9aca50c3aa5430305ba991a15"
+        },
+        {
+          "name": "TableHeader",
+          "file": "components/TableHeader.lite.tsx",
+          "sourceHash": "e78188f34b5750bb2c637351fce5da2714b1bba2012fd1e943945b3e10e625e9"
+        },
+        {
+          "name": "TableBody",
+          "file": "components/TableBody.lite.tsx",
+          "sourceHash": "88c1706fc438de976b52af71aca34faa2fd0c809cd54fe4d4290c23143ece0f7"
+        }
+      ]
+    },
+    "TableHeaderRow": {
+      "name": "TableHeaderRow",
+      "id": "667d23c84ccbe78a2226eff3ce6bad69560233d5",
+      "fingerprint": "adabe301d2fcb493c65936f6471bc781cc64d05081be1e4c8ae07cc9b71d4f51",
+      "hash": "adabe301d2fcb493c65936f6471bc781cc64d05081be1e4c8ae07cc9b71d4f51",
+      "file": "components/TableHeaderRow.lite.tsx",
+      "fileId": "wLWN7FdmqCslghDJPWIweW",
+      "nodeId": "2299:102",
+      "updatedAt": "2026-10-06T08:26:57Z",
+      "lastGenerated": "2026-10-06T09:02:23.227Z",
+      "snapshot": {
+        "fileKey": "wLWN7FdmqCslghDJPWIweW",
+        "version": "2407163521670865233",
+        "lastModified": "2026-10-06T08:26:57Z"
+      },
+      "composition": {
+        "version": 1,
+        "root": "TableHeaderRow",
+        "parts": [
+          {
+            "name": "TableHeaderRow",
+            "sourceNodeId": "2299:102",
+            "tag": "tr",
+            "classes": "",
+            "slot": "replace"
+          },
+          {
+            "name": "TableHeaderCell",
+            "sourceNodeId": "2305:220",
+            "tag": "th",
+            "classes": "",
+            "attributes": {
+              "scope": "col"
+            },
+            "slot": "replace"
+          }
+        ]
+      },
+      "outputs": [
+        {
+          "name": "TableHeaderRow",
+          "file": "components/TableHeaderRow.lite.tsx",
+          "sourceHash": "b521c072a3657cbb63f0d1a9301367df041ab5adea0974cf7e009b9babb41dab"
+        },
+        {
+          "name": "TableHeaderCell",
+          "file": "components/TableHeaderCell.lite.tsx",
+          "sourceHash": "5fd305ee2ef168ad4a76a36bb89278f8a2e9fd48594b57e98cc448e9a54bdccb"
+        }
+      ]
+    },
+    "TableBodyRow": {
+      "name": "TableBodyRow",
+      "id": "d9345e7919a39920fd32ab084b3bde9462caa4da",
+      "fingerprint": "8f1089b188bd1fe831b0c5b55f1c40f555533e59c45dc9ba4a40ccb349ec4fb3",
+      "hash": "8f1089b188bd1fe831b0c5b55f1c40f555533e59c45dc9ba4a40ccb349ec4fb3",
+      "file": "components/TableBodyRow.lite.tsx",
+      "fileId": "wLWN7FdmqCslghDJPWIweW",
+      "nodeId": "2299:111",
+      "updatedAt": "2026-10-06T08:26:57Z",
+      "lastGenerated": "2026-10-06T09:02:23.227Z",
+      "snapshot": {
+        "fileKey": "wLWN7FdmqCslghDJPWIweW",
+        "version": "2407163521670865233",
+        "lastModified": "2026-10-06T08:26:57Z"
+      },
+      "composition": {
+        "version": 1,
+        "root": "TableBodyRow",
+        "parts": [
+          {
+            "name": "TableBodyRow",
+            "sourceNodeId": "2299:111",
+            "tag": "tr",
+            "classes": "",
+            "slot": "replace"
+          },
+          {
+            "name": "TableCell",
+            "sourceNodeId": "2305:309",
+            "tag": "td",
+            "classes": "",
+            "slot": "replace"
+          }
+        ]
+      },
+      "outputs": [
+        {
+          "name": "TableBodyRow",
+          "file": "components/TableBodyRow.lite.tsx",
+          "sourceHash": "5e502ee2262dbc9b109ffb8342aed1ca22fccff4c7df8e454df9e720343e6a2f"
+        },
+        {
+          "name": "TableCell",
+          "file": "components/TableCell.lite.tsx",
+          "sourceHash": "de0f2e292322a408e98aa22b8d464f2464bf92f57e54cfb13c97ab8f20a9bdad"
+        }
+      ]
     }
   }
 }

@@ -1,0 +1,931 @@
+{
+  "id": "2299:102",
+  "name": "Table Header Row",
+  "type": "COMPONENT",
+  "componentPropertyDefinitions": {
+    "Show Column 1#2305:0": {
+      "type": "BOOLEAN",
+      "defaultValue": true
+    },
+    "Show Column 2#2305:1": {
+      "type": "BOOLEAN",
+      "defaultValue": true
+    },
+    "Show Column 3#2305:2": {
+      "type": "BOOLEAN",
+      "defaultValue": true
+    },
+    "Show Column 4#2305:3": {
+      "type": "BOOLEAN",
+      "defaultValue": true
+    },
+    "Show Column 5#2305:4": {
+      "type": "BOOLEAN",
+      "defaultValue": true
+    },
+    "Show Column 6#2305:5": {
+      "type": "BOOLEAN",
+      "defaultValue": false
+    },
+    "Show Column 7#2305:6": {
+      "type": "BOOLEAN",
+      "defaultValue": false
+    },
+    "Show Column 8#2305:7": {
+      "type": "BOOLEAN",
+      "defaultValue": false
+    },
+    "Show Column 9#2305:8": {
+      "type": "BOOLEAN",
+      "defaultValue": false
+    },
+    "Show Column 10#2305:9": {
+      "type": "BOOLEAN",
+      "defaultValue": false
+    }
+  },
+  "children": [
+    {
+      "id": "2305:220",
+      "name": "Column 1",
+      "type": "INSTANCE",
+      "componentPropertyReferences": {
+        "visible": "Show Column 1#2305:0"
+      },
+      "componentProperties": {
+        "Label#2299:3": {
+          "type": "TEXT",
+          "value": "Column 1"
+        }
+      },
+      "children": [
+        {
+          "id": "I2305:220;2299:99",
+          "name": "Header Text",
+          "type": "TEXT",
+          "componentPropertyReferences": {
+            "characters": "Label#2299:3"
+          },
+          "fills": [
+            {
+              "blendMode": "NORMAL",
+              "type": "SOLID",
+              "color": {
+                "r": 0.03921568766236305,
+                "g": 0.03921568766236305,
+                "b": 0.03921568766236305,
+                "a": 1
+              },
+              "boundVariables": {
+                "color": {
+                  "type": "VARIABLE_ALIAS",
+                  "id": "VariableID:2299:5"
+                }
+              }
+            }
+          ],
+          "strokes": [],
+          "strokeWeight": 1,
+          "absoluteBoundingBox": {
+            "x": 611,
+            "y": -255,
+            "width": 88,
+            "height": 21
+          },
+          "characters": "Column 1",
+          "style": {
+            "fontFamily": "Plus Jakarta Sans",
+            "fontPostScriptName": "PlusJakartaSans-Medium",
+            "fontStyle": "Medium",
+            "fontWeight": 500,
+            "textAutoResize": "HEIGHT",
+            "fontSize": 14,
+            "textAlignHorizontal": "LEFT",
+            "textAlignVertical": "TOP",
+            "letterSpacing": 0,
+            "lineHeightPx": 21,
+            "lineHeightPercent": 119.04761505126953,
+            "lineHeightPercentFontSize": 150,
+            "lineHeightUnit": "PIXELS"
+          }
+        }
+      ],
+      "clipsContent": false,
+      "fills": [],
+      "strokes": [],
+      "strokeWeight": 1,
+      "layoutMode": "HORIZONTAL",
+      "primaryAxisSizingMode": "FIXED",
+      "paddingLeft": 16,
+      "paddingRight": 16,
+      "paddingTop": 12,
+      "paddingBottom": 12,
+      "layoutWrap": "NO_WRAP",
+      "absoluteBoundingBox": {
+        "x": 595,
+        "y": -267,
+        "width": 120,
+        "height": 45
+      }
+    },
+    {
+      "id": "2305:222",
+      "name": "Column 2",
+      "type": "INSTANCE",
+      "componentPropertyReferences": {
+        "visible": "Show Column 2#2305:1"
+      },
+      "componentProperties": {
+        "Label#2299:3": {
+          "type": "TEXT",
+          "value": "Column 2"
+        }
+      },
+      "children": [
+        {
+          "id": "I2305:222;2299:99",
+          "name": "Header Text",
+          "type": "TEXT",
+          "componentPropertyReferences": {
+            "characters": "Label#2299:3"
+          },
+          "fills": [
+            {
+              "blendMode": "NORMAL",
+              "type": "SOLID",
+              "color": {
+                "r": 0.03921568766236305,
+                "g": 0.03921568766236305,
+                "b": 0.03921568766236305,
+                "a": 1
+              },
+              "boundVariables": {
+                "color": {
+                  "type": "VARIABLE_ALIAS",
+                  "id": "VariableID:2299:5"
+                }
+              }
+            }
+          ],
+          "strokes": [],
+          "strokeWeight": 1,
+          "absoluteBoundingBox": {
+            "x": 731,
+            "y": -255,
+            "width": 88,
+            "height": 21
+          },
+          "characters": "Column 2",
+          "style": {
+            "fontFamily": "Plus Jakarta Sans",
+            "fontPostScriptName": "PlusJakartaSans-Medium",
+            "fontStyle": "Medium",
+            "fontWeight": 500,
+            "textAutoResize": "HEIGHT",
+            "fontSize": 14,
+            "textAlignHorizontal": "LEFT",
+            "textAlignVertical": "TOP",
+            "letterSpacing": 0,
+            "lineHeightPx": 21,
+            "lineHeightPercent": 119.04761505126953,
+            "lineHeightPercentFontSize": 150,
+            "lineHeightUnit": "PIXELS"
+          }
+        }
+      ],
+      "clipsContent": false,
+      "fills": [],
+      "strokes": [],
+      "strokeWeight": 1,
+      "layoutMode": "HORIZONTAL",
+      "primaryAxisSizingMode": "FIXED",
+      "paddingLeft": 16,
+      "paddingRight": 16,
+      "paddingTop": 12,
+      "paddingBottom": 12,
+      "layoutWrap": "NO_WRAP",
+      "absoluteBoundingBox": {
+        "x": 715,
+        "y": -267,
+        "width": 120,
+        "height": 45
+      }
+    },
+    {
+      "id": "2305:224",
+      "name": "Column 3",
+      "type": "INSTANCE",
+      "componentPropertyReferences": {
+        "visible": "Show Column 3#2305:2"
+      },
+      "componentProperties": {
+        "Label#2299:3": {
+          "type": "TEXT",
+          "value": "Column 3"
+        }
+      },
+      "children": [
+        {
+          "id": "I2305:224;2299:99",
+          "name": "Header Text",
+          "type": "TEXT",
+          "componentPropertyReferences": {
+            "characters": "Label#2299:3"
+          },
+          "fills": [
+            {
+              "blendMode": "NORMAL",
+              "type": "SOLID",
+              "color": {
+                "r": 0.03921568766236305,
+                "g": 0.03921568766236305,
+                "b": 0.03921568766236305,
+                "a": 1
+              },
+              "boundVariables": {
+                "color": {
+                  "type": "VARIABLE_ALIAS",
+                  "id": "VariableID:2299:5"
+                }
+              }
+            }
+          ],
+          "strokes": [],
+          "strokeWeight": 1,
+          "absoluteBoundingBox": {
+            "x": 851,
+            "y": -255,
+            "width": 88,
+            "height": 21
+          },
+          "characters": "Column 3",
+          "style": {
+            "fontFamily": "Plus Jakarta Sans",
+            "fontPostScriptName": "PlusJakartaSans-Medium",
+            "fontStyle": "Medium",
+            "fontWeight": 500,
+            "textAutoResize": "HEIGHT",
+            "fontSize": 14,
+            "textAlignHorizontal": "LEFT",
+            "textAlignVertical": "TOP",
+            "letterSpacing": 0,
+            "lineHeightPx": 21,
+            "lineHeightPercent": 119.04761505126953,
+            "lineHeightPercentFontSize": 150,
+            "lineHeightUnit": "PIXELS"
+          }
+        }
+      ],
+      "clipsContent": false,
+      "fills": [],
+      "strokes": [],
+      "strokeWeight": 1,
+      "layoutMode": "HORIZONTAL",
+      "primaryAxisSizingMode": "FIXED",
+      "paddingLeft": 16,
+      "paddingRight": 16,
+      "paddingTop": 12,
+      "paddingBottom": 12,
+      "layoutWrap": "NO_WRAP",
+      "absoluteBoundingBox": {
+        "x": 835,
+        "y": -267,
+        "width": 120,
+        "height": 45
+      }
+    },
+    {
+      "id": "2305:226",
+      "name": "Column 4",
+      "type": "INSTANCE",
+      "componentPropertyReferences": {
+        "visible": "Show Column 4#2305:3"
+      },
+      "componentProperties": {
+        "Label#2299:3": {
+          "type": "TEXT",
+          "value": "Column 4"
+        }
+      },
+      "children": [
+        {
+          "id": "I2305:226;2299:99",
+          "name": "Header Text",
+          "type": "TEXT",
+          "componentPropertyReferences": {
+            "characters": "Label#2299:3"
+          },
+          "fills": [
+            {
+              "blendMode": "NORMAL",
+              "type": "SOLID",
+              "color": {
+                "r": 0.03921568766236305,
+                "g": 0.03921568766236305,
+                "b": 0.03921568766236305,
+                "a": 1
+              },
+              "boundVariables": {
+                "color": {
+                  "type": "VARIABLE_ALIAS",
+                  "id": "VariableID:2299:5"
+                }
+              }
+            }
+          ],
+          "strokes": [],
+          "strokeWeight": 1,
+          "absoluteBoundingBox": {
+            "x": 971,
+            "y": -255,
+            "width": 88,
+            "height": 21
+          },
+          "characters": "Column 4",
+          "style": {
+            "fontFamily": "Plus Jakarta Sans",
+            "fontPostScriptName": "PlusJakartaSans-Medium",
+            "fontStyle": "Medium",
+            "fontWeight": 500,
+            "textAutoResize": "HEIGHT",
+            "fontSize": 14,
+            "textAlignHorizontal": "LEFT",
+            "textAlignVertical": "TOP",
+            "letterSpacing": 0,
+            "lineHeightPx": 21,
+            "lineHeightPercent": 119.04761505126953,
+            "lineHeightPercentFontSize": 150,
+            "lineHeightUnit": "PIXELS"
+          }
+        }
+      ],
+      "clipsContent": false,
+      "fills": [],
+      "strokes": [],
+      "strokeWeight": 1,
+      "layoutMode": "HORIZONTAL",
+      "primaryAxisSizingMode": "FIXED",
+      "paddingLeft": 16,
+      "paddingRight": 16,
+      "paddingTop": 12,
+      "paddingBottom": 12,
+      "layoutWrap": "NO_WRAP",
+      "absoluteBoundingBox": {
+        "x": 955,
+        "y": -267,
+        "width": 120,
+        "height": 45
+      }
+    },
+    {
+      "id": "2305:228",
+      "name": "Column 5",
+      "type": "INSTANCE",
+      "componentPropertyReferences": {
+        "visible": "Show Column 5#2305:4"
+      },
+      "componentProperties": {
+        "Label#2299:3": {
+          "type": "TEXT",
+          "value": "Column 5"
+        }
+      },
+      "children": [
+        {
+          "id": "I2305:228;2299:99",
+          "name": "Header Text",
+          "type": "TEXT",
+          "componentPropertyReferences": {
+            "characters": "Label#2299:3"
+          },
+          "fills": [
+            {
+              "blendMode": "NORMAL",
+              "type": "SOLID",
+              "color": {
+                "r": 0.03921568766236305,
+                "g": 0.03921568766236305,
+                "b": 0.03921568766236305,
+                "a": 1
+              },
+              "boundVariables": {
+                "color": {
+                  "type": "VARIABLE_ALIAS",
+                  "id": "VariableID:2299:5"
+                }
+              }
+            }
+          ],
+          "strokes": [],
+          "strokeWeight": 1,
+          "absoluteBoundingBox": {
+            "x": 1091,
+            "y": -255,
+            "width": 88,
+            "height": 21
+          },
+          "characters": "Column 5",
+          "style": {
+            "fontFamily": "Plus Jakarta Sans",
+            "fontPostScriptName": "PlusJakartaSans-Medium",
+            "fontStyle": "Medium",
+            "fontWeight": 500,
+            "textAutoResize": "HEIGHT",
+            "fontSize": 14,
+            "textAlignHorizontal": "LEFT",
+            "textAlignVertical": "TOP",
+            "letterSpacing": 0,
+            "lineHeightPx": 21,
+            "lineHeightPercent": 119.04761505126953,
+            "lineHeightPercentFontSize": 150,
+            "lineHeightUnit": "PIXELS"
+          }
+        }
+      ],
+      "clipsContent": false,
+      "fills": [],
+      "strokes": [],
+      "strokeWeight": 1,
+      "layoutMode": "HORIZONTAL",
+      "primaryAxisSizingMode": "FIXED",
+      "paddingLeft": 16,
+      "paddingRight": 16,
+      "paddingTop": 12,
+      "paddingBottom": 12,
+      "layoutWrap": "NO_WRAP",
+      "absoluteBoundingBox": {
+        "x": 1075,
+        "y": -267,
+        "width": 120,
+        "height": 45
+      }
+    },
+    {
+      "id": "2305:230",
+      "name": "Column 6",
+      "visible": false,
+      "type": "INSTANCE",
+      "componentPropertyReferences": {
+        "visible": "Show Column 6#2305:5"
+      },
+      "componentProperties": {
+        "Label#2299:3": {
+          "type": "TEXT",
+          "value": "Column 6"
+        }
+      },
+      "children": [
+        {
+          "id": "I2305:230;2299:99",
+          "name": "Header Text",
+          "type": "TEXT",
+          "componentPropertyReferences": {
+            "characters": "Label#2299:3"
+          },
+          "fills": [
+            {
+              "blendMode": "NORMAL",
+              "type": "SOLID",
+              "color": {
+                "r": 0.03921568766236305,
+                "g": 0.03921568766236305,
+                "b": 0.03921568766236305,
+                "a": 1
+              },
+              "boundVariables": {
+                "color": {
+                  "type": "VARIABLE_ALIAS",
+                  "id": "VariableID:2299:5"
+                }
+              }
+            }
+          ],
+          "strokes": [],
+          "strokeWeight": 1,
+          "absoluteBoundingBox": {
+            "x": 1111,
+            "y": -255,
+            "width": 68,
+            "height": 21
+          },
+          "characters": "Column 6",
+          "style": {
+            "fontFamily": "Plus Jakarta Sans",
+            "fontPostScriptName": "PlusJakartaSans-Medium",
+            "fontStyle": "Medium",
+            "fontWeight": 500,
+            "textAutoResize": "HEIGHT",
+            "fontSize": 14,
+            "textAlignHorizontal": "LEFT",
+            "textAlignVertical": "TOP",
+            "letterSpacing": 0,
+            "lineHeightPx": 21,
+            "lineHeightPercent": 119.04761505126953,
+            "lineHeightPercentFontSize": 150,
+            "lineHeightUnit": "PIXELS"
+          }
+        }
+      ],
+      "clipsContent": false,
+      "fills": [],
+      "strokes": [],
+      "strokeWeight": 1,
+      "layoutMode": "HORIZONTAL",
+      "primaryAxisSizingMode": "FIXED",
+      "paddingLeft": 16,
+      "paddingRight": 16,
+      "paddingTop": 12,
+      "paddingBottom": 12,
+      "layoutWrap": "NO_WRAP",
+      "absoluteBoundingBox": {
+        "x": 1095,
+        "y": -267,
+        "width": 100,
+        "height": 44
+      }
+    },
+    {
+      "id": "2305:232",
+      "name": "Column 7",
+      "visible": false,
+      "type": "INSTANCE",
+      "componentPropertyReferences": {
+        "visible": "Show Column 7#2305:6"
+      },
+      "componentProperties": {
+        "Label#2299:3": {
+          "type": "TEXT",
+          "value": "Column 7"
+        }
+      },
+      "children": [
+        {
+          "id": "I2305:232;2299:99",
+          "name": "Header Text",
+          "type": "TEXT",
+          "componentPropertyReferences": {
+            "characters": "Label#2299:3"
+          },
+          "fills": [
+            {
+              "blendMode": "NORMAL",
+              "type": "SOLID",
+              "color": {
+                "r": 0.03921568766236305,
+                "g": 0.03921568766236305,
+                "b": 0.03921568766236305,
+                "a": 1
+              },
+              "boundVariables": {
+                "color": {
+                  "type": "VARIABLE_ALIAS",
+                  "id": "VariableID:2299:5"
+                }
+              }
+            }
+          ],
+          "strokes": [],
+          "strokeWeight": 1,
+          "absoluteBoundingBox": {
+            "x": 1111,
+            "y": -255,
+            "width": 68,
+            "height": 21
+          },
+          "characters": "Column 7",
+          "style": {
+            "fontFamily": "Plus Jakarta Sans",
+            "fontPostScriptName": "PlusJakartaSans-Medium",
+            "fontStyle": "Medium",
+            "fontWeight": 500,
+            "textAutoResize": "HEIGHT",
+            "fontSize": 14,
+            "textAlignHorizontal": "LEFT",
+            "textAlignVertical": "TOP",
+            "letterSpacing": 0,
+            "lineHeightPx": 21,
+            "lineHeightPercent": 119.04761505126953,
+            "lineHeightPercentFontSize": 150,
+            "lineHeightUnit": "PIXELS"
+          }
+        }
+      ],
+      "clipsContent": false,
+      "fills": [],
+      "strokes": [],
+      "strokeWeight": 1,
+      "layoutMode": "HORIZONTAL",
+      "primaryAxisSizingMode": "FIXED",
+      "paddingLeft": 16,
+      "paddingRight": 16,
+      "paddingTop": 12,
+      "paddingBottom": 12,
+      "layoutWrap": "NO_WRAP",
+      "absoluteBoundingBox": {
+        "x": 1095,
+        "y": -267,
+        "width": 100,
+        "height": 44
+      }
+    },
+    {
+      "id": "2305:234",
+      "name": "Column 8",
+      "visible": false,
+      "type": "INSTANCE",
+      "componentPropertyReferences": {
+        "visible": "Show Column 8#2305:7"
+      },
+      "componentProperties": {
+        "Label#2299:3": {
+          "type": "TEXT",
+          "value": "Column 8"
+        }
+      },
+      "children": [
+        {
+          "id": "I2305:234;2299:99",
+          "name": "Header Text",
+          "type": "TEXT",
+          "componentPropertyReferences": {
+            "characters": "Label#2299:3"
+          },
+          "fills": [
+            {
+              "blendMode": "NORMAL",
+              "type": "SOLID",
+              "color": {
+                "r": 0.03921568766236305,
+                "g": 0.03921568766236305,
+                "b": 0.03921568766236305,
+                "a": 1
+              },
+              "boundVariables": {
+                "color": {
+                  "type": "VARIABLE_ALIAS",
+                  "id": "VariableID:2299:5"
+                }
+              }
+            }
+          ],
+          "strokes": [],
+          "strokeWeight": 1,
+          "absoluteBoundingBox": {
+            "x": 1111,
+            "y": -255,
+            "width": 68,
+            "height": 21
+          },
+          "characters": "Column 8",
+          "style": {
+            "fontFamily": "Plus Jakarta Sans",
+            "fontPostScriptName": "PlusJakartaSans-Medium",
+            "fontStyle": "Medium",
+            "fontWeight": 500,
+            "textAutoResize": "HEIGHT",
+            "fontSize": 14,
+            "textAlignHorizontal": "LEFT",
+            "textAlignVertical": "TOP",
+            "letterSpacing": 0,
+            "lineHeightPx": 21,
+            "lineHeightPercent": 119.04761505126953,
+            "lineHeightPercentFontSize": 150,
+            "lineHeightUnit": "PIXELS"
+          }
+        }
+      ],
+      "clipsContent": false,
+      "fills": [],
+      "strokes": [],
+      "strokeWeight": 1,
+      "layoutMode": "HORIZONTAL",
+      "primaryAxisSizingMode": "FIXED",
+      "paddingLeft": 16,
+      "paddingRight": 16,
+      "paddingTop": 12,
+      "paddingBottom": 12,
+      "layoutWrap": "NO_WRAP",
+      "absoluteBoundingBox": {
+        "x": 1095,
+        "y": -267,
+        "width": 100,
+        "height": 44
+      }
+    },
+    {
+      "id": "2305:236",
+      "name": "Column 9",
+      "visible": false,
+      "type": "INSTANCE",
+      "componentPropertyReferences": {
+        "visible": "Show Column 9#2305:8"
+      },
+      "componentProperties": {
+        "Label#2299:3": {
+          "type": "TEXT",
+          "value": "Column 9"
+        }
+      },
+      "children": [
+        {
+          "id": "I2305:236;2299:99",
+          "name": "Header Text",
+          "type": "TEXT",
+          "componentPropertyReferences": {
+            "characters": "Label#2299:3"
+          },
+          "fills": [
+            {
+              "blendMode": "NORMAL",
+              "type": "SOLID",
+              "color": {
+                "r": 0.03921568766236305,
+                "g": 0.03921568766236305,
+                "b": 0.03921568766236305,
+                "a": 1
+              },
+              "boundVariables": {
+                "color": {
+                  "type": "VARIABLE_ALIAS",
+                  "id": "VariableID:2299:5"
+                }
+              }
+            }
+          ],
+          "strokes": [],
+          "strokeWeight": 1,
+          "absoluteBoundingBox": {
+            "x": 1111,
+            "y": -255,
+            "width": 68,
+            "height": 21
+          },
+          "characters": "Column 9",
+          "style": {
+            "fontFamily": "Plus Jakarta Sans",
+            "fontPostScriptName": "PlusJakartaSans-Medium",
+            "fontStyle": "Medium",
+            "fontWeight": 500,
+            "textAutoResize": "HEIGHT",
+            "fontSize": 14,
+            "textAlignHorizontal": "LEFT",
+            "textAlignVertical": "TOP",
+            "letterSpacing": 0,
+            "lineHeightPx": 21,
+            "lineHeightPercent": 119.04761505126953,
+            "lineHeightPercentFontSize": 150,
+            "lineHeightUnit": "PIXELS"
+          }
+        }
+      ],
+      "clipsContent": false,
+      "fills": [],
+      "strokes": [],
+      "strokeWeight": 1,
+      "layoutMode": "HORIZONTAL",
+      "primaryAxisSizingMode": "FIXED",
+      "paddingLeft": 16,
+      "paddingRight": 16,
+      "paddingTop": 12,
+      "paddingBottom": 12,
+      "layoutWrap": "NO_WRAP",
+      "absoluteBoundingBox": {
+        "x": 1095,
+        "y": -267,
+        "width": 100,
+        "height": 44
+      }
+    },
+    {
+      "id": "2305:238",
+      "name": "Column 10",
+      "visible": false,
+      "type": "INSTANCE",
+      "componentPropertyReferences": {
+        "visible": "Show Column 10#2305:9"
+      },
+      "componentProperties": {
+        "Label#2299:3": {
+          "type": "TEXT",
+          "value": "Column 10"
+        }
+      },
+      "children": [
+        {
+          "id": "I2305:238;2299:99",
+          "name": "Header Text",
+          "type": "TEXT",
+          "componentPropertyReferences": {
+            "characters": "Label#2299:3"
+          },
+          "fills": [
+            {
+              "blendMode": "NORMAL",
+              "type": "SOLID",
+              "color": {
+                "r": 0.03921568766236305,
+                "g": 0.03921568766236305,
+                "b": 0.03921568766236305,
+                "a": 1
+              },
+              "boundVariables": {
+                "color": {
+                  "type": "VARIABLE_ALIAS",
+                  "id": "VariableID:2299:5"
+                }
+              }
+            }
+          ],
+          "strokes": [],
+          "strokeWeight": 1,
+          "absoluteBoundingBox": {
+            "x": 1111,
+            "y": -255,
+            "width": 68,
+            "height": 42
+          },
+          "characters": "Column 10",
+          "style": {
+            "fontFamily": "Plus Jakarta Sans",
+            "fontPostScriptName": "PlusJakartaSans-Medium",
+            "fontStyle": "Medium",
+            "fontWeight": 500,
+            "textAutoResize": "HEIGHT",
+            "fontSize": 14,
+            "textAlignHorizontal": "LEFT",
+            "textAlignVertical": "TOP",
+            "letterSpacing": 0,
+            "lineHeightPx": 21,
+            "lineHeightPercent": 119.04761505126953,
+            "lineHeightPercentFontSize": 150,
+            "lineHeightUnit": "PIXELS"
+          }
+        }
+      ],
+      "clipsContent": false,
+      "fills": [],
+      "strokes": [],
+      "strokeWeight": 1,
+      "layoutMode": "HORIZONTAL",
+      "primaryAxisSizingMode": "FIXED",
+      "paddingLeft": 16,
+      "paddingRight": 16,
+      "paddingTop": 12,
+      "paddingBottom": 12,
+      "layoutWrap": "NO_WRAP",
+      "absoluteBoundingBox": {
+        "x": 1095,
+        "y": -267,
+        "width": 100,
+        "height": 64
+      }
+    }
+  ],
+  "clipsContent": false,
+  "fills": [
+    {
+      "blendMode": "NORMAL",
+      "type": "SOLID",
+      "color": {
+        "r": 0.9607843160629272,
+        "g": 0.9607843160629272,
+        "b": 0.9607843160629272,
+        "a": 1
+      },
+      "boundVariables": {
+        "color": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:2299:4"
+        }
+      }
+    }
+  ],
+  "strokes": [
+    {
+      "blendMode": "NORMAL",
+      "type": "SOLID",
+      "color": {
+        "r": 0.8980392217636108,
+        "g": 0.8980392217636108,
+        "b": 0.8980392217636108,
+        "a": 1
+      },
+      "boundVariables": {
+        "color": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:2299:11"
+        }
+      }
+    }
+  ],
+  "strokeWeight": 1,
+  "layoutMode": "HORIZONTAL",
+  "primaryAxisSizingMode": "FIXED",
+  "layoutWrap": "NO_WRAP",
+  "absoluteBoundingBox": {
+    "x": 595,
+    "y": -267,
+    "width": 600,
+    "height": 46
+  }
+}

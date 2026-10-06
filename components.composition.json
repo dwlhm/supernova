@@ -1,1 +1,151 @@
-{}
+{
+  "Breadcrumb": {
+    "version": 1,
+    "root": "Breadcrumb",
+    "parts": [
+      {
+        "name": "Breadcrumb",
+        "sourceNodeId": "2960:50",
+        "tag": "nav",
+        "classes": "",
+        "attributes": {
+          "aria-label": "Breadcrumb"
+        },
+        "slot": "replace"
+      },
+      {
+        "name": "BreadcrumbList",
+        "sourceNodeId": "2960:50",
+        "tag": "ol",
+        "slot": "replace"
+      },
+      {
+        "name": "BreadcrumbItem",
+        "sourceNodeId": "2960:51",
+        "tag": "li",
+        "slot": "replace"
+      },
+      {
+        "name": "BreadcrumbLink",
+        "sourceNodeId": "2960:52",
+        "tag": "a",
+        "props": {
+          "href": "string"
+        },
+        "attributes": {
+          "href": {
+            "prop": "href"
+          }
+        },
+        "slot": "replace"
+      },
+      {
+        "name": "BreadcrumbPage",
+        "sourceNodeId": "2960:55",
+        "tag": "span",
+        "attributes": {
+          "aria-current": "page"
+        },
+        "slot": "replace"
+      },
+      {
+        "name": "BreadcrumbSeparator",
+        "sourceNodeId": "2961:20761",
+        "tag": "span",
+        "attributes": {
+          "aria-hidden": "true"
+        },
+        "slot": "default",
+        "defaultContent": "/"
+      },
+      {
+        "name": "BreadcrumbEllipsis",
+        "sourceNodeId": "2960:62",
+        "tag": "span",
+        "attributes": {
+          "aria-hidden": "true"
+        },
+        "slot": "default",
+        "defaultContent": "…"
+      }
+    ],
+    "examples": {
+      "static": "import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbPage, BreadcrumbSeparator } from '@dwlhm/ui-react';\n\n<Breadcrumb>\n  <BreadcrumbList>\n    <BreadcrumbItem><BreadcrumbLink href=\"/\">Home</BreadcrumbLink></BreadcrumbItem>\n    <BreadcrumbItem><BreadcrumbSeparator /><BreadcrumbPage>Products</BreadcrumbPage></BreadcrumbItem>\n  </BreadcrumbList>\n</Breadcrumb>",
+      "loop": "import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbPage, BreadcrumbSeparator } from '@dwlhm/ui-react';\n\n// The consumer supplies paths, including stable IDs and link destinations.\n<Breadcrumb>\n  <BreadcrumbList>\n    {paths.map((path, index) => (\n      <BreadcrumbItem key={path.id}>\n        {index > 0 && <BreadcrumbSeparator />}\n        {index === paths.length - 1\n          ? <BreadcrumbPage>{path.label}</BreadcrumbPage>\n          : <BreadcrumbLink href={path.href}>{path.label}</BreadcrumbLink>}\n      </BreadcrumbItem>\n    ))}\n  </BreadcrumbList>\n</Breadcrumb>"
+    }
+  },
+  "Table": {
+    "version": 1,
+    "root": "Table",
+    "parts": [
+      {
+        "name": "Table",
+        "sourceNodeId": "2299:120",
+        "tag": "table",
+        "classes": "",
+        "slot": "replace"
+      },
+      {
+        "name": "TableHeader",
+        "sourceNodeId": "2308:312",
+        "tag": "thead",
+        "classes": "",
+        "slot": "replace"
+      },
+      {
+        "name": "TableBody",
+        "sourceNodeId": "2308:338",
+        "tag": "tbody",
+        "classes": "",
+        "slot": "replace"
+      }
+    ],
+    "examples": {
+      "static": "import { Table, TableHeader, TableBody, TableHeaderRow, TableHeaderCell, TableBodyRow, TableCell } from '@dwlhm/ui-react';\n<Table><TableHeader><TableHeaderRow><TableHeaderCell>Name</TableHeaderCell></TableHeaderRow></TableHeader><TableBody><TableBodyRow><TableCell>Product</TableCell></TableBodyRow></TableBody></Table>",
+      "loop": "import { Table, TableHeader, TableBody, TableHeaderRow, TableHeaderCell, TableBodyRow, TableCell } from '@dwlhm/ui-react';\n<Table>\n  <TableHeader><TableHeaderRow>{columns.map(column => <TableHeaderCell key={column.id}>{column.label}</TableHeaderCell>)}</TableHeaderRow></TableHeader>\n  <TableBody>{rows.map(row => <TableBodyRow key={row.id}>{columns.map(column => <TableCell key={column.id}>{row[column.id]}</TableCell>)}</TableBodyRow>)}</TableBody>\n</Table>"
+    }
+  },
+  "TableHeaderRow": {
+    "version": 1,
+    "root": "TableHeaderRow",
+    "parts": [
+      {
+        "name": "TableHeaderRow",
+        "sourceNodeId": "2299:102",
+        "tag": "tr",
+        "classes": "",
+        "slot": "replace"
+      },
+      {
+        "name": "TableHeaderCell",
+        "sourceNodeId": "2305:220",
+        "tag": "th",
+        "classes": "",
+        "attributes": {
+          "scope": "col"
+        },
+        "slot": "replace"
+      }
+    ]
+  },
+  "TableBodyRow": {
+    "version": 1,
+    "root": "TableBodyRow",
+    "parts": [
+      {
+        "name": "TableBodyRow",
+        "sourceNodeId": "2299:111",
+        "tag": "tr",
+        "classes": "",
+        "slot": "replace"
+      },
+      {
+        "name": "TableCell",
+        "sourceNodeId": "2305:309",
+        "tag": "td",
+        "classes": "",
+        "slot": "replace"
+      }
+    ]
+  }
+}

@@ -1539,6 +1539,10 @@ function parseArgs(args) {
       result.out = arg.slice(6);
     } else if (arg === '--out' || arg === '-o') {
       result.out = args[++i];
+    } else if (arg.startsWith('--figma-snapshot=')) {
+      result.figmaSnapshot = arg.slice('--figma-snapshot='.length);
+    } else if (arg === '--figma-snapshot') {
+      result.figmaSnapshot = args[++i];
     } else if (arg.startsWith('--fixture=')) {
       result.fixture = arg.slice(10);
     } else if (arg === '--fixture') {
@@ -1565,6 +1569,7 @@ function printHelp() {
   console.log(`
 Supernova Figma to Mitosis Transpiler
 Composition: --composition=<contract.json> --out=<directory> emits fixed parts.
+Offline: --figma-snapshot=<cached-file.json> --node=<id> uses only the saved file.
 
 Usage:
   node scripts/figma-to-mitosis.js [options]
@@ -1599,7 +1604,12 @@ async function runCli() {
   let figmaNode;
   const tokens = loadTokens(args.tokens);
 
-  if (args.fixture) {
+  if (args.figmaSnapshot) {
+    if (!args.node) throw new Error('--node is required with --figma-snapshot');
+    const { loadSnapshot, resolveSnapshotNode } = require('./figma-snapshot');
+    const snapshot = loadSnapshot(args.figmaSnapshot);
+    figmaNode = resolveSnapshotNode(snapshot, args.node, args.file || snapshot.fileKey);
+  } else if (args.fixture) {
     const fixturePath = path.resolve(process.cwd(), args.fixture);
     if (!fs.existsSync(fixturePath)) {
       throw new Error(`Fixture file not found: ${fixturePath}`);

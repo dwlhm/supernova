@@ -6,6 +6,17 @@ on:
     paths:
       - 'tokens/**'
       - 'components.catalog.json'
+      - 'components.composition.json'
+      - 'scripts/component-composition.js'
+      - 'scripts/figma-snapshot.js'
+      - 'scripts/cache-figma-file.js'
+      - 'scripts/figma-to-mitosis.js'
+      - 'scripts/process-pr-components.js'
+      - 'scripts/import-figma-components.js'
+      - 'scripts/generate-components.js'
+      - 'scripts/generate-docs.js'
+      - 'scripts/export-source.js'
+      - 'scripts/sync-tokens.js'
   workflow_dispatch:
 
 concurrency:
@@ -77,8 +88,8 @@ jobs:
             PR_BODY=$(cat << 'EOF'
           ## 🤖 Automated Component & Framework Package Sync (PR 2)
 
-          Pembaruan token desain atau katalog komponen telah dideteksi di `main`.
-          Workflow ini secara otomatis meregenerasi template universal Mitosis dan mengompilasi ke seluruh paket framework yang didukung.
+          Pembaruan token, katalog, kontrak composition, atau skrip generator telah dideteksi di `main`.
+          Workflow ini menyinkronkan template universal Mitosis sesuai fingerprint desain dan kontrak, lalu mengompilasi ke seluruh paket framework yang didukung. Template dengan fingerprint yang tidak berubah tetap dipertahankan.
 
           ### 📦 Ringkasan Perubahan
           - **Mitosis Templates**: `components/*.lite.tsx`

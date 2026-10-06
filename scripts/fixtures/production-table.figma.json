@@ -1,0 +1,4306 @@
+{
+  "id": "2571:20661",
+  "name": "Table",
+  "type": "COMPONENT_SET",
+  "componentPropertyDefinitions": {
+    "Show Column 1#2571:0": {
+      "type": "BOOLEAN",
+      "defaultValue": true
+    },
+    "Show Column 2#2571:1": {
+      "type": "BOOLEAN",
+      "defaultValue": true
+    },
+    "Show Column 3#2571:2": {
+      "type": "BOOLEAN",
+      "defaultValue": true
+    },
+    "Show Column 4#2571:3": {
+      "type": "BOOLEAN",
+      "defaultValue": true
+    },
+    "Show Column 5#2571:4": {
+      "type": "BOOLEAN",
+      "defaultValue": true
+    },
+    "Show Column 6#2571:5": {
+      "type": "BOOLEAN",
+      "defaultValue": false
+    },
+    "Show Column 7#2571:6": {
+      "type": "BOOLEAN",
+      "defaultValue": false
+    },
+    "Show Column 8#2571:7": {
+      "type": "BOOLEAN",
+      "defaultValue": false
+    },
+    "Show Column 9#2571:8": {
+      "type": "BOOLEAN",
+      "defaultValue": false
+    },
+    "Show Column 10#2571:9": {
+      "type": "BOOLEAN",
+      "defaultValue": false
+    },
+    "Show Row 1#2571:10": {
+      "type": "BOOLEAN",
+      "defaultValue": true
+    },
+    "Show Row 2#2571:11": {
+      "type": "BOOLEAN",
+      "defaultValue": true
+    },
+    "Show Row 3#2571:12": {
+      "type": "BOOLEAN",
+      "defaultValue": true
+    },
+    "Show Row 4#2571:13": {
+      "type": "BOOLEAN",
+      "defaultValue": true
+    },
+    "Show Row 5#2571:14": {
+      "type": "BOOLEAN",
+      "defaultValue": true
+    },
+    "Show Row 6#2571:15": {
+      "type": "BOOLEAN",
+      "defaultValue": false
+    },
+    "Show Row 7#2571:16": {
+      "type": "BOOLEAN",
+      "defaultValue": true
+    },
+    "Show Row 8#2571:17": {
+      "type": "BOOLEAN",
+      "defaultValue": true
+    },
+    "Show Row 9#2571:18": {
+      "type": "BOOLEAN",
+      "defaultValue": true
+    },
+    "Show Row 10#2571:19": {
+      "type": "BOOLEAN",
+      "defaultValue": true
+    },
+    "Show Checkbox#2571:20": {
+      "type": "BOOLEAN",
+      "defaultValue": false
+    },
+    "Show No#2571:21": {
+      "type": "BOOLEAN",
+      "defaultValue": false
+    },
+    "Title#2571:22": {
+      "type": "TEXT",
+      "defaultValue": "No Data Available"
+    },
+    "Body#2571:23": {
+      "type": "TEXT",
+      "defaultValue": "There's nothing here yet. Try adding some data or adjusting your filters."
+    },
+    "CTA Label#2571:24": {
+      "type": "TEXT",
+      "defaultValue": "Add Data"
+    },
+    "Show Icon#2576:12": {
+      "type": "BOOLEAN",
+      "defaultValue": true
+    },
+    "Show Title#2576:15": {
+      "type": "BOOLEAN",
+      "defaultValue": true
+    },
+    "Show Description#2576:18": {
+      "type": "BOOLEAN",
+      "defaultValue": true
+    },
+    "Show CTA#2576:21": {
+      "type": "BOOLEAN",
+      "defaultValue": true
+    },
+    "Icon#2579:0": {
+      "type": "INSTANCE_SWAP",
+      "defaultValue": "2375:103015",
+      "preferredValues": []
+    },
+    "State": {
+      "type": "VARIANT",
+      "defaultValue": "Default",
+      "variantOptions": [
+        "Default",
+        "Empty"
+      ]
+    }
+  },
+  "children": [
+    {
+      "id": "2299:120",
+      "name": "State=Default",
+      "type": "COMPONENT",
+      "children": [
+        {
+          "id": "2308:312",
+          "name": "Header Row",
+          "type": "FRAME",
+          "children": [
+            {
+              "id": "2308:1001",
+              "name": "Checkbox",
+              "visible": false,
+              "type": "INSTANCE",
+              "componentPropertyReferences": {
+                "visible": "Show Checkbox#2571:20"
+              },
+              "children": [
+                {
+                  "id": "I2308:1001;2308:992",
+                  "name": "Checkbox",
+                  "type": "INSTANCE",
+                  "componentProperties": {
+                    "rightLabel#2179:25": {
+                      "type": "BOOLEAN",
+                      "value": false
+                    },
+                    "leftLabel#2179:22": {
+                      "type": "BOOLEAN",
+                      "value": false
+                    },
+                    "State": {
+                      "value": "off",
+                      "type": "VARIANT",
+                      "boundVariables": {}
+                    },
+                    "Size": {
+                      "value": "Small",
+                      "type": "VARIANT",
+                      "boundVariables": {}
+                    },
+                    "Disabled": {
+                      "value": "false",
+                      "type": "VARIANT",
+                      "boundVariables": {}
+                    }
+                  },
+                  "children": [
+                    {
+                      "id": "I2308:1001;2308:992;2187:19",
+                      "name": "leftLabel",
+                      "visible": false,
+                      "type": "TEXT",
+                      "componentPropertyReferences": {
+                        "visible": "leftLabel#2179:22"
+                      },
+                      "fills": [
+                        {
+                          "blendMode": "NORMAL",
+                          "type": "SOLID",
+                          "color": {
+                            "r": 0.03921568766236305,
+                            "g": 0.03921568766236305,
+                            "b": 0.03921568766236305,
+                            "a": 1
+                          },
+                          "boundVariables": {
+                            "color": {
+                              "type": "VARIABLE_ALIAS",
+                              "id": "VariableID:2224:11"
+                            }
+                          }
+                        }
+                      ],
+                      "strokes": [],
+                      "strokeWeight": 1,
+                      "absoluteBoundingBox": {
+                        "x": 631,
+                        "y": 807,
+                        "width": 32,
+                        "height": 16
+                      },
+                      "characters": "Label",
+                      "style": {
+                        "fontFamily": "Plus Jakarta Sans",
+                        "fontPostScriptName": "PlusJakartaSans-Regular",
+                        "fontStyle": "Regular",
+                        "fontWeight": 400,
+                        "textAutoResize": "WIDTH_AND_HEIGHT",
+                        "fontSize": 12,
+                        "textAlignHorizontal": "LEFT",
+                        "textAlignVertical": "TOP",
+                        "letterSpacing": 0,
+                        "lineHeightPx": 16,
+                        "lineHeightPercent": 105.82010650634766,
+                        "lineHeightPercentFontSize": 133.3333282470703,
+                        "lineHeightUnit": "PIXELS"
+                      }
+                    },
+                    {
+                      "id": "I2308:1001;2308:992;2187:20",
+                      "name": "checkboxIcon",
+                      "type": "FRAME",
+                      "children": [],
+                      "clipsContent": true,
+                      "fills": [
+                        {
+                          "blendMode": "NORMAL",
+                          "type": "SOLID",
+                          "color": {
+                            "r": 1,
+                            "g": 1,
+                            "b": 1,
+                            "a": 1
+                          },
+                          "boundVariables": {
+                            "color": {
+                              "type": "VARIABLE_ALIAS",
+                              "id": "VariableID:2224:9"
+                            }
+                          }
+                        }
+                      ],
+                      "strokes": [
+                        {
+                          "blendMode": "NORMAL",
+                          "type": "SOLID",
+                          "color": {
+                            "r": 0.8980392217636108,
+                            "g": 0.8980392217636108,
+                            "b": 0.8980392217636108,
+                            "a": 1
+                          },
+                          "boundVariables": {
+                            "color": {
+                              "type": "VARIABLE_ALIAS",
+                              "id": "VariableID:2224:10"
+                            }
+                          }
+                        }
+                      ],
+                      "cornerRadius": 4,
+                      "strokeWeight": 1,
+                      "absoluteBoundingBox": {
+                        "x": 631,
+                        "y": 807,
+                        "width": 14,
+                        "height": 14
+                      }
+                    },
+                    {
+                      "id": "I2308:1001;2308:992;2187:21",
+                      "name": "rightLabel",
+                      "visible": false,
+                      "type": "TEXT",
+                      "componentPropertyReferences": {
+                        "visible": "rightLabel#2179:25"
+                      },
+                      "fills": [
+                        {
+                          "blendMode": "NORMAL",
+                          "type": "SOLID",
+                          "color": {
+                            "r": 0.03921568766236305,
+                            "g": 0.03921568766236305,
+                            "b": 0.03921568766236305,
+                            "a": 1
+                          },
+                          "boundVariables": {
+                            "color": {
+                              "type": "VARIABLE_ALIAS",
+                              "id": "VariableID:2224:11"
+                            }
+                          }
+                        }
+                      ],
+                      "strokes": [],
+                      "strokeWeight": 1,
+                      "absoluteBoundingBox": {
+                        "x": 631,
+                        "y": 807,
+                        "width": 32,
+                        "height": 16
+                      },
+                      "characters": "Label",
+                      "style": {
+                        "fontFamily": "Plus Jakarta Sans",
+                        "fontPostScriptName": "PlusJakartaSans-Regular",
+                        "fontStyle": "Regular",
+                        "fontWeight": 400,
+                        "textAutoResize": "WIDTH_AND_HEIGHT",
+                        "fontSize": 12,
+                        "textAlignHorizontal": "LEFT",
+                        "textAlignVertical": "TOP",
+                        "letterSpacing": 0,
+                        "lineHeightPx": 16,
+                        "lineHeightPercent": 105.82010650634766,
+                        "lineHeightPercentFontSize": 133.3333282470703,
+                        "lineHeightUnit": "PIXELS"
+                      }
+                    }
+                  ],
+                  "clipsContent": false,
+                  "fills": [],
+                  "strokes": [],
+                  "strokeWeight": 1,
+                  "layoutMode": "HORIZONTAL",
+                  "counterAxisAlignItems": "CENTER",
+                  "itemSpacing": 6,
+                  "layoutWrap": "NO_WRAP",
+                  "absoluteBoundingBox": {
+                    "x": 631,
+                    "y": 807,
+                    "width": 14,
+                    "height": 14
+                  }
+                }
+              ],
+              "clipsContent": false,
+              "fills": [],
+              "strokes": [],
+              "strokeWeight": 1,
+              "layoutMode": "HORIZONTAL",
+              "primaryAxisSizingMode": "FIXED",
+              "counterAxisAlignItems": "CENTER",
+              "primaryAxisAlignItems": "CENTER",
+              "paddingLeft": 16,
+              "paddingRight": 16,
+              "paddingTop": 12,
+              "paddingBottom": 12,
+              "layoutWrap": "NO_WRAP",
+              "absoluteBoundingBox": {
+                "x": 616,
+                "y": 802,
+                "width": 44,
+                "height": 38
+              }
+            },
+            {
+              "id": "2308:1006",
+              "name": "No",
+              "visible": false,
+              "type": "INSTANCE",
+              "componentPropertyReferences": {
+                "visible": "Show No#2571:21"
+              },
+              "children": [
+                {
+                  "id": "I2308:1006;2308:988",
+                  "name": "No Header Text",
+                  "type": "TEXT",
+                  "fills": [
+                    {
+                      "blendMode": "NORMAL",
+                      "type": "SOLID",
+                      "color": {
+                        "r": 0.03921568766236305,
+                        "g": 0.03921568766236305,
+                        "b": 0.03921568766236305,
+                        "a": 1
+                      },
+                      "boundVariables": {
+                        "color": {
+                          "type": "VARIABLE_ALIAS",
+                          "id": "VariableID:2299:5"
+                        }
+                      }
+                    }
+                  ],
+                  "strokes": [],
+                  "strokeWeight": 1,
+                  "absoluteBoundingBox": {
+                    "x": 674,
+                    "y": 803.5,
+                    "width": 20,
+                    "height": 21
+                  },
+                  "characters": "No",
+                  "style": {
+                    "fontFamily": "Plus Jakarta Sans",
+                    "fontPostScriptName": "PlusJakartaSans-Medium",
+                    "fontStyle": "Medium",
+                    "fontWeight": 500,
+                    "textAutoResize": "WIDTH_AND_HEIGHT",
+                    "fontSize": 14,
+                    "textAlignHorizontal": "LEFT",
+                    "textAlignVertical": "TOP",
+                    "letterSpacing": 0,
+                    "lineHeightPx": 21,
+                    "lineHeightPercent": 119.04761505126953,
+                    "lineHeightPercentFontSize": 150,
+                    "lineHeightUnit": "PIXELS"
+                  }
+                }
+              ],
+              "clipsContent": false,
+              "fills": [],
+              "strokes": [],
+              "strokeWeight": 1,
+              "layoutMode": "HORIZONTAL",
+              "primaryAxisSizingMode": "FIXED",
+              "counterAxisAlignItems": "CENTER",
+              "primaryAxisAlignItems": "CENTER",
+              "paddingLeft": 16,
+              "paddingRight": 16,
+              "paddingTop": 12,
+              "paddingBottom": 12,
+              "layoutWrap": "NO_WRAP",
+              "absoluteBoundingBox": {
+                "x": 660,
+                "y": 802,
+                "width": 48,
+                "height": 44
+              }
+            },
+            {
+              "id": "2308:313",
+              "name": "Column 1",
+              "type": "INSTANCE",
+              "componentPropertyReferences": {
+                "visible": "Show Column 1#2571:0"
+              },
+              "componentProperties": {
+                "Label#2299:3": {
+                  "type": "TEXT",
+                  "value": "Name"
+                }
+              },
+              "children": [
+                {
+                  "id": "I2308:313;2299:99",
+                  "name": "Header Text",
+                  "type": "TEXT",
+                  "componentPropertyReferences": {
+                    "characters": "Label#2299:3"
+                  },
+                  "fills": [
+                    {
+                      "blendMode": "NORMAL",
+                      "type": "SOLID",
+                      "color": {
+                        "r": 0.03921568766236305,
+                        "g": 0.03921568766236305,
+                        "b": 0.03921568766236305,
+                        "a": 1
+                      },
+                      "boundVariables": {
+                        "color": {
+                          "type": "VARIABLE_ALIAS",
+                          "id": "VariableID:2299:5"
+                        }
+                      }
+                    }
+                  ],
+                  "strokes": [],
+                  "strokeWeight": 1,
+                  "absoluteBoundingBox": {
+                    "x": 632,
+                    "y": 814,
+                    "width": 127.60000610351562,
+                    "height": 21
+                  },
+                  "characters": "Name",
+                  "style": {
+                    "fontFamily": "Plus Jakarta Sans",
+                    "fontPostScriptName": "PlusJakartaSans-Medium",
+                    "fontStyle": "Medium",
+                    "fontWeight": 500,
+                    "textAutoResize": "HEIGHT",
+                    "fontSize": 14,
+                    "textAlignHorizontal": "LEFT",
+                    "textAlignVertical": "TOP",
+                    "letterSpacing": 0,
+                    "lineHeightPx": 21,
+                    "lineHeightPercent": 119.04761505126953,
+                    "lineHeightPercentFontSize": 150,
+                    "lineHeightUnit": "PIXELS"
+                  }
+                }
+              ],
+              "clipsContent": false,
+              "fills": [],
+              "strokes": [],
+              "strokeWeight": 1,
+              "layoutMode": "HORIZONTAL",
+              "primaryAxisSizingMode": "FIXED",
+              "paddingLeft": 16,
+              "paddingRight": 16,
+              "paddingTop": 12,
+              "paddingBottom": 12,
+              "layoutWrap": "NO_WRAP",
+              "absoluteBoundingBox": {
+                "x": 616,
+                "y": 802,
+                "width": 159.60000610351562,
+                "height": 45
+              }
+            },
+            {
+              "id": "2308:315",
+              "name": "Column 2",
+              "type": "INSTANCE",
+              "componentPropertyReferences": {
+                "visible": "Show Column 2#2571:1"
+              },
+              "componentProperties": {
+                "Label#2299:3": {
+                  "type": "TEXT",
+                  "value": "Status"
+                }
+              },
+              "children": [
+                {
+                  "id": "I2308:315;2299:99",
+                  "name": "Header Text",
+                  "type": "TEXT",
+                  "componentPropertyReferences": {
+                    "characters": "Label#2299:3"
+                  },
+                  "fills": [
+                    {
+                      "blendMode": "NORMAL",
+                      "type": "SOLID",
+                      "color": {
+                        "r": 0.03921568766236305,
+                        "g": 0.03921568766236305,
+                        "b": 0.03921568766236305,
+                        "a": 1
+                      },
+                      "boundVariables": {
+                        "color": {
+                          "type": "VARIABLE_ALIAS",
+                          "id": "VariableID:2299:5"
+                        }
+                      }
+                    }
+                  ],
+                  "strokes": [],
+                  "strokeWeight": 1,
+                  "absoluteBoundingBox": {
+                    "x": 791.5999755859375,
+                    "y": 814,
+                    "width": 127.60000610351562,
+                    "height": 21
+                  },
+                  "characters": "Status",
+                  "style": {
+                    "fontFamily": "Plus Jakarta Sans",
+                    "fontPostScriptName": "PlusJakartaSans-Medium",
+                    "fontStyle": "Medium",
+                    "fontWeight": 500,
+                    "textAutoResize": "HEIGHT",
+                    "fontSize": 14,
+                    "textAlignHorizontal": "LEFT",
+                    "textAlignVertical": "TOP",
+                    "letterSpacing": 0,
+                    "lineHeightPx": 21,
+                    "lineHeightPercent": 119.04761505126953,
+                    "lineHeightPercentFontSize": 150,
+                    "lineHeightUnit": "PIXELS"
+                  }
+                }
+              ],
+              "clipsContent": false,
+              "fills": [],
+              "strokes": [],
+              "strokeWeight": 1,
+              "layoutMode": "HORIZONTAL",
+              "primaryAxisSizingMode": "FIXED",
+              "paddingLeft": 16,
+              "paddingRight": 16,
+              "paddingTop": 12,
+              "paddingBottom": 12,
+              "layoutWrap": "NO_WRAP",
+              "absoluteBoundingBox": {
+                "x": 775.5999755859375,
+                "y": 802,
+                "width": 159.60000610351562,
+                "height": 45
+              }
+            },
+            {
+              "id": "2308:317",
+              "name": "Column 3",
+              "type": "INSTANCE",
+              "componentPropertyReferences": {
+                "visible": "Show Column 3#2571:2"
+              },
+              "componentProperties": {
+                "Label#2299:3": {
+                  "type": "TEXT",
+                  "value": "Amount"
+                }
+              },
+              "children": [
+                {
+                  "id": "I2308:317;2299:99",
+                  "name": "Header Text",
+                  "type": "TEXT",
+                  "componentPropertyReferences": {
+                    "characters": "Label#2299:3"
+                  },
+                  "fills": [
+                    {
+                      "blendMode": "NORMAL",
+                      "type": "SOLID",
+                      "color": {
+                        "r": 0.03921568766236305,
+                        "g": 0.03921568766236305,
+                        "b": 0.03921568766236305,
+                        "a": 1
+                      },
+                      "boundVariables": {
+                        "color": {
+                          "type": "VARIABLE_ALIAS",
+                          "id": "VariableID:2299:5"
+                        }
+                      }
+                    }
+                  ],
+                  "strokes": [],
+                  "strokeWeight": 1,
+                  "absoluteBoundingBox": {
+                    "x": 951.2000122070312,
+                    "y": 814,
+                    "width": 127.60000610351562,
+                    "height": 21
+                  },
+                  "characters": "Amount",
+                  "style": {
+                    "fontFamily": "Plus Jakarta Sans",
+                    "fontPostScriptName": "PlusJakartaSans-Medium",
+                    "fontStyle": "Medium",
+                    "fontWeight": 500,
+                    "textAutoResize": "HEIGHT",
+                    "fontSize": 14,
+                    "textAlignHorizontal": "LEFT",
+                    "textAlignVertical": "TOP",
+                    "letterSpacing": 0,
+                    "lineHeightPx": 21,
+                    "lineHeightPercent": 119.04761505126953,
+                    "lineHeightPercentFontSize": 150,
+                    "lineHeightUnit": "PIXELS"
+                  }
+                }
+              ],
+              "clipsContent": false,
+              "fills": [],
+              "strokes": [],
+              "strokeWeight": 1,
+              "layoutMode": "HORIZONTAL",
+              "primaryAxisSizingMode": "FIXED",
+              "paddingLeft": 16,
+              "paddingRight": 16,
+              "paddingTop": 12,
+              "paddingBottom": 12,
+              "layoutWrap": "NO_WRAP",
+              "absoluteBoundingBox": {
+                "x": 935.2000122070312,
+                "y": 802,
+                "width": 159.60000610351562,
+                "height": 45
+              }
+            },
+            {
+              "id": "2308:319",
+              "name": "Column 4",
+              "type": "INSTANCE",
+              "componentPropertyReferences": {
+                "visible": "Show Column 4#2571:3"
+              },
+              "componentProperties": {
+                "Label#2299:3": {
+                  "type": "TEXT",
+                  "value": "Actions"
+                }
+              },
+              "children": [
+                {
+                  "id": "I2308:319;2299:99",
+                  "name": "Header Text",
+                  "type": "TEXT",
+                  "componentPropertyReferences": {
+                    "characters": "Label#2299:3"
+                  },
+                  "fills": [
+                    {
+                      "blendMode": "NORMAL",
+                      "type": "SOLID",
+                      "color": {
+                        "r": 0.03921568766236305,
+                        "g": 0.03921568766236305,
+                        "b": 0.03921568766236305,
+                        "a": 1
+                      },
+                      "boundVariables": {
+                        "color": {
+                          "type": "VARIABLE_ALIAS",
+                          "id": "VariableID:2299:5"
+                        }
+                      }
+                    }
+                  ],
+                  "strokes": [],
+                  "strokeWeight": 1,
+                  "absoluteBoundingBox": {
+                    "x": 1110.800048828125,
+                    "y": 814,
+                    "width": 127.59999084472656,
+                    "height": 21
+                  },
+                  "characters": "Actions",
+                  "style": {
+                    "fontFamily": "Plus Jakarta Sans",
+                    "fontPostScriptName": "PlusJakartaSans-Medium",
+                    "fontStyle": "Medium",
+                    "fontWeight": 500,
+                    "textAutoResize": "HEIGHT",
+                    "fontSize": 14,
+                    "textAlignHorizontal": "LEFT",
+                    "textAlignVertical": "TOP",
+                    "letterSpacing": 0,
+                    "lineHeightPx": 21,
+                    "lineHeightPercent": 119.04761505126953,
+                    "lineHeightPercentFontSize": 150,
+                    "lineHeightUnit": "PIXELS"
+                  }
+                }
+              ],
+              "clipsContent": false,
+              "fills": [],
+              "strokes": [],
+              "strokeWeight": 1,
+              "layoutMode": "HORIZONTAL",
+              "primaryAxisSizingMode": "FIXED",
+              "paddingLeft": 16,
+              "paddingRight": 16,
+              "paddingTop": 12,
+              "paddingBottom": 12,
+              "layoutWrap": "NO_WRAP",
+              "absoluteBoundingBox": {
+                "x": 1094.800048828125,
+                "y": 802,
+                "width": 159.59999084472656,
+                "height": 45
+              }
+            },
+            {
+              "id": "2308:321",
+              "name": "Column 5",
+              "type": "INSTANCE",
+              "componentPropertyReferences": {
+                "visible": "Show Column 5#2571:4"
+              },
+              "componentProperties": {
+                "Label#2299:3": {
+                  "type": "TEXT",
+                  "value": "Date"
+                }
+              },
+              "children": [
+                {
+                  "id": "I2308:321;2299:99",
+                  "name": "Header Text",
+                  "type": "TEXT",
+                  "componentPropertyReferences": {
+                    "characters": "Label#2299:3"
+                  },
+                  "fills": [
+                    {
+                      "blendMode": "NORMAL",
+                      "type": "SOLID",
+                      "color": {
+                        "r": 0.03921568766236305,
+                        "g": 0.03921568766236305,
+                        "b": 0.03921568766236305,
+                        "a": 1
+                      },
+                      "boundVariables": {
+                        "color": {
+                          "type": "VARIABLE_ALIAS",
+                          "id": "VariableID:2299:5"
+                        }
+                      }
+                    }
+                  ],
+                  "strokes": [],
+                  "strokeWeight": 1,
+                  "absoluteBoundingBox": {
+                    "x": 1270.4000244140625,
+                    "y": 814,
+                    "width": 127.59999084472656,
+                    "height": 21
+                  },
+                  "characters": "Date",
+                  "style": {
+                    "fontFamily": "Plus Jakarta Sans",
+                    "fontPostScriptName": "PlusJakartaSans-Medium",
+                    "fontStyle": "Medium",
+                    "fontWeight": 500,
+                    "textAutoResize": "HEIGHT",
+                    "fontSize": 14,
+                    "textAlignHorizontal": "LEFT",
+                    "textAlignVertical": "TOP",
+                    "letterSpacing": 0,
+                    "lineHeightPx": 21,
+                    "lineHeightPercent": 119.04761505126953,
+                    "lineHeightPercentFontSize": 150,
+                    "lineHeightUnit": "PIXELS"
+                  }
+                }
+              ],
+              "clipsContent": false,
+              "fills": [],
+              "strokes": [],
+              "strokeWeight": 1,
+              "layoutMode": "HORIZONTAL",
+              "primaryAxisSizingMode": "FIXED",
+              "paddingLeft": 16,
+              "paddingRight": 16,
+              "paddingTop": 12,
+              "paddingBottom": 12,
+              "layoutWrap": "NO_WRAP",
+              "absoluteBoundingBox": {
+                "x": 1254.4000244140625,
+                "y": 802,
+                "width": 159.59999084472656,
+                "height": 45
+              }
+            },
+            {
+              "id": "2308:323",
+              "name": "Column 6",
+              "visible": false,
+              "type": "INSTANCE",
+              "componentPropertyReferences": {
+                "visible": "Show Column 6#2571:5"
+              },
+              "componentProperties": {
+                "Label#2299:3": {
+                  "type": "TEXT",
+                  "value": "Email"
+                }
+              },
+              "children": [
+                {
+                  "id": "I2308:323;2299:99",
+                  "name": "Header Text",
+                  "type": "TEXT",
+                  "componentPropertyReferences": {
+                    "characters": "Label#2299:3"
+                  },
+                  "fills": [
+                    {
+                      "blendMode": "NORMAL",
+                      "type": "SOLID",
+                      "color": {
+                        "r": 0.03921568766236305,
+                        "g": 0.03921568766236305,
+                        "b": 0.03921568766236305,
+                        "a": 1
+                      },
+                      "boundVariables": {
+                        "color": {
+                          "type": "VARIABLE_ALIAS",
+                          "id": "VariableID:2299:5"
+                        }
+                      }
+                    }
+                  ],
+                  "strokes": [],
+                  "strokeWeight": 1,
+                  "absoluteBoundingBox": {
+                    "x": 792,
+                    "y": 814,
+                    "width": 1,
+                    "height": 105
+                  },
+                  "characters": "Email",
+                  "style": {
+                    "fontFamily": "Plus Jakarta Sans",
+                    "fontPostScriptName": "PlusJakartaSans-Medium",
+                    "fontStyle": "Medium",
+                    "fontWeight": 500,
+                    "textAutoResize": "HEIGHT",
+                    "fontSize": 14,
+                    "textAlignHorizontal": "LEFT",
+                    "textAlignVertical": "TOP",
+                    "letterSpacing": 0,
+                    "lineHeightPx": 21,
+                    "lineHeightPercent": 119.04761505126953,
+                    "lineHeightPercentFontSize": 150,
+                    "lineHeightUnit": "PIXELS"
+                  }
+                }
+              ],
+              "clipsContent": false,
+              "fills": [],
+              "strokes": [],
+              "strokeWeight": 1,
+              "layoutMode": "HORIZONTAL",
+              "primaryAxisSizingMode": "FIXED",
+              "paddingLeft": 16,
+              "paddingRight": 16,
+              "paddingTop": 12,
+              "paddingBottom": 12,
+              "layoutWrap": "NO_WRAP",
+              "absoluteBoundingBox": {
+                "x": 776,
+                "y": 802,
+                "width": 32,
+                "height": 264
+              }
+            },
+            {
+              "id": "2308:325",
+              "name": "Column 7",
+              "visible": false,
+              "type": "INSTANCE",
+              "componentPropertyReferences": {
+                "visible": "Show Column 7#2571:6"
+              },
+              "componentProperties": {
+                "Label#2299:3": {
+                  "type": "TEXT",
+                  "value": "Phone"
+                }
+              },
+              "children": [
+                {
+                  "id": "I2308:325;2299:99",
+                  "name": "Header Text",
+                  "type": "TEXT",
+                  "componentPropertyReferences": {
+                    "characters": "Label#2299:3"
+                  },
+                  "fills": [
+                    {
+                      "blendMode": "NORMAL",
+                      "type": "SOLID",
+                      "color": {
+                        "r": 0.03921568766236305,
+                        "g": 0.03921568766236305,
+                        "b": 0.03921568766236305,
+                        "a": 1
+                      },
+                      "boundVariables": {
+                        "color": {
+                          "type": "VARIABLE_ALIAS",
+                          "id": "VariableID:2299:5"
+                        }
+                      }
+                    }
+                  ],
+                  "strokes": [],
+                  "strokeWeight": 1,
+                  "absoluteBoundingBox": {
+                    "x": 792,
+                    "y": 814,
+                    "width": 1,
+                    "height": 105
+                  },
+                  "characters": "Phone",
+                  "style": {
+                    "fontFamily": "Plus Jakarta Sans",
+                    "fontPostScriptName": "PlusJakartaSans-Medium",
+                    "fontStyle": "Medium",
+                    "fontWeight": 500,
+                    "textAutoResize": "HEIGHT",
+                    "fontSize": 14,
+                    "textAlignHorizontal": "LEFT",
+                    "textAlignVertical": "TOP",
+                    "letterSpacing": 0,
+                    "lineHeightPx": 21,
+                    "lineHeightPercent": 119.04761505126953,
+                    "lineHeightPercentFontSize": 150,
+                    "lineHeightUnit": "PIXELS"
+                  }
+                }
+              ],
+              "clipsContent": false,
+              "fills": [],
+              "strokes": [],
+              "strokeWeight": 1,
+              "layoutMode": "HORIZONTAL",
+              "primaryAxisSizingMode": "FIXED",
+              "paddingLeft": 16,
+              "paddingRight": 16,
+              "paddingTop": 12,
+              "paddingBottom": 12,
+              "layoutWrap": "NO_WRAP",
+              "absoluteBoundingBox": {
+                "x": 776,
+                "y": 802,
+                "width": 32,
+                "height": 264
+              }
+            },
+            {
+              "id": "2308:327",
+              "name": "Column 8",
+              "visible": false,
+              "type": "INSTANCE",
+              "componentPropertyReferences": {
+                "visible": "Show Column 8#2571:7"
+              },
+              "componentProperties": {
+                "Label#2299:3": {
+                  "type": "TEXT",
+                  "value": "Address"
+                }
+              },
+              "children": [
+                {
+                  "id": "I2308:327;2299:99",
+                  "name": "Header Text",
+                  "type": "TEXT",
+                  "componentPropertyReferences": {
+                    "characters": "Label#2299:3"
+                  },
+                  "fills": [
+                    {
+                      "blendMode": "NORMAL",
+                      "type": "SOLID",
+                      "color": {
+                        "r": 0.03921568766236305,
+                        "g": 0.03921568766236305,
+                        "b": 0.03921568766236305,
+                        "a": 1
+                      },
+                      "boundVariables": {
+                        "color": {
+                          "type": "VARIABLE_ALIAS",
+                          "id": "VariableID:2299:5"
+                        }
+                      }
+                    }
+                  ],
+                  "strokes": [],
+                  "strokeWeight": 1,
+                  "absoluteBoundingBox": {
+                    "x": 792,
+                    "y": 814,
+                    "width": 1,
+                    "height": 147
+                  },
+                  "characters": "Address",
+                  "style": {
+                    "fontFamily": "Plus Jakarta Sans",
+                    "fontPostScriptName": "PlusJakartaSans-Medium",
+                    "fontStyle": "Medium",
+                    "fontWeight": 500,
+                    "textAutoResize": "HEIGHT",
+                    "fontSize": 14,
+                    "textAlignHorizontal": "LEFT",
+                    "textAlignVertical": "TOP",
+                    "letterSpacing": 0,
+                    "lineHeightPx": 21,
+                    "lineHeightPercent": 119.04761505126953,
+                    "lineHeightPercentFontSize": 150,
+                    "lineHeightUnit": "PIXELS"
+                  }
+                }
+              ],
+              "clipsContent": false,
+              "fills": [],
+              "strokes": [],
+              "strokeWeight": 1,
+              "layoutMode": "HORIZONTAL",
+              "primaryAxisSizingMode": "FIXED",
+              "paddingLeft": 16,
+              "paddingRight": 16,
+              "paddingTop": 12,
+              "paddingBottom": 12,
+              "layoutWrap": "NO_WRAP",
+              "absoluteBoundingBox": {
+                "x": 776,
+                "y": 802,
+                "width": 32,
+                "height": 264
+              }
+            },
+            {
+              "id": "2308:329",
+              "name": "Column 9",
+              "visible": false,
+              "type": "INSTANCE",
+              "componentPropertyReferences": {
+                "visible": "Show Column 9#2571:8"
+              },
+              "componentProperties": {
+                "Label#2299:3": {
+                  "type": "TEXT",
+                  "value": "Role"
+                }
+              },
+              "children": [
+                {
+                  "id": "I2308:329;2299:99",
+                  "name": "Header Text",
+                  "type": "TEXT",
+                  "componentPropertyReferences": {
+                    "characters": "Label#2299:3"
+                  },
+                  "fills": [
+                    {
+                      "blendMode": "NORMAL",
+                      "type": "SOLID",
+                      "color": {
+                        "r": 0.03921568766236305,
+                        "g": 0.03921568766236305,
+                        "b": 0.03921568766236305,
+                        "a": 1
+                      },
+                      "boundVariables": {
+                        "color": {
+                          "type": "VARIABLE_ALIAS",
+                          "id": "VariableID:2299:5"
+                        }
+                      }
+                    }
+                  ],
+                  "strokes": [],
+                  "strokeWeight": 1,
+                  "absoluteBoundingBox": {
+                    "x": 792,
+                    "y": 814,
+                    "width": 1,
+                    "height": 84
+                  },
+                  "characters": "Role",
+                  "style": {
+                    "fontFamily": "Plus Jakarta Sans",
+                    "fontPostScriptName": "PlusJakartaSans-Medium",
+                    "fontStyle": "Medium",
+                    "fontWeight": 500,
+                    "textAutoResize": "HEIGHT",
+                    "fontSize": 14,
+                    "textAlignHorizontal": "LEFT",
+                    "textAlignVertical": "TOP",
+                    "letterSpacing": 0,
+                    "lineHeightPx": 21,
+                    "lineHeightPercent": 119.04761505126953,
+                    "lineHeightPercentFontSize": 150,
+                    "lineHeightUnit": "PIXELS"
+                  }
+                }
+              ],
+              "clipsContent": false,
+              "fills": [],
+              "strokes": [],
+              "strokeWeight": 1,
+              "layoutMode": "HORIZONTAL",
+              "primaryAxisSizingMode": "FIXED",
+              "paddingLeft": 16,
+              "paddingRight": 16,
+              "paddingTop": 12,
+              "paddingBottom": 12,
+              "layoutWrap": "NO_WRAP",
+              "absoluteBoundingBox": {
+                "x": 776,
+                "y": 802,
+                "width": 32,
+                "height": 264
+              }
+            },
+            {
+              "id": "2308:331",
+              "name": "Column 10",
+              "visible": false,
+              "type": "INSTANCE",
+              "componentPropertyReferences": {
+                "visible": "Show Column 10#2571:9"
+              },
+              "componentProperties": {
+                "Label#2299:3": {
+                  "type": "TEXT",
+                  "value": "Notes"
+                }
+              },
+              "children": [
+                {
+                  "id": "I2308:331;2299:99",
+                  "name": "Header Text",
+                  "type": "TEXT",
+                  "componentPropertyReferences": {
+                    "characters": "Label#2299:3"
+                  },
+                  "fills": [
+                    {
+                      "blendMode": "NORMAL",
+                      "type": "SOLID",
+                      "color": {
+                        "r": 0.03921568766236305,
+                        "g": 0.03921568766236305,
+                        "b": 0.03921568766236305,
+                        "a": 1
+                      },
+                      "boundVariables": {
+                        "color": {
+                          "type": "VARIABLE_ALIAS",
+                          "id": "VariableID:2299:5"
+                        }
+                      }
+                    }
+                  ],
+                  "strokes": [],
+                  "strokeWeight": 1,
+                  "absoluteBoundingBox": {
+                    "x": 792,
+                    "y": 814,
+                    "width": 1,
+                    "height": 105
+                  },
+                  "characters": "Notes",
+                  "style": {
+                    "fontFamily": "Plus Jakarta Sans",
+                    "fontPostScriptName": "PlusJakartaSans-Medium",
+                    "fontStyle": "Medium",
+                    "fontWeight": 500,
+                    "textAutoResize": "HEIGHT",
+                    "fontSize": 14,
+                    "textAlignHorizontal": "LEFT",
+                    "textAlignVertical": "TOP",
+                    "letterSpacing": 0,
+                    "lineHeightPx": 21,
+                    "lineHeightPercent": 119.04761505126953,
+                    "lineHeightPercentFontSize": 150,
+                    "lineHeightUnit": "PIXELS"
+                  }
+                }
+              ],
+              "clipsContent": false,
+              "fills": [],
+              "strokes": [],
+              "strokeWeight": 1,
+              "layoutMode": "HORIZONTAL",
+              "primaryAxisSizingMode": "FIXED",
+              "paddingLeft": 16,
+              "paddingRight": 16,
+              "paddingTop": 12,
+              "paddingBottom": 12,
+              "layoutWrap": "NO_WRAP",
+              "absoluteBoundingBox": {
+                "x": 776,
+                "y": 802,
+                "width": 32,
+                "height": 264
+              }
+            }
+          ],
+          "clipsContent": true,
+          "fills": [
+            {
+              "blendMode": "NORMAL",
+              "type": "SOLID",
+              "color": {
+                "r": 0.9607843160629272,
+                "g": 0.9607843160629272,
+                "b": 0.9607843160629272,
+                "a": 1
+              },
+              "boundVariables": {
+                "color": {
+                  "type": "VARIABLE_ALIAS",
+                  "id": "VariableID:2299:4"
+                }
+              }
+            }
+          ],
+          "strokes": [
+            {
+              "blendMode": "NORMAL",
+              "type": "SOLID",
+              "color": {
+                "r": 0.8980392217636108,
+                "g": 0.8980392217636108,
+                "b": 0.8980392217636108,
+                "a": 1
+              },
+              "boundVariables": {
+                "color": {
+                  "type": "VARIABLE_ALIAS",
+                  "id": "VariableID:2299:11"
+                }
+              }
+            }
+          ],
+          "strokeWeight": 1,
+          "layoutMode": "HORIZONTAL",
+          "primaryAxisSizingMode": "FIXED",
+          "layoutWrap": "NO_WRAP",
+          "absoluteBoundingBox": {
+            "x": 616,
+            "y": 802,
+            "width": 798,
+            "height": 46
+          }
+        },
+        {
+          "id": "2308:338",
+          "name": "Row 1",
+          "type": "FRAME",
+          "componentPropertyReferences": {
+            "visible": "Show Row 1#2571:10"
+          },
+          "children": [
+            {
+              "id": "2308:1008",
+              "name": "Checkbox",
+              "visible": false,
+              "type": "INSTANCE",
+              "componentPropertyReferences": {
+                "visible": "Show Checkbox#2571:20"
+              },
+              "children": [
+                {
+                  "id": "I2308:1008;2308:997",
+                  "name": "Checkbox",
+                  "type": "INSTANCE",
+                  "componentProperties": {
+                    "rightLabel#2179:25": {
+                      "type": "BOOLEAN",
+                      "value": false
+                    },
+                    "leftLabel#2179:22": {
+                      "type": "BOOLEAN",
+                      "value": false
+                    },
+                    "State": {
+                      "value": "off",
+                      "type": "VARIANT",
+                      "boundVariables": {}
+                    },
+                    "Size": {
+                      "value": "Small",
+                      "type": "VARIANT",
+                      "boundVariables": {}
+                    },
+                    "Disabled": {
+                      "value": "false",
+                      "type": "VARIANT",
+                      "boundVariables": {}
+                    }
+                  },
+                  "children": [
+                    {
+                      "id": "I2308:1008;2308:997;2187:19",
+                      "name": "leftLabel",
+                      "visible": false,
+                      "type": "TEXT",
+                      "componentPropertyReferences": {
+                        "visible": "leftLabel#2179:22"
+                      },
+                      "fills": [
+                        {
+                          "blendMode": "NORMAL",
+                          "type": "SOLID",
+                          "color": {
+                            "r": 0.03921568766236305,
+                            "g": 0.03921568766236305,
+                            "b": 0.03921568766236305,
+                            "a": 1
+                          },
+                          "boundVariables": {
+                            "color": {
+                              "type": "VARIABLE_ALIAS",
+                              "id": "VariableID:2224:11"
+                            }
+                          }
+                        }
+                      ],
+                      "strokes": [],
+                      "strokeWeight": 1,
+                      "absoluteBoundingBox": {
+                        "x": 631,
+                        "y": 853,
+                        "width": 32,
+                        "height": 16
+                      },
+                      "characters": "Label",
+                      "style": {
+                        "fontFamily": "Plus Jakarta Sans",
+                        "fontPostScriptName": "PlusJakartaSans-Regular",
+                        "fontStyle": "Regular",
+                        "fontWeight": 400,
+                        "textAutoResize": "WIDTH_AND_HEIGHT",
+                        "fontSize": 12,
+                        "textAlignHorizontal": "LEFT",
+                        "textAlignVertical": "TOP",
+                        "letterSpacing": 0,
+                        "lineHeightPx": 16,
+                        "lineHeightPercent": 105.82010650634766,
+                        "lineHeightPercentFontSize": 133.3333282470703,
+                        "lineHeightUnit": "PIXELS"
+                      }
+                    },
+                    {
+                      "id": "I2308:1008;2308:997;2187:20",
+                      "name": "checkboxIcon",
+                      "type": "FRAME",
+                      "children": [],
+                      "clipsContent": true,
+                      "fills": [
+                        {
+                          "blendMode": "NORMAL",
+                          "type": "SOLID",
+                          "color": {
+                            "r": 1,
+                            "g": 1,
+                            "b": 1,
+                            "a": 1
+                          },
+                          "boundVariables": {
+                            "color": {
+                              "type": "VARIABLE_ALIAS",
+                              "id": "VariableID:2224:9"
+                            }
+                          }
+                        }
+                      ],
+                      "strokes": [
+                        {
+                          "blendMode": "NORMAL",
+                          "type": "SOLID",
+                          "color": {
+                            "r": 0.8980392217636108,
+                            "g": 0.8980392217636108,
+                            "b": 0.8980392217636108,
+                            "a": 1
+                          },
+                          "boundVariables": {
+                            "color": {
+                              "type": "VARIABLE_ALIAS",
+                              "id": "VariableID:2224:10"
+                            }
+                          }
+                        }
+                      ],
+                      "cornerRadius": 4,
+                      "strokeWeight": 1,
+                      "absoluteBoundingBox": {
+                        "x": 631,
+                        "y": 853,
+                        "width": 14,
+                        "height": 14
+                      }
+                    },
+                    {
+                      "id": "I2308:1008;2308:997;2187:21",
+                      "name": "rightLabel",
+                      "visible": false,
+                      "type": "TEXT",
+                      "componentPropertyReferences": {
+                        "visible": "rightLabel#2179:25"
+                      },
+                      "fills": [
+                        {
+                          "blendMode": "NORMAL",
+                          "type": "SOLID",
+                          "color": {
+                            "r": 0.03921568766236305,
+                            "g": 0.03921568766236305,
+                            "b": 0.03921568766236305,
+                            "a": 1
+                          },
+                          "boundVariables": {
+                            "color": {
+                              "type": "VARIABLE_ALIAS",
+                              "id": "VariableID:2224:11"
+                            }
+                          }
+                        }
+                      ],
+                      "strokes": [],
+                      "strokeWeight": 1,
+                      "absoluteBoundingBox": {
+                        "x": 631,
+                        "y": 853,
+                        "width": 32,
+                        "height": 16
+                      },
+                      "characters": "Label",
+                      "style": {
+                        "fontFamily": "Plus Jakarta Sans",
+                        "fontPostScriptName": "PlusJakartaSans-Regular",
+                        "fontStyle": "Regular",
+                        "fontWeight": 400,
+                        "textAutoResize": "WIDTH_AND_HEIGHT",
+                        "fontSize": 12,
+                        "textAlignHorizontal": "LEFT",
+                        "textAlignVertical": "TOP",
+                        "letterSpacing": 0,
+                        "lineHeightPx": 16,
+                        "lineHeightPercent": 105.82010650634766,
+                        "lineHeightPercentFontSize": 133.3333282470703,
+                        "lineHeightUnit": "PIXELS"
+                      }
+                    }
+                  ],
+                  "clipsContent": false,
+                  "fills": [],
+                  "strokes": [],
+                  "strokeWeight": 1,
+                  "layoutMode": "HORIZONTAL",
+                  "counterAxisAlignItems": "CENTER",
+                  "itemSpacing": 6,
+                  "layoutWrap": "NO_WRAP",
+                  "absoluteBoundingBox": {
+                    "x": 631,
+                    "y": 853,
+                    "width": 14,
+                    "height": 14
+                  }
+                }
+              ],
+              "clipsContent": false,
+              "fills": [],
+              "strokes": [],
+              "strokeWeight": 1,
+              "layoutMode": "HORIZONTAL",
+              "primaryAxisSizingMode": "FIXED",
+              "counterAxisAlignItems": "CENTER",
+              "primaryAxisAlignItems": "CENTER",
+              "paddingLeft": 16,
+              "paddingRight": 16,
+              "paddingTop": 12,
+              "paddingBottom": 12,
+              "layoutWrap": "NO_WRAP",
+              "absoluteBoundingBox": {
+                "x": 616,
+                "y": 848,
+                "width": 44,
+                "height": 38
+              }
+            },
+            {
+              "id": "2308:1013",
+              "name": "No",
+              "visible": false,
+              "type": "INSTANCE",
+              "componentPropertyReferences": {
+                "visible": "Show No#2571:21"
+              },
+              "componentProperties": {
+                "No#2308:20": {
+                  "type": "TEXT",
+                  "value": "1"
+                }
+              },
+              "children": [
+                {
+                  "id": "I2308:1013;2308:990",
+                  "name": "No Body Text",
+                  "type": "TEXT",
+                  "componentPropertyReferences": {
+                    "characters": "No#2308:20"
+                  },
+                  "fills": [
+                    {
+                      "blendMode": "NORMAL",
+                      "type": "SOLID",
+                      "color": {
+                        "r": 0.45098039507865906,
+                        "g": 0.45098039507865906,
+                        "b": 0.45098039507865906,
+                        "a": 1
+                      },
+                      "boundVariables": {
+                        "color": {
+                          "type": "VARIABLE_ALIAS",
+                          "id": "VariableID:2299:10"
+                        }
+                      }
+                    }
+                  ],
+                  "strokes": [],
+                  "strokeWeight": 1,
+                  "absoluteBoundingBox": {
+                    "x": 681,
+                    "y": 849.5,
+                    "width": 6,
+                    "height": 21
+                  },
+                  "characters": "1",
+                  "style": {
+                    "fontFamily": "Plus Jakarta Sans",
+                    "fontPostScriptName": "PlusJakartaSans-Regular",
+                    "fontStyle": "Regular",
+                    "fontWeight": 400,
+                    "textAutoResize": "WIDTH_AND_HEIGHT",
+                    "fontSize": 14,
+                    "textAlignHorizontal": "LEFT",
+                    "textAlignVertical": "TOP",
+                    "letterSpacing": 0,
+                    "lineHeightPx": 21,
+                    "lineHeightPercent": 119.04761505126953,
+                    "lineHeightPercentFontSize": 150,
+                    "lineHeightUnit": "PIXELS"
+                  }
+                }
+              ],
+              "clipsContent": false,
+              "fills": [],
+              "strokes": [],
+              "strokeWeight": 1,
+              "layoutMode": "HORIZONTAL",
+              "primaryAxisSizingMode": "FIXED",
+              "counterAxisAlignItems": "CENTER",
+              "primaryAxisAlignItems": "CENTER",
+              "paddingLeft": 16,
+              "paddingRight": 16,
+              "paddingTop": 12,
+              "paddingBottom": 12,
+              "layoutWrap": "NO_WRAP",
+              "absoluteBoundingBox": {
+                "x": 660,
+                "y": 848,
+                "width": 48,
+                "height": 44
+              }
+            },
+            {
+              "id": "2308:339",
+              "name": "Column 1",
+              "type": "INSTANCE",
+              "componentPropertyReferences": {
+                "visible": "Show Column 1#2571:0"
+              },
+              "componentProperties": {
+                "Cell Value#2301:12": {
+                  "type": "INSTANCE_SWAP",
+                  "value": "2301:193",
+                  "preferredValues": [
+                    {
+                      "type": "COMPONENT",
+                      "key": "d7d757f3744fda7107eaad52ee12e2c1e8082a0f"
+                    },
+                    {
+                      "type": "COMPONENT",
+                      "key": "bcb0d56adbc2578278bb0132c749868199c69453"
+                    },
+                    {
+                      "type": "COMPONENT",
+                      "key": "ffc3ec975db711e7a04e12eeaeae615b6ee507af"
+                    },
+                    {
+                      "type": "COMPONENT",
+                      "key": "f2d39ab11e755310820c641074c35acf69365fc3"
+                    },
+                    {
+                      "type": "COMPONENT",
+                      "key": "f0ba98825f6ed28724c2762a1b7a1bce37f9612c"
+                    }
+                  ]
+                }
+              },
+              "children": [
+                {
+                  "id": "I2308:339;2301:321",
+                  "name": "Cell Value",
+                  "type": "INSTANCE",
+                  "componentPropertyReferences": {
+                    "mainComponent": "Cell Value#2301:12"
+                  },
+                  "componentProperties": {
+                    "Slot#2945:18": {
+                      "type": "SLOT",
+                      "value": {
+                        "guid": {
+                          "sessionID": -1,
+                          "localID": -1
+                        }
+                      },
+                      "preferredValues": []
+                    },
+                    "Show Edit#2929:0": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komerce#2927:196": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komstore#2927:181": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show More#2929:28": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komed#2927:166": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Delete#2929:14": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komtim#2927:151": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Kompack#2927:106": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komchat#2927:76": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Affiliate#2927:1": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komcards#2927:61": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komlabs#2927:16": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komads#2927:46": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Value#2301:8": {
+                      "type": "TEXT",
+                      "value": "John Doe"
+                    },
+                    "Show Raja Ongkir#2927:31": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komship#2927:136": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komclass#2927:91": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komplace#2927:121": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Type": {
+                      "value": "Image Text",
+                      "type": "VARIANT",
+                      "boundVariables": {}
+                    }
+                  },
+                  "children": [
+                    {
+                      "id": "I2308:339;2301:321;2301:194",
+                      "name": "Image",
+                      "type": "VECTOR",
+                      "fills": [
+                        {
+                          "blendMode": "NORMAL",
+                          "type": "IMAGE",
+                          "scaleMode": "FILL",
+                          "imageRef": "ece298d0ec2c16f10310d45724b276a6035cb503"
+                        }
+                      ],
+                      "strokes": [],
+                      "strokeWeight": 1,
+                      "cornerRadius": 4,
+                      "absoluteBoundingBox": {
+                        "x": 632,
+                        "y": 860,
+                        "width": 28,
+                        "height": 28
+                      }
+                    },
+                    {
+                      "id": "I2308:339;2301:321;2301:195",
+                      "name": "Value",
+                      "type": "TEXT",
+                      "componentPropertyReferences": {
+                        "characters": "Value#2301:8"
+                      },
+                      "fills": [
+                        {
+                          "blendMode": "NORMAL",
+                          "type": "SOLID",
+                          "color": {
+                            "r": 0.03921568766236305,
+                            "g": 0.03921568766236305,
+                            "b": 0.03921568766236305,
+                            "a": 1
+                          },
+                          "boundVariables": {
+                            "color": {
+                              "type": "VARIABLE_ALIAS",
+                              "id": "VariableID:2299:9"
+                            }
+                          }
+                        }
+                      ],
+                      "strokes": [],
+                      "strokeWeight": 1,
+                      "absoluteBoundingBox": {
+                        "x": 668,
+                        "y": 863.5,
+                        "width": 91.60000610351562,
+                        "height": 21
+                      },
+                      "characters": "John Doe",
+                      "style": {
+                        "fontFamily": "Plus Jakarta Sans",
+                        "fontPostScriptName": "PlusJakartaSans-Regular",
+                        "fontStyle": "Regular",
+                        "fontWeight": 400,
+                        "textAutoResize": "HEIGHT",
+                        "fontSize": 14,
+                        "textAlignHorizontal": "LEFT",
+                        "textAlignVertical": "TOP",
+                        "letterSpacing": 0,
+                        "lineHeightPx": 21,
+                        "lineHeightPercent": 119.04761505126953,
+                        "lineHeightPercentFontSize": 150,
+                        "lineHeightUnit": "PIXELS"
+                      }
+                    }
+                  ],
+                  "clipsContent": false,
+                  "fills": [],
+                  "strokes": [],
+                  "strokeWeight": 1,
+                  "layoutMode": "HORIZONTAL",
+                  "primaryAxisSizingMode": "FIXED",
+                  "counterAxisAlignItems": "CENTER",
+                  "itemSpacing": 8,
+                  "layoutWrap": "NO_WRAP",
+                  "absoluteBoundingBox": {
+                    "x": 632,
+                    "y": 860,
+                    "width": 127.60000610351562,
+                    "height": 28
+                  }
+                }
+              ],
+              "clipsContent": false,
+              "fills": [],
+              "strokes": [],
+              "strokeWeight": 1,
+              "layoutMode": "HORIZONTAL",
+              "primaryAxisSizingMode": "FIXED",
+              "paddingLeft": 16,
+              "paddingRight": 16,
+              "paddingTop": 12,
+              "paddingBottom": 12,
+              "layoutWrap": "NO_WRAP",
+              "absoluteBoundingBox": {
+                "x": 616,
+                "y": 848,
+                "width": 159.60000610351562,
+                "height": 52
+              }
+            },
+            {
+              "id": "2308:342",
+              "name": "Column 2",
+              "type": "INSTANCE",
+              "componentPropertyReferences": {
+                "visible": "Show Column 2#2571:1"
+              },
+              "componentProperties": {
+                "Cell Value#2301:12": {
+                  "type": "INSTANCE_SWAP",
+                  "value": "2301:203",
+                  "preferredValues": [
+                    {
+                      "type": "COMPONENT",
+                      "key": "d7d757f3744fda7107eaad52ee12e2c1e8082a0f"
+                    },
+                    {
+                      "type": "COMPONENT",
+                      "key": "bcb0d56adbc2578278bb0132c749868199c69453"
+                    },
+                    {
+                      "type": "COMPONENT",
+                      "key": "ffc3ec975db711e7a04e12eeaeae615b6ee507af"
+                    },
+                    {
+                      "type": "COMPONENT",
+                      "key": "f2d39ab11e755310820c641074c35acf69365fc3"
+                    },
+                    {
+                      "type": "COMPONENT",
+                      "key": "f0ba98825f6ed28724c2762a1b7a1bce37f9612c"
+                    }
+                  ]
+                }
+              },
+              "children": [
+                {
+                  "id": "I2308:342;2301:321",
+                  "name": "Cell Value",
+                  "type": "INSTANCE",
+                  "componentPropertyReferences": {
+                    "mainComponent": "Cell Value#2301:12"
+                  },
+                  "componentProperties": {
+                    "Show More#2929:28": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Delete#2929:14": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komerce#2927:196": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komstore#2927:181": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komed#2927:166": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komship#2927:136": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Slot#2945:18": {
+                      "type": "SLOT",
+                      "value": {
+                        "guid": {
+                          "sessionID": -1,
+                          "localID": -1
+                        }
+                      },
+                      "preferredValues": []
+                    },
+                    "Show Kompack#2927:106": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komclass#2927:91": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komchat#2927:76": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komads#2927:46": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Raja Ongkir#2927:31": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Value#2301:8": {
+                      "type": "TEXT",
+                      "value": "Active"
+                    },
+                    "Show Komcards#2927:61": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Affiliate#2927:1": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komlabs#2927:16": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Edit#2929:0": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komtim#2927:151": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komplace#2927:121": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Type": {
+                      "value": "Badge",
+                      "type": "VARIANT",
+                      "boundVariables": {}
+                    }
+                  },
+                  "children": [
+                    {
+                      "id": "I2308:342;2301:321;2927:22971",
+                      "name": "Badge",
+                      "type": "INSTANCE",
+                      "componentProperties": {
+                        "Label#2841:0": {
+                          "type": "TEXT",
+                          "value": "Badge"
+                        },
+                        "Variant": {
+                          "value": "primary",
+                          "type": "VARIANT",
+                          "boundVariables": {}
+                        }
+                      },
+                      "children": [
+                        {
+                          "id": "I2308:342;2301:321;2927:22971;2841:131",
+                          "name": "Label",
+                          "type": "TEXT",
+                          "componentPropertyReferences": {
+                            "characters": "Label#2841:0"
+                          },
+                          "fills": [
+                            {
+                              "blendMode": "NORMAL",
+                              "type": "SOLID",
+                              "color": {
+                                "r": 0.47843137383461,
+                                "g": 0.18039216101169586,
+                                "b": 0.0470588244497776,
+                                "a": 1
+                              },
+                              "boundVariables": {
+                                "color": {
+                                  "type": "VARIABLE_ALIAS",
+                                  "id": "VariableID:2841:79"
+                                }
+                              }
+                            }
+                          ],
+                          "strokes": [],
+                          "strokeWeight": 1,
+                          "absoluteBoundingBox": {
+                            "x": 799.5999755859375,
+                            "y": 862,
+                            "width": 39,
+                            "height": 16
+                          },
+                          "characters": "Badge",
+                          "style": {
+                            "fontFamily": "Plus Jakarta Sans",
+                            "fontPostScriptName": "PlusJakartaSans-Medium",
+                            "fontStyle": "Medium",
+                            "fontWeight": 500,
+                            "textAutoResize": "WIDTH_AND_HEIGHT",
+                            "fontSize": 12,
+                            "textAlignHorizontal": "LEFT",
+                            "textAlignVertical": "TOP",
+                            "letterSpacing": 0,
+                            "lineHeightPx": 16,
+                            "lineHeightPercent": 105.82010650634766,
+                            "lineHeightPercentFontSize": 133.3333282470703,
+                            "lineHeightUnit": "PIXELS"
+                          }
+                        }
+                      ],
+                      "clipsContent": false,
+                      "fills": [
+                        {
+                          "blendMode": "NORMAL",
+                          "type": "SOLID",
+                          "color": {
+                            "r": 1,
+                            "g": 0.9098039269447327,
+                            "b": 0.8509804010391235,
+                            "a": 1
+                          },
+                          "boundVariables": {
+                            "color": {
+                              "type": "VARIABLE_ALIAS",
+                              "id": "VariableID:2841:78"
+                            }
+                          }
+                        }
+                      ],
+                      "strokes": [],
+                      "cornerRadius": 9999,
+                      "strokeWeight": 1,
+                      "layoutMode": "HORIZONTAL",
+                      "counterAxisAlignItems": "CENTER",
+                      "primaryAxisAlignItems": "CENTER",
+                      "paddingLeft": 8,
+                      "paddingRight": 8,
+                      "paddingTop": 2,
+                      "paddingBottom": 2,
+                      "itemSpacing": 4,
+                      "layoutWrap": "NO_WRAP",
+                      "absoluteBoundingBox": {
+                        "x": 791.5999755859375,
+                        "y": 860,
+                        "width": 55,
+                        "height": 20
+                      }
+                    }
+                  ],
+                  "clipsContent": false,
+                  "fills": [],
+                  "strokes": [],
+                  "strokeWeight": 1,
+                  "layoutMode": "HORIZONTAL",
+                  "primaryAxisSizingMode": "FIXED",
+                  "counterAxisAlignItems": "CENTER",
+                  "layoutWrap": "NO_WRAP",
+                  "absoluteBoundingBox": {
+                    "x": 791.5999755859375,
+                    "y": 860,
+                    "width": 127.60000610351562,
+                    "height": 20
+                  }
+                }
+              ],
+              "clipsContent": false,
+              "fills": [],
+              "strokes": [],
+              "strokeWeight": 1,
+              "layoutMode": "HORIZONTAL",
+              "primaryAxisSizingMode": "FIXED",
+              "paddingLeft": 16,
+              "paddingRight": 16,
+              "paddingTop": 12,
+              "paddingBottom": 12,
+              "layoutWrap": "NO_WRAP",
+              "absoluteBoundingBox": {
+                "x": 775.5999755859375,
+                "y": 848,
+                "width": 159.60000610351562,
+                "height": 44
+              }
+            },
+            {
+              "id": "2308:345",
+              "name": "Column 3",
+              "type": "INSTANCE",
+              "componentPropertyReferences": {
+                "visible": "Show Column 3#2571:2"
+              },
+              "componentProperties": {
+                "Cell Value#2301:12": {
+                  "type": "INSTANCE_SWAP",
+                  "value": "2574:767",
+                  "preferredValues": [
+                    {
+                      "type": "COMPONENT",
+                      "key": "d7d757f3744fda7107eaad52ee12e2c1e8082a0f"
+                    },
+                    {
+                      "type": "COMPONENT",
+                      "key": "bcb0d56adbc2578278bb0132c749868199c69453"
+                    },
+                    {
+                      "type": "COMPONENT",
+                      "key": "ffc3ec975db711e7a04e12eeaeae615b6ee507af"
+                    },
+                    {
+                      "type": "COMPONENT",
+                      "key": "f2d39ab11e755310820c641074c35acf69365fc3"
+                    },
+                    {
+                      "type": "COMPONENT",
+                      "key": "f0ba98825f6ed28724c2762a1b7a1bce37f9612c"
+                    }
+                  ]
+                }
+              },
+              "children": [
+                {
+                  "id": "I2308:345;2301:321",
+                  "name": "Cell Value",
+                  "type": "INSTANCE",
+                  "componentPropertyReferences": {
+                    "mainComponent": "Cell Value#2301:12"
+                  },
+                  "componentProperties": {
+                    "Show Delete#2929:14": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Slot#2945:18": {
+                      "type": "SLOT",
+                      "value": {
+                        "guid": {
+                          "sessionID": -1,
+                          "localID": -1
+                        }
+                      },
+                      "preferredValues": []
+                    },
+                    "Show Edit#2929:0": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komtim#2927:151": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komship#2927:136": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show More#2929:28": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komclass#2927:91": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komcards#2927:61": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komed#2927:166": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komchat#2927:76": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komlabs#2927:16": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komads#2927:46": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komstore#2927:181": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komplace#2927:121": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Raja Ongkir#2927:31": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Kompack#2927:106": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komerce#2927:196": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Affiliate#2927:1": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Value#2301:8": {
+                      "type": "TEXT",
+                      "value": "$1,200"
+                    },
+                    "Type": {
+                      "value": "Number",
+                      "type": "VARIANT",
+                      "boundVariables": {}
+                    }
+                  },
+                  "children": [
+                    {
+                      "id": "I2308:345;2301:321;2574:768",
+                      "name": "Value",
+                      "type": "TEXT",
+                      "componentPropertyReferences": {
+                        "characters": "Value#2301:8"
+                      },
+                      "fills": [
+                        {
+                          "blendMode": "NORMAL",
+                          "type": "SOLID",
+                          "color": {
+                            "r": 0.03921568766236305,
+                            "g": 0.03921568766236305,
+                            "b": 0.03921568766236305,
+                            "a": 1
+                          },
+                          "boundVariables": {
+                            "color": {
+                              "type": "VARIABLE_ALIAS",
+                              "id": "VariableID:2299:9"
+                            }
+                          }
+                        }
+                      ],
+                      "strokes": [],
+                      "strokeWeight": 1,
+                      "absoluteBoundingBox": {
+                        "x": 951.2000122070312,
+                        "y": 860,
+                        "width": 127.60000610351562,
+                        "height": 21
+                      },
+                      "characters": "$1,200",
+                      "style": {
+                        "fontFamily": "Plus Jakarta Sans",
+                        "fontPostScriptName": "PlusJakartaSans-Regular",
+                        "fontStyle": "Regular",
+                        "fontWeight": 400,
+                        "textAutoResize": "HEIGHT",
+                        "fontSize": 14,
+                        "textAlignHorizontal": "LEFT",
+                        "textAlignVertical": "TOP",
+                        "letterSpacing": 0,
+                        "lineHeightPx": 21,
+                        "lineHeightPercent": 119.04761505126953,
+                        "lineHeightPercentFontSize": 150,
+                        "lineHeightUnit": "PIXELS"
+                      }
+                    }
+                  ],
+                  "clipsContent": false,
+                  "fills": [],
+                  "strokes": [],
+                  "strokeWeight": 1,
+                  "layoutMode": "HORIZONTAL",
+                  "primaryAxisSizingMode": "FIXED",
+                  "counterAxisAlignItems": "CENTER",
+                  "layoutWrap": "NO_WRAP",
+                  "absoluteBoundingBox": {
+                    "x": 951.2000122070312,
+                    "y": 860,
+                    "width": 127.60000610351562,
+                    "height": 21
+                  }
+                }
+              ],
+              "clipsContent": false,
+              "fills": [],
+              "strokes": [],
+              "strokeWeight": 1,
+              "layoutMode": "HORIZONTAL",
+              "primaryAxisSizingMode": "FIXED",
+              "paddingLeft": 16,
+              "paddingRight": 16,
+              "paddingTop": 12,
+              "paddingBottom": 12,
+              "layoutWrap": "NO_WRAP",
+              "absoluteBoundingBox": {
+                "x": 935.2000122070312,
+                "y": 848,
+                "width": 159.60000610351562,
+                "height": 45
+              }
+            },
+            {
+              "id": "2308:348",
+              "name": "Column 4",
+              "type": "INSTANCE",
+              "componentPropertyReferences": {
+                "visible": "Show Column 4#2571:3"
+              },
+              "componentProperties": {
+                "Cell Value#2301:12": {
+                  "type": "INSTANCE_SWAP",
+                  "value": "2301:198",
+                  "preferredValues": [
+                    {
+                      "type": "COMPONENT",
+                      "key": "d7d757f3744fda7107eaad52ee12e2c1e8082a0f"
+                    },
+                    {
+                      "type": "COMPONENT",
+                      "key": "bcb0d56adbc2578278bb0132c749868199c69453"
+                    },
+                    {
+                      "type": "COMPONENT",
+                      "key": "ffc3ec975db711e7a04e12eeaeae615b6ee507af"
+                    },
+                    {
+                      "type": "COMPONENT",
+                      "key": "f2d39ab11e755310820c641074c35acf69365fc3"
+                    },
+                    {
+                      "type": "COMPONENT",
+                      "key": "f0ba98825f6ed28724c2762a1b7a1bce37f9612c"
+                    }
+                  ]
+                }
+              },
+              "children": [
+                {
+                  "id": "I2308:348;2301:321",
+                  "name": "Cell Value",
+                  "type": "INSTANCE",
+                  "componentPropertyReferences": {
+                    "mainComponent": "Cell Value#2301:12"
+                  },
+                  "componentProperties": {
+                    "Show Delete#2929:14": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Edit#2929:0": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show More#2929:28": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komerce#2927:196": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komstore#2927:181": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komed#2927:166": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Raja Ongkir#2927:31": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komship#2927:136": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Kompack#2927:106": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komtim#2927:151": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komclass#2927:91": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komchat#2927:76": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komcards#2927:61": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komads#2927:46": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Slot#2945:18": {
+                      "type": "SLOT",
+                      "value": {
+                        "guid": {
+                          "sessionID": -1,
+                          "localID": -1
+                        }
+                      },
+                      "preferredValues": []
+                    },
+                    "Show Komplace#2927:121": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Affiliate#2927:1": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komlabs#2927:16": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Value#2301:8": {
+                      "type": "TEXT",
+                      "value": "Cell Value"
+                    },
+                    "Type": {
+                      "value": "Action",
+                      "type": "VARIANT",
+                      "boundVariables": {}
+                    }
+                  },
+                  "children": [
+                    {
+                      "id": "I2308:348;2301:321;2301:199",
+                      "name": "Button",
+                      "type": "INSTANCE",
+                      "componentProperties": {
+                        "⮑ Right icon#11:50": {
+                          "type": "INSTANCE_SWAP",
+                          "value": "2367:20856",
+                          "preferredValues": [
+                            {
+                              "type": "COMPONENT",
+                              "key": "9ab03bbd392d6869a952097bce32aa5ab9f8249a"
+                            }
+                          ]
+                        },
+                        "Show right icon#11:16": {
+                          "type": "BOOLEAN",
+                          "value": false
+                        },
+                        "⮑ Left icon#11:34": {
+                          "type": "INSTANCE_SWAP",
+                          "value": "2367:20856",
+                          "preferredValues": [
+                            {
+                              "type": "COMPONENT",
+                              "key": "9ab03bbd392d6869a952097bce32aa5ab9f8249a"
+                            }
+                          ]
+                        },
+                        "Show Label#3297:0": {
+                          "type": "BOOLEAN",
+                          "value": true
+                        },
+                        "Label#2581:0": {
+                          "type": "TEXT",
+                          "value": "Label"
+                        },
+                        "Show left icon#11:0": {
+                          "type": "BOOLEAN",
+                          "value": false
+                        },
+                        "Roundness": {
+                          "value": "Default",
+                          "type": "VARIANT",
+                          "boundVariables": {}
+                        },
+                        "Style": {
+                          "value": "Primary",
+                          "type": "VARIANT",
+                          "boundVariables": {}
+                        },
+                        "Size": {
+                          "value": "Small",
+                          "type": "VARIANT",
+                          "boundVariables": {}
+                        },
+                        "State": {
+                          "value": "Default",
+                          "type": "VARIANT",
+                          "boundVariables": {}
+                        }
+                      },
+                      "children": [
+                        {
+                          "id": "I2308:348;2301:321;2301:199;2266:1144",
+                          "name": "Left icon wrapper",
+                          "visible": false,
+                          "type": "FRAME",
+                          "componentPropertyReferences": {
+                            "visible": "Show left icon#11:0"
+                          },
+                          "children": [
+                            {
+                              "id": "I2308:348;2301:321;2301:199;2266:1146",
+                              "name": "lucide/plus",
+                              "type": "INSTANCE",
+                              "componentPropertyReferences": {
+                                "mainComponent": "⮑ Left icon#11:34"
+                              },
+                              "children": [
+                                {
+                                  "id": "I2308:348;2301:321;2301:199;2266:1146;2367:14057",
+                                  "name": "Vector",
+                                  "type": "VECTOR",
+                                  "fills": [],
+                                  "strokes": [
+                                    {
+                                      "blendMode": "NORMAL",
+                                      "type": "SOLID",
+                                      "color": {
+                                        "r": 1,
+                                        "g": 1,
+                                        "b": 1,
+                                        "a": 1
+                                      },
+                                      "boundVariables": {
+                                        "color": {
+                                          "type": "VARIABLE_ALIAS",
+                                          "id": "VariableID:2120:7"
+                                        }
+                                      }
+                                    }
+                                  ],
+                                  "strokeWeight": 0.8333333134651184,
+                                  "absoluteBoundingBox": {
+                                    "x": 1125.5916748046875,
+                                    "y": 872.1666870117188,
+                                    "width": 11.666666030883789,
+                                    "height": 11.666666030883789
+                                  }
+                                }
+                              ],
+                              "clipsContent": true,
+                              "fills": [],
+                              "strokes": [],
+                              "strokeWeight": 1.6666666269302368,
+                              "absoluteBoundingBox": {
+                                "x": 1121.425048828125,
+                                "y": 868,
+                                "width": 20,
+                                "height": 20
+                              }
+                            }
+                          ],
+                          "clipsContent": false,
+                          "fills": [],
+                          "strokes": [],
+                          "strokeWeight": 1,
+                          "layoutMode": "HORIZONTAL",
+                          "counterAxisAlignItems": "CENTER",
+                          "primaryAxisAlignItems": "CENTER",
+                          "layoutWrap": "NO_WRAP",
+                          "absoluteBoundingBox": {
+                            "x": 1122.800048828125,
+                            "y": 869.375,
+                            "width": 13.25,
+                            "height": 13.25
+                          }
+                        },
+                        {
+                          "id": "I2308:348;2301:321;2301:199;2266:1148",
+                          "name": "Label",
+                          "type": "TEXT",
+                          "componentPropertyReferences": {
+                            "visible": "Show Label#3297:0",
+                            "characters": "Label#2581:0"
+                          },
+                          "fills": [
+                            {
+                              "blendMode": "NORMAL",
+                              "type": "SOLID",
+                              "color": {
+                                "r": 1,
+                                "g": 1,
+                                "b": 1,
+                                "a": 1
+                              },
+                              "boundVariables": {
+                                "color": {
+                                  "type": "VARIABLE_ALIAS",
+                                  "id": "VariableID:2118:4"
+                                }
+                              }
+                            }
+                          ],
+                          "strokes": [],
+                          "strokeWeight": 1,
+                          "absoluteBoundingBox": {
+                            "x": 1122.800048828125,
+                            "y": 865.5,
+                            "width": 37,
+                            "height": 21
+                          },
+                          "characters": "Label",
+                          "style": {
+                            "fontFamily": "Plus Jakarta Sans",
+                            "fontPostScriptName": "PlusJakartaSans-Medium",
+                            "fontStyle": "Medium",
+                            "fontWeight": 500,
+                            "textAutoResize": "WIDTH_AND_HEIGHT",
+                            "fontSize": 14,
+                            "textAlignHorizontal": "CENTER",
+                            "textAlignVertical": "CENTER",
+                            "letterSpacing": 0,
+                            "lineHeightPx": 21,
+                            "lineHeightPercent": 119.04761505126953,
+                            "lineHeightPercentFontSize": 150,
+                            "lineHeightUnit": "PIXELS"
+                          }
+                        },
+                        {
+                          "id": "I2308:348;2301:321;2301:199;2266:1149",
+                          "name": "Right icon wrapper",
+                          "visible": false,
+                          "type": "FRAME",
+                          "componentPropertyReferences": {
+                            "visible": "Show right icon#11:16"
+                          },
+                          "children": [
+                            {
+                              "id": "I2308:348;2301:321;2301:199;2266:1151",
+                              "name": "lucide/plus",
+                              "type": "INSTANCE",
+                              "componentPropertyReferences": {
+                                "mainComponent": "⮑ Right icon#11:50"
+                              },
+                              "children": [
+                                {
+                                  "id": "I2308:348;2301:321;2301:199;2266:1151;2367:14057",
+                                  "name": "Vector",
+                                  "type": "VECTOR",
+                                  "fills": [],
+                                  "strokes": [
+                                    {
+                                      "blendMode": "NORMAL",
+                                      "type": "SOLID",
+                                      "color": {
+                                        "r": 1,
+                                        "g": 1,
+                                        "b": 1,
+                                        "a": 1
+                                      },
+                                      "boundVariables": {
+                                        "color": {
+                                          "type": "VARIABLE_ALIAS",
+                                          "id": "VariableID:2120:7"
+                                        }
+                                      }
+                                    }
+                                  ],
+                                  "strokeWeight": 0.8333333134651184,
+                                  "absoluteBoundingBox": {
+                                    "x": 1163.5916748046875,
+                                    "y": 872.1666870117188,
+                                    "width": 11.666666030883789,
+                                    "height": 11.666666030883789
+                                  }
+                                }
+                              ],
+                              "clipsContent": true,
+                              "fills": [],
+                              "strokes": [],
+                              "strokeWeight": 1.6666666269302368,
+                              "absoluteBoundingBox": {
+                                "x": 1159.425048828125,
+                                "y": 868,
+                                "width": 20,
+                                "height": 20
+                              }
+                            }
+                          ],
+                          "clipsContent": false,
+                          "fills": [],
+                          "strokes": [],
+                          "strokeWeight": 1,
+                          "layoutMode": "HORIZONTAL",
+                          "counterAxisAlignItems": "CENTER",
+                          "primaryAxisAlignItems": "CENTER",
+                          "layoutWrap": "NO_WRAP",
+                          "absoluteBoundingBox": {
+                            "x": 1160.800048828125,
+                            "y": 869.375,
+                            "width": 13.25,
+                            "height": 13.25
+                          }
+                        }
+                      ],
+                      "clipsContent": false,
+                      "fills": [
+                        {
+                          "blendMode": "NORMAL",
+                          "type": "SOLID",
+                          "color": {
+                            "r": 0.8980392217636108,
+                            "g": 0.3333333432674408,
+                            "b": 0.0784313753247261,
+                            "a": 1
+                          },
+                          "boundVariables": {
+                            "color": {
+                              "type": "VARIABLE_ALIAS",
+                              "id": "VariableID:2118:2"
+                            }
+                          }
+                        }
+                      ],
+                      "strokes": [],
+                      "cornerRadius": 8,
+                      "strokeWeight": 1,
+                      "layoutMode": "HORIZONTAL",
+                      "counterAxisAlignItems": "CENTER",
+                      "primaryAxisAlignItems": "CENTER",
+                      "paddingLeft": 12,
+                      "paddingRight": 12,
+                      "paddingTop": 4,
+                      "paddingBottom": 4,
+                      "itemSpacing": 6,
+                      "layoutWrap": "NO_WRAP",
+                      "absoluteBoundingBox": {
+                        "x": 1110.800048828125,
+                        "y": 860,
+                        "width": 61,
+                        "height": 32
+                      }
+                    }
+                  ],
+                  "clipsContent": false,
+                  "fills": [],
+                  "strokes": [],
+                  "strokeWeight": 1,
+                  "layoutMode": "HORIZONTAL",
+                  "primaryAxisSizingMode": "FIXED",
+                  "counterAxisAlignItems": "CENTER",
+                  "layoutWrap": "NO_WRAP",
+                  "absoluteBoundingBox": {
+                    "x": 1110.800048828125,
+                    "y": 860,
+                    "width": 127.59999084472656,
+                    "height": 32
+                  }
+                }
+              ],
+              "clipsContent": false,
+              "fills": [],
+              "strokes": [],
+              "strokeWeight": 1,
+              "layoutMode": "HORIZONTAL",
+              "primaryAxisSizingMode": "FIXED",
+              "paddingLeft": 16,
+              "paddingRight": 16,
+              "paddingTop": 12,
+              "paddingBottom": 12,
+              "layoutWrap": "NO_WRAP",
+              "absoluteBoundingBox": {
+                "x": 1094.800048828125,
+                "y": 848,
+                "width": 159.59999084472656,
+                "height": 56
+              }
+            },
+            {
+              "id": "2308:351",
+              "name": "Column 5",
+              "type": "INSTANCE",
+              "componentPropertyReferences": {
+                "visible": "Show Column 5#2571:4"
+              },
+              "componentProperties": {
+                "Cell Value#2301:12": {
+                  "type": "INSTANCE_SWAP",
+                  "value": "2301:191",
+                  "preferredValues": [
+                    {
+                      "type": "COMPONENT",
+                      "key": "d7d757f3744fda7107eaad52ee12e2c1e8082a0f"
+                    },
+                    {
+                      "type": "COMPONENT",
+                      "key": "bcb0d56adbc2578278bb0132c749868199c69453"
+                    },
+                    {
+                      "type": "COMPONENT",
+                      "key": "ffc3ec975db711e7a04e12eeaeae615b6ee507af"
+                    },
+                    {
+                      "type": "COMPONENT",
+                      "key": "f2d39ab11e755310820c641074c35acf69365fc3"
+                    },
+                    {
+                      "type": "COMPONENT",
+                      "key": "f0ba98825f6ed28724c2762a1b7a1bce37f9612c"
+                    }
+                  ]
+                }
+              },
+              "children": [
+                {
+                  "id": "I2308:351;2301:321",
+                  "name": "Cell Value",
+                  "type": "INSTANCE",
+                  "componentPropertyReferences": {
+                    "mainComponent": "Cell Value#2301:12"
+                  },
+                  "componentProperties": {
+                    "Slot#2945:18": {
+                      "type": "SLOT",
+                      "value": {
+                        "guid": {
+                          "sessionID": -1,
+                          "localID": -1
+                        }
+                      },
+                      "preferredValues": []
+                    },
+                    "Show Edit#2929:0": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komerce#2927:196": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komed#2927:166": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Kompack#2927:106": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komchat#2927:76": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Delete#2929:14": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komship#2927:136": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komcards#2927:61": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show More#2929:28": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Raja Ongkir#2927:31": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komclass#2927:91": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komstore#2927:181": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komads#2927:46": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komlabs#2927:16": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komtim#2927:151": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Affiliate#2927:1": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komplace#2927:121": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Value#2301:8": {
+                      "type": "TEXT",
+                      "value": "2024-01-15"
+                    },
+                    "Type": {
+                      "value": "Text",
+                      "type": "VARIANT",
+                      "boundVariables": {}
+                    }
+                  },
+                  "children": [
+                    {
+                      "id": "I2308:351;2301:321;2301:192",
+                      "name": "Value",
+                      "type": "TEXT",
+                      "componentPropertyReferences": {
+                        "characters": "Value#2301:8"
+                      },
+                      "fills": [
+                        {
+                          "blendMode": "NORMAL",
+                          "type": "SOLID",
+                          "color": {
+                            "r": 0.03921568766236305,
+                            "g": 0.03921568766236305,
+                            "b": 0.03921568766236305,
+                            "a": 1
+                          },
+                          "boundVariables": {
+                            "color": {
+                              "type": "VARIABLE_ALIAS",
+                              "id": "VariableID:2299:9"
+                            }
+                          }
+                        }
+                      ],
+                      "strokes": [],
+                      "strokeWeight": 1,
+                      "absoluteBoundingBox": {
+                        "x": 1270.4000244140625,
+                        "y": 860,
+                        "width": 127.59999084472656,
+                        "height": 21
+                      },
+                      "characters": "2024-01-15",
+                      "style": {
+                        "fontFamily": "Plus Jakarta Sans",
+                        "fontPostScriptName": "PlusJakartaSans-Regular",
+                        "fontStyle": "Regular",
+                        "fontWeight": 400,
+                        "textAutoResize": "HEIGHT",
+                        "fontSize": 14,
+                        "textAlignHorizontal": "LEFT",
+                        "textAlignVertical": "TOP",
+                        "letterSpacing": 0,
+                        "lineHeightPx": 21,
+                        "lineHeightPercent": 119.04761505126953,
+                        "lineHeightPercentFontSize": 150,
+                        "lineHeightUnit": "PIXELS"
+                      }
+                    }
+                  ],
+                  "clipsContent": false,
+                  "fills": [],
+                  "strokes": [],
+                  "strokeWeight": 1,
+                  "layoutMode": "HORIZONTAL",
+                  "primaryAxisSizingMode": "FIXED",
+                  "counterAxisAlignItems": "CENTER",
+                  "layoutWrap": "NO_WRAP",
+                  "absoluteBoundingBox": {
+                    "x": 1270.4000244140625,
+                    "y": 860,
+                    "width": 127.59999084472656,
+                    "height": 21
+                  }
+                }
+              ],
+              "clipsContent": false,
+              "fills": [],
+              "strokes": [],
+              "strokeWeight": 1,
+              "layoutMode": "HORIZONTAL",
+              "primaryAxisSizingMode": "FIXED",
+              "paddingLeft": 16,
+              "paddingRight": 16,
+              "paddingTop": 12,
+              "paddingBottom": 12,
+              "layoutWrap": "NO_WRAP",
+              "absoluteBoundingBox": {
+                "x": 1254.4000244140625,
+                "y": 848,
+                "width": 159.59999084472656,
+                "height": 45
+              }
+            },
+            {
+              "id": "2308:354",
+              "name": "Column 6",
+              "visible": false,
+              "type": "INSTANCE",
+              "componentPropertyReferences": {
+                "visible": "Show Column 6#2571:5"
+              },
+              "componentProperties": {
+                "Cell Value#2301:12": {
+                  "type": "INSTANCE_SWAP",
+                  "value": "2301:191",
+                  "preferredValues": [
+                    {
+                      "type": "COMPONENT",
+                      "key": "d7d757f3744fda7107eaad52ee12e2c1e8082a0f"
+                    },
+                    {
+                      "type": "COMPONENT",
+                      "key": "bcb0d56adbc2578278bb0132c749868199c69453"
+                    },
+                    {
+                      "type": "COMPONENT",
+                      "key": "ffc3ec975db711e7a04e12eeaeae615b6ee507af"
+                    },
+                    {
+                      "type": "COMPONENT",
+                      "key": "f2d39ab11e755310820c641074c35acf69365fc3"
+                    },
+                    {
+                      "type": "COMPONENT",
+                      "key": "f0ba98825f6ed28724c2762a1b7a1bce37f9612c"
+                    }
+                  ]
+                }
+              },
+              "children": [
+                {
+                  "id": "I2308:354;2301:321",
+                  "name": "Cell Value",
+                  "type": "INSTANCE",
+                  "componentPropertyReferences": {
+                    "mainComponent": "Cell Value#2301:12"
+                  },
+                  "componentProperties": {
+                    "Slot#2945:18": {
+                      "type": "SLOT",
+                      "value": {
+                        "guid": {
+                          "sessionID": -1,
+                          "localID": -1
+                        }
+                      },
+                      "preferredValues": []
+                    },
+                    "Show Edit#2929:0": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komerce#2927:196": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komed#2927:166": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Kompack#2927:106": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komchat#2927:76": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Delete#2929:14": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komship#2927:136": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komcards#2927:61": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show More#2929:28": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Raja Ongkir#2927:31": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komclass#2927:91": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komstore#2927:181": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komads#2927:46": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komlabs#2927:16": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komtim#2927:151": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Affiliate#2927:1": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komplace#2927:121": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Value#2301:8": {
+                      "type": "TEXT",
+                      "value": "Cell Value"
+                    },
+                    "Type": {
+                      "value": "Text",
+                      "type": "VARIANT",
+                      "boundVariables": {}
+                    }
+                  },
+                  "children": [
+                    {
+                      "id": "I2308:354;2301:321;2301:192",
+                      "name": "Value",
+                      "type": "TEXT",
+                      "componentPropertyReferences": {
+                        "characters": "Value#2301:8"
+                      },
+                      "fills": [
+                        {
+                          "blendMode": "NORMAL",
+                          "type": "SOLID",
+                          "color": {
+                            "r": 0.03921568766236305,
+                            "g": 0.03921568766236305,
+                            "b": 0.03921568766236305,
+                            "a": 1
+                          },
+                          "boundVariables": {
+                            "color": {
+                              "type": "VARIABLE_ALIAS",
+                              "id": "VariableID:2299:9"
+                            }
+                          }
+                        }
+                      ],
+                      "strokes": [],
+                      "strokeWeight": 1,
+                      "absoluteBoundingBox": {
+                        "x": 792,
+                        "y": 860,
+                        "width": 1,
+                        "height": 189
+                      },
+                      "characters": "Cell Value",
+                      "style": {
+                        "fontFamily": "Plus Jakarta Sans",
+                        "fontPostScriptName": "PlusJakartaSans-Regular",
+                        "fontStyle": "Regular",
+                        "fontWeight": 400,
+                        "textAutoResize": "HEIGHT",
+                        "fontSize": 14,
+                        "textAlignHorizontal": "LEFT",
+                        "textAlignVertical": "TOP",
+                        "letterSpacing": 0,
+                        "lineHeightPx": 21,
+                        "lineHeightPercent": 119.04761505126953,
+                        "lineHeightPercentFontSize": 150,
+                        "lineHeightUnit": "PIXELS"
+                      }
+                    }
+                  ],
+                  "clipsContent": false,
+                  "fills": [],
+                  "strokes": [],
+                  "strokeWeight": 1,
+                  "layoutMode": "HORIZONTAL",
+                  "primaryAxisSizingMode": "FIXED",
+                  "counterAxisAlignItems": "CENTER",
+                  "layoutWrap": "NO_WRAP",
+                  "absoluteBoundingBox": {
+                    "x": 792,
+                    "y": 860,
+                    "width": 1,
+                    "height": 189
+                  }
+                }
+              ],
+              "clipsContent": false,
+              "fills": [],
+              "strokes": [],
+              "strokeWeight": 1,
+              "layoutMode": "HORIZONTAL",
+              "primaryAxisSizingMode": "FIXED",
+              "paddingLeft": 16,
+              "paddingRight": 16,
+              "paddingTop": 12,
+              "paddingBottom": 12,
+              "layoutWrap": "NO_WRAP",
+              "absoluteBoundingBox": {
+                "x": 776,
+                "y": 848,
+                "width": 32,
+                "height": 204
+              }
+            },
+            {
+              "id": "2308:357",
+              "name": "Column 7",
+              "visible": false,
+              "type": "INSTANCE",
+              "componentPropertyReferences": {
+                "visible": "Show Column 7#2571:6"
+              },
+              "componentProperties": {
+                "Cell Value#2301:12": {
+                  "type": "INSTANCE_SWAP",
+                  "value": "2301:191",
+                  "preferredValues": [
+                    {
+                      "type": "COMPONENT",
+                      "key": "d7d757f3744fda7107eaad52ee12e2c1e8082a0f"
+                    },
+                    {
+                      "type": "COMPONENT",
+                      "key": "bcb0d56adbc2578278bb0132c749868199c69453"
+                    },
+                    {
+                      "type": "COMPONENT",
+                      "key": "ffc3ec975db711e7a04e12eeaeae615b6ee507af"
+                    },
+                    {
+                      "type": "COMPONENT",
+                      "key": "f2d39ab11e755310820c641074c35acf69365fc3"
+                    },
+                    {
+                      "type": "COMPONENT",
+                      "key": "f0ba98825f6ed28724c2762a1b7a1bce37f9612c"
+                    }
+                  ]
+                }
+              },
+              "children": [
+                {
+                  "id": "I2308:357;2301:321",
+                  "name": "Cell Value",
+                  "type": "INSTANCE",
+                  "componentPropertyReferences": {
+                    "mainComponent": "Cell Value#2301:12"
+                  },
+                  "componentProperties": {
+                    "Slot#2945:18": {
+                      "type": "SLOT",
+                      "value": {
+                        "guid": {
+                          "sessionID": -1,
+                          "localID": -1
+                        }
+                      },
+                      "preferredValues": []
+                    },
+                    "Show Edit#2929:0": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komerce#2927:196": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komed#2927:166": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Kompack#2927:106": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komchat#2927:76": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Delete#2929:14": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komship#2927:136": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komcards#2927:61": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show More#2929:28": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Raja Ongkir#2927:31": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komclass#2927:91": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komstore#2927:181": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komads#2927:46": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komlabs#2927:16": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komtim#2927:151": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Affiliate#2927:1": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komplace#2927:121": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Value#2301:8": {
+                      "type": "TEXT",
+                      "value": "Cell Value"
+                    },
+                    "Type": {
+                      "value": "Text",
+                      "type": "VARIANT",
+                      "boundVariables": {}
+                    }
+                  },
+                  "children": [
+                    {
+                      "id": "I2308:357;2301:321;2301:192",
+                      "name": "Value",
+                      "type": "TEXT",
+                      "componentPropertyReferences": {
+                        "characters": "Value#2301:8"
+                      },
+                      "fills": [
+                        {
+                          "blendMode": "NORMAL",
+                          "type": "SOLID",
+                          "color": {
+                            "r": 0.03921568766236305,
+                            "g": 0.03921568766236305,
+                            "b": 0.03921568766236305,
+                            "a": 1
+                          },
+                          "boundVariables": {
+                            "color": {
+                              "type": "VARIABLE_ALIAS",
+                              "id": "VariableID:2299:9"
+                            }
+                          }
+                        }
+                      ],
+                      "strokes": [],
+                      "strokeWeight": 1,
+                      "absoluteBoundingBox": {
+                        "x": 792,
+                        "y": 860,
+                        "width": 1,
+                        "height": 189
+                      },
+                      "characters": "Cell Value",
+                      "style": {
+                        "fontFamily": "Plus Jakarta Sans",
+                        "fontPostScriptName": "PlusJakartaSans-Regular",
+                        "fontStyle": "Regular",
+                        "fontWeight": 400,
+                        "textAutoResize": "HEIGHT",
+                        "fontSize": 14,
+                        "textAlignHorizontal": "LEFT",
+                        "textAlignVertical": "TOP",
+                        "letterSpacing": 0,
+                        "lineHeightPx": 21,
+                        "lineHeightPercent": 119.04761505126953,
+                        "lineHeightPercentFontSize": 150,
+                        "lineHeightUnit": "PIXELS"
+                      }
+                    }
+                  ],
+                  "clipsContent": false,
+                  "fills": [],
+                  "strokes": [],
+                  "strokeWeight": 1,
+                  "layoutMode": "HORIZONTAL",
+                  "primaryAxisSizingMode": "FIXED",
+                  "counterAxisAlignItems": "CENTER",
+                  "layoutWrap": "NO_WRAP",
+                  "absoluteBoundingBox": {
+                    "x": 792,
+                    "y": 860,
+                    "width": 1,
+                    "height": 189
+                  }
+                }
+              ],
+              "clipsContent": false,
+              "fills": [],
+              "strokes": [],
+              "strokeWeight": 1,
+              "layoutMode": "HORIZONTAL",
+              "primaryAxisSizingMode": "FIXED",
+              "paddingLeft": 16,
+              "paddingRight": 16,
+              "paddingTop": 12,
+              "paddingBottom": 12,
+              "layoutWrap": "NO_WRAP",
+              "absoluteBoundingBox": {
+                "x": 776,
+                "y": 848,
+                "width": 32,
+                "height": 204
+              }
+            },
+            {
+              "id": "2308:360",
+              "name": "Column 8",
+              "visible": false,
+              "type": "INSTANCE",
+              "componentPropertyReferences": {
+                "visible": "Show Column 8#2571:7"
+              },
+              "componentProperties": {
+                "Cell Value#2301:12": {
+                  "type": "INSTANCE_SWAP",
+                  "value": "2301:191",
+                  "preferredValues": [
+                    {
+                      "type": "COMPONENT",
+                      "key": "d7d757f3744fda7107eaad52ee12e2c1e8082a0f"
+                    },
+                    {
+                      "type": "COMPONENT",
+                      "key": "bcb0d56adbc2578278bb0132c749868199c69453"
+                    },
+                    {
+                      "type": "COMPONENT",
+                      "key": "ffc3ec975db711e7a04e12eeaeae615b6ee507af"
+                    },
+                    {
+                      "type": "COMPONENT",
+                      "key": "f2d39ab11e755310820c641074c35acf69365fc3"
+                    },
+                    {
+                      "type": "COMPONENT",
+                      "key": "f0ba98825f6ed28724c2762a1b7a1bce37f9612c"
+                    }
+                  ]
+                }
+              },
+              "children": [
+                {
+                  "id": "I2308:360;2301:321",
+                  "name": "Cell Value",
+                  "type": "INSTANCE",
+                  "componentPropertyReferences": {
+                    "mainComponent": "Cell Value#2301:12"
+                  },
+                  "componentProperties": {
+                    "Slot#2945:18": {
+                      "type": "SLOT",
+                      "value": {
+                        "guid": {
+                          "sessionID": -1,
+                          "localID": -1
+                        }
+                      },
+                      "preferredValues": []
+                    },
+                    "Show Edit#2929:0": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komerce#2927:196": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komed#2927:166": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Kompack#2927:106": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komchat#2927:76": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Delete#2929:14": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komship#2927:136": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komcards#2927:61": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show More#2929:28": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Raja Ongkir#2927:31": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komclass#2927:91": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komstore#2927:181": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komads#2927:46": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komlabs#2927:16": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komtim#2927:151": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Affiliate#2927:1": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komplace#2927:121": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Value#2301:8": {
+                      "type": "TEXT",
+                      "value": "Cell Value"
+                    },
+                    "Type": {
+                      "value": "Text",
+                      "type": "VARIANT",
+                      "boundVariables": {}
+                    }
+                  },
+                  "children": [
+                    {
+                      "id": "I2308:360;2301:321;2301:192",
+                      "name": "Value",
+                      "type": "TEXT",
+                      "componentPropertyReferences": {
+                        "characters": "Value#2301:8"
+                      },
+                      "fills": [
+                        {
+                          "blendMode": "NORMAL",
+                          "type": "SOLID",
+                          "color": {
+                            "r": 0.03921568766236305,
+                            "g": 0.03921568766236305,
+                            "b": 0.03921568766236305,
+                            "a": 1
+                          },
+                          "boundVariables": {
+                            "color": {
+                              "type": "VARIABLE_ALIAS",
+                              "id": "VariableID:2299:9"
+                            }
+                          }
+                        }
+                      ],
+                      "strokes": [],
+                      "strokeWeight": 1,
+                      "absoluteBoundingBox": {
+                        "x": 792,
+                        "y": 860,
+                        "width": 1,
+                        "height": 189
+                      },
+                      "characters": "Cell Value",
+                      "style": {
+                        "fontFamily": "Plus Jakarta Sans",
+                        "fontPostScriptName": "PlusJakartaSans-Regular",
+                        "fontStyle": "Regular",
+                        "fontWeight": 400,
+                        "textAutoResize": "HEIGHT",
+                        "fontSize": 14,
+                        "textAlignHorizontal": "LEFT",
+                        "textAlignVertical": "TOP",
+                        "letterSpacing": 0,
+                        "lineHeightPx": 21,
+                        "lineHeightPercent": 119.04761505126953,
+                        "lineHeightPercentFontSize": 150,
+                        "lineHeightUnit": "PIXELS"
+                      }
+                    }
+                  ],
+                  "clipsContent": false,
+                  "fills": [],
+                  "strokes": [],
+                  "strokeWeight": 1,
+                  "layoutMode": "HORIZONTAL",
+                  "primaryAxisSizingMode": "FIXED",
+                  "counterAxisAlignItems": "CENTER",
+                  "layoutWrap": "NO_WRAP",
+                  "absoluteBoundingBox": {
+                    "x": 792,
+                    "y": 860,
+                    "width": 1,
+                    "height": 189
+                  }
+                }
+              ],
+              "clipsContent": false,
+              "fills": [],
+              "strokes": [],
+              "strokeWeight": 1,
+              "layoutMode": "HORIZONTAL",
+              "primaryAxisSizingMode": "FIXED",
+              "paddingLeft": 16,
+              "paddingRight": 16,
+              "paddingTop": 12,
+              "paddingBottom": 12,
+              "layoutWrap": "NO_WRAP",
+              "absoluteBoundingBox": {
+                "x": 776,
+                "y": 848,
+                "width": 32,
+                "height": 204
+              }
+            },
+            {
+              "id": "2308:363",
+              "name": "Column 9",
+              "visible": false,
+              "type": "INSTANCE",
+              "componentPropertyReferences": {
+                "visible": "Show Column 9#2571:8"
+              },
+              "componentProperties": {
+                "Cell Value#2301:12": {
+                  "type": "INSTANCE_SWAP",
+                  "value": "2301:191",
+                  "preferredValues": [
+                    {
+                      "type": "COMPONENT",
+                      "key": "d7d757f3744fda7107eaad52ee12e2c1e8082a0f"
+                    },
+                    {
+                      "type": "COMPONENT",
+                      "key": "bcb0d56adbc2578278bb0132c749868199c69453"
+                    },
+                    {
+                      "type": "COMPONENT",
+                      "key": "ffc3ec975db711e7a04e12eeaeae615b6ee507af"
+                    },
+                    {
+                      "type": "COMPONENT",
+                      "key": "f2d39ab11e755310820c641074c35acf69365fc3"
+                    },
+                    {
+                      "type": "COMPONENT",
+                      "key": "f0ba98825f6ed28724c2762a1b7a1bce37f9612c"
+                    }
+                  ]
+                }
+              },
+              "children": [
+                {
+                  "id": "I2308:363;2301:321",
+                  "name": "Cell Value",
+                  "type": "INSTANCE",
+                  "componentPropertyReferences": {
+                    "mainComponent": "Cell Value#2301:12"
+                  },
+                  "componentProperties": {
+                    "Slot#2945:18": {
+                      "type": "SLOT",
+                      "value": {
+                        "guid": {
+                          "sessionID": -1,
+                          "localID": -1
+                        }
+                      },
+                      "preferredValues": []
+                    },
+                    "Show Edit#2929:0": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komerce#2927:196": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komed#2927:166": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Kompack#2927:106": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komchat#2927:76": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Delete#2929:14": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komship#2927:136": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komcards#2927:61": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show More#2929:28": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Raja Ongkir#2927:31": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komclass#2927:91": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komstore#2927:181": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komads#2927:46": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komlabs#2927:16": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komtim#2927:151": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Affiliate#2927:1": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komplace#2927:121": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Value#2301:8": {
+                      "type": "TEXT",
+                      "value": "Cell Value"
+                    },
+                    "Type": {
+                      "value": "Text",
+                      "type": "VARIANT",
+                      "boundVariables": {}
+                    }
+                  },
+                  "children": [
+                    {
+                      "id": "I2308:363;2301:321;2301:192",
+                      "name": "Value",
+                      "type": "TEXT",
+                      "componentPropertyReferences": {
+                        "characters": "Value#2301:8"
+                      },
+                      "fills": [
+                        {
+                          "blendMode": "NORMAL",
+                          "type": "SOLID",
+                          "color": {
+                            "r": 0.03921568766236305,
+                            "g": 0.03921568766236305,
+                            "b": 0.03921568766236305,
+                            "a": 1
+                          },
+                          "boundVariables": {
+                            "color": {
+                              "type": "VARIABLE_ALIAS",
+                              "id": "VariableID:2299:9"
+                            }
+                          }
+                        }
+                      ],
+                      "strokes": [],
+                      "strokeWeight": 1,
+                      "absoluteBoundingBox": {
+                        "x": 792,
+                        "y": 860,
+                        "width": 1,
+                        "height": 189
+                      },
+                      "characters": "Cell Value",
+                      "style": {
+                        "fontFamily": "Plus Jakarta Sans",
+                        "fontPostScriptName": "PlusJakartaSans-Regular",
+                        "fontStyle": "Regular",
+                        "fontWeight": 400,
+                        "textAutoResize": "HEIGHT",
+                        "fontSize": 14,
+                        "textAlignHorizontal": "LEFT",
+                        "textAlignVertical": "TOP",
+                        "letterSpacing": 0,
+                        "lineHeightPx": 21,
+                        "lineHeightPercent": 119.04761505126953,
+                        "lineHeightPercentFontSize": 150,
+                        "lineHeightUnit": "PIXELS"
+                      }
+                    }
+                  ],
+                  "clipsContent": false,
+                  "fills": [],
+                  "strokes": [],
+                  "strokeWeight": 1,
+                  "layoutMode": "HORIZONTAL",
+                  "primaryAxisSizingMode": "FIXED",
+                  "counterAxisAlignItems": "CENTER",
+                  "layoutWrap": "NO_WRAP",
+                  "absoluteBoundingBox": {
+                    "x": 792,
+                    "y": 860,
+                    "width": 1,
+                    "height": 189
+                  }
+                }
+              ],
+              "clipsContent": false,
+              "fills": [],
+              "strokes": [],
+              "strokeWeight": 1,
+              "layoutMode": "HORIZONTAL",
+              "primaryAxisSizingMode": "FIXED",
+              "paddingLeft": 16,
+              "paddingRight": 16,
+              "paddingTop": 12,
+              "paddingBottom": 12,
+              "layoutWrap": "NO_WRAP",
+              "absoluteBoundingBox": {
+                "x": 776,
+                "y": 848,
+                "width": 32,
+                "height": 204
+              }
+            },
+            {
+              "id": "2308:366",
+              "name": "Column 10",
+              "visible": false,
+              "type": "INSTANCE",
+              "componentPropertyReferences": {
+                "visible": "Show Column 10#2571:9"
+              },
+              "componentProperties": {
+                "Cell Value#2301:12": {
+                  "type": "INSTANCE_SWAP",
+                  "value": "2301:191",
+                  "preferredValues": [
+                    {
+                      "type": "COMPONENT",
+                      "key": "d7d757f3744fda7107eaad52ee12e2c1e8082a0f"
+                    },
+                    {
+                      "type": "COMPONENT",
+                      "key": "bcb0d56adbc2578278bb0132c749868199c69453"
+                    },
+                    {
+                      "type": "COMPONENT",
+                      "key": "ffc3ec975db711e7a04e12eeaeae615b6ee507af"
+                    },
+                    {
+                      "type": "COMPONENT",
+                      "key": "f2d39ab11e755310820c641074c35acf69365fc3"
+                    },
+                    {
+                      "type": "COMPONENT",
+                      "key": "f0ba98825f6ed28724c2762a1b7a1bce37f9612c"
+                    }
+                  ]
+                }
+              },
+              "children": [
+                {
+                  "id": "I2308:366;2301:321",
+                  "name": "Cell Value",
+                  "type": "INSTANCE",
+                  "componentPropertyReferences": {
+                    "mainComponent": "Cell Value#2301:12"
+                  },
+                  "componentProperties": {
+                    "Slot#2945:18": {
+                      "type": "SLOT",
+                      "value": {
+                        "guid": {
+                          "sessionID": -1,
+                          "localID": -1
+                        }
+                      },
+                      "preferredValues": []
+                    },
+                    "Show Edit#2929:0": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komerce#2927:196": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komed#2927:166": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Kompack#2927:106": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komchat#2927:76": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Delete#2929:14": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komship#2927:136": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komcards#2927:61": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show More#2929:28": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Raja Ongkir#2927:31": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komclass#2927:91": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komstore#2927:181": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komads#2927:46": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komlabs#2927:16": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komtim#2927:151": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Affiliate#2927:1": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Show Komplace#2927:121": {
+                      "type": "BOOLEAN",
+                      "value": true
+                    },
+                    "Value#2301:8": {
+                      "type": "TEXT",
+                      "value": "Cell Value"
+                    },
+                    "Type": {
+                      "value": "Text",
+                      "type": "VARIANT",
+                      "boundVariables": {}
+                    }
+                  },
+                  "children": [
+                    {
+                      "id": "I2308:366;2301:321;2301:192",
+                      "name": "Value",
+                      "type": "TEXT",
+                      "componentPropertyReferences": {
+                        "characters": "Value#2301:8"
+                      },
+                      "fills": [
+                        {
+                          "blendMode": "NORMAL",
+                          "type": "SOLID",
+                          "color": {
+                            "r": 0.03921568766236305,
+                            "g": 0.03921568766236305,
+                            "b": 0.03921568766236305,
+                            "a": 1
+                          },
+                          "boundVariables": {
+                            "color": {
+                              "type": "VARIABLE_ALIAS",
+                              "id": "VariableID:2299:9"
+                            }
+                          }
+                        }
+                      ],
+                      "strokes": [],
+                      "strokeWeight": 1,
+                      "absoluteBoundingBox": {
+                        "x": 792,
+                        "y": 860,
+                        "width": 1,
+                        "height": 189
+                      },
+                      "characters": "Cell Value",
+                      "style": {
+                        "fontFamily": "Plus Jakarta Sans",
+                        "fontPostScriptName": "PlusJakartaSans-Regular",
+                        "fontStyle": "Regular",
+                        "fontWeight": 400,
+                        "textAutoResize": "HEIGHT",
+                        "fontSize": 14,
+                        "textAlignHorizontal": "LEFT",
+                        "textAlignVertical": "TOP",
+                        "letterSpacing": 0,
+                        "lineHeightPx": 21,
+                        "lineHeightPercent": 119.04761505126953,
+                        "lineHeightPercentFontSize": 150,
+                        "lineHeightUnit": "PIXELS"
+                      }
+                    }
+                  ],
+                  "clipsContent": false,
+                  "fills": [],
+                  "strokes": [],
+                  "strokeWeight": 1,
+                  "layoutMode": "HORIZONTAL",
+                  "primaryAxisSizingMode": "FIXED",
+                  "counterAxisAlignItems": "CENTER",
+                  "layoutWrap": "NO_WRAP",
+                  "absoluteBoundingBox": {
+                    "x": 792,
+                    "y": 860,
+                    "width": 1,
+                    "height": 189
+                  }
+                }
+              ],
+              "clipsContent": false,
+              "fills": [],
+              "strokes": [],
+              "strokeWeight": 1,
+              "layoutMode": "HORIZONTAL",
+              "primaryAxisSizingMode": "FIXED",
+              "paddingLeft": 16,
+              "paddingRight": 16,
+              "paddingTop": 12,
+              "paddingBottom": 12,
+              "layoutWrap": "NO_WRAP",
+              "absoluteBoundingBox": {
+                "x": 776,
+                "y": 848,
+                "width": 32,
+                "height": 204
+              }
+            }
+          ],
+          "clipsContent": true,
+          "fills": [
+            {
+              "blendMode": "NORMAL",
+              "type": "SOLID",
+              "color": {
+                "r": 1,
+                "g": 1,
+                "b": 1,
+                "a": 1
+              },
+              "boundVariables": {
+                "color": {
+                  "type": "VARIABLE_ALIAS",
+                  "id": "VariableID:2299:6"
+                }
+              }
+            }
+          ],
+          "strokes": [
+            {
+              "blendMode": "NORMAL",
+              "type": "SOLID",
+              "color": {
+                "r": 0.8980392217636108,
+                "g": 0.8980392217636108,
+                "b": 0.8980392217636108,
+                "a": 1
+              },
+              "boundVariables": {
+                "color": {
+                  "type": "VARIABLE_ALIAS",
+                  "id": "VariableID:2299:11"
+                }
+              }
+            }
+          ],
+          "strokeWeight": 1,
+          "layoutMode": "HORIZONTAL",
+          "primaryAxisSizingMode": "FIXED",
+          "layoutWrap": "NO_WRAP",
+          "absoluteBoundingBox": {
+            "x": 616,
+            "y": 848,
+            "width": 798,
+            "height": 57
+          }
+        }
+      ],
+      "clipsContent": true,
+      "fills": [
+        {
+          "blendMode": "NORMAL",
+          "type": "SOLID",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1,
+            "a": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:2299:2"
+            }
+          }
+        }
+      ],
+      "strokes": [
+        {
+          "blendMode": "NORMAL",
+          "type": "SOLID",
+          "color": {
+            "r": 0.8980392217636108,
+            "g": 0.8980392217636108,
+            "b": 0.8980392217636108,
+            "a": 1
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:2299:3"
+            }
+          }
+        }
+      ],
+      "cornerRadius": 8,
+      "strokeWeight": 1,
+      "layoutMode": "VERTICAL",
+      "counterAxisSizingMode": "FIXED",
+      "layoutWrap": "NO_WRAP",
+      "absoluteBoundingBox": {
+        "x": 615,
+        "y": 801,
+        "width": 800,
+        "height": 621
+      }
+    }
+  ],
+  "clipsContent": true,
+  "fills": [],
+  "strokes": [
+    {
+      "blendMode": "NORMAL",
+      "type": "SOLID",
+      "color": {
+        "r": 0.5411764979362488,
+        "g": 0.21960784494876862,
+        "b": 0.9607843160629272,
+        "a": 1
+      },
+      "boundVariables": {
+        "color": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:3767:1768"
+        }
+      }
+    }
+  ],
+  "cornerRadius": 5,
+  "strokeWeight": 1,
+  "absoluteBoundingBox": {
+    "x": 595,
+    "y": 781,
+    "width": 840,
+    "height": 1057
+  }
+}

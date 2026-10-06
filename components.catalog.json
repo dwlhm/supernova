@@ -102,5 +102,622 @@
       "variants": [],
       "updatedAt": "2026-10-05T01:02:43.832Z"
     }
+  },
+  {
+    "id": "a36bc32c03e4207d699b229b22acd18c7ebdd186",
+    "name": "Breadcrumb",
+    "rawName": "Breadcrumb",
+    "description": "Description\nA breadcrumb navigation component that communicates the user's current location within a hierarchical structure and provides a clear path back to higher levels.\n\n\nWhen to use\nUse on pages that are nested within a clear hierarchy.\nUse when users may need to move quickly to a parent level.\nUse in content-heavy products, settings, catalogs, or multi-level navigation.\nDo not use as a replacement for primary navigation or for flat page structures.\n\n\nUsage guidelines\nKeep labels concise, recognizable, and consistent with page titles.\nArrange items from the highest level to the current page.\nTreat the final item as the current location; it should not navigate to itself.\nUse the shortest variant that accurately represents the hierarchy.\nFor long paths, use the deep variant with an ellipsis to collapse intermediate levels.\nKeep separators visually consistent and ensure interactive items have clear hover and focus states.\n\n\nProperties\nType — Controls the hierarchy depth: 1, 2, or deep.\nShow Ellipsis — Shows or hides the collapsed-path indicator. Use primarily with Type=deep when intermediate levels are omitted.",
+    "brandId": null,
+    "hasMitosisDefinition": false,
+    "fileId": "wLWN7FdmqCslghDJPWIweW",
+    "nodeId": "2107:63117",
+    "sourceId": "a36bc32c03e4207d699b229b22acd18c7ebdd186",
+    "componentPropertyDefinitions": {
+      "Show Ellipsis#2953:4": {
+        "type": "BOOLEAN",
+        "defaultValue": true
+      },
+      "Type": {
+        "type": "VARIANT",
+        "defaultValue": "2",
+        "variantOptions": [
+          "2",
+          "deep",
+          "1"
+        ]
+      }
+    },
+    "variantPropertyValues": {},
+    "updatedAt": "2026-10-06T08:26:57Z",
+    "sceneHash": "0baebdf5b8e694c35e6a9d2088511a553d7b315daf2350fcb0a7af5852752439",
+    "figma": {
+      "fileId": "wLWN7FdmqCslghDJPWIweW",
+      "nodeId": "2107:63117",
+      "sourceId": "a36bc32c03e4207d699b229b22acd18c7ebdd186",
+      "key": "a36bc32c03e4207d699b229b22acd18c7ebdd186",
+      "name": "Breadcrumb",
+      "thumbnailUrl": null,
+      "componentPropertyDefinitions": {
+        "Show Ellipsis#2953:4": {
+          "type": "BOOLEAN",
+          "defaultValue": true
+        },
+        "Type": {
+          "type": "VARIANT",
+          "defaultValue": "2",
+          "variantOptions": [
+            "2",
+            "deep",
+            "1"
+          ]
+        }
+      },
+      "variantPropertyValues": {},
+      "variants": [
+        {
+          "id": "2960:50",
+          "name": "Type=2",
+          "variantPropertyValues": {},
+          "origin": {
+            "fileId": "wLWN7FdmqCslghDJPWIweW",
+            "nodeId": "2960:50",
+            "sourceId": "38292572ce845fa16b6d0dd4fba71edb77c24f7b"
+          },
+          "updatedAt": "2026-10-06T08:26:57Z"
+        },
+        {
+          "id": "2960:58",
+          "name": "Type=deep",
+          "variantPropertyValues": {},
+          "origin": {
+            "fileId": "wLWN7FdmqCslghDJPWIweW",
+            "nodeId": "2960:58",
+            "sourceId": "0f70624a43e60001639a85c617c22e4bc07262fa"
+          },
+          "updatedAt": "2026-10-06T08:26:57Z"
+        },
+        {
+          "id": "2960:76",
+          "name": "Type=1",
+          "variantPropertyValues": {},
+          "origin": {
+            "fileId": "wLWN7FdmqCslghDJPWIweW",
+            "nodeId": "2960:76",
+            "sourceId": "2482ccc307b4353bd874aa6f1f42005f944c59fe"
+          },
+          "updatedAt": "2026-10-06T08:26:57Z"
+        }
+      ],
+      "updatedAt": "2026-10-06T08:26:57Z"
+    }
+  },
+  {
+    "id": "3a820cd7b046dfabaf3b26f49f9055ac1a70e111",
+    "name": "Table",
+    "rawName": "Table",
+    "description": "Description\nA configurable data-table component with populated and empty states, up to ten columns and ten rows, optional row selection, and optional row numbering.\n\n\nWhen to use\nUse to present structured records that users need to scan and compare across consistent columns. Use the Empty state when no records are available.\n\n\nUsage guidelines\nUse clear column labels and keep cell content consistent by column.\nShow only the columns required for the task.\nEnable checkboxes only when bulk selection or row selection is supported.\nEnable row numbers only when sequential references are useful.\nUse the Empty state for true no-data outcomes and provide a relevant next action when possible.\nFor complex sorting, filtering, pagination, or responsive behavior, pair this component with the appropriate surrounding controls and patterns.\n\n\nProperties\nState — Switches between Default and Empty.\nShow Column 1–10 — Shows or hides table columns.\nShow Row 1–10 — Shows or hides data rows.\nShow Checkbox — Shows or hides the selection column.\nShow No — Shows or hides the row-number column.\nTitle — Sets the empty-state heading.\nBody — Sets the empty-state supporting text.\nCTA Label — Sets the empty-state action label.\nShow Icon — Shows or hides the empty-state icon.\nShow Title — Shows or hides the empty-state heading.\nShow Description — Shows or hides the empty-state supporting text.\nShow CTA — Shows or hides the empty-state action.\nIcon — Swaps the empty-state icon.",
+    "brandId": null,
+    "hasMitosisDefinition": false,
+    "fileId": "wLWN7FdmqCslghDJPWIweW",
+    "nodeId": "2571:20661",
+    "sourceId": "3a820cd7b046dfabaf3b26f49f9055ac1a70e111",
+    "componentPropertyDefinitions": {
+      "Show Column 1#2571:0": {
+        "type": "BOOLEAN",
+        "defaultValue": true
+      },
+      "Show Column 2#2571:1": {
+        "type": "BOOLEAN",
+        "defaultValue": true
+      },
+      "Show Column 3#2571:2": {
+        "type": "BOOLEAN",
+        "defaultValue": true
+      },
+      "Show Column 4#2571:3": {
+        "type": "BOOLEAN",
+        "defaultValue": true
+      },
+      "Show Column 5#2571:4": {
+        "type": "BOOLEAN",
+        "defaultValue": true
+      },
+      "Show Column 6#2571:5": {
+        "type": "BOOLEAN",
+        "defaultValue": false
+      },
+      "Show Column 7#2571:6": {
+        "type": "BOOLEAN",
+        "defaultValue": false
+      },
+      "Show Column 8#2571:7": {
+        "type": "BOOLEAN",
+        "defaultValue": false
+      },
+      "Show Column 9#2571:8": {
+        "type": "BOOLEAN",
+        "defaultValue": false
+      },
+      "Show Column 10#2571:9": {
+        "type": "BOOLEAN",
+        "defaultValue": false
+      },
+      "Show Row 1#2571:10": {
+        "type": "BOOLEAN",
+        "defaultValue": true
+      },
+      "Show Row 2#2571:11": {
+        "type": "BOOLEAN",
+        "defaultValue": true
+      },
+      "Show Row 3#2571:12": {
+        "type": "BOOLEAN",
+        "defaultValue": true
+      },
+      "Show Row 4#2571:13": {
+        "type": "BOOLEAN",
+        "defaultValue": true
+      },
+      "Show Row 5#2571:14": {
+        "type": "BOOLEAN",
+        "defaultValue": true
+      },
+      "Show Row 6#2571:15": {
+        "type": "BOOLEAN",
+        "defaultValue": false
+      },
+      "Show Row 7#2571:16": {
+        "type": "BOOLEAN",
+        "defaultValue": true
+      },
+      "Show Row 8#2571:17": {
+        "type": "BOOLEAN",
+        "defaultValue": true
+      },
+      "Show Row 9#2571:18": {
+        "type": "BOOLEAN",
+        "defaultValue": true
+      },
+      "Show Row 10#2571:19": {
+        "type": "BOOLEAN",
+        "defaultValue": true
+      },
+      "Show Checkbox#2571:20": {
+        "type": "BOOLEAN",
+        "defaultValue": false
+      },
+      "Show No#2571:21": {
+        "type": "BOOLEAN",
+        "defaultValue": false
+      },
+      "Title#2571:22": {
+        "type": "TEXT",
+        "defaultValue": "No Data Available"
+      },
+      "Body#2571:23": {
+        "type": "TEXT",
+        "defaultValue": "There's nothing here yet. Try adding some data or adjusting your filters."
+      },
+      "CTA Label#2571:24": {
+        "type": "TEXT",
+        "defaultValue": "Add Data"
+      },
+      "Show Icon#2576:12": {
+        "type": "BOOLEAN",
+        "defaultValue": true
+      },
+      "Show Title#2576:15": {
+        "type": "BOOLEAN",
+        "defaultValue": true
+      },
+      "Show Description#2576:18": {
+        "type": "BOOLEAN",
+        "defaultValue": true
+      },
+      "Show CTA#2576:21": {
+        "type": "BOOLEAN",
+        "defaultValue": true
+      },
+      "Icon#2579:0": {
+        "type": "INSTANCE_SWAP",
+        "defaultValue": "2375:103015",
+        "preferredValues": []
+      },
+      "State": {
+        "type": "VARIANT",
+        "defaultValue": "Default",
+        "variantOptions": [
+          "Default",
+          "Empty"
+        ]
+      }
+    },
+    "variantPropertyValues": {},
+    "updatedAt": "2026-10-06T08:26:57Z",
+    "sceneHash": "e30fd5539d968487b6ce6f8e16b108ffcdec1e2ac0f35b8193347f95158c1c89",
+    "figma": {
+      "fileId": "wLWN7FdmqCslghDJPWIweW",
+      "nodeId": "2571:20661",
+      "sourceId": "3a820cd7b046dfabaf3b26f49f9055ac1a70e111",
+      "key": "3a820cd7b046dfabaf3b26f49f9055ac1a70e111",
+      "name": "Table",
+      "thumbnailUrl": null,
+      "componentPropertyDefinitions": {
+        "Show Column 1#2571:0": {
+          "type": "BOOLEAN",
+          "defaultValue": true
+        },
+        "Show Column 2#2571:1": {
+          "type": "BOOLEAN",
+          "defaultValue": true
+        },
+        "Show Column 3#2571:2": {
+          "type": "BOOLEAN",
+          "defaultValue": true
+        },
+        "Show Column 4#2571:3": {
+          "type": "BOOLEAN",
+          "defaultValue": true
+        },
+        "Show Column 5#2571:4": {
+          "type": "BOOLEAN",
+          "defaultValue": true
+        },
+        "Show Column 6#2571:5": {
+          "type": "BOOLEAN",
+          "defaultValue": false
+        },
+        "Show Column 7#2571:6": {
+          "type": "BOOLEAN",
+          "defaultValue": false
+        },
+        "Show Column 8#2571:7": {
+          "type": "BOOLEAN",
+          "defaultValue": false
+        },
+        "Show Column 9#2571:8": {
+          "type": "BOOLEAN",
+          "defaultValue": false
+        },
+        "Show Column 10#2571:9": {
+          "type": "BOOLEAN",
+          "defaultValue": false
+        },
+        "Show Row 1#2571:10": {
+          "type": "BOOLEAN",
+          "defaultValue": true
+        },
+        "Show Row 2#2571:11": {
+          "type": "BOOLEAN",
+          "defaultValue": true
+        },
+        "Show Row 3#2571:12": {
+          "type": "BOOLEAN",
+          "defaultValue": true
+        },
+        "Show Row 4#2571:13": {
+          "type": "BOOLEAN",
+          "defaultValue": true
+        },
+        "Show Row 5#2571:14": {
+          "type": "BOOLEAN",
+          "defaultValue": true
+        },
+        "Show Row 6#2571:15": {
+          "type": "BOOLEAN",
+          "defaultValue": false
+        },
+        "Show Row 7#2571:16": {
+          "type": "BOOLEAN",
+          "defaultValue": true
+        },
+        "Show Row 8#2571:17": {
+          "type": "BOOLEAN",
+          "defaultValue": true
+        },
+        "Show Row 9#2571:18": {
+          "type": "BOOLEAN",
+          "defaultValue": true
+        },
+        "Show Row 10#2571:19": {
+          "type": "BOOLEAN",
+          "defaultValue": true
+        },
+        "Show Checkbox#2571:20": {
+          "type": "BOOLEAN",
+          "defaultValue": false
+        },
+        "Show No#2571:21": {
+          "type": "BOOLEAN",
+          "defaultValue": false
+        },
+        "Title#2571:22": {
+          "type": "TEXT",
+          "defaultValue": "No Data Available"
+        },
+        "Body#2571:23": {
+          "type": "TEXT",
+          "defaultValue": "There's nothing here yet. Try adding some data or adjusting your filters."
+        },
+        "CTA Label#2571:24": {
+          "type": "TEXT",
+          "defaultValue": "Add Data"
+        },
+        "Show Icon#2576:12": {
+          "type": "BOOLEAN",
+          "defaultValue": true
+        },
+        "Show Title#2576:15": {
+          "type": "BOOLEAN",
+          "defaultValue": true
+        },
+        "Show Description#2576:18": {
+          "type": "BOOLEAN",
+          "defaultValue": true
+        },
+        "Show CTA#2576:21": {
+          "type": "BOOLEAN",
+          "defaultValue": true
+        },
+        "Icon#2579:0": {
+          "type": "INSTANCE_SWAP",
+          "defaultValue": "2375:103015",
+          "preferredValues": []
+        },
+        "State": {
+          "type": "VARIANT",
+          "defaultValue": "Default",
+          "variantOptions": [
+            "Default",
+            "Empty"
+          ]
+        }
+      },
+      "variantPropertyValues": {},
+      "variants": [
+        {
+          "id": "2299:120",
+          "name": "State=Default",
+          "variantPropertyValues": {},
+          "origin": {
+            "fileId": "wLWN7FdmqCslghDJPWIweW",
+            "nodeId": "2299:120",
+            "sourceId": "d0590468eef9ddc2bd78b8ce0ae12491a4ea032b"
+          },
+          "updatedAt": "2026-10-06T08:26:57Z"
+        },
+        {
+          "id": "2572:878",
+          "name": "State=Empty",
+          "variantPropertyValues": {},
+          "origin": {
+            "fileId": "wLWN7FdmqCslghDJPWIweW",
+            "nodeId": "2572:878",
+            "sourceId": "fedc79d62022e1b5b0ea85dbdaff878fc18a924a"
+          },
+          "updatedAt": "2026-10-06T08:26:57Z"
+        }
+      ],
+      "updatedAt": "2026-10-06T08:26:57Z"
+    }
+  },
+  {
+    "id": "667d23c84ccbe78a2226eff3ce6bad69560233d5",
+    "name": "TableHeaderRow",
+    "rawName": "Table Header Row",
+    "description": "Description\nA reusable table header row with up to ten configurable columns.\n\n\nWhen to use\nUse at the top of a data table to label and align its columns. Omit it only when the surrounding context makes every column unambiguous.\n\n\nUsage guidelines\nMatch visible header columns to the visible columns in every body row.\nUse short, descriptive labels.\nKeep column order and widths consistent with the body rows.\nAvoid wrapping header labels when a shorter label is available.\n\n\nProperties\nShow Column 1–10 — Shows or hides each header column. Columns 1–5 are visible by default; columns 6–10 are optional.",
+    "brandId": null,
+    "hasMitosisDefinition": false,
+    "fileId": "wLWN7FdmqCslghDJPWIweW",
+    "nodeId": "2299:102",
+    "sourceId": "667d23c84ccbe78a2226eff3ce6bad69560233d5",
+    "componentPropertyDefinitions": {
+      "Show Column 1#2305:0": {
+        "type": "BOOLEAN",
+        "defaultValue": true
+      },
+      "Show Column 2#2305:1": {
+        "type": "BOOLEAN",
+        "defaultValue": true
+      },
+      "Show Column 3#2305:2": {
+        "type": "BOOLEAN",
+        "defaultValue": true
+      },
+      "Show Column 4#2305:3": {
+        "type": "BOOLEAN",
+        "defaultValue": true
+      },
+      "Show Column 5#2305:4": {
+        "type": "BOOLEAN",
+        "defaultValue": true
+      },
+      "Show Column 6#2305:5": {
+        "type": "BOOLEAN",
+        "defaultValue": false
+      },
+      "Show Column 7#2305:6": {
+        "type": "BOOLEAN",
+        "defaultValue": false
+      },
+      "Show Column 8#2305:7": {
+        "type": "BOOLEAN",
+        "defaultValue": false
+      },
+      "Show Column 9#2305:8": {
+        "type": "BOOLEAN",
+        "defaultValue": false
+      },
+      "Show Column 10#2305:9": {
+        "type": "BOOLEAN",
+        "defaultValue": false
+      }
+    },
+    "variantPropertyValues": {},
+    "updatedAt": "2026-10-06T08:26:57Z",
+    "sceneHash": "82e697c3808b60fbca826ccf9b98d6db3dae6e149690426fa0eb2d87a0fe152f",
+    "figma": {
+      "fileId": "wLWN7FdmqCslghDJPWIweW",
+      "nodeId": "2299:102",
+      "sourceId": "667d23c84ccbe78a2226eff3ce6bad69560233d5",
+      "key": "667d23c84ccbe78a2226eff3ce6bad69560233d5",
+      "name": "Table Header Row",
+      "thumbnailUrl": null,
+      "componentPropertyDefinitions": {
+        "Show Column 1#2305:0": {
+          "type": "BOOLEAN",
+          "defaultValue": true
+        },
+        "Show Column 2#2305:1": {
+          "type": "BOOLEAN",
+          "defaultValue": true
+        },
+        "Show Column 3#2305:2": {
+          "type": "BOOLEAN",
+          "defaultValue": true
+        },
+        "Show Column 4#2305:3": {
+          "type": "BOOLEAN",
+          "defaultValue": true
+        },
+        "Show Column 5#2305:4": {
+          "type": "BOOLEAN",
+          "defaultValue": true
+        },
+        "Show Column 6#2305:5": {
+          "type": "BOOLEAN",
+          "defaultValue": false
+        },
+        "Show Column 7#2305:6": {
+          "type": "BOOLEAN",
+          "defaultValue": false
+        },
+        "Show Column 8#2305:7": {
+          "type": "BOOLEAN",
+          "defaultValue": false
+        },
+        "Show Column 9#2305:8": {
+          "type": "BOOLEAN",
+          "defaultValue": false
+        },
+        "Show Column 10#2305:9": {
+          "type": "BOOLEAN",
+          "defaultValue": false
+        }
+      },
+      "variantPropertyValues": {},
+      "variants": [],
+      "updatedAt": "2026-10-06T08:26:57Z"
+    }
+  },
+  {
+    "id": "d9345e7919a39920fd32ab084b3bde9462caa4da",
+    "name": "TableBodyRow",
+    "rawName": "Table Body Row",
+    "description": "Description\nA reusable table body row with up to ten configurable data columns.\n\n\nWhen to use\nUse for each data record in the default table state.\n\n\nUsage guidelines\nKeep the visible columns synchronized with Table Header Row.\nUse the same cell-value type and alignment throughout each column.\nPreserve a consistent row height across a table.\nPlace row-level actions in the designated actions column.\n\n\nProperties\nShow Column 1–10 — Shows or hides each data column. Columns 1–5 are visible by default; columns 6–10 are optional.",
+    "brandId": null,
+    "hasMitosisDefinition": false,
+    "fileId": "wLWN7FdmqCslghDJPWIweW",
+    "nodeId": "2299:111",
+    "sourceId": "d9345e7919a39920fd32ab084b3bde9462caa4da",
+    "componentPropertyDefinitions": {
+      "Show Column 1#2305:10": {
+        "type": "BOOLEAN",
+        "defaultValue": true
+      },
+      "Show Column 2#2305:11": {
+        "type": "BOOLEAN",
+        "defaultValue": true
+      },
+      "Show Column 3#2305:12": {
+        "type": "BOOLEAN",
+        "defaultValue": true
+      },
+      "Show Column 4#2305:13": {
+        "type": "BOOLEAN",
+        "defaultValue": true
+      },
+      "Show Column 5#2305:14": {
+        "type": "BOOLEAN",
+        "defaultValue": true
+      },
+      "Show Column 6#2305:15": {
+        "type": "BOOLEAN",
+        "defaultValue": false
+      },
+      "Show Column 7#2305:16": {
+        "type": "BOOLEAN",
+        "defaultValue": false
+      },
+      "Show Column 8#2305:17": {
+        "type": "BOOLEAN",
+        "defaultValue": false
+      },
+      "Show Column 9#2305:18": {
+        "type": "BOOLEAN",
+        "defaultValue": false
+      },
+      "Show Column 10#2305:19": {
+        "type": "BOOLEAN",
+        "defaultValue": false
+      }
+    },
+    "variantPropertyValues": {},
+    "updatedAt": "2026-10-06T08:26:57Z",
+    "sceneHash": "7b9df34db62b6381ff85f238f24674a8b78b2741b934391ee69950e9aff2542f",
+    "figma": {
+      "fileId": "wLWN7FdmqCslghDJPWIweW",
+      "nodeId": "2299:111",
+      "sourceId": "d9345e7919a39920fd32ab084b3bde9462caa4da",
+      "key": "d9345e7919a39920fd32ab084b3bde9462caa4da",
+      "name": "Table Body Row",
+      "thumbnailUrl": null,
+      "componentPropertyDefinitions": {
+        "Show Column 1#2305:10": {
+          "type": "BOOLEAN",
+          "defaultValue": true
+        },
+        "Show Column 2#2305:11": {
+          "type": "BOOLEAN",
+          "defaultValue": true
+        },
+        "Show Column 3#2305:12": {
+          "type": "BOOLEAN",
+          "defaultValue": true
+        },
+        "Show Column 4#2305:13": {
+          "type": "BOOLEAN",
+          "defaultValue": true
+        },
+        "Show Column 5#2305:14": {
+          "type": "BOOLEAN",
+          "defaultValue": true
+        },
+        "Show Column 6#2305:15": {
+          "type": "BOOLEAN",
+          "defaultValue": false
+        },
+        "Show Column 7#2305:16": {
+          "type": "BOOLEAN",
+          "defaultValue": false
+        },
+        "Show Column 8#2305:17": {
+          "type": "BOOLEAN",
+          "defaultValue": false
+        },
+        "Show Column 9#2305:18": {
+          "type": "BOOLEAN",
+          "defaultValue": false
+        },
+        "Show Column 10#2305:19": {
+          "type": "BOOLEAN",
+          "defaultValue": false
+        }
+      },
+      "variantPropertyValues": {},
+      "variants": [],
+      "updatedAt": "2026-10-06T08:26:57Z"
+    }
   }
 ]

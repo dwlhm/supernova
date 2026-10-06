@@ -315,7 +315,8 @@ function createSyntheticFigmaNode(component) {
  * Resolve Figma node: from fixture file, embedded node, Figma REST API, or synthetic mock.
  */
 async function resolveFigmaNode(component, options = {}) {
-  const { mock = false, token = null, fixturesDir = null, nodeCache = null } = options;
+  const { mock = false, token = null, fixturesDir = null, nodeCache = null, snapshot = null } = options;
+  if (snapshot) return require('./figma-snapshot').resolveSnapshotNode(snapshot, component.nodeId || component.figma?.nodeId, component.fileId || component.figma?.fileId || snapshot.fileKey);
 
   // 1. Explicit fixture path on component
   if (component.fixture || component.fixturePath) {
@@ -478,6 +479,7 @@ async function processPrComponents(options = {}) {
   const {
     catalog: catalogArg = 'components.catalog.json',
     compositionRegistry: compositionRegistryArg = 'components.composition.json',
+    figmaSnapshot: figmaSnapshotArg = null,
     manifest: manifestArg = '.components-manifest.json',
     base: baseRef = null,
     componentsDir: componentsDirArg = 'components',
@@ -489,6 +491,7 @@ async function processPrComponents(options = {}) {
     silent = false,
   } = options;
 
+  const snapshot = figmaSnapshotArg ? require('./figma-snapshot').loadSnapshot(figmaSnapshotArg) : null;
   const cwd = process.cwd();
   const catalogPath = path.resolve(cwd, catalogArg);
   const manifestPath = path.resolve(cwd, manifestArg);
@@ -530,17 +533,20 @@ async function processPrComponents(options = {}) {
       }
     }
   }
+  if (snapshot) for (const component of catalog) {
+    if (component && component.name) require('./figma-snapshot').resolveSnapshotNode(snapshot, component.nodeId || component.figma?.nodeId, component.fileId || component.figma?.fileId || snapshot.fileKey);
+  }
   const catalogRoots = new Set(catalog.filter(c => c && c.name).map(c => toPascalCase(c.name)));
   for (const [name, entry] of Object.entries(baselineManifest.components)) {
     if (authoritativeCatalog && !catalogRoots.has(name)) validateOwnedRemovals(entry.outputs, new Set(outputOwners.keys()), componentsDir);
   }
   const tokens = loadTokens(tokensPath);
-  const isMockMode = mock || (!token && !process.env.FIGMA_ACCESS_TOKEN);
+  const isMockMode = !!snapshot || mock || (!token && !process.env.FIGMA_ACCESS_TOKEN);
   const effectiveToken = token || process.env.FIGMA_ACCESS_TOKEN;
 
   // Batch pre-fetch remote Figma component nodes (chunk size 50)
   const nodeCache = {};
-  if (!isMockMode && effectiveToken) {
+  if (!snapshot && !isMockMode && effectiveToken) {
     const remoteComponentsByFile = new Map();
     for (const component of catalog) {
       if (!component || !component.name) continue;
@@ -603,10 +609,12 @@ async function processPrComponents(options = {}) {
     const relativeFilePath = path.relative(cwd, componentFilePath).replace(/\\/g, '/');
 
     // Compute deterministic SHA-256 fingerprint
-    const currentFingerprint = computeFingerprint(component);
-
-    // Baseline manifest lookup
+    // Baseline manifest lookup. Introducing offline snapshot mode must not
+    // invalidate unchanged legacy templates/custom edits by itself.
     const baselineEntry = baselineManifest.components[pascalName] || baselineManifest.components[component.name];
+    const snapshotNode = snapshot ? require('./figma-snapshot').resolveSnapshotNode(snapshot, component.nodeId || component.figma?.nodeId, component.fileId || component.figma?.fileId || snapshot.fileKey) : null;
+    const useSnapshotFingerprint = snapshotNode && (component.composition != null || !baselineEntry || baselineEntry.snapshot);
+    const currentFingerprint = computeFingerprint(useSnapshotFingerprint ? { ...component, sceneHash: sourceHash(JSON.stringify(snapshotNode)) } : component);
     const baselineFingerprint = getManifestFingerprint(baselineEntry);
     const expectedNames = component.composition != null ? component.composition.parts.map(part => part.name) : [pascalName];
     const fileExists = expectedNames.every(name => fs.existsSync(path.join(componentsDir, `${name}.lite.tsx`)));
@@ -644,6 +652,7 @@ async function processPrComponents(options = {}) {
         token: token || process.env.FIGMA_ACCESS_TOKEN,
         fixturesDir,
         nodeCache,
+        snapshot,
       });
 
       const generatedSources = transpileFigmaNodeToMitosisArtifacts(figmaNode, {
@@ -678,6 +687,7 @@ async function processPrComponents(options = {}) {
         nodeId: component.nodeId || (component.figma && component.figma.nodeId) || null,
         updatedAt: component.updatedAt || (component.figma && component.figma.updatedAt) || null,
         lastGenerated: new Date().toISOString(),
+        ...(snapshot ? { snapshot: { fileKey: snapshot.fileKey, version: snapshot.file.version, lastModified: snapshot.file.lastModified } } : {}),
         composition: component.composition || null,
         outputs: Object.entries(generatedSources).map(([name, code]) => ({ name, file: path.relative(cwd, path.join(componentsDir, `${name}.lite.tsx`)).replace(/\\/g, '/'), sourceHash: sourceHash(code) })),
       };
@@ -796,6 +806,10 @@ function parseArgs(argv) {
       result.compositionRegistry = arg.slice(23);
     } else if (arg === '--composition-registry') {
       result.compositionRegistry = argv[++i];
+    } else if (arg.startsWith('--figma-snapshot=')) {
+      result.figmaSnapshot = arg.slice('--figma-snapshot='.length);
+    } else if (arg === '--figma-snapshot') {
+      result.figmaSnapshot = argv[++i];
     } else if (arg.startsWith('--catalog=')) {
       result.catalog = arg.slice(10);
     } else if (arg === '--catalog' || arg === '-c') {
@@ -851,6 +865,7 @@ Options:
   --manifest, -m        Path to .components-manifest.json (default: .components-manifest.json)
   --base, -b            Git ref (e.g. origin/main) or file path to read baseline manifest
   --components-dir, -d  Directory for generated .lite.tsx components (default: components/)
+  --figma-snapshot=<path>  Use saved full scene offline; never fetch missing nodes
   --dry-run             Preview actions without writing files
   --mock                Force offline/mock mode (skip Figma REST API calls)
   --token, -t           Figma personal access token (or set FIGMA_ACCESS_TOKEN env var)

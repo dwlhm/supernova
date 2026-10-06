@@ -28,3 +28,6 @@ reference/
 
 # Pnpm lockfile (project uses npm)
 pnpm-lock.yaml
+
+# Local complete Figma snapshots; reuse offline without committing design data.
+.cache/figma/

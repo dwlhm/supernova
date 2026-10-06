@@ -16,7 +16,7 @@
     "export:mock": "node exporter/mock/runner.js",
     "dev:mock": "node exporter/mock/runner.js --watch",
     "export:mock:dark": "node exporter/mock/runner.js --theme theme-dark",
-    "test": "npm run test:exporter && npm run test:figma-import && npm run test:figma-to-mitosis && npm run test:pr-components && npm run test:composition",
+    "test": "npm run test:exporter && npm run test:figma-import && npm run test:figma-to-mitosis && npm run test:pr-components && npm run test:composition && npm run test:figma-snapshot && npm run test:production-composition",
     "test:exporter": "node exporter/mock/test.js",
     "figma:discover": "node scripts/import-figma-components.js --dry-run",
     "figma:import": "node scripts/import-figma-components.js",
@@ -35,7 +35,10 @@
     "build:packages": "npm run build --workspaces --if-present",
     "clean": "node scripts/clean.js",
     "validate:exporter-package": "node exporter/scripts/validate-package.js",
-    "test:composition": "node scripts/test-component-composition.js"
+    "test:composition": "node scripts/test-component-composition.js",
+    "test:figma-snapshot": "node scripts/test-figma-snapshot.js",
+    "figma:cache": "node scripts/cache-figma-file.js",
+    "test:production-composition": "node scripts/test-production-composition.js"
   },
   "devDependencies": {
     "@builder.io/mitosis": "^0.14.1",

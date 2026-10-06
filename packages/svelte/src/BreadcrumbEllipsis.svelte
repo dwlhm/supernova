@@ -1,0 +1,37 @@
+<script context="module" lang="ts">
+  /* @composition {"root":"Breadcrumb","part":"BreadcrumbEllipsis","parts":["Breadcrumb","BreadcrumbList","BreadcrumbItem","BreadcrumbLink","BreadcrumbPage","BreadcrumbSeparator","BreadcrumbEllipsis"],"slot":"default","defaultContent":"…","examples":{"static":"import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbPage, BreadcrumbSeparator } from '@dwlhm/ui-react';
+
+<Breadcrumb>
+  <BreadcrumbList>
+    <BreadcrumbItem><BreadcrumbLink href=\"/\">Home</BreadcrumbLink></BreadcrumbItem>
+    <BreadcrumbItem><BreadcrumbSeparator /><BreadcrumbPage>Products</BreadcrumbPage></BreadcrumbItem>
+  </BreadcrumbList>
+</Breadcrumb>","loop":"import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbPage, BreadcrumbSeparator } from '@dwlhm/ui-react';
+
+// The consumer supplies paths, including stable IDs and link destinations.
+<Breadcrumb>
+  <BreadcrumbList>
+    {paths.map((path, index) => (
+      <BreadcrumbItem key={path.id}>
+        {index > 0 && <BreadcrumbSeparator />}
+        {index === paths.length - 1
+          ? <BreadcrumbPage>{path.label}</BreadcrumbPage>
+          : <BreadcrumbLink href={path.href}>{path.label}</BreadcrumbLink>}
+      </BreadcrumbItem>
+    ))}
+  </BreadcrumbList>
+</Breadcrumb>"}} */
+
+  export interface BreadcrumbEllipsisProps {
+    children?: any;
+    className?: string;
+  }
+</script>
+
+<script lang="ts">
+  export let className: BreadcrumbEllipsisProps["className"];
+</script>
+
+<span aria-hidden="true" class={"" + (className ? " " + className : "")}
+  ><slot>…</slot></span
+>
