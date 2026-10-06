@@ -1,6 +1,6 @@
 {
   "name": "@dwlhm/ui-vue2",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Vue 2 UI components for dwlhm Design System (Webpack 4 compatible)",
   "main": "dist/index.cjs",
   "module": "dist/index.mjs",
