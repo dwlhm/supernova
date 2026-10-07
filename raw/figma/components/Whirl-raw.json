@@ -1,0 +1,205 @@
+{
+  "componentPropertyDefinitions": {},
+  "description": "",
+  "document": {
+    "absoluteBoundingBox": {
+      "height": 24,
+      "width": 24,
+      "x": 890.86,
+      "y": 293
+    },
+    "blendMode": "PASS_THROUGH",
+    "bottomLeftRadius": 0,
+    "bottomRightRadius": 0,
+    "children": [
+      {
+        "absoluteBoundingBox": {
+          "height": 18,
+          "width": 18,
+          "x": 893.86,
+          "y": 296
+        },
+        "blendMode": "PASS_THROUGH",
+        "cornerRadius": 0,
+        "dashPattern": [],
+        "effects": [],
+        "fills": [],
+        "height": 18,
+        "id": "179:2491",
+        "layoutAlign": "INHERIT",
+        "layoutGrow": 0,
+        "layoutSizingHorizontal": "FIXED",
+        "layoutSizingVertical": "FIXED",
+        "name": "Vector",
+        "opacity": 1,
+        "rotation": 0,
+        "strokeAlign": "CENTER",
+        "strokeWeight": 1,
+        "strokes": [
+          {
+            "blendMode": "NORMAL",
+            "color": {
+              "a": 1,
+              "b": 0,
+              "g": 0,
+              "r": 0
+            },
+            "opacity": 1,
+            "type": "SOLID",
+            "visible": true
+          }
+        ],
+        "type": "VECTOR",
+        "visible": true,
+        "width": 18
+      }
+    ],
+    "componentPropertyDefinitions": {},
+    "cornerRadius": 0,
+    "counterAxisAlignItems": "MIN",
+    "dashPattern": [],
+    "effects": [],
+    "fills": [
+      {
+        "blendMode": "NORMAL",
+        "color": {
+          "a": 1,
+          "b": 1,
+          "g": 1,
+          "r": 1
+        },
+        "opacity": 1,
+        "type": "SOLID",
+        "visible": false
+      }
+    ],
+    "height": 24,
+    "id": "179:2536",
+    "itemSpacing": 0,
+    "layoutAlign": "INHERIT",
+    "layoutGrow": 0,
+    "layoutMode": "NONE",
+    "layoutSizingHorizontal": "FIXED",
+    "layoutSizingVertical": "FIXED",
+    "name": "whirl",
+    "opacity": 1,
+    "paddingBottom": 0,
+    "paddingLeft": 0,
+    "paddingRight": 0,
+    "paddingTop": 0,
+    "primaryAxisAlignItems": "MIN",
+    "rotation": 0,
+    "strokeAlign": "INSIDE",
+    "strokeWeight": 1,
+    "strokes": [],
+    "topLeftRadius": 0,
+    "topRightRadius": 0,
+    "type": "COMPONENT",
+    "visible": true,
+    "width": 24
+  },
+  "fileId": "",
+  "id": "179:2536",
+  "name": "whirl",
+  "node": {
+    "absoluteBoundingBox": {
+      "height": 24,
+      "width": 24,
+      "x": 890.86,
+      "y": 293
+    },
+    "blendMode": "PASS_THROUGH",
+    "bottomLeftRadius": 0,
+    "bottomRightRadius": 0,
+    "children": [
+      {
+        "absoluteBoundingBox": {
+          "height": 18,
+          "width": 18,
+          "x": 893.86,
+          "y": 296
+        },
+        "blendMode": "PASS_THROUGH",
+        "cornerRadius": 0,
+        "dashPattern": [],
+        "effects": [],
+        "fills": [],
+        "height": 18,
+        "id": "179:2491",
+        "layoutAlign": "INHERIT",
+        "layoutGrow": 0,
+        "layoutSizingHorizontal": "FIXED",
+        "layoutSizingVertical": "FIXED",
+        "name": "Vector",
+        "opacity": 1,
+        "rotation": 0,
+        "strokeAlign": "CENTER",
+        "strokeWeight": 1,
+        "strokes": [
+          {
+            "blendMode": "NORMAL",
+            "color": {
+              "a": 1,
+              "b": 0,
+              "g": 0,
+              "r": 0
+            },
+            "opacity": 1,
+            "type": "SOLID",
+            "visible": true
+          }
+        ],
+        "type": "VECTOR",
+        "visible": true,
+        "width": 18
+      }
+    ],
+    "componentPropertyDefinitions": {},
+    "cornerRadius": 0,
+    "counterAxisAlignItems": "MIN",
+    "dashPattern": [],
+    "effects": [],
+    "fills": [
+      {
+        "blendMode": "NORMAL",
+        "color": {
+          "a": 1,
+          "b": 1,
+          "g": 1,
+          "r": 1
+        },
+        "opacity": 1,
+        "type": "SOLID",
+        "visible": false
+      }
+    ],
+    "height": 24,
+    "id": "179:2536",
+    "itemSpacing": 0,
+    "layoutAlign": "INHERIT",
+    "layoutGrow": 0,
+    "layoutMode": "NONE",
+    "layoutSizingHorizontal": "FIXED",
+    "layoutSizingVertical": "FIXED",
+    "name": "whirl",
+    "opacity": 1,
+    "paddingBottom": 0,
+    "paddingLeft": 0,
+    "paddingRight": 0,
+    "paddingTop": 0,
+    "primaryAxisAlignItems": "MIN",
+    "rotation": 0,
+    "strokeAlign": "INSIDE",
+    "strokeWeight": 1,
+    "strokes": [],
+    "topLeftRadius": 0,
+    "topRightRadius": 0,
+    "type": "COMPONENT",
+    "visible": true,
+    "width": 24
+  },
+  "nodeId": "179:2536",
+  "rawName": "whirl",
+  "variantPropertyValues": {},
+  "variants": []
+}

@@ -8,6 +8,9 @@
     "packages/*"
   ],
   "scripts": {
+    "server": "cd server && go run .",
+    "plugin:build": "cd figma-plugin && node build.js",
+    "plugin:dev": "cd figma-plugin && node build.js --watch",
     "build": "npm run build --workspace=exporter",
     "dev": "npm run dev --workspace=exporter",
     "build:exporter": "npm run build --workspace=exporter",

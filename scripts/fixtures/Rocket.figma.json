@@ -1,0 +1,100 @@
+{
+  "componentPropertyDefinitions": {},
+  "document": {
+    "absoluteBoundingBox": {
+      "height": 24,
+      "width": 24,
+      "x": 1079.43,
+      "y": 293
+    },
+    "blendMode": "PASS_THROUGH",
+    "bottomLeftRadius": 0,
+    "bottomRightRadius": 0,
+    "children": [
+      {
+        "absoluteBoundingBox": {
+          "height": 16.05,
+          "width": 16.05,
+          "x": 1083.38,
+          "y": 297
+        },
+        "blendMode": "PASS_THROUGH",
+        "cornerRadius": 0,
+        "dashPattern": [],
+        "effects": [],
+        "fills": [],
+        "height": 16.05,
+        "id": "179:2497",
+        "layoutAlign": "INHERIT",
+        "layoutGrow": 0,
+        "layoutSizingHorizontal": "FIXED",
+        "layoutSizingVertical": "FIXED",
+        "name": "Vector",
+        "opacity": 1,
+        "rotation": 0,
+        "strokeAlign": "CENTER",
+        "strokeWeight": 1,
+        "strokes": [
+          {
+            "blendMode": "NORMAL",
+            "color": {
+              "a": 1,
+              "b": 0,
+              "g": 0,
+              "r": 0
+            },
+            "opacity": 1,
+            "type": "SOLID",
+            "visible": true
+          }
+        ],
+        "type": "VECTOR",
+        "visible": true,
+        "width": 16.05
+      }
+    ],
+    "componentPropertyDefinitions": {},
+    "cornerRadius": 0,
+    "counterAxisAlignItems": "MIN",
+    "dashPattern": [],
+    "effects": [],
+    "fills": [
+      {
+        "blendMode": "NORMAL",
+        "color": {
+          "a": 1,
+          "b": 1,
+          "g": 1,
+          "r": 1
+        },
+        "opacity": 1,
+        "type": "SOLID",
+        "visible": false
+      }
+    ],
+    "height": 24,
+    "id": "179:2538",
+    "itemSpacing": 0,
+    "layoutAlign": "INHERIT",
+    "layoutGrow": 0,
+    "layoutMode": "NONE",
+    "layoutSizingHorizontal": "FIXED",
+    "layoutSizingVertical": "FIXED",
+    "name": "rocket",
+    "opacity": 1,
+    "paddingBottom": 0,
+    "paddingLeft": 0,
+    "paddingRight": 0,
+    "paddingTop": 0,
+    "primaryAxisAlignItems": "MIN",
+    "rotation": 0,
+    "strokeAlign": "INSIDE",
+    "strokeWeight": 1,
+    "strokes": [],
+    "topLeftRadius": 0,
+    "topRightRadius": 0,
+    "type": "COMPONENT",
+    "visible": true,
+    "width": 24
+  }
+}

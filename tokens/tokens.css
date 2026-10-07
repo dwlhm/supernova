@@ -1,222 +1,112 @@
 /**
- * This file was generated automatically by Supernova Mitosis Exporter. Do not edit directly.
- */
-
-/**
- * Duplicate token names disambiguated during export:
- *   css --color-foreground-neutral -> --color-foreground-neutral-2 (token 4434f7e6-bbaa-4c28-94c4-4b7dfce85fd8, conflicts with 089752d3-2b38-4ea4-928b-aacfdb255c12)
- *   key colorForegroundNeutral -> colorForegroundNeutral2 (token 4434f7e6-bbaa-4c28-94c4-4b7dfce85fd8, conflicts with 089752d3-2b38-4ea4-928b-aacfdb255c12)
- *   theme --color-foreground-neutral -> --color-foreground-neutral-2 (token 4434f7e6-bbaa-4c28-94c4-4b7dfce85fd8, conflicts with 089752d3-2b38-4ea4-928b-aacfdb255c12)
- *   css --color-border-neutral -> --color-border-neutral-2 (token 569743ab-b07d-4944-b6b3-da48e68aae35, conflicts with 056211cf-3a0f-4037-a7ef-e4306ee74b09)
- *   key colorBorderNeutral -> colorBorderNeutral2 (token 569743ab-b07d-4944-b6b3-da48e68aae35, conflicts with 056211cf-3a0f-4037-a7ef-e4306ee74b09)
- *   theme --color-border-neutral -> --color-border-neutral-2 (token 569743ab-b07d-4944-b6b3-da48e68aae35, conflicts with 056211cf-3a0f-4037-a7ef-e4306ee74b09)
- *   css --color-foreground-neutral-faded -> --color-foreground-neutral-faded-2 (token 1c535094-ccdd-43e3-be72-524d3fbcc6a4, conflicts with 906f24b3-940a-4649-89a5-5cb6fea86550)
- *   key colorForegroundNeutralFaded -> colorForegroundNeutralFaded2 (token 1c535094-ccdd-43e3-be72-524d3fbcc6a4, conflicts with 906f24b3-940a-4649-89a5-5cb6fea86550)
- *   theme --color-foreground-neutral-faded -> --color-foreground-neutral-faded-2 (token 1c535094-ccdd-43e3-be72-524d3fbcc6a4, conflicts with 906f24b3-940a-4649-89a5-5cb6fea86550)
- *   css --color-border-focus -> --color-border-focus-2 (token b0b8b7da-b1a3-4c64-90c2-f5282628c15e, conflicts with 55044f83-54ed-411f-b069-670e9cd261e7)
- *   key colorBorderFocus -> colorBorderFocus2 (token b0b8b7da-b1a3-4c64-90c2-f5282628c15e, conflicts with 55044f83-54ed-411f-b069-670e9cd261e7)
- *   theme --color-border-focus -> --color-border-focus-2 (token b0b8b7da-b1a3-4c64-90c2-f5282628c15e, conflicts with 55044f83-54ed-411f-b069-670e9cd261e7)
- *   css --color-border-primary -> --color-border-primary-2 (token b9fdab94-06f7-4224-8d7d-7873fe366959, conflicts with 472fadf6-d947-4c72-8be0-21f8187b5dd3)
- *   key colorBorderPrimary -> colorBorderPrimary2 (token b9fdab94-06f7-4224-8d7d-7873fe366959, conflicts with 472fadf6-d947-4c72-8be0-21f8187b5dd3)
- *   theme --color-border-primary -> --color-border-primary-2 (token b9fdab94-06f7-4224-8d7d-7873fe366959, conflicts with 472fadf6-d947-4c72-8be0-21f8187b5dd3)
- *   css --color-foreground-primary -> --color-foreground-primary-2 (token 4bc780f9-fada-4509-b062-706e71023d2a, conflicts with bd5d83c8-b9c3-46e8-98d2-2fb1dde0a64a)
- *   key colorForegroundPrimary -> colorForegroundPrimary2 (token 4bc780f9-fada-4509-b062-706e71023d2a, conflicts with bd5d83c8-b9c3-46e8-98d2-2fb1dde0a64a)
- *   theme --color-foreground-primary -> --color-foreground-primary-2 (token 4bc780f9-fada-4509-b062-706e71023d2a, conflicts with bd5d83c8-b9c3-46e8-98d2-2fb1dde0a64a)
- *   css --color-foreground-secondary -> --color-foreground-secondary-2 (token aa543c65-5daf-4a6d-8ece-faed8406e265, conflicts with 28591320-5685-4640-889f-698f5b5411a5)
- *   key colorForegroundSecondary -> colorForegroundSecondary2 (token aa543c65-5daf-4a6d-8ece-faed8406e265, conflicts with 28591320-5685-4640-889f-698f5b5411a5)
- *   theme --color-foreground-secondary -> --color-foreground-secondary-2 (token aa543c65-5daf-4a6d-8ece-faed8406e265, conflicts with 28591320-5685-4640-889f-698f5b5411a5)
- *   css --color-foreground-positive -> --color-foreground-positive-2 (token 20c78709-9fe3-437f-8492-a66eb28952dd, conflicts with c027da5a-6fb2-4726-8b80-2335481dc418)
- *   key colorForegroundPositive -> colorForegroundPositive2 (token 20c78709-9fe3-437f-8492-a66eb28952dd, conflicts with c027da5a-6fb2-4726-8b80-2335481dc418)
- *   theme --color-foreground-positive -> --color-foreground-positive-2 (token 20c78709-9fe3-437f-8492-a66eb28952dd, conflicts with c027da5a-6fb2-4726-8b80-2335481dc418)
- *   css --color-foreground-disabled -> --color-foreground-disabled-2 (token dd1703ed-2b05-41d6-ab6c-e52f9d64c34e, conflicts with 62ec5e9e-18b2-45b8-9190-a7745b67e2d9)
- *   key colorForegroundDisabled -> colorForegroundDisabled2 (token dd1703ed-2b05-41d6-ab6c-e52f9d64c34e, conflicts with 62ec5e9e-18b2-45b8-9190-a7745b67e2d9)
- *   theme --color-foreground-disabled -> --color-foreground-disabled-2 (token dd1703ed-2b05-41d6-ab6c-e52f9d64c34e, conflicts with 62ec5e9e-18b2-45b8-9190-a7745b67e2d9)
- *   css --color-border-primary-faded -> --color-border-primary-faded-2 (token bc4985da-d79b-4277-82e7-83622d6353d2, conflicts with c09af59e-e3be-41d3-be35-00bb556cc30a)
- *   key colorBorderPrimaryFaded -> colorBorderPrimaryFaded2 (token bc4985da-d79b-4277-82e7-83622d6353d2, conflicts with c09af59e-e3be-41d3-be35-00bb556cc30a)
- *   theme --color-border-primary-faded -> --color-border-primary-faded-2 (token bc4985da-d79b-4277-82e7-83622d6353d2, conflicts with c09af59e-e3be-41d3-be35-00bb556cc30a)
- *   css --color-background-neutral -> --color-background-neutral-2 (token b2f9f554-1bcb-4ea9-b99c-3ffe0177181d, conflicts with 9f76f746-a3c5-4dde-a7e0-87586936c892)
- *   key colorBackgroundNeutral -> colorBackgroundNeutral2 (token b2f9f554-1bcb-4ea9-b99c-3ffe0177181d, conflicts with 9f76f746-a3c5-4dde-a7e0-87586936c892)
- *   theme --color-background-neutral -> --color-background-neutral-2 (token b2f9f554-1bcb-4ea9-b99c-3ffe0177181d, conflicts with 9f76f746-a3c5-4dde-a7e0-87586936c892)
- *   css --color-border-positive -> --color-border-positive-2 (token 58a0d7a4-e677-4f10-9547-4aa873de1e46, conflicts with 996f5e77-5c8d-4eb5-a994-9daeaba27a9b)
- *   key colorBorderPositive -> colorBorderPositive2 (token 58a0d7a4-e677-4f10-9547-4aa873de1e46, conflicts with 996f5e77-5c8d-4eb5-a994-9daeaba27a9b)
- *   theme --color-border-positive -> --color-border-positive-2 (token 58a0d7a4-e677-4f10-9547-4aa873de1e46, conflicts with 996f5e77-5c8d-4eb5-a994-9daeaba27a9b)
- *   css --color-border-positive-faded -> --color-border-positive-faded-2 (token 15218097-d471-491b-9481-ab6073b58c6d, conflicts with d5be679e-c0c6-43fc-bd9f-030c4adb49f1)
- *   key colorBorderPositiveFaded -> colorBorderPositiveFaded2 (token 15218097-d471-491b-9481-ab6073b58c6d, conflicts with d5be679e-c0c6-43fc-bd9f-030c4adb49f1)
- *   theme --color-border-positive-faded -> --color-border-positive-faded-2 (token 15218097-d471-491b-9481-ab6073b58c6d, conflicts with d5be679e-c0c6-43fc-bd9f-030c4adb49f1)
- *   css --color-border-secondary-faded -> --color-border-secondary-faded-2 (token d15eaed4-8a9b-44ad-bfca-bb605ff993a8, conflicts with c8aad5fd-d58c-4e52-835a-f744ac525729)
- *   key colorBorderSecondaryFaded -> colorBorderSecondaryFaded2 (token d15eaed4-8a9b-44ad-bfca-bb605ff993a8, conflicts with c8aad5fd-d58c-4e52-835a-f744ac525729)
- *   theme --color-border-secondary-faded -> --color-border-secondary-faded-2 (token d15eaed4-8a9b-44ad-bfca-bb605ff993a8, conflicts with c8aad5fd-d58c-4e52-835a-f744ac525729)
- *   css --color-border-secondary -> --color-border-secondary-2 (token 445f615f-caeb-4141-b755-f42bd584bcd0, conflicts with c1b04331-4a85-45e3-92ec-7101774cd58b)
- *   key colorBorderSecondary -> colorBorderSecondary2 (token 445f615f-caeb-4141-b755-f42bd584bcd0, conflicts with c1b04331-4a85-45e3-92ec-7101774cd58b)
- *   theme --color-border-secondary -> --color-border-secondary-2 (token 445f615f-caeb-4141-b755-f42bd584bcd0, conflicts with c1b04331-4a85-45e3-92ec-7101774cd58b)
- *   css --color-background-page -> --color-background-page-2 (token 6f61e450-393f-41a0-a412-155ace8f26f9, conflicts with 0b449643-8785-4fb6-a174-83192fcf9332)
- *   key colorBackgroundPage -> colorBackgroundPage2 (token 6f61e450-393f-41a0-a412-155ace8f26f9, conflicts with 0b449643-8785-4fb6-a174-83192fcf9332)
- *   theme --color-background-page -> --color-background-page-2 (token 6f61e450-393f-41a0-a412-155ace8f26f9, conflicts with 0b449643-8785-4fb6-a174-83192fcf9332)
- *   css --color-background-primary -> --color-background-primary-2 (token cabcf7bd-1f8c-44c7-bc9c-1c6c7a59f6b9, conflicts with ab482add-7293-4df2-9f32-c5a0b9b091e5)
- *   key colorBackgroundPrimary -> colorBackgroundPrimary2 (token cabcf7bd-1f8c-44c7-bc9c-1c6c7a59f6b9, conflicts with ab482add-7293-4df2-9f32-c5a0b9b091e5)
- *   theme --color-background-primary -> --color-background-primary-2 (token cabcf7bd-1f8c-44c7-bc9c-1c6c7a59f6b9, conflicts with ab482add-7293-4df2-9f32-c5a0b9b091e5)
- *   css --color-background-primary-highlighted -> --color-background-primary-highlighted-2 (token 0d345aa9-73c9-453d-9318-a2b02b877623, conflicts with ae9387df-94ad-4a39-a570-055f6c6b99e2)
- *   key colorBackgroundPrimaryHighlighted -> colorBackgroundPrimaryHighlighted2 (token 0d345aa9-73c9-453d-9318-a2b02b877623, conflicts with ae9387df-94ad-4a39-a570-055f6c6b99e2)
- *   theme --color-background-primary-highlighted -> --color-background-primary-highlighted-2 (token 0d345aa9-73c9-453d-9318-a2b02b877623, conflicts with ae9387df-94ad-4a39-a570-055f6c6b99e2)
- *   css --color-background-primary-faded -> --color-background-primary-faded-2 (token 57d98e98-f0d8-4d72-ac4b-07af6169d4bb, conflicts with ad61e192-1554-4dd0-98b8-fd1eaab49f53)
- *   key colorBackgroundPrimaryFaded -> colorBackgroundPrimaryFaded2 (token 57d98e98-f0d8-4d72-ac4b-07af6169d4bb, conflicts with ad61e192-1554-4dd0-98b8-fd1eaab49f53)
- *   theme --color-background-primary-faded -> --color-background-primary-faded-2 (token 57d98e98-f0d8-4d72-ac4b-07af6169d4bb, conflicts with ad61e192-1554-4dd0-98b8-fd1eaab49f53)
- *   css --color-background-secondary -> --color-background-secondary-2 (token 11df0aac-d248-4e43-bbe4-1d01ae1e0d68, conflicts with 6f1e48ff-b020-4fc6-a821-407280556b6a)
- *   key colorBackgroundSecondary -> colorBackgroundSecondary2 (token 11df0aac-d248-4e43-bbe4-1d01ae1e0d68, conflicts with 6f1e48ff-b020-4fc6-a821-407280556b6a)
- *   theme --color-background-secondary -> --color-background-secondary-2 (token 11df0aac-d248-4e43-bbe4-1d01ae1e0d68, conflicts with 6f1e48ff-b020-4fc6-a821-407280556b6a)
- *   css --color-background-secondary-highlighted -> --color-background-secondary-highlighted-2 (token bc72d0b5-e3e2-49ec-b098-47077846054b, conflicts with 9eb86f6b-0baf-4c98-8e3b-e0f7f0ff1430)
- *   key colorBackgroundSecondaryHighlighted -> colorBackgroundSecondaryHighlighted2 (token bc72d0b5-e3e2-49ec-b098-47077846054b, conflicts with 9eb86f6b-0baf-4c98-8e3b-e0f7f0ff1430)
- *   theme --color-background-secondary-highlighted -> --color-background-secondary-highlighted-2 (token bc72d0b5-e3e2-49ec-b098-47077846054b, conflicts with 9eb86f6b-0baf-4c98-8e3b-e0f7f0ff1430)
- *   css --color-background-secondary-faded -> --color-background-secondary-faded-2 (token 75842c87-00aa-407e-9cc8-4103cfa1affb, conflicts with 0c7fb597-d19b-44e0-ae5e-ffb1b81cac62)
- *   key colorBackgroundSecondaryFaded -> colorBackgroundSecondaryFaded2 (token 75842c87-00aa-407e-9cc8-4103cfa1affb, conflicts with 0c7fb597-d19b-44e0-ae5e-ffb1b81cac62)
- *   theme --color-background-secondary-faded -> --color-background-secondary-faded-2 (token 75842c87-00aa-407e-9cc8-4103cfa1affb, conflicts with 0c7fb597-d19b-44e0-ae5e-ffb1b81cac62)
- *   css --color-background-positive-highlighted -> --color-background-positive-highlighted-2 (token c25fd0e1-79b7-425f-a4d5-7f7c6e49b89e, conflicts with b38361c2-b1ce-467e-892e-41aeca0be086)
- *   key colorBackgroundPositiveHighlighted -> colorBackgroundPositiveHighlighted2 (token c25fd0e1-79b7-425f-a4d5-7f7c6e49b89e, conflicts with b38361c2-b1ce-467e-892e-41aeca0be086)
- *   theme --color-background-positive-highlighted -> --color-background-positive-highlighted-2 (token c25fd0e1-79b7-425f-a4d5-7f7c6e49b89e, conflicts with b38361c2-b1ce-467e-892e-41aeca0be086)
- *   css --color-background-positive-faded -> --color-background-positive-faded-2 (token e07c3cac-793a-4673-aca0-30196af701d8, conflicts with 1ad19a44-46d1-45a1-8ccc-93c796939971)
- *   key colorBackgroundPositiveFaded -> colorBackgroundPositiveFaded2 (token e07c3cac-793a-4673-aca0-30196af701d8, conflicts with 1ad19a44-46d1-45a1-8ccc-93c796939971)
- *   theme --color-background-positive-faded -> --color-background-positive-faded-2 (token e07c3cac-793a-4673-aca0-30196af701d8, conflicts with 1ad19a44-46d1-45a1-8ccc-93c796939971)
- *   css --color-background-positive -> --color-background-positive-2 (token 7031eee3-9c41-4dd5-91dd-771fcf7d611a, conflicts with 367b7ad8-afac-447d-b417-c3b66ad8c9f5)
- *   key colorBackgroundPositive -> colorBackgroundPositive2 (token 7031eee3-9c41-4dd5-91dd-771fcf7d611a, conflicts with 367b7ad8-afac-447d-b417-c3b66ad8c9f5)
- *   theme --color-background-positive -> --color-background-positive-2 (token 7031eee3-9c41-4dd5-91dd-771fcf7d611a, conflicts with 367b7ad8-afac-447d-b417-c3b66ad8c9f5)
- *   css --shadow-raised -> --shadow-raised-2 (token 128f5ccc-e873-4fe2-9c0a-c5a75a6590e1, conflicts with 6e128191-c46a-4281-91ed-1f688ec62fdc)
- *   key shadowRaised -> shadowRaised2 (token 128f5ccc-e873-4fe2-9c0a-c5a75a6590e1, conflicts with 6e128191-c46a-4281-91ed-1f688ec62fdc)
- *   theme --shadow-raised -> --shadow-raised-2 (token 128f5ccc-e873-4fe2-9c0a-c5a75a6590e1, conflicts with 6e128191-c46a-4281-91ed-1f688ec62fdc)
+ * This file was generated automatically by Supernova Sync Server. Do not edit directly.
  */
 
 :root {
-  --color-background-blur: rgba(255, 255, 255, 0.800000011920929);
-  --color-background-blur-neutral: rgba(96, 105, 129, 0.800000011920929);
-  --color-blue-blue-200: rgba(236, 245, 255, 1);
-  --color-gray-gray-200: rgba(246, 247, 249, 1);
-  --color-gray-gray-300: rgba(230, 232, 239, 1);
-  --color-gray-gray-500: rgba(198, 204, 219, 1);
-  --color-gray-gray-600: rgba(127, 133, 148, 1);
-  --color-gray-gray-700: rgba(96, 105, 129, 1);
-  --color-blue-blue-300: rgba(209, 226, 255, 1);
-  --color-blue-blue-500: rgba(82, 146, 255, 1);
-  --color-blue-blue-600: rgba(16, 98, 254, 1);
-  --color-blue-blue-700: rgba(1, 78, 225, 1);
-  --color-green-green-200: rgba(235, 254, 246, 1);
-  --color-green-green-300: rgba(180, 233, 197, 1);
-  --color-green-green-500: rgba(106, 200, 131, 1);
-  --color-green-green-600: rgba(53, 162, 79, 1);
-  --color-green-green-700: rgba(0, 122, 28, 1);
-  --color-purple-purple-200: rgba(0, 0, 0, 1);
-  --color-purple-purple-300: rgba(217, 200, 245, 1);
-  --color-purple-purple-500: rgba(190, 159, 240, 1);
-  --color-purple-purple-600: rgba(162, 117, 234, 1);
-  --color-purple-purple-700: rgba(135, 76, 230, 1);
-  --color-white: rgba(255, 255, 255, 1);
-  --color-black: rgba(0, 0, 0, 1);
-  --color-base-gray-200: rgba(246, 247, 249, 1);
-  --color-base-gray-300: rgba(230, 232, 239, 1);
-  --color-base-gray-500: rgba(198, 204, 219, 1);
-  --color-base-gray-600: rgba(127, 133, 148, 1);
-  --color-base-gray-700: rgba(96, 105, 129, 1);
-  --color-base-purple-200: rgba(0, 0, 0, 1);
-  --color-base-purple-300: rgba(217, 200, 245, 1);
-  --color-base-purple-500: rgba(190, 159, 240, 1);
-  --color-base-purple-600: rgba(162, 117, 234, 1);
-  --color-base-purple-700: rgba(135, 76, 230, 1);
-  --color-base-blue-200: rgba(236, 245, 255, 1);
-  --color-base-blue-300: rgba(209, 226, 255, 1);
-  --color-base-blue-500: rgba(82, 146, 255, 1);
-  --color-base-blue-600: rgba(16, 98, 254, 1);
-  --color-base-blue-700: rgba(1, 78, 225, 1);
-  --color-base-green-200: rgba(235, 254, 246, 1);
-  --color-base-green-300: rgba(180, 233, 197, 1);
-  --color-base-green-500: rgba(106, 200, 131, 1);
-  --color-base-green-600: rgba(53, 162, 79, 1);
-  --color-base-green-700: rgba(0, 122, 28, 1);
-  --color-base-black: rgba(0, 0, 0, 1);
-  --color-base-white: rgba(255, 255, 255, 1);
-  --color-foreground-neutral: rgba(0, 0, 0, 1);
-  --color-foreground-neutral-2: rgba(0, 0, 0, 1);
-  --color-border-neutral: rgba(230, 232, 239, 1);
-  --color-border-neutral-2: rgba(230, 232, 239, 1);
-  --color-foreground-neutral-faded: rgba(96, 105, 129, 1);
-  --color-foreground-neutral-faded-2: rgba(96, 105, 129, 1);
-  --color-border-focus: rgba(82, 146, 255, 1);
-  --color-border-focus-2: rgba(82, 146, 255, 1);
-  --color-border-primary: rgba(1, 78, 225, 1);
-  --color-border-primary-2: rgba(1, 78, 225, 1);
-  --color-foreground-primary: rgba(1, 78, 225, 1);
-  --color-foreground-primary-2: rgba(1, 78, 225, 1);
-  --color-foreground-secondary: rgba(135, 76, 230, 1);
-  --color-foreground-secondary-2: rgba(135, 76, 230, 1);
-  --color-foreground-positive: rgba(0, 122, 28, 1);
-  --color-foreground-positive-2: rgba(0, 122, 28, 1);
-  --color-foreground-disabled: rgba(198, 204, 219, 1);
-  --color-foreground-disabled-2: rgba(198, 204, 219, 1);
-  --color-border-primary-faded: rgba(209, 226, 255, 1);
-  --color-border-primary-faded-2: rgba(209, 226, 255, 1);
-  --color-background-neutral: rgba(246, 247, 249, 1);
-  --color-background-neutral-2: rgba(246, 247, 249, 1);
-  --color-border-positive: rgba(0, 122, 28, 1);
-  --color-border-positive-2: rgba(0, 122, 28, 1);
-  --color-border-positive-faded: rgba(180, 233, 197, 1);
-  --color-border-positive-faded-2: rgba(180, 233, 197, 1);
-  --color-border-secondary-faded: rgba(217, 200, 245, 1);
-  --color-border-secondary-faded-2: rgba(217, 200, 245, 1);
-  --color-border-secondary: rgba(135, 76, 230, 1);
-  --color-border-secondary-2: rgba(135, 76, 230, 1);
-  --color-background-page: rgba(255, 255, 255, 1);
-  --color-background-page-2: rgba(255, 255, 255, 1);
-  --color-background-primary: rgba(1, 78, 225, 1);
-  --color-background-primary-2: rgba(1, 78, 225, 1);
-  --color-background-primary-highlighted: rgba(16, 98, 254, 1);
-  --color-background-primary-highlighted-2: rgba(16, 98, 254, 1);
-  --color-background-primary-faded: rgba(236, 245, 255, 1);
-  --color-background-primary-faded-2: rgba(236, 245, 255, 1);
-  --color-background-secondary: rgba(135, 76, 230, 1);
-  --color-background-secondary-2: rgba(135, 76, 230, 1);
-  --color-background-secondary-highlighted: rgba(162, 117, 234, 1);
-  --color-background-secondary-highlighted-2: rgba(162, 117, 234, 1);
-  --color-background-secondary-faded: rgba(0, 0, 0, 1);
-  --color-background-secondary-faded-2: rgba(0, 0, 0, 1);
-  --color-background-positive-highlighted: rgba(53, 162, 79, 1);
-  --color-background-positive-highlighted-2: rgba(53, 162, 79, 1);
-  --color-background-positive-faded: rgba(235, 254, 246, 1);
-  --color-background-positive-faded-2: rgba(235, 254, 246, 1);
-  --color-background-positive: rgba(0, 122, 28, 1);
-  --color-background-positive-2: rgba(0, 122, 28, 1);
-  --shadow-raised: 0px 1px 3px -1px rgba(20, 23, 31, 0.05999999865889549), 0px 2px 3px -3px rgba(20, 23, 31, 0.1000000014901161);
-  --typography-body-body-1: 400 16px/24px Inter;
-  --typography-body-body-2: 500 14px/20px Inter;
-  --typography-heading-heading-1: 600 36px/44px Inter;
-  --typography-heading-heading-2: 600 28px/36px Inter;
-  --typography-heading-heading-3: 600 18px/28px Inter;
-  --gradient-gradient-gradient-1: linear-gradient(-158.49deg, rgba(16, 98, 254, 1) 0%, rgba(135, 76, 230, 1) 87.19%);
-  --shadow-raised-2: 0px 1px 3px -1px rgba(20, 23, 31, 0.05999999865889549), 0px 2px 3px -3px rgba(20, 23, 31, 0.1000000014901161);
-  --shadow-overlay: 0px 15px 25px 0px rgba(20, 23, 31, 0.07000000029802322), 0px 5px 10px 0px rgba(20, 23, 31, 0.05000000074505806);
-  --blur-blur: blur(12px);
-  --typography-body-body-3: 400 12px/16px Inter;
-  --gradient-gradient-gradient-2: linear-gradient(166.84deg, rgba(106, 200, 131, 1) 0%, rgba(82, 146, 255, 1) 46.21%, rgba(190, 159, 240, 1) 91.5%);
-  --shadow-shadow-2xs: 0px 1px 0px 0px rgba(0, 0, 0, 0.05000000074505806);
-  --shadow-shadow-xs: 0px 1px 2px 0px rgba(0, 0, 0, 0.05000000074505806);
-  --shadow-shadow-sm: 0px 1px 3px 0px rgba(0, 0, 0, 0.1000000014901161), 0px 1px 2px -1px rgba(0, 0, 0, 0.1000000014901161);
-  --shadow-shadow-md: 0px 4px 6px -1px rgba(0, 0, 0, 0.1000000014901161), 0px 2px 4px -2px rgba(0, 0, 0, 0.1000000014901161);
-  --shadow-shadow-lg: 0px 10px 15px -3px rgba(0, 0, 0, 0.1000000014901161), 0px 4px 6px -4px rgba(0, 0, 0, 0.1000000014901161);
-  --shadow-shadow-xl: 0px 20px 25px -5px rgba(0, 0, 0, 0.1000000014901161), 0px 8px 10px -6px rgba(0, 0, 0, 0.1000000014901161);
-  --shadow-shadow-2xl: 0px 25px 50px 12px rgba(0, 0, 0, 0.25);
-  --shadow-focus-ring-primary: 0px 0px 0px 3px rgba(255, 176, 136, 1);
-  --shadow-focus-ring-default: 0px 0px 0px 3px rgba(212, 212, 212, 1);
-  --shadow-focus-ring-error: 0px 0px 0px 3px rgba(253, 164, 175, 1);
-  --typography-heading-1: 600 48px/48px "Plus Jakarta Sans";
-  --typography-heading-2: 600 30px/30px "Plus Jakarta Sans";
-  --typography-heading-3: 600 24px/28.8px "Plus Jakarta Sans";
-  --typography-heading-4: 600 20px/24px "Plus Jakarta Sans";
-  --typography-title-regular: 400 16px/24px "Plus Jakarta Sans";
-  --typography-title-medium: 500 16px/24px "Plus Jakarta Sans";
-  --typography-title-bold: 600 16px/24px "Plus Jakarta Sans";
-  --typography-body-regular: 400 14px/21px "Plus Jakarta Sans";
-  --typography-body-medium: 500 14px/21px "Plus Jakarta Sans";
-  --typography-body-bold: 600 14px/21px "Plus Jakarta Sans";
-  --typography-caption-regular: 400 12px/16px "Plus Jakarta Sans";
-  --typography-caption-medium: 500 12px/16px "Plus Jakarta Sans";
-  --typography-caption-bold: 600 12px/16px "Plus Jakarta Sans";
-  --typography-label-regular: 400 11px/14px "Plus Jakarta Sans";
-  --typography-label-medium: 500 11px/14px "Plus Jakarta Sans";
-  --typography-label-bold: 600 11px/14px "Plus Jakarta Sans";
+  --blur: blur(12px);
+  --background-blur: rgba(255, 255, 255, 0.8);
+  --background-blur-neutral: rgba(96, 105, 129, 0.8);
+  --background-neutral: #f6f7f9;
+  --background-page: #ffffff;
+  --background-positive: #007a1c;
+  --background-positive-faded: #ebfef6;
+  --background-positive-highlighted: #35a24f;
+  --background-primary: #014ee1;
+  --background-primary-faded: #ecf5ff;
+  --background-primary-highlighted: #1062fe;
+  --background-secondary: #874ce6;
+  --background-secondary-faded: #f5f2fd;
+  --background-secondary-highlighted: #a275ea;
+  --base-black: #000000;
+  --base-blue200: #ecf5ff;
+  --base-blue300: #d1e2ff;
+  --base-blue500: #5292ff;
+  --base-blue600: #1062fe;
+  --base-blue700: #014ee1;
+  --base-gray200: #f6f7f9;
+  --base-gray300: #e6e8ef;
+  --base-gray500: #c6ccdb;
+  --base-gray600: #7f8594;
+  --base-gray700: #606981;
+  --base-green200: #ebfef6;
+  --base-green300: #b4e9c5;
+  --base-green500: #6ac883;
+  --base-green600: #35a24f;
+  --base-green700: #007a1c;
+  --base-purple200: #f5f2fd;
+  --base-purple300: #d9c8f5;
+  --base-purple500: #be9ff0;
+  --base-purple600: #a275ea;
+  --base-purple700: #874ce6;
+  --base-white: #ffffff;
+  --black: #000000;
+  --blue-blue200: #ecf5ff;
+  --blue-blue300: #d1e2ff;
+  --blue-blue500: #5292ff;
+  --blue-blue600: #1062fe;
+  --blue-blue700: #014ee1;
+  --border-focus: #5292ff;
+  --border-neutral: #e6e8ef;
+  --border-positive: #007a1c;
+  --border-positive-faded: #b4e9c5;
+  --border-primary: #014ee1;
+  --border-primary-faded: #d1e2ff;
+  --border-secondary: #874ce6;
+  --border-secondary-faded: #d9c8f5;
+  --foreground-disabled: #c6ccdb;
+  --foreground-neutral: #000000;
+  --foreground-neutral-faded: #606981;
+  --foreground-positive: #007a1c;
+  --foreground-primary: #014ee1;
+  --foreground-secondary: #874ce6;
+  --gray-gray200: #f6f7f9;
+  --gray-gray300: #e6e8ef;
+  --gray-gray500: #c6ccdb;
+  --gray-gray600: #7f8594;
+  --gray-gray700: #606981;
+  --green-green200: #ebfef6;
+  --green-green300: #b4e9c5;
+  --green-green500: #6ac883;
+  --green-green600: #35a24f;
+  --green-green700: #007a1c;
+  --purple-purple200: #f5f2fd;
+  --purple-purple300: #d9c8f5;
+  --purple-purple500: #be9ff0;
+  --purple-purple600: #a275ea;
+  --purple-purple700: #874ce6;
+  --white: #ffffff;
+  --gradient-gradient1: linear-gradient(90deg, #1062fe 0%, #874ce6 87.19%);
+  --gradient-gradient2: linear-gradient(90deg, #6ac883 0%, #5292ff 46.21%, #be9ff0 91.5%);
+  --overlay: 0px 15px 25px 0px rgba(20, 23, 31, 0.07);
+  --raised: 0px 1px 3px -1px rgba(20, 23, 31, 0.06);
+  --body-body1-font-family: Inter;
+  --body-body1-font-size: 16px;
+  --body-body1-font-weight: Regular;
+  --body-body1-line-height: 24px;
+  --body-body1-letter-spacing: 0px;
+  --body-body2-font-weight: Medium;
+  --body-body2-line-height: 20px;
+  --body-body2-letter-spacing: 0px;
+  --body-body2-font-family: Inter;
+  --body-body2-font-size: 14px;
+  --body-body3-font-family: Inter;
+  --body-body3-font-size: 12px;
+  --body-body3-font-weight: Regular;
+  --body-body3-line-height: 16px;
+  --body-body3-letter-spacing: 0px;
+  --heading-heading1-line-height: 44px;
+  --heading-heading1-letter-spacing: 0px;
+  --heading-heading1-font-family: Inter;
+  --heading-heading1-font-size: 36px;
+  --heading-heading1-font-weight: Semi Bold;
+  --heading-heading2-font-size: 28px;
+  --heading-heading2-font-weight: Semi Bold;
+  --heading-heading2-line-height: 36px;
+  --heading-heading2-letter-spacing: 0px;
+  --heading-heading2-font-family: Inter;
+  --heading-heading3-font-family: Inter;
+  --heading-heading3-font-size: 18px;
+  --heading-heading3-font-weight: Semi Bold;
+  --heading-heading3-line-height: 28px;
+  --heading-heading3-letter-spacing: 0px;
 }

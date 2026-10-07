@@ -1,126 +1,118 @@
 [
   {
-    "id": "db4c088e4426fc89013936b329e89b3c6d976b5d",
-    "name": "Checkbox",
-    "rawName": "Checkbox",
-    "description": "A checkbox lets users select or clear one or more independent options. It supports selected and unselected states, three sizes, disabled states, and optional labels on either side.\n\n\nWhen to use\nUse for optional, independent choices where more than one option may be selected.\nUse for confirmations, consent, preferences, and multi-select lists.\nUse when the result is applied after a user action such as Save or Submit.\nDo not use for mutually exclusive choices; use radio buttons instead.\nDo not use for an action that takes effect immediately; use a switch instead.\n\n\nUsage guidelines\nPair the checkbox with a short, clear label that describes the choice.\nPrefer a right-side label for left-to-right interfaces; use a left-side label only when the layout requires it.\nUse only one label position at a time.\nKeep related checkboxes vertically aligned and group them under a clear heading when needed.\nAvoid preselecting an option unless it is safe, expected, and easy to reverse.\nUse the disabled state only when the option is unavailable, and explain why when the reason is not obvious.\n\n\nProperties\nState: off (unselected) or on (selected).\nSize: Small, Medium, or Large. Match the surrounding control density and touch-target requirements.\nDisabled: false for interactive use or true when the control is unavailable.\nleftLabel: Shows or hides the label on the left side.\nrightLabel: Shows or hides the label on the right side.",
     "brandId": null,
-    "hasMitosisDefinition": false,
-    "fileId": "wLWN7FdmqCslghDJPWIweW",
-    "nodeId": "2179:474",
-    "sourceId": "db4c088e4426fc89013936b329e89b3c6d976b5d",
     "componentPropertyDefinitions": [],
-    "variantPropertyValues": {},
-    "updatedAt": "2026-09-29T02:56:03.315Z",
+    "description": "A checkbox lets users select or clear one or more independent options. It supports selected and unselected states, three sizes, disabled states, and optional labels on either side.\n\n\nWhen to use\nUse for optional, independent choices where more than one option may be selected.\nUse for confirmations, consent, preferences, and multi-select lists.\nUse when the result is applied after a user action such as Save or Submit.\nDo not use for mutually exclusive choices; use radio buttons instead.\nDo not use for an action that takes effect immediately; use a switch instead.\n\n\nUsage guidelines\nPair the checkbox with a short, clear label that describes the choice.\nPrefer a right-side label for left-to-right interfaces; use a left-side label only when the layout requires it.\nUse only one label position at a time.\nKeep related checkboxes vertically aligned and group them under a clear heading when needed.\nAvoid preselecting an option unless it is safe, expected, and easy to reverse.\nUse the disabled state only when the option is unavailable, and explain why when the reason is not obvious.\n\n\nProperties\nState: off (unselected) or on (selected).\nSize: Small, Medium, or Large. Match the surrounding control density and touch-target requirements.\nDisabled: false for interactive use or true when the control is unavailable.\nleftLabel: Shows or hides the label on the left side.\nrightLabel: Shows or hides the label on the right side.",
     "figma": {
+      "componentPropertyDefinitions": [],
       "fileId": "wLWN7FdmqCslghDJPWIweW",
-      "nodeId": "2179:474",
-      "sourceId": "db4c088e4426fc89013936b329e89b3c6d976b5d",
       "key": "db4c088e4426fc89013936b329e89b3c6d976b5d",
       "name": "Checkbox",
-      "thumbnailUrl": "https://s3-alpha.figma.com/checkpoints/jPt/znu/hAT1Zq9DbVNPekYx/2179_474.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAQ4GOSFWCQPXYJSOJ%2F20261004%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20261004T120000Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=8df44346e6a17488956f54c78dc77500e2515ae44ad1f3133866401d4e04bf1f",
-      "componentPropertyDefinitions": [],
+      "nodeId": "2179:474",
+      "sourceId": "db4c088e4426fc89013936b329e89b3c6d976b5d",
+      "thumbnailUrl": "https://s3-alpha.figma.com/checkpoints/jPt/znu/hAT1Zq9DbVNPekYx/2179_474.png?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=AKIAQ4GOSFWCQPXYJSOJ%2F20261004%2Fus-west-2%2Fs3%2Faws4_request\u0026X-Amz-Date=20261004T120000Z\u0026X-Amz-Expires=604800\u0026X-Amz-SignedHeaders=host\u0026X-Amz-Signature=8df44346e6a17488956f54c78dc77500e2515ae44ad1f3133866401d4e04bf1f",
+      "updatedAt": "2026-09-29T02:56:03.315Z",
       "variantPropertyValues": {},
-      "variants": [],
-      "updatedAt": "2026-09-29T02:56:03.315Z"
-    }
+      "variants": []
+    },
+    "fileId": "wLWN7FdmqCslghDJPWIweW",
+    "hasMitosisDefinition": false,
+    "id": "db4c088e4426fc89013936b329e89b3c6d976b5d",
+    "name": "Checkbox",
+    "nodeId": "2179:474",
+    "rawName": "Checkbox",
+    "sourceId": "db4c088e4426fc89013936b329e89b3c6d976b5d",
+    "updatedAt": "2026-09-29T02:56:03.315Z",
+    "variantPropertyValues": {}
   },
   {
-    "id": "532b6f674222a46e6250fd3a235e43a7646a1c15",
-    "name": "Button",
-    "rawName": "Button",
-    "description": "A versatile interactive component for user actions and link-styled navigation. It supports multiple emphasis levels, sizes, corner treatments, interaction states, optional leading and trailing icons, and an editable label.\n\nWHEN TO USE\n• Use for actions such as submitting a form, confirming a decision, starting a workflow, or performing an operation.\n• Use one clear Primary button for the preferred action at each decision point.\n• Use Secondary, Outline, or Ghost for supporting actions.\n• Use Destructive for dangerous or irreversible actions.\n• Use Style=Link for navigation to another destination and implement it semantically as a hyperlink.\n\nUSAGE GUIDELINES\n• Use a clear, concise, action-oriented label that ideally begins with a verb.\n• Match visual emphasis to the importance of the action.\n• Keep icon usage purposeful: leading icons can reinforce meaning, while trailing icons can indicate direction or continuation.\n• Keep the label visible unless the icon is universally understood and has an accessible name.\n• Use Disabled sparingly and explain why an action is unavailable when needed.\n• Do not use Hover, Focus, or Pressed as resting states; they communicate interaction feedback or progress.\n• Keep button hierarchy and sizing consistent within the same action group.\n\nPROPERTIES\n• Style — Primary, Secondary, Outline, Ghost, Destructive, or Link. Controls visual emphasis and semantic intent.\n• Size — Large, Regular, Small, or Mini. Controls dimensions and density.\n• Roundness — Default or Round. Controls corner treatment.\n• State — Default, Hover, Focus, Pressed, or Disabled. Represents interaction and availability.\n• Label — Changes the button text.\n• Show Label — Shows or hides the text label.\n• Show left icon / Show right icon — Toggles the leading or trailing icon.\n• Left icon / Right icon — Swaps the icon shown in the corresponding position.",
     "brandId": null,
-    "hasMitosisDefinition": false,
-    "fileId": "wLWN7FdmqCslghDJPWIweW",
-    "nodeId": "2266:662",
-    "sourceId": "532b6f674222a46e6250fd3a235e43a7646a1c15",
     "componentPropertyDefinitions": [],
-    "variantPropertyValues": {},
-    "updatedAt": "2026-10-05T01:02:37.336Z",
+    "description": "A versatile interactive component for user actions and link-styled navigation. It supports multiple emphasis levels, sizes, corner treatments, interaction states, optional leading and trailing icons, and an editable label.\n\nWHEN TO USE\n• Use for actions such as submitting a form, confirming a decision, starting a workflow, or performing an operation.\n• Use one clear Primary button for the preferred action at each decision point.\n• Use Secondary, Outline, or Ghost for supporting actions.\n• Use Destructive for dangerous or irreversible actions.\n• Use Style=Link for navigation to another destination and implement it semantically as a hyperlink.\n\nUSAGE GUIDELINES\n• Use a clear, concise, action-oriented label that ideally begins with a verb.\n• Match visual emphasis to the importance of the action.\n• Keep icon usage purposeful: leading icons can reinforce meaning, while trailing icons can indicate direction or continuation.\n• Keep the label visible unless the icon is universally understood and has an accessible name.\n• Use Disabled sparingly and explain why an action is unavailable when needed.\n• Do not use Hover, Focus, or Pressed as resting states; they communicate interaction feedback or progress.\n• Keep button hierarchy and sizing consistent within the same action group.\n\nPROPERTIES\n• Style — Primary, Secondary, Outline, Ghost, Destructive, or Link. Controls visual emphasis and semantic intent.\n• Size — Large, Regular, Small, or Mini. Controls dimensions and density.\n• Roundness — Default or Round. Controls corner treatment.\n• State — Default, Hover, Focus, Pressed, or Disabled. Represents interaction and availability.\n• Label — Changes the button text.\n• Show Label — Shows or hides the text label.\n• Show left icon / Show right icon — Toggles the leading or trailing icon.\n• Left icon / Right icon — Swaps the icon shown in the corresponding position.",
     "figma": {
+      "componentPropertyDefinitions": [],
       "fileId": "wLWN7FdmqCslghDJPWIweW",
-      "nodeId": "2266:662",
-      "sourceId": "532b6f674222a46e6250fd3a235e43a7646a1c15",
       "key": "532b6f674222a46e6250fd3a235e43a7646a1c15",
       "name": "Button",
-      "thumbnailUrl": "https://s3-alpha.figma.com/checkpoints/MHy/4cV/3hde8D7VfyQnZqDd/2266_662.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAQ4GOSFWCQPXYJSOJ%2F20261004%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20261004T120000Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=c71449612c299d84a240529a94558a5fc8fd1077a24b7bbe15e8aad2aa3a03cb",
-      "componentPropertyDefinitions": [],
+      "nodeId": "2266:662",
+      "sourceId": "532b6f674222a46e6250fd3a235e43a7646a1c15",
+      "thumbnailUrl": "https://s3-alpha.figma.com/checkpoints/MHy/4cV/3hde8D7VfyQnZqDd/2266_662.png?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=AKIAQ4GOSFWCQPXYJSOJ%2F20261004%2Fus-west-2%2Fs3%2Faws4_request\u0026X-Amz-Date=20261004T120000Z\u0026X-Amz-Expires=604800\u0026X-Amz-SignedHeaders=host\u0026X-Amz-Signature=c71449612c299d84a240529a94558a5fc8fd1077a24b7bbe15e8aad2aa3a03cb",
+      "updatedAt": "2026-10-05T01:02:37.336Z",
       "variantPropertyValues": {},
-      "variants": [],
-      "updatedAt": "2026-10-05T01:02:37.336Z"
-    }
+      "variants": []
+    },
+    "fileId": "wLWN7FdmqCslghDJPWIweW",
+    "hasMitosisDefinition": false,
+    "id": "532b6f674222a46e6250fd3a235e43a7646a1c15",
+    "name": "Button",
+    "nodeId": "2266:662",
+    "rawName": "Button",
+    "sourceId": "532b6f674222a46e6250fd3a235e43a7646a1c15",
+    "updatedAt": "2026-10-05T01:02:37.336Z",
+    "variantPropertyValues": {}
   },
   {
-    "id": "b52b293561ab2233dd749023df9007fe73925b1f",
-    "name": "Badge",
-    "rawName": "Badge",
-    "description": "A compact label used to communicate status, category, or supporting metadata without interrupting the main content.\n\n\nWhen to useShow a concise status, classification, or attribute.\nHelp users scan and compare items quickly.\nUse alongside primary content, not as a replacement for buttons or alerts.\n\n\nUsage guidelinesKeep labels short, clear, and sentence case.\nChoose the variant by meaning, not decoration.\nUse one semantic meaning consistently across the product.\nAvoid placing several high-emphasis badges next to each other.\nDo not use a Badge for interactive actions.\n\n\nPropertiesVariant: primary, secondary, destructive, success, warning, info, or outline.\nLabel: Editable text displayed inside the badge.",
     "brandId": null,
-    "hasMitosisDefinition": false,
-    "fileId": "wLWN7FdmqCslghDJPWIweW",
-    "nodeId": "2841:144",
-    "sourceId": "b52b293561ab2233dd749023df9007fe73925b1f",
     "componentPropertyDefinitions": [],
-    "variantPropertyValues": {},
-    "updatedAt": "2026-09-28T09:00:08.412Z",
+    "description": "A compact label used to communicate status, category, or supporting metadata without interrupting the main content.\n\n\nWhen to useShow a concise status, classification, or attribute.\nHelp users scan and compare items quickly.\nUse alongside primary content, not as a replacement for buttons or alerts.\n\n\nUsage guidelinesKeep labels short, clear, and sentence case.\nChoose the variant by meaning, not decoration.\nUse one semantic meaning consistently across the product.\nAvoid placing several high-emphasis badges next to each other.\nDo not use a Badge for interactive actions.\n\n\nPropertiesVariant: primary, secondary, destructive, success, warning, info, or outline.\nLabel: Editable text displayed inside the badge.",
     "figma": {
+      "componentPropertyDefinitions": [],
       "fileId": "wLWN7FdmqCslghDJPWIweW",
-      "nodeId": "2841:144",
-      "sourceId": "b52b293561ab2233dd749023df9007fe73925b1f",
       "key": "b52b293561ab2233dd749023df9007fe73925b1f",
       "name": "Badge",
-      "thumbnailUrl": "https://s3-alpha.figma.com/checkpoints/oEO/F5M/AG4tpq68tQbUtwHF/2841_144.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAQ4GOSFWCQPXYJSOJ%2F20261004%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20261004T120000Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=534f99c4148e2aa46514b61613d19497f04459bc8941cd4028e692e65168cb65",
-      "componentPropertyDefinitions": [],
+      "nodeId": "2841:144",
+      "sourceId": "b52b293561ab2233dd749023df9007fe73925b1f",
+      "thumbnailUrl": "https://s3-alpha.figma.com/checkpoints/oEO/F5M/AG4tpq68tQbUtwHF/2841_144.png?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=AKIAQ4GOSFWCQPXYJSOJ%2F20261004%2Fus-west-2%2Fs3%2Faws4_request\u0026X-Amz-Date=20261004T120000Z\u0026X-Amz-Expires=604800\u0026X-Amz-SignedHeaders=host\u0026X-Amz-Signature=534f99c4148e2aa46514b61613d19497f04459bc8941cd4028e692e65168cb65",
+      "updatedAt": "2026-09-28T09:00:08.412Z",
       "variantPropertyValues": {},
-      "variants": [],
-      "updatedAt": "2026-09-28T09:00:08.412Z"
-    }
+      "variants": []
+    },
+    "fileId": "wLWN7FdmqCslghDJPWIweW",
+    "hasMitosisDefinition": false,
+    "id": "b52b293561ab2233dd749023df9007fe73925b1f",
+    "name": "Badge",
+    "nodeId": "2841:144",
+    "rawName": "Badge",
+    "sourceId": "b52b293561ab2233dd749023df9007fe73925b1f",
+    "updatedAt": "2026-09-28T09:00:08.412Z",
+    "variantPropertyValues": {}
   },
   {
-    "id": "b169307a591332d47ee55979c04c06e7641cf859",
-    "name": "AlertDialog",
-    "rawName": "Alert dialog",
-    "description": "Alert dialog asks users to explicitly confirm an important, risky, or difficult-to-reverse action before it is performed.\n\n\nWhen to use\nBefore destructive actions such as deleting an account, data, or access.\nWhen an action is permanent or may affect multiple people.\nWhen users need to understand the consequences before proceeding.\n\n\nUsage guidelines\nUse a clear heading that states the decision the user must make.\nKeep the description concise and explain the consequence and affected item.\nUse specific action labels; avoid ambiguous labels such as “OK”.\nPlace the safe or cancel action first and the primary action on the right.\nHide the description only when the heading provides sufficient context. Keep it visible for high-risk actions.\nUse a destructive button style when the confirmed action is destructive.\n\n\nProperties\nShow description — Shows or hides the supporting description.\nHeading content — Sets the dialog heading.\nDescription content — Sets the supporting explanation or consequence.\nCancel button — Controls the content and configuration of the safe action.\nContinue button — Controls the content and configuration of the primary action.",
     "brandId": null,
-    "hasMitosisDefinition": false,
-    "fileId": "wLWN7FdmqCslghDJPWIweW",
-    "nodeId": "3429:327",
-    "sourceId": "b169307a591332d47ee55979c04c06e7641cf859",
     "componentPropertyDefinitions": [],
-    "variantPropertyValues": {},
-    "updatedAt": "2026-10-05T01:02:43.832Z",
+    "description": "Alert dialog asks users to explicitly confirm an important, risky, or difficult-to-reverse action before it is performed.\n\n\nWhen to use\nBefore destructive actions such as deleting an account, data, or access.\nWhen an action is permanent or may affect multiple people.\nWhen users need to understand the consequences before proceeding.\n\n\nUsage guidelines\nUse a clear heading that states the decision the user must make.\nKeep the description concise and explain the consequence and affected item.\nUse specific action labels; avoid ambiguous labels such as “OK”.\nPlace the safe or cancel action first and the primary action on the right.\nHide the description only when the heading provides sufficient context. Keep it visible for high-risk actions.\nUse a destructive button style when the confirmed action is destructive.\n\n\nProperties\nShow description — Shows or hides the supporting description.\nHeading content — Sets the dialog heading.\nDescription content — Sets the supporting explanation or consequence.\nCancel button — Controls the content and configuration of the safe action.\nContinue button — Controls the content and configuration of the primary action.",
     "figma": {
+      "componentPropertyDefinitions": [],
       "fileId": "wLWN7FdmqCslghDJPWIweW",
-      "nodeId": "3429:327",
-      "sourceId": "b169307a591332d47ee55979c04c06e7641cf859",
       "key": "b169307a591332d47ee55979c04c06e7641cf859",
       "name": "Alert dialog",
-      "thumbnailUrl": "https://s3-alpha.figma.com/checkpoints/h1S/Gr7/e4wT3kxHknTCQ9uj/3429_327.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAQ4GOSFWCQPXYJSOJ%2F20261004%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20261004T120000Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=9e678b5aad4e19876ae8693fd8d2834b5b17adab12046b3200ea9a365e424be2",
-      "componentPropertyDefinitions": [],
+      "nodeId": "3429:327",
+      "sourceId": "b169307a591332d47ee55979c04c06e7641cf859",
+      "thumbnailUrl": "https://s3-alpha.figma.com/checkpoints/h1S/Gr7/e4wT3kxHknTCQ9uj/3429_327.png?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=AKIAQ4GOSFWCQPXYJSOJ%2F20261004%2Fus-west-2%2Fs3%2Faws4_request\u0026X-Amz-Date=20261004T120000Z\u0026X-Amz-Expires=604800\u0026X-Amz-SignedHeaders=host\u0026X-Amz-Signature=9e678b5aad4e19876ae8693fd8d2834b5b17adab12046b3200ea9a365e424be2",
+      "updatedAt": "2026-10-05T01:02:43.832Z",
       "variantPropertyValues": {},
-      "variants": [],
-      "updatedAt": "2026-10-05T01:02:43.832Z"
-    }
+      "variants": []
+    },
+    "fileId": "wLWN7FdmqCslghDJPWIweW",
+    "hasMitosisDefinition": false,
+    "id": "b169307a591332d47ee55979c04c06e7641cf859",
+    "name": "AlertDialog",
+    "nodeId": "3429:327",
+    "rawName": "Alert dialog",
+    "sourceId": "b169307a591332d47ee55979c04c06e7641cf859",
+    "updatedAt": "2026-10-05T01:02:43.832Z",
+    "variantPropertyValues": {}
   },
   {
-    "id": "a36bc32c03e4207d699b229b22acd18c7ebdd186",
-    "name": "Breadcrumb",
-    "rawName": "Breadcrumb",
-    "description": "Description\nA breadcrumb navigation component that communicates the user's current location within a hierarchical structure and provides a clear path back to higher levels.\n\n\nWhen to use\nUse on pages that are nested within a clear hierarchy.\nUse when users may need to move quickly to a parent level.\nUse in content-heavy products, settings, catalogs, or multi-level navigation.\nDo not use as a replacement for primary navigation or for flat page structures.\n\n\nUsage guidelines\nKeep labels concise, recognizable, and consistent with page titles.\nArrange items from the highest level to the current page.\nTreat the final item as the current location; it should not navigate to itself.\nUse the shortest variant that accurately represents the hierarchy.\nFor long paths, use the deep variant with an ellipsis to collapse intermediate levels.\nKeep separators visually consistent and ensure interactive items have clear hover and focus states.\n\n\nProperties\nType — Controls the hierarchy depth: 1, 2, or deep.\nShow Ellipsis — Shows or hides the collapsed-path indicator. Use primarily with Type=deep when intermediate levels are omitted.",
     "brandId": null,
-    "hasMitosisDefinition": false,
-    "fileId": "wLWN7FdmqCslghDJPWIweW",
-    "nodeId": "2107:63117",
-    "sourceId": "a36bc32c03e4207d699b229b22acd18c7ebdd186",
     "componentPropertyDefinitions": {
       "Show Ellipsis#2953:4": {
-        "type": "BOOLEAN",
-        "defaultValue": true
+        "defaultValue": true,
+        "type": "BOOLEAN"
       },
       "Type": {
-        "type": "VARIANT",
         "defaultValue": "2",
+        "type": "VARIANT",
         "variantOptions": [
           "2",
           "deep",
@@ -128,24 +120,16 @@
         ]
       }
     },
-    "variantPropertyValues": {},
-    "updatedAt": "2026-10-06T08:26:57Z",
-    "sceneHash": "0baebdf5b8e694c35e6a9d2088511a553d7b315daf2350fcb0a7af5852752439",
+    "description": "Description\nA breadcrumb navigation component that communicates the user's current location within a hierarchical structure and provides a clear path back to higher levels.\n\n\nWhen to use\nUse on pages that are nested within a clear hierarchy.\nUse when users may need to move quickly to a parent level.\nUse in content-heavy products, settings, catalogs, or multi-level navigation.\nDo not use as a replacement for primary navigation or for flat page structures.\n\n\nUsage guidelines\nKeep labels concise, recognizable, and consistent with page titles.\nArrange items from the highest level to the current page.\nTreat the final item as the current location; it should not navigate to itself.\nUse the shortest variant that accurately represents the hierarchy.\nFor long paths, use the deep variant with an ellipsis to collapse intermediate levels.\nKeep separators visually consistent and ensure interactive items have clear hover and focus states.\n\n\nProperties\nType — Controls the hierarchy depth: 1, 2, or deep.\nShow Ellipsis — Shows or hides the collapsed-path indicator. Use primarily with Type=deep when intermediate levels are omitted.",
     "figma": {
-      "fileId": "wLWN7FdmqCslghDJPWIweW",
-      "nodeId": "2107:63117",
-      "sourceId": "a36bc32c03e4207d699b229b22acd18c7ebdd186",
-      "key": "a36bc32c03e4207d699b229b22acd18c7ebdd186",
-      "name": "Breadcrumb",
-      "thumbnailUrl": null,
       "componentPropertyDefinitions": {
         "Show Ellipsis#2953:4": {
-          "type": "BOOLEAN",
-          "defaultValue": true
+          "defaultValue": true,
+          "type": "BOOLEAN"
         },
         "Type": {
-          "type": "VARIANT",
           "defaultValue": "2",
+          "type": "VARIANT",
           "variantOptions": [
             "2",
             "deep",
@@ -153,571 +137,2562 @@
           ]
         }
       },
+      "fileId": "wLWN7FdmqCslghDJPWIweW",
+      "key": "a36bc32c03e4207d699b229b22acd18c7ebdd186",
+      "name": "Breadcrumb",
+      "nodeId": "2107:63117",
+      "sourceId": "a36bc32c03e4207d699b229b22acd18c7ebdd186",
+      "thumbnailUrl": null,
+      "updatedAt": "2026-10-06T08:26:57Z",
       "variantPropertyValues": {},
       "variants": [
         {
           "id": "2960:50",
           "name": "Type=2",
-          "variantPropertyValues": {},
           "origin": {
             "fileId": "wLWN7FdmqCslghDJPWIweW",
             "nodeId": "2960:50",
             "sourceId": "38292572ce845fa16b6d0dd4fba71edb77c24f7b"
           },
-          "updatedAt": "2026-10-06T08:26:57Z"
+          "updatedAt": "2026-10-06T08:26:57Z",
+          "variantPropertyValues": {}
         },
         {
           "id": "2960:58",
           "name": "Type=deep",
-          "variantPropertyValues": {},
           "origin": {
             "fileId": "wLWN7FdmqCslghDJPWIweW",
             "nodeId": "2960:58",
             "sourceId": "0f70624a43e60001639a85c617c22e4bc07262fa"
           },
-          "updatedAt": "2026-10-06T08:26:57Z"
+          "updatedAt": "2026-10-06T08:26:57Z",
+          "variantPropertyValues": {}
         },
         {
           "id": "2960:76",
           "name": "Type=1",
-          "variantPropertyValues": {},
           "origin": {
             "fileId": "wLWN7FdmqCslghDJPWIweW",
             "nodeId": "2960:76",
             "sourceId": "2482ccc307b4353bd874aa6f1f42005f944c59fe"
           },
-          "updatedAt": "2026-10-06T08:26:57Z"
+          "updatedAt": "2026-10-06T08:26:57Z",
+          "variantPropertyValues": {}
         }
-      ],
-      "updatedAt": "2026-10-06T08:26:57Z"
-    }
+      ]
+    },
+    "fileId": "wLWN7FdmqCslghDJPWIweW",
+    "hasMitosisDefinition": false,
+    "id": "a36bc32c03e4207d699b229b22acd18c7ebdd186",
+    "name": "Breadcrumb",
+    "nodeId": "2107:63117",
+    "rawName": "Breadcrumb",
+    "sceneHash": "0baebdf5b8e694c35e6a9d2088511a553d7b315daf2350fcb0a7af5852752439",
+    "sourceId": "a36bc32c03e4207d699b229b22acd18c7ebdd186",
+    "updatedAt": "2026-10-06T08:26:57Z",
+    "variantPropertyValues": {}
   },
   {
-    "id": "3a820cd7b046dfabaf3b26f49f9055ac1a70e111",
-    "name": "Table",
-    "rawName": "Table",
-    "description": "Description\nA configurable data-table component with populated and empty states, up to ten columns and ten rows, optional row selection, and optional row numbering.\n\n\nWhen to use\nUse to present structured records that users need to scan and compare across consistent columns. Use the Empty state when no records are available.\n\n\nUsage guidelines\nUse clear column labels and keep cell content consistent by column.\nShow only the columns required for the task.\nEnable checkboxes only when bulk selection or row selection is supported.\nEnable row numbers only when sequential references are useful.\nUse the Empty state for true no-data outcomes and provide a relevant next action when possible.\nFor complex sorting, filtering, pagination, or responsive behavior, pair this component with the appropriate surrounding controls and patterns.\n\n\nProperties\nState — Switches between Default and Empty.\nShow Column 1–10 — Shows or hides table columns.\nShow Row 1–10 — Shows or hides data rows.\nShow Checkbox — Shows or hides the selection column.\nShow No — Shows or hides the row-number column.\nTitle — Sets the empty-state heading.\nBody — Sets the empty-state supporting text.\nCTA Label — Sets the empty-state action label.\nShow Icon — Shows or hides the empty-state icon.\nShow Title — Shows or hides the empty-state heading.\nShow Description — Shows or hides the empty-state supporting text.\nShow CTA — Shows or hides the empty-state action.\nIcon — Swaps the empty-state icon.",
     "brandId": null,
-    "hasMitosisDefinition": false,
-    "fileId": "wLWN7FdmqCslghDJPWIweW",
-    "nodeId": "2571:20661",
-    "sourceId": "3a820cd7b046dfabaf3b26f49f9055ac1a70e111",
     "componentPropertyDefinitions": {
-      "Show Column 1#2571:0": {
-        "type": "BOOLEAN",
-        "defaultValue": true
-      },
-      "Show Column 2#2571:1": {
-        "type": "BOOLEAN",
-        "defaultValue": true
-      },
-      "Show Column 3#2571:2": {
-        "type": "BOOLEAN",
-        "defaultValue": true
-      },
-      "Show Column 4#2571:3": {
-        "type": "BOOLEAN",
-        "defaultValue": true
-      },
-      "Show Column 5#2571:4": {
-        "type": "BOOLEAN",
-        "defaultValue": true
-      },
-      "Show Column 6#2571:5": {
-        "type": "BOOLEAN",
-        "defaultValue": false
-      },
-      "Show Column 7#2571:6": {
-        "type": "BOOLEAN",
-        "defaultValue": false
-      },
-      "Show Column 8#2571:7": {
-        "type": "BOOLEAN",
-        "defaultValue": false
-      },
-      "Show Column 9#2571:8": {
-        "type": "BOOLEAN",
-        "defaultValue": false
-      },
-      "Show Column 10#2571:9": {
-        "type": "BOOLEAN",
-        "defaultValue": false
-      },
-      "Show Row 1#2571:10": {
-        "type": "BOOLEAN",
-        "defaultValue": true
-      },
-      "Show Row 2#2571:11": {
-        "type": "BOOLEAN",
-        "defaultValue": true
-      },
-      "Show Row 3#2571:12": {
-        "type": "BOOLEAN",
-        "defaultValue": true
-      },
-      "Show Row 4#2571:13": {
-        "type": "BOOLEAN",
-        "defaultValue": true
-      },
-      "Show Row 5#2571:14": {
-        "type": "BOOLEAN",
-        "defaultValue": true
-      },
-      "Show Row 6#2571:15": {
-        "type": "BOOLEAN",
-        "defaultValue": false
-      },
-      "Show Row 7#2571:16": {
-        "type": "BOOLEAN",
-        "defaultValue": true
-      },
-      "Show Row 8#2571:17": {
-        "type": "BOOLEAN",
-        "defaultValue": true
-      },
-      "Show Row 9#2571:18": {
-        "type": "BOOLEAN",
-        "defaultValue": true
-      },
-      "Show Row 10#2571:19": {
-        "type": "BOOLEAN",
-        "defaultValue": true
-      },
-      "Show Checkbox#2571:20": {
-        "type": "BOOLEAN",
-        "defaultValue": false
-      },
-      "Show No#2571:21": {
-        "type": "BOOLEAN",
-        "defaultValue": false
-      },
-      "Title#2571:22": {
-        "type": "TEXT",
-        "defaultValue": "No Data Available"
-      },
       "Body#2571:23": {
-        "type": "TEXT",
-        "defaultValue": "There's nothing here yet. Try adding some data or adjusting your filters."
+        "defaultValue": "There's nothing here yet. Try adding some data or adjusting your filters.",
+        "type": "TEXT"
       },
       "CTA Label#2571:24": {
-        "type": "TEXT",
-        "defaultValue": "Add Data"
-      },
-      "Show Icon#2576:12": {
-        "type": "BOOLEAN",
-        "defaultValue": true
-      },
-      "Show Title#2576:15": {
-        "type": "BOOLEAN",
-        "defaultValue": true
-      },
-      "Show Description#2576:18": {
-        "type": "BOOLEAN",
-        "defaultValue": true
-      },
-      "Show CTA#2576:21": {
-        "type": "BOOLEAN",
-        "defaultValue": true
+        "defaultValue": "Add Data",
+        "type": "TEXT"
       },
       "Icon#2579:0": {
-        "type": "INSTANCE_SWAP",
         "defaultValue": "2375:103015",
-        "preferredValues": []
+        "preferredValues": [],
+        "type": "INSTANCE_SWAP"
+      },
+      "Show CTA#2576:21": {
+        "defaultValue": true,
+        "type": "BOOLEAN"
+      },
+      "Show Checkbox#2571:20": {
+        "defaultValue": false,
+        "type": "BOOLEAN"
+      },
+      "Show Column 1#2571:0": {
+        "defaultValue": true,
+        "type": "BOOLEAN"
+      },
+      "Show Column 10#2571:9": {
+        "defaultValue": false,
+        "type": "BOOLEAN"
+      },
+      "Show Column 2#2571:1": {
+        "defaultValue": true,
+        "type": "BOOLEAN"
+      },
+      "Show Column 3#2571:2": {
+        "defaultValue": true,
+        "type": "BOOLEAN"
+      },
+      "Show Column 4#2571:3": {
+        "defaultValue": true,
+        "type": "BOOLEAN"
+      },
+      "Show Column 5#2571:4": {
+        "defaultValue": true,
+        "type": "BOOLEAN"
+      },
+      "Show Column 6#2571:5": {
+        "defaultValue": false,
+        "type": "BOOLEAN"
+      },
+      "Show Column 7#2571:6": {
+        "defaultValue": false,
+        "type": "BOOLEAN"
+      },
+      "Show Column 8#2571:7": {
+        "defaultValue": false,
+        "type": "BOOLEAN"
+      },
+      "Show Column 9#2571:8": {
+        "defaultValue": false,
+        "type": "BOOLEAN"
+      },
+      "Show Description#2576:18": {
+        "defaultValue": true,
+        "type": "BOOLEAN"
+      },
+      "Show Icon#2576:12": {
+        "defaultValue": true,
+        "type": "BOOLEAN"
+      },
+      "Show No#2571:21": {
+        "defaultValue": false,
+        "type": "BOOLEAN"
+      },
+      "Show Row 1#2571:10": {
+        "defaultValue": true,
+        "type": "BOOLEAN"
+      },
+      "Show Row 10#2571:19": {
+        "defaultValue": true,
+        "type": "BOOLEAN"
+      },
+      "Show Row 2#2571:11": {
+        "defaultValue": true,
+        "type": "BOOLEAN"
+      },
+      "Show Row 3#2571:12": {
+        "defaultValue": true,
+        "type": "BOOLEAN"
+      },
+      "Show Row 4#2571:13": {
+        "defaultValue": true,
+        "type": "BOOLEAN"
+      },
+      "Show Row 5#2571:14": {
+        "defaultValue": true,
+        "type": "BOOLEAN"
+      },
+      "Show Row 6#2571:15": {
+        "defaultValue": false,
+        "type": "BOOLEAN"
+      },
+      "Show Row 7#2571:16": {
+        "defaultValue": true,
+        "type": "BOOLEAN"
+      },
+      "Show Row 8#2571:17": {
+        "defaultValue": true,
+        "type": "BOOLEAN"
+      },
+      "Show Row 9#2571:18": {
+        "defaultValue": true,
+        "type": "BOOLEAN"
+      },
+      "Show Title#2576:15": {
+        "defaultValue": true,
+        "type": "BOOLEAN"
       },
       "State": {
-        "type": "VARIANT",
         "defaultValue": "Default",
+        "type": "VARIANT",
         "variantOptions": [
           "Default",
           "Empty"
         ]
+      },
+      "Title#2571:22": {
+        "defaultValue": "No Data Available",
+        "type": "TEXT"
       }
     },
-    "variantPropertyValues": {},
-    "updatedAt": "2026-10-06T08:26:57Z",
-    "sceneHash": "e30fd5539d968487b6ce6f8e16b108ffcdec1e2ac0f35b8193347f95158c1c89",
+    "description": "Description\nA configurable data-table component with populated and empty states, up to ten columns and ten rows, optional row selection, and optional row numbering.\n\n\nWhen to use\nUse to present structured records that users need to scan and compare across consistent columns. Use the Empty state when no records are available.\n\n\nUsage guidelines\nUse clear column labels and keep cell content consistent by column.\nShow only the columns required for the task.\nEnable checkboxes only when bulk selection or row selection is supported.\nEnable row numbers only when sequential references are useful.\nUse the Empty state for true no-data outcomes and provide a relevant next action when possible.\nFor complex sorting, filtering, pagination, or responsive behavior, pair this component with the appropriate surrounding controls and patterns.\n\n\nProperties\nState — Switches between Default and Empty.\nShow Column 1–10 — Shows or hides table columns.\nShow Row 1–10 — Shows or hides data rows.\nShow Checkbox — Shows or hides the selection column.\nShow No — Shows or hides the row-number column.\nTitle — Sets the empty-state heading.\nBody — Sets the empty-state supporting text.\nCTA Label — Sets the empty-state action label.\nShow Icon — Shows or hides the empty-state icon.\nShow Title — Shows or hides the empty-state heading.\nShow Description — Shows or hides the empty-state supporting text.\nShow CTA — Shows or hides the empty-state action.\nIcon — Swaps the empty-state icon.",
     "figma": {
-      "fileId": "wLWN7FdmqCslghDJPWIweW",
-      "nodeId": "2571:20661",
-      "sourceId": "3a820cd7b046dfabaf3b26f49f9055ac1a70e111",
-      "key": "3a820cd7b046dfabaf3b26f49f9055ac1a70e111",
-      "name": "Table",
-      "thumbnailUrl": null,
       "componentPropertyDefinitions": {
-        "Show Column 1#2571:0": {
-          "type": "BOOLEAN",
-          "defaultValue": true
-        },
-        "Show Column 2#2571:1": {
-          "type": "BOOLEAN",
-          "defaultValue": true
-        },
-        "Show Column 3#2571:2": {
-          "type": "BOOLEAN",
-          "defaultValue": true
-        },
-        "Show Column 4#2571:3": {
-          "type": "BOOLEAN",
-          "defaultValue": true
-        },
-        "Show Column 5#2571:4": {
-          "type": "BOOLEAN",
-          "defaultValue": true
-        },
-        "Show Column 6#2571:5": {
-          "type": "BOOLEAN",
-          "defaultValue": false
-        },
-        "Show Column 7#2571:6": {
-          "type": "BOOLEAN",
-          "defaultValue": false
-        },
-        "Show Column 8#2571:7": {
-          "type": "BOOLEAN",
-          "defaultValue": false
-        },
-        "Show Column 9#2571:8": {
-          "type": "BOOLEAN",
-          "defaultValue": false
-        },
-        "Show Column 10#2571:9": {
-          "type": "BOOLEAN",
-          "defaultValue": false
-        },
-        "Show Row 1#2571:10": {
-          "type": "BOOLEAN",
-          "defaultValue": true
-        },
-        "Show Row 2#2571:11": {
-          "type": "BOOLEAN",
-          "defaultValue": true
-        },
-        "Show Row 3#2571:12": {
-          "type": "BOOLEAN",
-          "defaultValue": true
-        },
-        "Show Row 4#2571:13": {
-          "type": "BOOLEAN",
-          "defaultValue": true
-        },
-        "Show Row 5#2571:14": {
-          "type": "BOOLEAN",
-          "defaultValue": true
-        },
-        "Show Row 6#2571:15": {
-          "type": "BOOLEAN",
-          "defaultValue": false
-        },
-        "Show Row 7#2571:16": {
-          "type": "BOOLEAN",
-          "defaultValue": true
-        },
-        "Show Row 8#2571:17": {
-          "type": "BOOLEAN",
-          "defaultValue": true
-        },
-        "Show Row 9#2571:18": {
-          "type": "BOOLEAN",
-          "defaultValue": true
-        },
-        "Show Row 10#2571:19": {
-          "type": "BOOLEAN",
-          "defaultValue": true
-        },
-        "Show Checkbox#2571:20": {
-          "type": "BOOLEAN",
-          "defaultValue": false
-        },
-        "Show No#2571:21": {
-          "type": "BOOLEAN",
-          "defaultValue": false
-        },
-        "Title#2571:22": {
-          "type": "TEXT",
-          "defaultValue": "No Data Available"
-        },
         "Body#2571:23": {
-          "type": "TEXT",
-          "defaultValue": "There's nothing here yet. Try adding some data or adjusting your filters."
+          "defaultValue": "There's nothing here yet. Try adding some data or adjusting your filters.",
+          "type": "TEXT"
         },
         "CTA Label#2571:24": {
-          "type": "TEXT",
-          "defaultValue": "Add Data"
-        },
-        "Show Icon#2576:12": {
-          "type": "BOOLEAN",
-          "defaultValue": true
-        },
-        "Show Title#2576:15": {
-          "type": "BOOLEAN",
-          "defaultValue": true
-        },
-        "Show Description#2576:18": {
-          "type": "BOOLEAN",
-          "defaultValue": true
-        },
-        "Show CTA#2576:21": {
-          "type": "BOOLEAN",
-          "defaultValue": true
+          "defaultValue": "Add Data",
+          "type": "TEXT"
         },
         "Icon#2579:0": {
-          "type": "INSTANCE_SWAP",
           "defaultValue": "2375:103015",
-          "preferredValues": []
+          "preferredValues": [],
+          "type": "INSTANCE_SWAP"
+        },
+        "Show CTA#2576:21": {
+          "defaultValue": true,
+          "type": "BOOLEAN"
+        },
+        "Show Checkbox#2571:20": {
+          "defaultValue": false,
+          "type": "BOOLEAN"
+        },
+        "Show Column 1#2571:0": {
+          "defaultValue": true,
+          "type": "BOOLEAN"
+        },
+        "Show Column 10#2571:9": {
+          "defaultValue": false,
+          "type": "BOOLEAN"
+        },
+        "Show Column 2#2571:1": {
+          "defaultValue": true,
+          "type": "BOOLEAN"
+        },
+        "Show Column 3#2571:2": {
+          "defaultValue": true,
+          "type": "BOOLEAN"
+        },
+        "Show Column 4#2571:3": {
+          "defaultValue": true,
+          "type": "BOOLEAN"
+        },
+        "Show Column 5#2571:4": {
+          "defaultValue": true,
+          "type": "BOOLEAN"
+        },
+        "Show Column 6#2571:5": {
+          "defaultValue": false,
+          "type": "BOOLEAN"
+        },
+        "Show Column 7#2571:6": {
+          "defaultValue": false,
+          "type": "BOOLEAN"
+        },
+        "Show Column 8#2571:7": {
+          "defaultValue": false,
+          "type": "BOOLEAN"
+        },
+        "Show Column 9#2571:8": {
+          "defaultValue": false,
+          "type": "BOOLEAN"
+        },
+        "Show Description#2576:18": {
+          "defaultValue": true,
+          "type": "BOOLEAN"
+        },
+        "Show Icon#2576:12": {
+          "defaultValue": true,
+          "type": "BOOLEAN"
+        },
+        "Show No#2571:21": {
+          "defaultValue": false,
+          "type": "BOOLEAN"
+        },
+        "Show Row 1#2571:10": {
+          "defaultValue": true,
+          "type": "BOOLEAN"
+        },
+        "Show Row 10#2571:19": {
+          "defaultValue": true,
+          "type": "BOOLEAN"
+        },
+        "Show Row 2#2571:11": {
+          "defaultValue": true,
+          "type": "BOOLEAN"
+        },
+        "Show Row 3#2571:12": {
+          "defaultValue": true,
+          "type": "BOOLEAN"
+        },
+        "Show Row 4#2571:13": {
+          "defaultValue": true,
+          "type": "BOOLEAN"
+        },
+        "Show Row 5#2571:14": {
+          "defaultValue": true,
+          "type": "BOOLEAN"
+        },
+        "Show Row 6#2571:15": {
+          "defaultValue": false,
+          "type": "BOOLEAN"
+        },
+        "Show Row 7#2571:16": {
+          "defaultValue": true,
+          "type": "BOOLEAN"
+        },
+        "Show Row 8#2571:17": {
+          "defaultValue": true,
+          "type": "BOOLEAN"
+        },
+        "Show Row 9#2571:18": {
+          "defaultValue": true,
+          "type": "BOOLEAN"
+        },
+        "Show Title#2576:15": {
+          "defaultValue": true,
+          "type": "BOOLEAN"
         },
         "State": {
-          "type": "VARIANT",
           "defaultValue": "Default",
+          "type": "VARIANT",
           "variantOptions": [
             "Default",
             "Empty"
           ]
+        },
+        "Title#2571:22": {
+          "defaultValue": "No Data Available",
+          "type": "TEXT"
         }
       },
+      "fileId": "wLWN7FdmqCslghDJPWIweW",
+      "key": "3a820cd7b046dfabaf3b26f49f9055ac1a70e111",
+      "name": "Table",
+      "nodeId": "2571:20661",
+      "sourceId": "3a820cd7b046dfabaf3b26f49f9055ac1a70e111",
+      "thumbnailUrl": null,
+      "updatedAt": "2026-10-06T08:26:57Z",
       "variantPropertyValues": {},
       "variants": [
         {
           "id": "2299:120",
           "name": "State=Default",
-          "variantPropertyValues": {},
           "origin": {
             "fileId": "wLWN7FdmqCslghDJPWIweW",
             "nodeId": "2299:120",
             "sourceId": "d0590468eef9ddc2bd78b8ce0ae12491a4ea032b"
           },
-          "updatedAt": "2026-10-06T08:26:57Z"
+          "updatedAt": "2026-10-06T08:26:57Z",
+          "variantPropertyValues": {}
         },
         {
           "id": "2572:878",
           "name": "State=Empty",
-          "variantPropertyValues": {},
           "origin": {
             "fileId": "wLWN7FdmqCslghDJPWIweW",
             "nodeId": "2572:878",
             "sourceId": "fedc79d62022e1b5b0ea85dbdaff878fc18a924a"
           },
-          "updatedAt": "2026-10-06T08:26:57Z"
+          "updatedAt": "2026-10-06T08:26:57Z",
+          "variantPropertyValues": {}
         }
-      ],
-      "updatedAt": "2026-10-06T08:26:57Z"
-    }
+      ]
+    },
+    "fileId": "wLWN7FdmqCslghDJPWIweW",
+    "hasMitosisDefinition": false,
+    "id": "3a820cd7b046dfabaf3b26f49f9055ac1a70e111",
+    "name": "Table",
+    "nodeId": "2571:20661",
+    "rawName": "Table",
+    "sceneHash": "e30fd5539d968487b6ce6f8e16b108ffcdec1e2ac0f35b8193347f95158c1c89",
+    "sourceId": "3a820cd7b046dfabaf3b26f49f9055ac1a70e111",
+    "updatedAt": "2026-10-06T08:26:57Z",
+    "variantPropertyValues": {}
   },
   {
-    "id": "667d23c84ccbe78a2226eff3ce6bad69560233d5",
-    "name": "TableHeaderRow",
-    "rawName": "Table Header Row",
-    "description": "Description\nA reusable table header row with up to ten configurable columns.\n\n\nWhen to use\nUse at the top of a data table to label and align its columns. Omit it only when the surrounding context makes every column unambiguous.\n\n\nUsage guidelines\nMatch visible header columns to the visible columns in every body row.\nUse short, descriptive labels.\nKeep column order and widths consistent with the body rows.\nAvoid wrapping header labels when a shorter label is available.\n\n\nProperties\nShow Column 1–10 — Shows or hides each header column. Columns 1–5 are visible by default; columns 6–10 are optional.",
     "brandId": null,
-    "hasMitosisDefinition": false,
-    "fileId": "wLWN7FdmqCslghDJPWIweW",
-    "nodeId": "2299:102",
-    "sourceId": "667d23c84ccbe78a2226eff3ce6bad69560233d5",
     "componentPropertyDefinitions": {
       "Show Column 1#2305:0": {
-        "type": "BOOLEAN",
-        "defaultValue": true
-      },
-      "Show Column 2#2305:1": {
-        "type": "BOOLEAN",
-        "defaultValue": true
-      },
-      "Show Column 3#2305:2": {
-        "type": "BOOLEAN",
-        "defaultValue": true
-      },
-      "Show Column 4#2305:3": {
-        "type": "BOOLEAN",
-        "defaultValue": true
-      },
-      "Show Column 5#2305:4": {
-        "type": "BOOLEAN",
-        "defaultValue": true
-      },
-      "Show Column 6#2305:5": {
-        "type": "BOOLEAN",
-        "defaultValue": false
-      },
-      "Show Column 7#2305:6": {
-        "type": "BOOLEAN",
-        "defaultValue": false
-      },
-      "Show Column 8#2305:7": {
-        "type": "BOOLEAN",
-        "defaultValue": false
-      },
-      "Show Column 9#2305:8": {
-        "type": "BOOLEAN",
-        "defaultValue": false
+        "defaultValue": true,
+        "type": "BOOLEAN"
       },
       "Show Column 10#2305:9": {
-        "type": "BOOLEAN",
-        "defaultValue": false
+        "defaultValue": false,
+        "type": "BOOLEAN"
+      },
+      "Show Column 2#2305:1": {
+        "defaultValue": true,
+        "type": "BOOLEAN"
+      },
+      "Show Column 3#2305:2": {
+        "defaultValue": true,
+        "type": "BOOLEAN"
+      },
+      "Show Column 4#2305:3": {
+        "defaultValue": true,
+        "type": "BOOLEAN"
+      },
+      "Show Column 5#2305:4": {
+        "defaultValue": true,
+        "type": "BOOLEAN"
+      },
+      "Show Column 6#2305:5": {
+        "defaultValue": false,
+        "type": "BOOLEAN"
+      },
+      "Show Column 7#2305:6": {
+        "defaultValue": false,
+        "type": "BOOLEAN"
+      },
+      "Show Column 8#2305:7": {
+        "defaultValue": false,
+        "type": "BOOLEAN"
+      },
+      "Show Column 9#2305:8": {
+        "defaultValue": false,
+        "type": "BOOLEAN"
       }
     },
-    "variantPropertyValues": {},
-    "updatedAt": "2026-10-06T08:26:57Z",
-    "sceneHash": "82e697c3808b60fbca826ccf9b98d6db3dae6e149690426fa0eb2d87a0fe152f",
+    "description": "Description\nA reusable table header row with up to ten configurable columns.\n\n\nWhen to use\nUse at the top of a data table to label and align its columns. Omit it only when the surrounding context makes every column unambiguous.\n\n\nUsage guidelines\nMatch visible header columns to the visible columns in every body row.\nUse short, descriptive labels.\nKeep column order and widths consistent with the body rows.\nAvoid wrapping header labels when a shorter label is available.\n\n\nProperties\nShow Column 1–10 — Shows or hides each header column. Columns 1–5 are visible by default; columns 6–10 are optional.",
     "figma": {
-      "fileId": "wLWN7FdmqCslghDJPWIweW",
-      "nodeId": "2299:102",
-      "sourceId": "667d23c84ccbe78a2226eff3ce6bad69560233d5",
-      "key": "667d23c84ccbe78a2226eff3ce6bad69560233d5",
-      "name": "Table Header Row",
-      "thumbnailUrl": null,
       "componentPropertyDefinitions": {
         "Show Column 1#2305:0": {
-          "type": "BOOLEAN",
-          "defaultValue": true
-        },
-        "Show Column 2#2305:1": {
-          "type": "BOOLEAN",
-          "defaultValue": true
-        },
-        "Show Column 3#2305:2": {
-          "type": "BOOLEAN",
-          "defaultValue": true
-        },
-        "Show Column 4#2305:3": {
-          "type": "BOOLEAN",
-          "defaultValue": true
-        },
-        "Show Column 5#2305:4": {
-          "type": "BOOLEAN",
-          "defaultValue": true
-        },
-        "Show Column 6#2305:5": {
-          "type": "BOOLEAN",
-          "defaultValue": false
-        },
-        "Show Column 7#2305:6": {
-          "type": "BOOLEAN",
-          "defaultValue": false
-        },
-        "Show Column 8#2305:7": {
-          "type": "BOOLEAN",
-          "defaultValue": false
-        },
-        "Show Column 9#2305:8": {
-          "type": "BOOLEAN",
-          "defaultValue": false
+          "defaultValue": true,
+          "type": "BOOLEAN"
         },
         "Show Column 10#2305:9": {
-          "type": "BOOLEAN",
-          "defaultValue": false
+          "defaultValue": false,
+          "type": "BOOLEAN"
+        },
+        "Show Column 2#2305:1": {
+          "defaultValue": true,
+          "type": "BOOLEAN"
+        },
+        "Show Column 3#2305:2": {
+          "defaultValue": true,
+          "type": "BOOLEAN"
+        },
+        "Show Column 4#2305:3": {
+          "defaultValue": true,
+          "type": "BOOLEAN"
+        },
+        "Show Column 5#2305:4": {
+          "defaultValue": true,
+          "type": "BOOLEAN"
+        },
+        "Show Column 6#2305:5": {
+          "defaultValue": false,
+          "type": "BOOLEAN"
+        },
+        "Show Column 7#2305:6": {
+          "defaultValue": false,
+          "type": "BOOLEAN"
+        },
+        "Show Column 8#2305:7": {
+          "defaultValue": false,
+          "type": "BOOLEAN"
+        },
+        "Show Column 9#2305:8": {
+          "defaultValue": false,
+          "type": "BOOLEAN"
         }
       },
+      "fileId": "wLWN7FdmqCslghDJPWIweW",
+      "key": "667d23c84ccbe78a2226eff3ce6bad69560233d5",
+      "name": "Table Header Row",
+      "nodeId": "2299:102",
+      "sourceId": "667d23c84ccbe78a2226eff3ce6bad69560233d5",
+      "thumbnailUrl": null,
+      "updatedAt": "2026-10-06T08:26:57Z",
       "variantPropertyValues": {},
-      "variants": [],
-      "updatedAt": "2026-10-06T08:26:57Z"
+      "variants": []
+    },
+    "fileId": "wLWN7FdmqCslghDJPWIweW",
+    "hasMitosisDefinition": false,
+    "id": "667d23c84ccbe78a2226eff3ce6bad69560233d5",
+    "name": "TableHeaderRow",
+    "nodeId": "2299:102",
+    "rawName": "Table Header Row",
+    "sceneHash": "82e697c3808b60fbca826ccf9b98d6db3dae6e149690426fa0eb2d87a0fe152f",
+    "sourceId": "667d23c84ccbe78a2226eff3ce6bad69560233d5",
+    "updatedAt": "2026-10-06T08:26:57Z",
+    "variantPropertyValues": {}
+  },
+  {
+    "brandId": null,
+    "componentPropertyDefinitions": {
+      "Show Column 1#2305:10": {
+        "defaultValue": true,
+        "type": "BOOLEAN"
+      },
+      "Show Column 10#2305:19": {
+        "defaultValue": false,
+        "type": "BOOLEAN"
+      },
+      "Show Column 2#2305:11": {
+        "defaultValue": true,
+        "type": "BOOLEAN"
+      },
+      "Show Column 3#2305:12": {
+        "defaultValue": true,
+        "type": "BOOLEAN"
+      },
+      "Show Column 4#2305:13": {
+        "defaultValue": true,
+        "type": "BOOLEAN"
+      },
+      "Show Column 5#2305:14": {
+        "defaultValue": true,
+        "type": "BOOLEAN"
+      },
+      "Show Column 6#2305:15": {
+        "defaultValue": false,
+        "type": "BOOLEAN"
+      },
+      "Show Column 7#2305:16": {
+        "defaultValue": false,
+        "type": "BOOLEAN"
+      },
+      "Show Column 8#2305:17": {
+        "defaultValue": false,
+        "type": "BOOLEAN"
+      },
+      "Show Column 9#2305:18": {
+        "defaultValue": false,
+        "type": "BOOLEAN"
+      }
+    },
+    "description": "Description\nA reusable table body row with up to ten configurable data columns.\n\n\nWhen to use\nUse for each data record in the default table state.\n\n\nUsage guidelines\nKeep the visible columns synchronized with Table Header Row.\nUse the same cell-value type and alignment throughout each column.\nPreserve a consistent row height across a table.\nPlace row-level actions in the designated actions column.\n\n\nProperties\nShow Column 1–10 — Shows or hides each data column. Columns 1–5 are visible by default; columns 6–10 are optional.",
+    "figma": {
+      "componentPropertyDefinitions": {
+        "Show Column 1#2305:10": {
+          "defaultValue": true,
+          "type": "BOOLEAN"
+        },
+        "Show Column 10#2305:19": {
+          "defaultValue": false,
+          "type": "BOOLEAN"
+        },
+        "Show Column 2#2305:11": {
+          "defaultValue": true,
+          "type": "BOOLEAN"
+        },
+        "Show Column 3#2305:12": {
+          "defaultValue": true,
+          "type": "BOOLEAN"
+        },
+        "Show Column 4#2305:13": {
+          "defaultValue": true,
+          "type": "BOOLEAN"
+        },
+        "Show Column 5#2305:14": {
+          "defaultValue": true,
+          "type": "BOOLEAN"
+        },
+        "Show Column 6#2305:15": {
+          "defaultValue": false,
+          "type": "BOOLEAN"
+        },
+        "Show Column 7#2305:16": {
+          "defaultValue": false,
+          "type": "BOOLEAN"
+        },
+        "Show Column 8#2305:17": {
+          "defaultValue": false,
+          "type": "BOOLEAN"
+        },
+        "Show Column 9#2305:18": {
+          "defaultValue": false,
+          "type": "BOOLEAN"
+        }
+      },
+      "fileId": "wLWN7FdmqCslghDJPWIweW",
+      "key": "d9345e7919a39920fd32ab084b3bde9462caa4da",
+      "name": "Table Body Row",
+      "nodeId": "2299:111",
+      "sourceId": "d9345e7919a39920fd32ab084b3bde9462caa4da",
+      "thumbnailUrl": null,
+      "updatedAt": "2026-10-06T08:26:57Z",
+      "variantPropertyValues": {},
+      "variants": []
+    },
+    "fileId": "wLWN7FdmqCslghDJPWIweW",
+    "hasMitosisDefinition": false,
+    "id": "d9345e7919a39920fd32ab084b3bde9462caa4da",
+    "name": "TableBodyRow",
+    "nodeId": "2299:111",
+    "rawName": "Table Body Row",
+    "sceneHash": "7b9df34db62b6381ff85f238f24674a8b78b2741b934391ee69950e9aff2542f",
+    "sourceId": "d9345e7919a39920fd32ab084b3bde9462caa4da",
+    "updatedAt": "2026-10-06T08:26:57Z",
+    "variantPropertyValues": {}
+  },
+  {
+    "brandId": null,
+    "componentPropertyDefinitions": {
+      "color": {
+        "defaultValue": "primary",
+        "type": "VARIANT",
+        "variantOptions": [
+          "primary",
+          "positive",
+          "secondary"
+        ]
+      },
+      "shape": {
+        "defaultValue": "square",
+        "type": "VARIANT",
+        "variantOptions": [
+          "round",
+          "square"
+        ]
+      },
+      "size": {
+        "defaultValue": "medium",
+        "type": "VARIANT",
+        "variantOptions": [
+          "medium",
+          "small"
+        ]
+      }
+    },
+    "description": "Avatars are used to represent a user or company in the interface.",
+    "figma": {
+      "componentPropertyDefinitions": {
+        "color": {
+          "defaultValue": "primary",
+          "type": "VARIANT",
+          "variantOptions": [
+            "primary",
+            "positive",
+            "secondary"
+          ]
+        },
+        "shape": {
+          "defaultValue": "square",
+          "type": "VARIANT",
+          "variantOptions": [
+            "round",
+            "square"
+          ]
+        },
+        "size": {
+          "defaultValue": "medium",
+          "type": "VARIANT",
+          "variantOptions": [
+            "medium",
+            "small"
+          ]
+        }
+      },
+      "fileId": "",
+      "key": "",
+      "name": "Avatar",
+      "nodeId": "60:9129",
+      "sourceId": "",
+      "thumbnailUrl": null,
+      "updatedAt": "2026-10-07T02:01:45Z",
+      "variantPropertyValues": {
+        "color": "primary",
+        "shape": "square",
+        "size": "medium"
+      },
+      "variants": [
+        {
+          "id": "60:9258",
+          "name": "color=primary, shape=square, size=medium",
+          "variantProperties": {
+            "color": "primary",
+            "shape": "square",
+            "size": "medium"
+          }
+        },
+        {
+          "id": "60:9317",
+          "name": "color=secondary, shape=square, size=medium",
+          "variantProperties": {
+            "color": "secondary",
+            "shape": "square",
+            "size": "medium"
+          }
+        },
+        {
+          "id": "60:9315",
+          "name": "color=positive, shape=square, size=medium",
+          "variantProperties": {
+            "color": "positive",
+            "shape": "square",
+            "size": "medium"
+          }
+        },
+        {
+          "id": "60:9319",
+          "name": "color=primary, shape=round, size=medium",
+          "variantProperties": {
+            "color": "primary",
+            "shape": "round",
+            "size": "medium"
+          }
+        },
+        {
+          "id": "60:9321",
+          "name": "color=secondary, shape=round, size=medium",
+          "variantProperties": {
+            "color": "secondary",
+            "shape": "round",
+            "size": "medium"
+          }
+        },
+        {
+          "id": "60:9323",
+          "name": "color=positive, shape=round, size=medium",
+          "variantProperties": {
+            "color": "positive",
+            "shape": "round",
+            "size": "medium"
+          }
+        },
+        {
+          "id": "60:9325",
+          "name": "color=primary, shape=square, size=small",
+          "variantProperties": {
+            "color": "primary",
+            "shape": "square",
+            "size": "small"
+          }
+        },
+        {
+          "id": "60:9327",
+          "name": "color=secondary, shape=square, size=small",
+          "variantProperties": {
+            "color": "secondary",
+            "shape": "square",
+            "size": "small"
+          }
+        },
+        {
+          "id": "60:9329",
+          "name": "color=positive, shape=square, size=small",
+          "variantProperties": {
+            "color": "positive",
+            "shape": "square",
+            "size": "small"
+          }
+        },
+        {
+          "id": "60:9331",
+          "name": "color=primary, shape=round, size=small",
+          "variantProperties": {
+            "color": "primary",
+            "shape": "round",
+            "size": "small"
+          }
+        },
+        {
+          "id": "60:9333",
+          "name": "color=secondary, shape=round, size=small",
+          "variantProperties": {
+            "color": "secondary",
+            "shape": "round",
+            "size": "small"
+          }
+        },
+        {
+          "id": "60:9335",
+          "name": "color=positive, shape=round, size=small",
+          "variantProperties": {
+            "color": "positive",
+            "shape": "round",
+            "size": "small"
+          }
+        }
+      ]
+    },
+    "fileId": "",
+    "hasMitosisDefinition": false,
+    "id": "60:9129",
+    "name": "Avatar",
+    "nodeId": "60:9129",
+    "rawName": "Avatar",
+    "sourceId": "",
+    "updatedAt": "2026-10-07T02:01:45Z",
+    "variantPropertyValues": {
+      "color": "primary",
+      "shape": "square",
+      "size": "medium"
     }
   },
   {
-    "id": "d9345e7919a39920fd32ab084b3bde9462caa4da",
-    "name": "TableBodyRow",
-    "rawName": "Table Body Row",
-    "description": "Description\nA reusable table body row with up to ten configurable data columns.\n\n\nWhen to use\nUse for each data record in the default table state.\n\n\nUsage guidelines\nKeep the visible columns synchronized with Table Header Row.\nUse the same cell-value type and alignment throughout each column.\nPreserve a consistent row height across a table.\nPlace row-level actions in the designated actions column.\n\n\nProperties\nShow Column 1–10 — Shows or hides each data column. Columns 1–5 are visible by default; columns 6–10 are optional.",
     "brandId": null,
-    "hasMitosisDefinition": false,
-    "fileId": "wLWN7FdmqCslghDJPWIweW",
-    "nodeId": "2299:111",
-    "sourceId": "d9345e7919a39920fd32ab084b3bde9462caa4da",
     "componentPropertyDefinitions": {
-      "Show Column 1#2305:10": {
-        "type": "BOOLEAN",
-        "defaultValue": true
+      "color": {
+        "defaultValue": "primary",
+        "type": "VARIANT",
+        "variantOptions": [
+          "secondary",
+          "primary",
+          "positive"
+        ]
       },
-      "Show Column 2#2305:11": {
-        "type": "BOOLEAN",
-        "defaultValue": true
+      "show action#293:0": {
+        "defaultValue": true,
+        "type": "BOOLEAN"
       },
-      "Show Column 3#2305:12": {
-        "type": "BOOLEAN",
-        "defaultValue": true
+      "show icon#2367:17": {
+        "defaultValue": true,
+        "type": "BOOLEAN"
       },
-      "Show Column 4#2305:13": {
-        "type": "BOOLEAN",
-        "defaultValue": true
+      "show text#2357:19": {
+        "defaultValue": true,
+        "type": "BOOLEAN"
       },
-      "Show Column 5#2305:14": {
-        "type": "BOOLEAN",
-        "defaultValue": true
+      "show title#2357:16": {
+        "defaultValue": true,
+        "type": "BOOLEAN"
       },
-      "Show Column 6#2305:15": {
-        "type": "BOOLEAN",
-        "defaultValue": false
+      "text#2357:6": {
+        "defaultValue": "Alerts display a prominent message related to the whole page or its specific area.",
+        "type": "TEXT"
       },
-      "Show Column 7#2305:16": {
-        "type": "BOOLEAN",
-        "defaultValue": false
-      },
-      "Show Column 8#2305:17": {
-        "type": "BOOLEAN",
-        "defaultValue": false
-      },
-      "Show Column 9#2305:18": {
-        "type": "BOOLEAN",
-        "defaultValue": false
-      },
-      "Show Column 10#2305:19": {
-        "type": "BOOLEAN",
-        "defaultValue": false
+      "title#2357:4": {
+        "defaultValue": "Alert title",
+        "type": "TEXT"
       }
     },
-    "variantPropertyValues": {},
-    "updatedAt": "2026-10-06T08:26:57Z",
-    "sceneHash": "7b9df34db62b6381ff85f238f24674a8b78b2741b934391ee69950e9aff2542f",
+    "description": "Alerts display a prominent message that communicates important information related to adjacent content.",
     "figma": {
-      "fileId": "wLWN7FdmqCslghDJPWIweW",
-      "nodeId": "2299:111",
-      "sourceId": "d9345e7919a39920fd32ab084b3bde9462caa4da",
-      "key": "d9345e7919a39920fd32ab084b3bde9462caa4da",
-      "name": "Table Body Row",
-      "thumbnailUrl": null,
       "componentPropertyDefinitions": {
-        "Show Column 1#2305:10": {
-          "type": "BOOLEAN",
-          "defaultValue": true
+        "color": {
+          "defaultValue": "primary",
+          "type": "VARIANT",
+          "variantOptions": [
+            "secondary",
+            "primary",
+            "positive"
+          ]
         },
-        "Show Column 2#2305:11": {
-          "type": "BOOLEAN",
-          "defaultValue": true
+        "show action#293:0": {
+          "defaultValue": true,
+          "type": "BOOLEAN"
         },
-        "Show Column 3#2305:12": {
-          "type": "BOOLEAN",
-          "defaultValue": true
+        "show icon#2367:17": {
+          "defaultValue": true,
+          "type": "BOOLEAN"
         },
-        "Show Column 4#2305:13": {
-          "type": "BOOLEAN",
-          "defaultValue": true
+        "show text#2357:19": {
+          "defaultValue": true,
+          "type": "BOOLEAN"
         },
-        "Show Column 5#2305:14": {
-          "type": "BOOLEAN",
-          "defaultValue": true
+        "show title#2357:16": {
+          "defaultValue": true,
+          "type": "BOOLEAN"
         },
-        "Show Column 6#2305:15": {
-          "type": "BOOLEAN",
-          "defaultValue": false
+        "text#2357:6": {
+          "defaultValue": "Alerts display a prominent message related to the whole page or its specific area.",
+          "type": "TEXT"
         },
-        "Show Column 7#2305:16": {
-          "type": "BOOLEAN",
-          "defaultValue": false
-        },
-        "Show Column 8#2305:17": {
-          "type": "BOOLEAN",
-          "defaultValue": false
-        },
-        "Show Column 9#2305:18": {
-          "type": "BOOLEAN",
-          "defaultValue": false
-        },
-        "Show Column 10#2305:19": {
-          "type": "BOOLEAN",
-          "defaultValue": false
+        "title#2357:4": {
+          "defaultValue": "Alert title",
+          "type": "TEXT"
         }
       },
-      "variantPropertyValues": {},
-      "variants": [],
-      "updatedAt": "2026-10-06T08:26:57Z"
+      "fileId": "",
+      "key": "",
+      "name": "Alert",
+      "nodeId": "60:7093",
+      "sourceId": "",
+      "thumbnailUrl": null,
+      "updatedAt": "2026-10-07T02:01:45Z",
+      "variantPropertyValues": {
+        "color": "primary"
+      },
+      "variants": [
+        {
+          "id": "60:7115",
+          "name": "color=primary",
+          "variantProperties": {
+            "color": "primary"
+          }
+        },
+        {
+          "id": "60:7094",
+          "name": "color=secondary",
+          "variantProperties": {
+            "color": "secondary"
+          }
+        },
+        {
+          "id": "60:7157",
+          "name": "color=positive",
+          "variantProperties": {
+            "color": "positive"
+          }
+        }
+      ]
+    },
+    "fileId": "",
+    "hasMitosisDefinition": false,
+    "id": "60:7093",
+    "name": "Alert",
+    "nodeId": "60:7093",
+    "rawName": "Alert",
+    "sourceId": "",
+    "updatedAt": "2026-10-07T02:01:45Z",
+    "variantPropertyValues": {
+      "color": "primary"
     }
+  },
+  {
+    "brandId": null,
+    "componentPropertyDefinitions": {
+      "End icon#129:29": {
+        "defaultValue": "2:21808",
+        "preferredValues": [
+          {
+            "key": "241cd561f95fee9c4ba7183f51809d450091cf68",
+            "type": "COMPONENT_SET"
+          },
+          {
+            "key": "3747eafc6ebbf9725874a143bed92970dffe97a1",
+            "type": "COMPONENT_SET"
+          },
+          {
+            "key": "47788e5a0e50b9d8ae43e5766d2f92246ad19bd9",
+            "type": "COMPONENT_SET"
+          },
+          {
+            "key": "2bbf42b4d6016fd3200c5aa038e59e8d66b0aabe",
+            "type": "COMPONENT_SET"
+          }
+        ],
+        "type": "INSTANCE_SWAP"
+      },
+      "End icon?#129:31": {
+        "defaultValue": false,
+        "type": "BOOLEAN"
+      },
+      "Full width?": {
+        "defaultValue": "false",
+        "type": "VARIANT",
+        "variantOptions": [
+          "false"
+        ]
+      },
+      "Icon#129:30": {
+        "defaultValue": "2:21803",
+        "preferredValues": [],
+        "type": "INSTANCE_SWAP"
+      },
+      "Icon?#129:28": {
+        "defaultValue": true,
+        "type": "BOOLEAN"
+      },
+      "Size": {
+        "defaultValue": "medium",
+        "type": "VARIANT",
+        "variantOptions": [
+          "small",
+          "medium"
+        ]
+      },
+      "State": {
+        "defaultValue": "default",
+        "type": "VARIANT",
+        "variantOptions": [
+          "default",
+          "hover",
+          "disabled"
+        ]
+      },
+      "Style": {
+        "defaultValue": "solid",
+        "type": "VARIANT",
+        "variantOptions": [
+          "ghost",
+          "outline",
+          "solid"
+        ]
+      },
+      "Text#129:33": {
+        "defaultValue": "Button",
+        "type": "TEXT"
+      }
+    },
+    "description": "Gradient buttons should be used sparingly and for temporary actions. They are used to call special attention to a certain action.",
+    "figma": {
+      "componentPropertyDefinitions": {
+        "End icon#129:29": {
+          "defaultValue": "2:21808",
+          "preferredValues": [
+            {
+              "key": "241cd561f95fee9c4ba7183f51809d450091cf68",
+              "type": "COMPONENT_SET"
+            },
+            {
+              "key": "3747eafc6ebbf9725874a143bed92970dffe97a1",
+              "type": "COMPONENT_SET"
+            },
+            {
+              "key": "47788e5a0e50b9d8ae43e5766d2f92246ad19bd9",
+              "type": "COMPONENT_SET"
+            },
+            {
+              "key": "2bbf42b4d6016fd3200c5aa038e59e8d66b0aabe",
+              "type": "COMPONENT_SET"
+            }
+          ],
+          "type": "INSTANCE_SWAP"
+        },
+        "End icon?#129:31": {
+          "defaultValue": false,
+          "type": "BOOLEAN"
+        },
+        "Full width?": {
+          "defaultValue": "false",
+          "type": "VARIANT",
+          "variantOptions": [
+            "false"
+          ]
+        },
+        "Icon#129:30": {
+          "defaultValue": "2:21803",
+          "preferredValues": [],
+          "type": "INSTANCE_SWAP"
+        },
+        "Icon?#129:28": {
+          "defaultValue": true,
+          "type": "BOOLEAN"
+        },
+        "Size": {
+          "defaultValue": "medium",
+          "type": "VARIANT",
+          "variantOptions": [
+            "small",
+            "medium"
+          ]
+        },
+        "State": {
+          "defaultValue": "default",
+          "type": "VARIANT",
+          "variantOptions": [
+            "default",
+            "hover",
+            "disabled"
+          ]
+        },
+        "Style": {
+          "defaultValue": "solid",
+          "type": "VARIANT",
+          "variantOptions": [
+            "ghost",
+            "outline",
+            "solid"
+          ]
+        },
+        "Text#129:33": {
+          "defaultValue": "Button",
+          "type": "TEXT"
+        }
+      },
+      "fileId": "",
+      "key": "",
+      "name": "Button Gradient",
+      "nodeId": "60:9131",
+      "sourceId": "",
+      "thumbnailUrl": null,
+      "updatedAt": "2026-10-07T02:01:45Z",
+      "variantPropertyValues": {
+        "Full width?": "false",
+        "Size": "medium",
+        "State": "default",
+        "Style": "solid"
+      },
+      "variants": [
+        {
+          "id": "60:9132",
+          "name": "Style=solid, Size=medium, Full width?=false, State=default",
+          "variantProperties": {
+            "Full width?": "false",
+            "Size": "medium",
+            "State": "default",
+            "Style": "solid"
+          }
+        },
+        {
+          "id": "60:9137",
+          "name": "Style=solid, Size=medium, Full width?=false, State=disabled",
+          "variantProperties": {
+            "Full width?": "false",
+            "Size": "medium",
+            "State": "disabled",
+            "Style": "solid"
+          }
+        },
+        {
+          "id": "60:9142",
+          "name": "Style=solid, Size=medium, Full width?=false, State=hover",
+          "variantProperties": {
+            "Full width?": "false",
+            "Size": "medium",
+            "State": "hover",
+            "Style": "solid"
+          }
+        },
+        {
+          "id": "60:9147",
+          "name": "Style=outline, Size=medium, Full width?=false, State=default",
+          "variantProperties": {
+            "Full width?": "false",
+            "Size": "medium",
+            "State": "default",
+            "Style": "outline"
+          }
+        },
+        {
+          "id": "60:9152",
+          "name": "Style=outline, Size=medium, Full width?=false, State=disabled",
+          "variantProperties": {
+            "Full width?": "false",
+            "Size": "medium",
+            "State": "disabled",
+            "Style": "outline"
+          }
+        },
+        {
+          "id": "60:9157",
+          "name": "Style=ghost, Size=medium, Full width?=false, State=default",
+          "variantProperties": {
+            "Full width?": "false",
+            "Size": "medium",
+            "State": "default",
+            "Style": "ghost"
+          }
+        },
+        {
+          "id": "60:9162",
+          "name": "Style=ghost, Size=medium, Full width?=false, State=disabled",
+          "variantProperties": {
+            "Full width?": "false",
+            "Size": "medium",
+            "State": "disabled",
+            "Style": "ghost"
+          }
+        },
+        {
+          "id": "60:9167",
+          "name": "Style=outline, Size=medium, Full width?=false, State=hover",
+          "variantProperties": {
+            "Full width?": "false",
+            "Size": "medium",
+            "State": "hover",
+            "Style": "outline"
+          }
+        },
+        {
+          "id": "60:9172",
+          "name": "Style=ghost, Size=medium, Full width?=false, State=hover",
+          "variantProperties": {
+            "Full width?": "false",
+            "Size": "medium",
+            "State": "hover",
+            "Style": "ghost"
+          }
+        },
+        {
+          "id": "60:9177",
+          "name": "Style=solid, Size=small, Full width?=false, State=default",
+          "variantProperties": {
+            "Full width?": "false",
+            "Size": "small",
+            "State": "default",
+            "Style": "solid"
+          }
+        },
+        {
+          "id": "60:9182",
+          "name": "Style=solid, Size=small, Full width?=false, State=disabled",
+          "variantProperties": {
+            "Full width?": "false",
+            "Size": "small",
+            "State": "disabled",
+            "Style": "solid"
+          }
+        },
+        {
+          "id": "60:9187",
+          "name": "Style=outline, Size=small, Full width?=false, State=default",
+          "variantProperties": {
+            "Full width?": "false",
+            "Size": "small",
+            "State": "default",
+            "Style": "outline"
+          }
+        },
+        {
+          "id": "60:9192",
+          "name": "Style=outline, Size=small, Full width?=false, State=disabled",
+          "variantProperties": {
+            "Full width?": "false",
+            "Size": "small",
+            "State": "disabled",
+            "Style": "outline"
+          }
+        },
+        {
+          "id": "60:9197",
+          "name": "Style=ghost, Size=small, Full width?=false, State=default",
+          "variantProperties": {
+            "Full width?": "false",
+            "Size": "small",
+            "State": "default",
+            "Style": "ghost"
+          }
+        },
+        {
+          "id": "60:9202",
+          "name": "Style=ghost, Size=small, Full width?=false, State=disabled",
+          "variantProperties": {
+            "Full width?": "false",
+            "Size": "small",
+            "State": "disabled",
+            "Style": "ghost"
+          }
+        },
+        {
+          "id": "60:9207",
+          "name": "Style=solid, Size=small, Full width?=false, State=hover",
+          "variantProperties": {
+            "Full width?": "false",
+            "Size": "small",
+            "State": "hover",
+            "Style": "solid"
+          }
+        },
+        {
+          "id": "60:9212",
+          "name": "Style=outline, Size=small, Full width?=false, State=hover",
+          "variantProperties": {
+            "Full width?": "false",
+            "Size": "small",
+            "State": "hover",
+            "Style": "outline"
+          }
+        },
+        {
+          "id": "60:9217",
+          "name": "Style=ghost, Size=small, Full width?=false, State=hover",
+          "variantProperties": {
+            "Full width?": "false",
+            "Size": "small",
+            "State": "hover",
+            "Style": "ghost"
+          }
+        }
+      ]
+    },
+    "fileId": "",
+    "hasMitosisDefinition": false,
+    "id": "60:9131",
+    "name": "ButtonGradient",
+    "nodeId": "60:9131",
+    "rawName": "Button Gradient",
+    "sourceId": "",
+    "updatedAt": "2026-10-07T02:01:45Z",
+    "variantPropertyValues": {
+      "Full width?": "false",
+      "Size": "medium",
+      "State": "default",
+      "Style": "solid"
+    }
+  },
+  {
+    "brandId": null,
+    "componentPropertyDefinitions": {
+      "End icon#129:29": {
+        "defaultValue": "2:21808",
+        "preferredValues": [
+          {
+            "key": "241cd561f95fee9c4ba7183f51809d450091cf68",
+            "type": "COMPONENT_SET"
+          },
+          {
+            "key": "3747eafc6ebbf9725874a143bed92970dffe97a1",
+            "type": "COMPONENT_SET"
+          },
+          {
+            "key": "47788e5a0e50b9d8ae43e5766d2f92246ad19bd9",
+            "type": "COMPONENT_SET"
+          },
+          {
+            "key": "2bbf42b4d6016fd3200c5aa038e59e8d66b0aabe",
+            "type": "COMPONENT_SET"
+          }
+        ],
+        "type": "INSTANCE_SWAP"
+      },
+      "End icon?#129:31": {
+        "defaultValue": false,
+        "type": "BOOLEAN"
+      },
+      "Full width?": {
+        "defaultValue": "false",
+        "type": "VARIANT",
+        "variantOptions": [
+          "false"
+        ]
+      },
+      "Icon#129:30": {
+        "defaultValue": "2:21803",
+        "preferredValues": [],
+        "type": "INSTANCE_SWAP"
+      },
+      "Icon?#129:28": {
+        "defaultValue": true,
+        "type": "BOOLEAN"
+      },
+      "Size": {
+        "defaultValue": "medium",
+        "type": "VARIANT",
+        "variantOptions": [
+          "small",
+          "medium"
+        ]
+      },
+      "State": {
+        "defaultValue": "default",
+        "type": "VARIANT",
+        "variantOptions": [
+          "default",
+          "hover",
+          "disabled"
+        ]
+      },
+      "Style": {
+        "defaultValue": "solid",
+        "type": "VARIANT",
+        "variantOptions": [
+          "ghost",
+          "outline",
+          "solid"
+        ]
+      },
+      "Text#129:33": {
+        "defaultValue": "Button",
+        "type": "TEXT"
+      }
+    },
+    "description": "Positive buttons are used for actions with a semantic positive outcome.",
+    "figma": {
+      "componentPropertyDefinitions": {
+        "End icon#129:29": {
+          "defaultValue": "2:21808",
+          "preferredValues": [
+            {
+              "key": "241cd561f95fee9c4ba7183f51809d450091cf68",
+              "type": "COMPONENT_SET"
+            },
+            {
+              "key": "3747eafc6ebbf9725874a143bed92970dffe97a1",
+              "type": "COMPONENT_SET"
+            },
+            {
+              "key": "47788e5a0e50b9d8ae43e5766d2f92246ad19bd9",
+              "type": "COMPONENT_SET"
+            },
+            {
+              "key": "2bbf42b4d6016fd3200c5aa038e59e8d66b0aabe",
+              "type": "COMPONENT_SET"
+            }
+          ],
+          "type": "INSTANCE_SWAP"
+        },
+        "End icon?#129:31": {
+          "defaultValue": false,
+          "type": "BOOLEAN"
+        },
+        "Full width?": {
+          "defaultValue": "false",
+          "type": "VARIANT",
+          "variantOptions": [
+            "false"
+          ]
+        },
+        "Icon#129:30": {
+          "defaultValue": "2:21803",
+          "preferredValues": [],
+          "type": "INSTANCE_SWAP"
+        },
+        "Icon?#129:28": {
+          "defaultValue": true,
+          "type": "BOOLEAN"
+        },
+        "Size": {
+          "defaultValue": "medium",
+          "type": "VARIANT",
+          "variantOptions": [
+            "small",
+            "medium"
+          ]
+        },
+        "State": {
+          "defaultValue": "default",
+          "type": "VARIANT",
+          "variantOptions": [
+            "default",
+            "hover",
+            "disabled"
+          ]
+        },
+        "Style": {
+          "defaultValue": "solid",
+          "type": "VARIANT",
+          "variantOptions": [
+            "ghost",
+            "outline",
+            "solid"
+          ]
+        },
+        "Text#129:33": {
+          "defaultValue": "Button",
+          "type": "TEXT"
+        }
+      },
+      "fileId": "",
+      "key": "",
+      "name": "Button Positive",
+      "nodeId": "60:8294",
+      "sourceId": "",
+      "thumbnailUrl": null,
+      "updatedAt": "2026-10-07T02:01:45Z",
+      "variantPropertyValues": {
+        "Full width?": "false",
+        "Size": "medium",
+        "State": "default",
+        "Style": "solid"
+      },
+      "variants": [
+        {
+          "id": "60:8295",
+          "name": "Style=solid, Size=medium, Full width?=false, State=default",
+          "variantProperties": {
+            "Full width?": "false",
+            "Size": "medium",
+            "State": "default",
+            "Style": "solid"
+          }
+        },
+        {
+          "id": "60:8300",
+          "name": "Style=solid, Size=medium, Full width?=false, State=disabled",
+          "variantProperties": {
+            "Full width?": "false",
+            "Size": "medium",
+            "State": "disabled",
+            "Style": "solid"
+          }
+        },
+        {
+          "id": "60:8305",
+          "name": "Style=solid, Size=medium, Full width?=false, State=hover",
+          "variantProperties": {
+            "Full width?": "false",
+            "Size": "medium",
+            "State": "hover",
+            "Style": "solid"
+          }
+        },
+        {
+          "id": "60:8310",
+          "name": "Style=outline, Size=medium, Full width?=false, State=default",
+          "variantProperties": {
+            "Full width?": "false",
+            "Size": "medium",
+            "State": "default",
+            "Style": "outline"
+          }
+        },
+        {
+          "id": "60:8315",
+          "name": "Style=outline, Size=medium, Full width?=false, State=disabled",
+          "variantProperties": {
+            "Full width?": "false",
+            "Size": "medium",
+            "State": "disabled",
+            "Style": "outline"
+          }
+        },
+        {
+          "id": "60:8320",
+          "name": "Style=ghost, Size=medium, Full width?=false, State=default",
+          "variantProperties": {
+            "Full width?": "false",
+            "Size": "medium",
+            "State": "default",
+            "Style": "ghost"
+          }
+        },
+        {
+          "id": "60:8325",
+          "name": "Style=ghost, Size=medium, Full width?=false, State=disabled",
+          "variantProperties": {
+            "Full width?": "false",
+            "Size": "medium",
+            "State": "disabled",
+            "Style": "ghost"
+          }
+        },
+        {
+          "id": "60:8330",
+          "name": "Style=outline, Size=medium, Full width?=false, State=hover",
+          "variantProperties": {
+            "Full width?": "false",
+            "Size": "medium",
+            "State": "hover",
+            "Style": "outline"
+          }
+        },
+        {
+          "id": "60:8335",
+          "name": "Style=ghost, Size=medium, Full width?=false, State=hover",
+          "variantProperties": {
+            "Full width?": "false",
+            "Size": "medium",
+            "State": "hover",
+            "Style": "ghost"
+          }
+        },
+        {
+          "id": "60:8340",
+          "name": "Style=solid, Size=small, Full width?=false, State=default",
+          "variantProperties": {
+            "Full width?": "false",
+            "Size": "small",
+            "State": "default",
+            "Style": "solid"
+          }
+        },
+        {
+          "id": "60:8345",
+          "name": "Style=solid, Size=small, Full width?=false, State=disabled",
+          "variantProperties": {
+            "Full width?": "false",
+            "Size": "small",
+            "State": "disabled",
+            "Style": "solid"
+          }
+        },
+        {
+          "id": "60:8350",
+          "name": "Style=outline, Size=small, Full width?=false, State=default",
+          "variantProperties": {
+            "Full width?": "false",
+            "Size": "small",
+            "State": "default",
+            "Style": "outline"
+          }
+        },
+        {
+          "id": "60:8355",
+          "name": "Style=outline, Size=small, Full width?=false, State=disabled",
+          "variantProperties": {
+            "Full width?": "false",
+            "Size": "small",
+            "State": "disabled",
+            "Style": "outline"
+          }
+        },
+        {
+          "id": "60:8360",
+          "name": "Style=ghost, Size=small, Full width?=false, State=default",
+          "variantProperties": {
+            "Full width?": "false",
+            "Size": "small",
+            "State": "default",
+            "Style": "ghost"
+          }
+        },
+        {
+          "id": "60:8365",
+          "name": "Style=ghost, Size=small, Full width?=false, State=disabled",
+          "variantProperties": {
+            "Full width?": "false",
+            "Size": "small",
+            "State": "disabled",
+            "Style": "ghost"
+          }
+        },
+        {
+          "id": "60:8370",
+          "name": "Style=solid, Size=small, Full width?=false, State=hover",
+          "variantProperties": {
+            "Full width?": "false",
+            "Size": "small",
+            "State": "hover",
+            "Style": "solid"
+          }
+        },
+        {
+          "id": "60:8375",
+          "name": "Style=outline, Size=small, Full width?=false, State=hover",
+          "variantProperties": {
+            "Full width?": "false",
+            "Size": "small",
+            "State": "hover",
+            "Style": "outline"
+          }
+        },
+        {
+          "id": "60:8380",
+          "name": "Style=ghost, Size=small, Full width?=false, State=hover",
+          "variantProperties": {
+            "Full width?": "false",
+            "Size": "small",
+            "State": "hover",
+            "Style": "ghost"
+          }
+        }
+      ]
+    },
+    "fileId": "",
+    "hasMitosisDefinition": false,
+    "id": "60:8294",
+    "name": "ButtonPositive",
+    "nodeId": "60:8294",
+    "rawName": "Button Positive",
+    "sourceId": "",
+    "updatedAt": "2026-10-07T02:01:45Z",
+    "variantPropertyValues": {
+      "Full width?": "false",
+      "Size": "medium",
+      "State": "default",
+      "Style": "solid"
+    }
+  },
+  {
+    "brandId": null,
+    "componentPropertyDefinitions": {
+      "End icon#129:29": {
+        "defaultValue": "2:21808",
+        "preferredValues": [
+          {
+            "key": "241cd561f95fee9c4ba7183f51809d450091cf68",
+            "type": "COMPONENT_SET"
+          },
+          {
+            "key": "3747eafc6ebbf9725874a143bed92970dffe97a1",
+            "type": "COMPONENT_SET"
+          },
+          {
+            "key": "47788e5a0e50b9d8ae43e5766d2f92246ad19bd9",
+            "type": "COMPONENT_SET"
+          },
+          {
+            "key": "2bbf42b4d6016fd3200c5aa038e59e8d66b0aabe",
+            "type": "COMPONENT_SET"
+          }
+        ],
+        "type": "INSTANCE_SWAP"
+      },
+      "End icon?#129:31": {
+        "defaultValue": false,
+        "type": "BOOLEAN"
+      },
+      "Full width?": {
+        "defaultValue": "false",
+        "type": "VARIANT",
+        "variantOptions": [
+          "false"
+        ]
+      },
+      "Icon#129:30": {
+        "defaultValue": "2:21803",
+        "preferredValues": [],
+        "type": "INSTANCE_SWAP"
+      },
+      "Icon?#129:28": {
+        "defaultValue": true,
+        "type": "BOOLEAN"
+      },
+      "Size": {
+        "defaultValue": "medium",
+        "type": "VARIANT",
+        "variantOptions": [
+          "small",
+          "medium"
+        ]
+      },
+      "State": {
+        "defaultValue": "default",
+        "type": "VARIANT",
+        "variantOptions": [
+          "default",
+          "hover",
+          "disabled"
+        ]
+      },
+      "Style": {
+        "defaultValue": "solid",
+        "type": "VARIANT",
+        "variantOptions": [
+          "ghost",
+          "outline",
+          "solid"
+        ]
+      },
+      "Text#129:33": {
+        "defaultValue": "Button",
+        "type": "TEXT"
+      }
+    },
+    "description": "Secondary buttons are used for actions to be taken in an interface that are less important the primary actions.",
+    "figma": {
+      "componentPropertyDefinitions": {
+        "End icon#129:29": {
+          "defaultValue": "2:21808",
+          "preferredValues": [
+            {
+              "key": "241cd561f95fee9c4ba7183f51809d450091cf68",
+              "type": "COMPONENT_SET"
+            },
+            {
+              "key": "3747eafc6ebbf9725874a143bed92970dffe97a1",
+              "type": "COMPONENT_SET"
+            },
+            {
+              "key": "47788e5a0e50b9d8ae43e5766d2f92246ad19bd9",
+              "type": "COMPONENT_SET"
+            },
+            {
+              "key": "2bbf42b4d6016fd3200c5aa038e59e8d66b0aabe",
+              "type": "COMPONENT_SET"
+            }
+          ],
+          "type": "INSTANCE_SWAP"
+        },
+        "End icon?#129:31": {
+          "defaultValue": false,
+          "type": "BOOLEAN"
+        },
+        "Full width?": {
+          "defaultValue": "false",
+          "type": "VARIANT",
+          "variantOptions": [
+            "false"
+          ]
+        },
+        "Icon#129:30": {
+          "defaultValue": "2:21803",
+          "preferredValues": [],
+          "type": "INSTANCE_SWAP"
+        },
+        "Icon?#129:28": {
+          "defaultValue": true,
+          "type": "BOOLEAN"
+        },
+        "Size": {
+          "defaultValue": "medium",
+          "type": "VARIANT",
+          "variantOptions": [
+            "small",
+            "medium"
+          ]
+        },
+        "State": {
+          "defaultValue": "default",
+          "type": "VARIANT",
+          "variantOptions": [
+            "default",
+            "hover",
+            "disabled"
+          ]
+        },
+        "Style": {
+          "defaultValue": "solid",
+          "type": "VARIANT",
+          "variantOptions": [
+            "ghost",
+            "outline",
+            "solid"
+          ]
+        },
+        "Text#129:33": {
+          "defaultValue": "Button",
+          "type": "TEXT"
+        }
+      },
+      "fileId": "",
+      "key": "",
+      "name": "Button Secondary",
+      "nodeId": "60:8167",
+      "sourceId": "",
+      "thumbnailUrl": null,
+      "updatedAt": "2026-10-07T02:01:45Z",
+      "variantPropertyValues": {
+        "Full width?": "false",
+        "Size": "medium",
+        "State": "default",
+        "Style": "solid"
+      },
+      "variants": [
+        {
+          "id": "60:8168",
+          "name": "Style=solid, Size=medium, Full width?=false, State=default",
+          "variantProperties": {
+            "Full width?": "false",
+            "Size": "medium",
+            "State": "default",
+            "Style": "solid"
+          }
+        },
+        {
+          "id": "60:8173",
+          "name": "Style=solid, Size=medium, Full width?=false, State=disabled",
+          "variantProperties": {
+            "Full width?": "false",
+            "Size": "medium",
+            "State": "disabled",
+            "Style": "solid"
+          }
+        },
+        {
+          "id": "60:8178",
+          "name": "Style=solid, Size=medium, Full width?=false, State=hover",
+          "variantProperties": {
+            "Full width?": "false",
+            "Size": "medium",
+            "State": "hover",
+            "Style": "solid"
+          }
+        },
+        {
+          "id": "60:8183",
+          "name": "Style=outline, Size=medium, Full width?=false, State=default",
+          "variantProperties": {
+            "Full width?": "false",
+            "Size": "medium",
+            "State": "default",
+            "Style": "outline"
+          }
+        },
+        {
+          "id": "60:8188",
+          "name": "Style=outline, Size=medium, Full width?=false, State=disabled",
+          "variantProperties": {
+            "Full width?": "false",
+            "Size": "medium",
+            "State": "disabled",
+            "Style": "outline"
+          }
+        },
+        {
+          "id": "60:8193",
+          "name": "Style=ghost, Size=medium, Full width?=false, State=default",
+          "variantProperties": {
+            "Full width?": "false",
+            "Size": "medium",
+            "State": "default",
+            "Style": "ghost"
+          }
+        },
+        {
+          "id": "60:8198",
+          "name": "Style=ghost, Size=medium, Full width?=false, State=disabled",
+          "variantProperties": {
+            "Full width?": "false",
+            "Size": "medium",
+            "State": "disabled",
+            "Style": "ghost"
+          }
+        },
+        {
+          "id": "60:8203",
+          "name": "Style=outline, Size=medium, Full width?=false, State=hover",
+          "variantProperties": {
+            "Full width?": "false",
+            "Size": "medium",
+            "State": "hover",
+            "Style": "outline"
+          }
+        },
+        {
+          "id": "60:8208",
+          "name": "Style=ghost, Size=medium, Full width?=false, State=hover",
+          "variantProperties": {
+            "Full width?": "false",
+            "Size": "medium",
+            "State": "hover",
+            "Style": "ghost"
+          }
+        },
+        {
+          "id": "60:8213",
+          "name": "Style=solid, Size=small, Full width?=false, State=default",
+          "variantProperties": {
+            "Full width?": "false",
+            "Size": "small",
+            "State": "default",
+            "Style": "solid"
+          }
+        },
+        {
+          "id": "60:8218",
+          "name": "Style=solid, Size=small, Full width?=false, State=disabled",
+          "variantProperties": {
+            "Full width?": "false",
+            "Size": "small",
+            "State": "disabled",
+            "Style": "solid"
+          }
+        },
+        {
+          "id": "60:8223",
+          "name": "Style=outline, Size=small, Full width?=false, State=default",
+          "variantProperties": {
+            "Full width?": "false",
+            "Size": "small",
+            "State": "default",
+            "Style": "outline"
+          }
+        },
+        {
+          "id": "60:8228",
+          "name": "Style=outline, Size=small, Full width?=false, State=disabled",
+          "variantProperties": {
+            "Full width?": "false",
+            "Size": "small",
+            "State": "disabled",
+            "Style": "outline"
+          }
+        },
+        {
+          "id": "60:8233",
+          "name": "Style=ghost, Size=small, Full width?=false, State=default",
+          "variantProperties": {
+            "Full width?": "false",
+            "Size": "small",
+            "State": "default",
+            "Style": "ghost"
+          }
+        },
+        {
+          "id": "60:8238",
+          "name": "Style=ghost, Size=small, Full width?=false, State=disabled",
+          "variantProperties": {
+            "Full width?": "false",
+            "Size": "small",
+            "State": "disabled",
+            "Style": "ghost"
+          }
+        },
+        {
+          "id": "60:8243",
+          "name": "Style=solid, Size=small, Full width?=false, State=hover",
+          "variantProperties": {
+            "Full width?": "false",
+            "Size": "small",
+            "State": "hover",
+            "Style": "solid"
+          }
+        },
+        {
+          "id": "60:8248",
+          "name": "Style=outline, Size=small, Full width?=false, State=hover",
+          "variantProperties": {
+            "Full width?": "false",
+            "Size": "small",
+            "State": "hover",
+            "Style": "outline"
+          }
+        },
+        {
+          "id": "60:8253",
+          "name": "Style=ghost, Size=small, Full width?=false, State=hover",
+          "variantProperties": {
+            "Full width?": "false",
+            "Size": "small",
+            "State": "hover",
+            "Style": "ghost"
+          }
+        }
+      ]
+    },
+    "fileId": "",
+    "hasMitosisDefinition": false,
+    "id": "60:8167",
+    "name": "ButtonSecondary",
+    "nodeId": "60:8167",
+    "rawName": "Button Secondary",
+    "sourceId": "",
+    "updatedAt": "2026-10-07T02:01:45Z",
+    "variantPropertyValues": {
+      "Full width?": "false",
+      "Size": "medium",
+      "State": "default",
+      "Style": "solid"
+    }
+  },
+  {
+    "brandId": null,
+    "componentPropertyDefinitions": {
+      "End icon#129:29": {
+        "defaultValue": "2:21808",
+        "preferredValues": [
+          {
+            "key": "241cd561f95fee9c4ba7183f51809d450091cf68",
+            "type": "COMPONENT_SET"
+          },
+          {
+            "key": "3747eafc6ebbf9725874a143bed92970dffe97a1",
+            "type": "COMPONENT_SET"
+          },
+          {
+            "key": "47788e5a0e50b9d8ae43e5766d2f92246ad19bd9",
+            "type": "COMPONENT_SET"
+          },
+          {
+            "key": "2bbf42b4d6016fd3200c5aa038e59e8d66b0aabe",
+            "type": "COMPONENT_SET"
+          }
+        ],
+        "type": "INSTANCE_SWAP"
+      },
+      "End icon?#129:31": {
+        "defaultValue": false,
+        "type": "BOOLEAN"
+      },
+      "Full width?": {
+        "defaultValue": "false",
+        "type": "VARIANT",
+        "variantOptions": [
+          "false"
+        ]
+      },
+      "Icon#129:30": {
+        "defaultValue": "2:21803",
+        "preferredValues": [],
+        "type": "INSTANCE_SWAP"
+      },
+      "Icon?#129:28": {
+        "defaultValue": true,
+        "type": "BOOLEAN"
+      },
+      "Size": {
+        "defaultValue": "medium",
+        "type": "VARIANT",
+        "variantOptions": [
+          "small",
+          "medium"
+        ]
+      },
+      "State": {
+        "defaultValue": "default",
+        "type": "VARIANT",
+        "variantOptions": [
+          "default",
+          "hover",
+          "disabled"
+        ]
+      },
+      "Style": {
+        "defaultValue": "solid",
+        "type": "VARIANT",
+        "variantOptions": [
+          "ghost",
+          "outline",
+          "solid"
+        ]
+      },
+      "Text#129:33": {
+        "defaultValue": "Button",
+        "type": "TEXT"
+      }
+    },
+    "description": "Primary buttons are used for the most important action to be taken in an interface.",
+    "figma": {
+      "componentPropertyDefinitions": {
+        "End icon#129:29": {
+          "defaultValue": "2:21808",
+          "preferredValues": [
+            {
+              "key": "241cd561f95fee9c4ba7183f51809d450091cf68",
+              "type": "COMPONENT_SET"
+            },
+            {
+              "key": "3747eafc6ebbf9725874a143bed92970dffe97a1",
+              "type": "COMPONENT_SET"
+            },
+            {
+              "key": "47788e5a0e50b9d8ae43e5766d2f92246ad19bd9",
+              "type": "COMPONENT_SET"
+            },
+            {
+              "key": "2bbf42b4d6016fd3200c5aa038e59e8d66b0aabe",
+              "type": "COMPONENT_SET"
+            }
+          ],
+          "type": "INSTANCE_SWAP"
+        },
+        "End icon?#129:31": {
+          "defaultValue": false,
+          "type": "BOOLEAN"
+        },
+        "Full width?": {
+          "defaultValue": "false",
+          "type": "VARIANT",
+          "variantOptions": [
+            "false"
+          ]
+        },
+        "Icon#129:30": {
+          "defaultValue": "2:21803",
+          "preferredValues": [],
+          "type": "INSTANCE_SWAP"
+        },
+        "Icon?#129:28": {
+          "defaultValue": true,
+          "type": "BOOLEAN"
+        },
+        "Size": {
+          "defaultValue": "medium",
+          "type": "VARIANT",
+          "variantOptions": [
+            "small",
+            "medium"
+          ]
+        },
+        "State": {
+          "defaultValue": "default",
+          "type": "VARIANT",
+          "variantOptions": [
+            "default",
+            "hover",
+            "disabled"
+          ]
+        },
+        "Style": {
+          "defaultValue": "solid",
+          "type": "VARIANT",
+          "variantOptions": [
+            "ghost",
+            "outline",
+            "solid"
+          ]
+        },
+        "Text#129:33": {
+          "defaultValue": "Button",
+          "type": "TEXT"
+        }
+      },
+      "fileId": "",
+      "key": "",
+      "name": "Button Primary",
+      "nodeId": "60:7405",
+      "sourceId": "",
+      "thumbnailUrl": null,
+      "updatedAt": "2026-10-07T02:01:45Z",
+      "variantPropertyValues": {
+        "Full width?": "false",
+        "Size": "medium",
+        "State": "default",
+        "Style": "solid"
+      },
+      "variants": [
+        {
+          "id": "60:7406",
+          "name": "Style=solid, Size=medium, Full width?=false, State=default",
+          "variantProperties": {
+            "Full width?": "false",
+            "Size": "medium",
+            "State": "default",
+            "Style": "solid"
+          }
+        },
+        {
+          "id": "60:7411",
+          "name": "Style=solid, Size=medium, Full width?=false, State=disabled",
+          "variantProperties": {
+            "Full width?": "false",
+            "Size": "medium",
+            "State": "disabled",
+            "Style": "solid"
+          }
+        },
+        {
+          "id": "60:7416",
+          "name": "Style=solid, Size=medium, Full width?=false, State=hover",
+          "variantProperties": {
+            "Full width?": "false",
+            "Size": "medium",
+            "State": "hover",
+            "Style": "solid"
+          }
+        },
+        {
+          "id": "60:7421",
+          "name": "Style=outline, Size=medium, Full width?=false, State=default",
+          "variantProperties": {
+            "Full width?": "false",
+            "Size": "medium",
+            "State": "default",
+            "Style": "outline"
+          }
+        },
+        {
+          "id": "60:7426",
+          "name": "Style=outline, Size=medium, Full width?=false, State=disabled",
+          "variantProperties": {
+            "Full width?": "false",
+            "Size": "medium",
+            "State": "disabled",
+            "Style": "outline"
+          }
+        },
+        {
+          "id": "60:7437",
+          "name": "Style=ghost, Size=medium, Full width?=false, State=default",
+          "variantProperties": {
+            "Full width?": "false",
+            "Size": "medium",
+            "State": "default",
+            "Style": "ghost"
+          }
+        },
+        {
+          "id": "60:7442",
+          "name": "Style=ghost, Size=medium, Full width?=false, State=disabled",
+          "variantProperties": {
+            "Full width?": "false",
+            "Size": "medium",
+            "State": "disabled",
+            "Style": "ghost"
+          }
+        },
+        {
+          "id": "60:7447",
+          "name": "Style=outline, Size=medium, Full width?=false, State=hover",
+          "variantProperties": {
+            "Full width?": "false",
+            "Size": "medium",
+            "State": "hover",
+            "Style": "outline"
+          }
+        },
+        {
+          "id": "60:7458",
+          "name": "Style=ghost, Size=medium, Full width?=false, State=hover",
+          "variantProperties": {
+            "Full width?": "false",
+            "Size": "medium",
+            "State": "hover",
+            "Style": "ghost"
+          }
+        },
+        {
+          "id": "60:7469",
+          "name": "Style=solid, Size=small, Full width?=false, State=default",
+          "variantProperties": {
+            "Full width?": "false",
+            "Size": "small",
+            "State": "default",
+            "Style": "solid"
+          }
+        },
+        {
+          "id": "60:7474",
+          "name": "Style=solid, Size=small, Full width?=false, State=disabled",
+          "variantProperties": {
+            "Full width?": "false",
+            "Size": "small",
+            "State": "disabled",
+            "Style": "solid"
+          }
+        },
+        {
+          "id": "60:7479",
+          "name": "Style=outline, Size=small, Full width?=false, State=default",
+          "variantProperties": {
+            "Full width?": "false",
+            "Size": "small",
+            "State": "default",
+            "Style": "outline"
+          }
+        },
+        {
+          "id": "60:7484",
+          "name": "Style=outline, Size=small, Full width?=false, State=disabled",
+          "variantProperties": {
+            "Full width?": "false",
+            "Size": "small",
+            "State": "disabled",
+            "Style": "outline"
+          }
+        },
+        {
+          "id": "60:7489",
+          "name": "Style=ghost, Size=small, Full width?=false, State=default",
+          "variantProperties": {
+            "Full width?": "false",
+            "Size": "small",
+            "State": "default",
+            "Style": "ghost"
+          }
+        },
+        {
+          "id": "60:7494",
+          "name": "Style=ghost, Size=small, Full width?=false, State=disabled",
+          "variantProperties": {
+            "Full width?": "false",
+            "Size": "small",
+            "State": "disabled",
+            "Style": "ghost"
+          }
+        },
+        {
+          "id": "60:7499",
+          "name": "Style=solid, Size=small, Full width?=false, State=hover",
+          "variantProperties": {
+            "Full width?": "false",
+            "Size": "small",
+            "State": "hover",
+            "Style": "solid"
+          }
+        },
+        {
+          "id": "60:7510",
+          "name": "Style=outline, Size=small, Full width?=false, State=hover",
+          "variantProperties": {
+            "Full width?": "false",
+            "Size": "small",
+            "State": "hover",
+            "Style": "outline"
+          }
+        },
+        {
+          "id": "60:7541",
+          "name": "Style=ghost, Size=small, Full width?=false, State=hover",
+          "variantProperties": {
+            "Full width?": "false",
+            "Size": "small",
+            "State": "hover",
+            "Style": "ghost"
+          }
+        }
+      ]
+    },
+    "fileId": "",
+    "hasMitosisDefinition": false,
+    "id": "60:7405",
+    "name": "ButtonPrimary",
+    "nodeId": "60:7405",
+    "rawName": "Button Primary",
+    "sourceId": "",
+    "updatedAt": "2026-10-07T02:01:45Z",
+    "variantPropertyValues": {
+      "Full width?": "false",
+      "Size": "medium",
+      "State": "default",
+      "Style": "solid"
+    }
+  },
+  {
+    "brandId": null,
+    "componentPropertyDefinitions": {},
+    "description": "",
+    "figma": {
+      "componentPropertyDefinitions": {},
+      "fileId": "",
+      "key": "",
+      "name": "comet",
+      "nodeId": "179:2534",
+      "sourceId": "",
+      "thumbnailUrl": null,
+      "updatedAt": "2026-10-07T02:01:45Z",
+      "variantPropertyValues": {},
+      "variants": []
+    },
+    "fileId": "",
+    "hasMitosisDefinition": false,
+    "id": "179:2534",
+    "name": "Comet",
+    "nodeId": "179:2534",
+    "rawName": "comet",
+    "sourceId": "",
+    "updatedAt": "2026-10-07T02:01:45Z",
+    "variantPropertyValues": {}
+  },
+  {
+    "brandId": null,
+    "componentPropertyDefinitions": {},
+    "description": "",
+    "figma": {
+      "componentPropertyDefinitions": {},
+      "fileId": "",
+      "key": "",
+      "name": "whirl",
+      "nodeId": "179:2536",
+      "sourceId": "",
+      "thumbnailUrl": null,
+      "updatedAt": "2026-10-07T02:01:45Z",
+      "variantPropertyValues": {},
+      "variants": []
+    },
+    "fileId": "",
+    "hasMitosisDefinition": false,
+    "id": "179:2536",
+    "name": "Whirl",
+    "nodeId": "179:2536",
+    "rawName": "whirl",
+    "sourceId": "",
+    "updatedAt": "2026-10-07T02:01:45Z",
+    "variantPropertyValues": {}
+  },
+  {
+    "brandId": null,
+    "componentPropertyDefinitions": {},
+    "description": "",
+    "figma": {
+      "componentPropertyDefinitions": {},
+      "fileId": "",
+      "key": "",
+      "name": "satellite",
+      "nodeId": "179:2535",
+      "sourceId": "",
+      "thumbnailUrl": null,
+      "updatedAt": "2026-10-07T02:01:45Z",
+      "variantPropertyValues": {},
+      "variants": []
+    },
+    "fileId": "",
+    "hasMitosisDefinition": false,
+    "id": "179:2535",
+    "name": "Satellite",
+    "nodeId": "179:2535",
+    "rawName": "satellite",
+    "sourceId": "",
+    "updatedAt": "2026-10-07T02:01:45Z",
+    "variantPropertyValues": {}
+  },
+  {
+    "brandId": null,
+    "componentPropertyDefinitions": {},
+    "description": "",
+    "figma": {
+      "componentPropertyDefinitions": {},
+      "fileId": "",
+      "key": "",
+      "name": "ufo",
+      "nodeId": "179:2537",
+      "sourceId": "",
+      "thumbnailUrl": null,
+      "updatedAt": "2026-10-07T02:01:45Z",
+      "variantPropertyValues": {},
+      "variants": []
+    },
+    "fileId": "",
+    "hasMitosisDefinition": false,
+    "id": "179:2537",
+    "name": "Ufo",
+    "nodeId": "179:2537",
+    "rawName": "ufo",
+    "sourceId": "",
+    "updatedAt": "2026-10-07T02:01:45Z",
+    "variantPropertyValues": {}
+  },
+  {
+    "brandId": null,
+    "componentPropertyDefinitions": {},
+    "description": "",
+    "figma": {
+      "componentPropertyDefinitions": {},
+      "fileId": "",
+      "key": "",
+      "name": "rocket",
+      "nodeId": "179:2538",
+      "sourceId": "",
+      "thumbnailUrl": null,
+      "updatedAt": "2026-10-07T02:01:45Z",
+      "variantPropertyValues": {},
+      "variants": []
+    },
+    "fileId": "",
+    "hasMitosisDefinition": false,
+    "id": "179:2538",
+    "name": "Rocket",
+    "nodeId": "179:2538",
+    "rawName": "rocket",
+    "sourceId": "",
+    "updatedAt": "2026-10-07T02:01:45Z",
+    "variantPropertyValues": {}
+  },
+  {
+    "brandId": null,
+    "componentPropertyDefinitions": {},
+    "description": "",
+    "figma": {
+      "componentPropertyDefinitions": {},
+      "fileId": "",
+      "key": "",
+      "name": "telescope",
+      "nodeId": "179:2539",
+      "sourceId": "",
+      "thumbnailUrl": null,
+      "updatedAt": "2026-10-07T02:01:45Z",
+      "variantPropertyValues": {},
+      "variants": []
+    },
+    "fileId": "",
+    "hasMitosisDefinition": false,
+    "id": "179:2539",
+    "name": "Telescope",
+    "nodeId": "179:2539",
+    "rawName": "telescope",
+    "sourceId": "",
+    "updatedAt": "2026-10-07T02:01:45Z",
+    "variantPropertyValues": {}
+  },
+  {
+    "brandId": null,
+    "componentPropertyDefinitions": {},
+    "description": "",
+    "figma": {
+      "componentPropertyDefinitions": {},
+      "fileId": "",
+      "key": "",
+      "name": "meteor",
+      "nodeId": "179:2540",
+      "sourceId": "",
+      "thumbnailUrl": null,
+      "updatedAt": "2026-10-07T02:01:45Z",
+      "variantPropertyValues": {},
+      "variants": []
+    },
+    "fileId": "",
+    "hasMitosisDefinition": false,
+    "id": "179:2540",
+    "name": "Meteor",
+    "nodeId": "179:2540",
+    "rawName": "meteor",
+    "sourceId": "",
+    "updatedAt": "2026-10-07T02:01:45Z",
+    "variantPropertyValues": {}
+  },
+  {
+    "brandId": null,
+    "componentPropertyDefinitions": {},
+    "description": "",
+    "figma": {
+      "componentPropertyDefinitions": {},
+      "fileId": "",
+      "key": "",
+      "name": "planet",
+      "nodeId": "179:2541",
+      "sourceId": "",
+      "thumbnailUrl": null,
+      "updatedAt": "2026-10-07T02:01:45Z",
+      "variantPropertyValues": {},
+      "variants": []
+    },
+    "fileId": "",
+    "hasMitosisDefinition": false,
+    "id": "179:2541",
+    "name": "Planet",
+    "nodeId": "179:2541",
+    "rawName": "planet",
+    "sourceId": "",
+    "updatedAt": "2026-10-07T02:01:45Z",
+    "variantPropertyValues": {}
   }
 ]

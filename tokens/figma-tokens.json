@@ -1,0 +1,132 @@
+{
+  "blurs": {
+    "blur": "blur(12px)"
+  },
+  "colors": {
+    "backgroundBlur": "rgba(255, 255, 255, 0.8)",
+    "backgroundBlurNeutral": "rgba(96, 105, 129, 0.8)",
+    "backgroundNeutral": "#f6f7f9",
+    "backgroundPage": "#ffffff",
+    "backgroundPositive": "#007a1c",
+    "backgroundPositiveFaded": "#ebfef6",
+    "backgroundPositiveHighlighted": "#35a24f",
+    "backgroundPrimary": "#014ee1",
+    "backgroundPrimaryFaded": "#ecf5ff",
+    "backgroundPrimaryHighlighted": "#1062fe",
+    "backgroundSecondary": "#874ce6",
+    "backgroundSecondaryFaded": "#f5f2fd",
+    "backgroundSecondaryHighlighted": "#a275ea",
+    "baseBlack": "#000000",
+    "baseBlue200": "#ecf5ff",
+    "baseBlue300": "#d1e2ff",
+    "baseBlue500": "#5292ff",
+    "baseBlue600": "#1062fe",
+    "baseBlue700": "#014ee1",
+    "baseGray200": "#f6f7f9",
+    "baseGray300": "#e6e8ef",
+    "baseGray500": "#c6ccdb",
+    "baseGray600": "#7f8594",
+    "baseGray700": "#606981",
+    "baseGreen200": "#ebfef6",
+    "baseGreen300": "#b4e9c5",
+    "baseGreen500": "#6ac883",
+    "baseGreen600": "#35a24f",
+    "baseGreen700": "#007a1c",
+    "basePurple200": "#f5f2fd",
+    "basePurple300": "#d9c8f5",
+    "basePurple500": "#be9ff0",
+    "basePurple600": "#a275ea",
+    "basePurple700": "#874ce6",
+    "baseWhite": "#ffffff",
+    "black": "#000000",
+    "blueBlue200": "#ecf5ff",
+    "blueBlue300": "#d1e2ff",
+    "blueBlue500": "#5292ff",
+    "blueBlue600": "#1062fe",
+    "blueBlue700": "#014ee1",
+    "borderFocus": "#5292ff",
+    "borderNeutral": "#e6e8ef",
+    "borderPositive": "#007a1c",
+    "borderPositiveFaded": "#b4e9c5",
+    "borderPrimary": "#014ee1",
+    "borderPrimaryFaded": "#d1e2ff",
+    "borderSecondary": "#874ce6",
+    "borderSecondaryFaded": "#d9c8f5",
+    "foregroundDisabled": "#c6ccdb",
+    "foregroundNeutral": "#000000",
+    "foregroundNeutralFaded": "#606981",
+    "foregroundPositive": "#007a1c",
+    "foregroundPrimary": "#014ee1",
+    "foregroundSecondary": "#874ce6",
+    "grayGray200": "#f6f7f9",
+    "grayGray300": "#e6e8ef",
+    "grayGray500": "#c6ccdb",
+    "grayGray600": "#7f8594",
+    "grayGray700": "#606981",
+    "greenGreen200": "#ebfef6",
+    "greenGreen300": "#b4e9c5",
+    "greenGreen500": "#6ac883",
+    "greenGreen600": "#35a24f",
+    "greenGreen700": "#007a1c",
+    "purplePurple200": "#f5f2fd",
+    "purplePurple300": "#d9c8f5",
+    "purplePurple500": "#be9ff0",
+    "purplePurple600": "#a275ea",
+    "purplePurple700": "#874ce6",
+    "white": "#ffffff"
+  },
+  "gradients": {
+    "gradientGradient1": "linear-gradient(90deg, #1062fe 0%, #874ce6 87.19%)",
+    "gradientGradient2": "linear-gradient(90deg, #6ac883 0%, #5292ff 46.21%, #be9ff0 91.5%)"
+  },
+  "radii": {},
+  "shadows": {
+    "overlay": "0px 15px 25px 0px rgba(20, 23, 31, 0.07)",
+    "raised": "0px 1px 3px -1px rgba(20, 23, 31, 0.06)"
+  },
+  "spacing": {},
+  "typography": {
+    "bodyBody1": {
+      "fontFamily": "Inter",
+      "fontSize": "16px",
+      "fontWeight": "Regular",
+      "letterSpacing": "0px",
+      "lineHeight": "24px"
+    },
+    "bodyBody2": {
+      "fontFamily": "Inter",
+      "fontSize": "14px",
+      "fontWeight": "Medium",
+      "letterSpacing": "0px",
+      "lineHeight": "20px"
+    },
+    "bodyBody3": {
+      "fontFamily": "Inter",
+      "fontSize": "12px",
+      "fontWeight": "Regular",
+      "letterSpacing": "0px",
+      "lineHeight": "16px"
+    },
+    "headingHeading1": {
+      "fontFamily": "Inter",
+      "fontSize": "36px",
+      "fontWeight": "Semi Bold",
+      "letterSpacing": "0px",
+      "lineHeight": "44px"
+    },
+    "headingHeading2": {
+      "fontFamily": "Inter",
+      "fontSize": "28px",
+      "fontWeight": "Semi Bold",
+      "letterSpacing": "0px",
+      "lineHeight": "36px"
+    },
+    "headingHeading3": {
+      "fontFamily": "Inter",
+      "fontSize": "18px",
+      "fontWeight": "Semi Bold",
+      "letterSpacing": "0px",
+      "lineHeight": "28px"
+    }
+  }
+}

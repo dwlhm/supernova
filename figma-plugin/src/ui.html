@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Supernova Design System Sync</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --bg-subtle: #f8fafc;
+      --card-bg: #ffffff;
+      --border: #e2e8f0;
+      --border-focus: #3b82f6;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --text-subtle: #94a3b8;
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --primary-active: #1e40af;
+      --primary-fg: #ffffff;
+      --success: #16a34a;
+      --danger: #dc2626;
+      --warning: #d97706;
+      --radius: 6px;
+      --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #1e1e1e;
+        --bg-subtle: #2d2d2d;
+        --card-bg: #252526;
+        --border: #3c3c3c;
+        --border-focus: #60a5fa;
+        --text: #f1f5f9;
+        --text-muted: #94a3b8;
+        --text-subtle: #64748b;
+        --primary: #3b82f6;
+        --primary-hover: #2563eb;
+        --primary-active: #1d4ed8;
+        --primary-fg: #ffffff;
+        --success: #22c55e;
+        --danger: #ef4444;
+        --warning: #f59e0b;
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-family);
+      font-size: 12px;
+      color: var(--text);
+      background-color: var(--bg);
+      line-height: 1.5;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Header */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .brand-icon {
+      width: 22px;
+      height: 22px;
+      background: linear-gradient(135deg, #1062fe 0%, #874ce6 100%);
+      border-radius: 5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 700;
+      font-size: 11px;
+    }
+
+    .brand-title {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 2px 8px;
+      border-radius: 9999px;
+      font-size: 11px;
+      font-weight: 500;
+      background: var(--bg-subtle);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--text-subtle);
+    }
+
+    .status-dot.connected {
+      background: var(--success);
+      box-shadow: 0 0 0 2px rgba(22, 163, 74, 0.2);
+    }
+
+    .status-dot.disconnected {
+      background: var(--danger);
+      box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.2);
+    }
+
+    .status-dot.checking {
+      background: var(--warning);
+      animation: pulse 1s infinite alternate;
+    }
+
+    @keyframes pulse {
+      from { opacity: 0.4; }
+      to { opacity: 1; }
+    }
+
+    /* Cards */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .card-title {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+    }
+
+    /* Inputs & Controls */
+    .field-row {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    input[type="text"] {
+      flex: 1;
+      height: 28px;
+      padding: 0 8px;
+      font-size: 12px;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-mono);
+      outline: none;
+    }
+
+    input[type="text"]:focus {
+      border-color: var(--border-focus);
+    }
+
+    .btn {
+      height: 28px;
+      padding: 0 10px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      border: 1px solid var(--border);
+      background: var(--bg-subtle);
+      color: var(--text);
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+
+    .btn:hover:not(:disabled) {
+      background: var(--border);
+    }
+
+    .btn:active:not(:disabled) {
+      transform: scale(0.98);
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: var(--primary-fg);
+      font-weight: 600;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background: var(--primary-hover);
+      border-color: var(--primary-hover);
+    }
+
+    .btn-primary:active:not(:disabled) {
+      background: var(--primary-active);
+    }
+
+    .btn-group {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+    }
+
+    /* Segmented Control / Radios */
+    .segmented-control {
+      display: flex;
+      background: var(--bg-subtle);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 2px;
+      gap: 2px;
+    }
+
+    .segment-label {
+      flex: 1;
+      text-align: center;
+      padding: 6px 4px;
+      font-size: 11px;
+      font-weight: 500;
+      cursor: pointer;
+      border-radius: 3px;
+      color: var(--text-muted);
+      user-select: none;
+      white-space: nowrap;
+    }
+
+    .segment-label:hover {
+      color: var(--text);
+    }
+
+    .segment-label.active {
+      background: var(--card-bg);
+      color: var(--text);
+      font-weight: 600;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+    }
+
+    /* Checkboxes */
+    .checkbox-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      user-select: none;
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .checkbox-row:hover {
+      color: var(--text);
+    }
+
+    .checkbox-row input[type="checkbox"] {
+      accent-color: var(--primary);
+      cursor: pointer;
+    }
+
+    /* Log Area */
+    .log-container {
+      flex: 1;
+      min-height: 120px;
+      background: #0f172a;
+      color: #e2e8f0;
+      border-radius: var(--radius);
+      padding: 8px 10px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      line-height: 1.45;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      border: 1px solid #1e293b;
+    }
+
+    .log-line {
+      word-break: break-all;
+    }
+
+    .log-line.info { color: #94a3b8; }
+    .log-line.success { color: #4ade80; }
+    .log-line.warn { color: #fbbf24; }
+    .log-line.error { color: #f87171; }
+    .log-line.highlight { color: #60a5fa; font-weight: 600; }
+
+    .log-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 10px;
+      color: var(--text-muted);
+    }
+
+    .clear-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 10px;
+      text-decoration: underline;
+    }
+
+    .clear-btn:hover {
+      color: var(--text);
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="brand">
+      <div class="brand-icon">S</div>
+      <div class="brand-title">Supernova Sync</div>
+    </div>
+    <div class="status-badge" id="statusBadge">
+      <div class="status-dot checking" id="statusDot"></div>
+      <span id="statusText">Checking server...</span>
+    </div>
+  </header>
+
+  <!-- Server Config Card -->
+  <div class="card">
+    <div class="card-title">Backend Server</div>
+    <div class="field-row">
+      <input type="text" id="serverUrl" value="http://localhost:8080" placeholder="http://localhost:8080">
+      <button class="btn" id="btnTestConn">Test</button>
+    </div>
+  </div>
+
+  <!-- Extraction Scope -->
+  <div class="card">
+    <div class="card-title">Extraction Scope</div>
+    <div class="segmented-control" id="scopeControl">
+      <div class="segment-label active" data-scope="selection">Selection</div>
+      <div class="segment-label" data-scope="page">Current Page</div>
+      <div class="segment-label" data-scope="all">Entire Document</div>
+    </div>
+
+    <!-- Options -->
+    <div style="display: flex; flex-direction: column; gap: 6px; margin-top: 4px;">
+      <label class="checkbox-row">
+        <input type="checkbox" id="chkSaveRaw" checked>
+        <span>Save raw Figma JSON (raw/figma/)</span>
+      </label>
+      <label class="checkbox-row">
+        <input type="checkbox" id="chkAutoGenerate">
+        <span>Auto-trigger Mitosis compilation</span>
+      </label>
+    </div>
+  </div>
+
+  <!-- Actions -->
+  <div style="display: flex; flex-direction: column; gap: 6px;">
+    <button class="btn btn-primary" id="btnSyncAll" style="height: 32px; font-size: 12px;">
+      ⚡ Extract & Sync All (Tokens + Components)
+    </button>
+    <div class="btn-group">
+      <button class="btn" id="btnSyncTokens">Sync Tokens Only</button>
+      <button class="btn" id="btnSyncComponents">Sync Components Only</button>
+    </div>
+  </div>
+
+  <!-- Activity Log -->
+  <div class="log-footer">
+    <span>ACTIVITY LOG</span>
+    <button class="clear-btn" id="btnClearLog">Clear Log</button>
+  </div>
+  <div class="log-container" id="logTerminal">
+    <div class="log-line info">[Ready] Plugin initialized. Connect to local Go server to sync.</div>
+  </div>
+
+  <!-- Script injection boundary -->
+  <!-- INJECT_SCRIPT -->
+</body>
+</html>
