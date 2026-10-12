@@ -1,134 +1,95 @@
 # Breadcrumb
 
-Composable part of Breadcrumb. Consumer owns content, order and repetition.
-## Composition
-
-Root: `Breadcrumb`. Parts: `Breadcrumb`, `BreadcrumbList`, `BreadcrumbItem`, `BreadcrumbLink`, `BreadcrumbPage`, `BreadcrumbSeparator`, `BreadcrumbEllipsis`.
-
-The default slot replaces all design example children. Consumers own item data, ordering and repetition. There is no composition mode or internal design type prop.
-
-### Static composition
-
-```tsx
-import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbPage, BreadcrumbSeparator } from '@dwlhm/ui-react';
-
-<Breadcrumb>
-  <BreadcrumbList>
-    <BreadcrumbItem><BreadcrumbLink href="/">Home</BreadcrumbLink></BreadcrumbItem>
-    <BreadcrumbItem><BreadcrumbSeparator /><BreadcrumbPage>Products</BreadcrumbPage></BreadcrumbItem>
-  </BreadcrumbList>
-</Breadcrumb>
-```
-
-### Consumer loop
-
-```tsx
-import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbPage, BreadcrumbSeparator } from '@dwlhm/ui-react';
-
-// The consumer supplies paths, including stable IDs and link destinations.
-<Breadcrumb>
-  <BreadcrumbList>
-    {paths.map((path, index) => (
-      <BreadcrumbItem key={path.id}>
-        {index > 0 && <BreadcrumbSeparator />}
-        {index === paths.length - 1
-          ? <BreadcrumbPage>{path.label}</BreadcrumbPage>
-          : <BreadcrumbLink href={path.href}>{path.label}</BreadcrumbLink>}
-      </BreadcrumbItem>
-    ))}
-  </BreadcrumbList>
-</Breadcrumb>
-```
+Description
+A breadcrumb navigation component that communicates the user's current location within a hierarchical structure and provides a clear path back to higher levels.
 
 
----
+When to use
+Use on pages that are nested within a clear hierarchy.
+Use when users may need to move quickly to a parent level.
+Use in content-heavy products, settings, catalogs, or multi-level navigation.
+Do not use as a replacement for primary navigation or for flat page structures.
 
-Interactive preview is not available for composition parts; use the examples below.
 
-## Code Examples
+Usage guidelines
+Keep labels concise, recognizable, and consistent with page titles.
+Arrange items from the highest level to the current page.
+Treat the final item as the current location; it should not navigate to itself.
+Use the shortest variant that accurately represents the hierarchy.
+For long paths, use the deep variant with an ellipsis to collapse intermediate levels.
+Keep separators visually consistent and ensure interactive items have clear hover and focus states.
+
+
+Properties
+Type — Controls the hierarchy depth: 1, 2, or deep.
+Show Ellipsis — Shows or hides the collapsed-path indicator. Use primarily with Type=deep when intermediate levels are omitted.
+
+## Usage
 
 ::: code-group
 
 ```tsx [React]
-import { Breadcrumb } from '@dwlhm/ui-react'
-```
+import { Breadcrumb } from './Breadcrumb';
 
-```svelte [Svelte]
-import Breadcrumb from '@dwlhm/ui-svelte/Breadcrumb.svelte'
+export default function Example() {
+  return (
+    <Breadcrumb show Ellipsis type="2">
+      Breadcrumb
+    </Breadcrumb>
+  );
+}
 ```
 
 ```vue [Vue 3]
-<template>
-  <Breadcrumb />
-</template>
-
 <script setup lang="ts">
-import { Breadcrumb } from '@dwlhm/ui-vue'
+import { Breadcrumb } from './Breadcrumb';
 </script>
+
+<template>
+  <Breadcrumb show Ellipsis type="2">
+    Breadcrumb
+  </Breadcrumb>
+</template>
 ```
 
-```vue [Vue 2]
-<template>
-  <Breadcrumb />
-</template>
-
-<script>
-import { Breadcrumb } from '@dwlhm/ui-vue2'
-
-export default {
-  components: { Breadcrumb }
-}
+```svelte [Svelte]
+<script lang="ts">
+  import Breadcrumb from './Breadcrumb.svelte';
 </script>
+
+<Breadcrumb show Ellipsis type="2">
+  Breadcrumb
+</Breadcrumb>
+```
+
+```ts [Angular]
+import { Component } from '@angular/core';
+import { BreadcrumbComponent } from './breadcrumb.component';
+
+@Component({
+  selector: 'app-root',
+  standalone: true,
+  imports: [BreadcrumbComponent],
+  template: `
+    <app-breadcrumb show Ellipsis type="2">
+      Breadcrumb
+    </app-breadcrumb>
+  `,
+})
+export class AppComponent {}
 ```
 
 :::
 
----
-
-## Props Reference
+## Props & Variants
 
 | Property | Type | Default | Description |
 | :--- | :--- | :--- | :--- |
-| `children` | `any` | `-` | - |
-| `className` | `string` | `-` | - |
+| `Show Ellipsis` | `boolean` | `true` | - |
+| `Type` | ``2` \| `deep` \| `1`` | `2` | - |
 
+## Accessibility (a11y)
 
----
-
-## Framework Integration
-
-### React
-
-```tsx
-import { Breadcrumb } from '@dwlhm/ui-react'
-```
-
-### Svelte
-
-```svelte
-<script>
-  import Breadcrumb from '@dwlhm/ui-svelte/Breadcrumb.svelte'
-</script>
-```
-
-### Vue 3
-
-```vue
-<script setup lang="ts">
-import { Breadcrumb } from '@dwlhm/ui-vue'
-</script>
-```
-
-### Vue 2 (Webpack 4 Compatible)
-
-```vue
-<script>
-import { Breadcrumb } from '@dwlhm/ui-vue2'
-
-export default {
-  components: {
-    Breadcrumb
-  }
-}
-</script>
-```
+- **Keyboard Navigation**: Ensure interactive child elements are reachable and operable via standard keyboard sequences (<kbd>Tab</kbd>, <kbd>Enter</kbd>, <kbd>Space</kbd>).
+- **WAI-ARIA Roles & States**: Appropriate ARIA roles and dynamic state attributes (e.g. `aria-expanded`, `aria-selected`, `aria-hidden`) reflect component status.
+- **Color Contrast**: All typography and interactive UI boundaries satisfy WCAG 2.1 AA requirements (4.5:1 for normal text, 3:1 for large text and UI components).
