@@ -1,0 +1,19 @@
+{
+  "name": "@supernova/figma-plugin",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Figma plugin to extract design tokens and components across entire documents",
+  "scripts": {
+    "build": "node build.js",
+    "typecheck": "tsc --noEmit",
+    "test": "node build.js && node --test test/*.test.js"
+  },
+  "devDependencies": {
+    "@figma/plugin-typings": "^1.106.0",
+    "@supernova/contracts": "workspace:*",
+    "@types/node": "^22.13.0",
+    "esbuild": "^0.25.0",
+    "typescript": "^5.8.2"
+  }
+}
