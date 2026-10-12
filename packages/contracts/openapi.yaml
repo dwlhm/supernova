@@ -1,0 +1,388 @@
+openapi: 3.0.3
+info:
+  title: Supernova Extraction & Compilation API
+  version: 1.0.0
+  description: API for extracting Figma designs and compiling multi-framework components.
+
+security:
+  - BearerAuth: []
+
+paths:
+  /v1/extractions:
+    post:
+      summary: Submit document extraction
+      operationId: submitExtraction
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExtractionRequest'
+      responses:
+        '202':
+          description: Extraction job accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExtractionResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '413':
+          description: Payload too large
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /v1/jobs/{id}:
+    get:
+      summary: Get job progress
+      operationId: getJob
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Unique job identifier
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Job progress details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobResponse'
+        '404':
+          description: Job not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /v1/jobs/{id}/download:
+    get:
+      summary: Download zip archive of components
+      operationId: downloadJobArchive
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Unique job identifier
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Zip archive containing compiled component packages
+          content:
+            application/zip:
+              schema:
+                type: string
+                format: binary
+        '404':
+          description: Job not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Job archive not ready
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /v1/health:
+    get:
+      summary: Health status
+      operationId: getHealth
+      security: []
+      responses:
+        '200':
+          description: Service health status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    Framework:
+      type: string
+      enum:
+        - mitosis
+        - react
+        - svelte
+        - vue3
+        - vue2
+        - angular
+
+    PublisherType:
+      type: string
+      enum:
+        - download
+        - pull_request
+
+    JobStatus:
+      type: string
+      enum:
+        - queued
+        - authoring
+        - compiling
+        - publishing
+        - succeeded
+        - failed
+
+    ComponentStatus:
+      type: string
+      enum:
+        - pending
+        - authoring
+        - compiling
+        - done
+        - failed
+
+    FigmaColor:
+      type: object
+      required:
+        - r
+        - g
+        - b
+        - a
+      properties:
+        r:
+          type: number
+        g:
+          type: number
+        b:
+          type: number
+        a:
+          type: number
+
+    FigmaToken:
+      type: object
+      required:
+        - id
+        - name
+        - type
+        - value
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        type:
+          type: string
+        value:
+          description: Token value of arbitrary type
+        description:
+          type: string
+
+    FigmaComponentSpec:
+      type: object
+      required:
+        - id
+        - name
+        - node
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        key:
+          type: string
+        description:
+          type: string
+        componentSetName:
+          type: string
+        pageName:
+          type: string
+          description: Name of the Figma page the component belongs to
+        properties:
+          type: object
+          description: Variant properties, booleans, text, instanceSwap
+          additionalProperties: true
+        node:
+          type: object
+          description: Figma scene node representation (type, layout, fills, strokes, children, etc.)
+          additionalProperties: true
+
+    FigmaDocument:
+      type: object
+      required:
+        - name
+        - tokens
+        - components
+      properties:
+        name:
+          type: string
+        version:
+          type: string
+        lastModified:
+          type: string
+        tokens:
+          type: array
+          items:
+            $ref: '#/components/schemas/FigmaToken'
+        components:
+          type: array
+          items:
+            $ref: '#/components/schemas/FigmaComponentSpec'
+
+    ExtractionOptions:
+      type: object
+      properties:
+        prTitle:
+          type: string
+        branchName:
+          type: string
+
+    ExtractionRequest:
+      type: object
+      required:
+        - document
+      properties:
+        document:
+          $ref: '#/components/schemas/FigmaDocument'
+        targets:
+          type: array
+          items:
+            $ref: '#/components/schemas/Framework'
+          default:
+            - mitosis
+        publishers:
+          type: array
+          items:
+            $ref: '#/components/schemas/PublisherType'
+          default:
+            - download
+        options:
+          $ref: '#/components/schemas/ExtractionOptions'
+
+    ExtractionResponse:
+      type: object
+      required:
+        - jobId
+        - status
+        - createdAt
+      properties:
+        jobId:
+          type: string
+          format: uuid
+        status:
+          $ref: '#/components/schemas/JobStatus'
+        createdAt:
+          type: string
+          format: date-time
+
+    StageError:
+      type: object
+      required:
+        - stage
+        - message
+      properties:
+        stage:
+          type: string
+        message:
+          type: string
+
+    ComponentProgress:
+      type: object
+      required:
+        - name
+        - status
+      properties:
+        name:
+          type: string
+        status:
+          $ref: '#/components/schemas/ComponentStatus'
+        group:
+          type: string
+          description: Group or category of the component, e.g. components, icons
+        stageError:
+          $ref: '#/components/schemas/StageError'
+
+    PublishResults:
+      type: object
+      properties:
+        downloadUrl:
+          type: string
+        pullRequestUrl:
+          type: string
+
+    JobResponse:
+      type: object
+      required:
+        - jobId
+        - status
+        - targets
+        - publishers
+        - components
+        - createdAt
+        - updatedAt
+      properties:
+        jobId:
+          type: string
+        status:
+          $ref: '#/components/schemas/JobStatus'
+        targets:
+          type: array
+          items:
+            $ref: '#/components/schemas/Framework'
+        publishers:
+          type: array
+          items:
+            $ref: '#/components/schemas/PublisherType'
+        components:
+          type: array
+          items:
+            $ref: '#/components/schemas/ComponentProgress'
+        publishResults:
+          $ref: '#/components/schemas/PublishResults'
+        error:
+          $ref: '#/components/schemas/StageError'
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    ErrorResponse:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        details:
+          description: Additional error details or context
+
+    HealthResponse:
+      type: object
+      required:
+        - status
+        - version
+      properties:
+        status:
+          type: string
+        version:
+          type: string

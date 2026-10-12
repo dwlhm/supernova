@@ -1,0 +1,21 @@
+export * from './schema.js';
+import type { components, paths } from './schema.js';
+
+export type ExtractionRequest = components['schemas']['ExtractionRequest'];
+export type ExtractionResponse = components['schemas']['ExtractionResponse'];
+export type JobResponse = components['schemas']['JobResponse'];
+export type Framework = components['schemas']['Framework'];
+export type PublisherType = components['schemas']['PublisherType'];
+export type JobStatus = components['schemas']['JobStatus'];
+export type FigmaDocument = components['schemas']['FigmaDocument'];
+export type FigmaComponentSpec = components['schemas']['FigmaComponentSpec'];
+export type FigmaToken = components['schemas']['FigmaToken'];
+export type FigmaColor = components['schemas']['FigmaColor'];
+export type ComponentProgress = components['schemas']['ComponentProgress'];
+export type ComponentStatus = components['schemas']['ComponentStatus'];
+export type StageError = components['schemas']['StageError'];
+export type PublishResults = components['schemas']['PublishResults'];
+export type ErrorResponse = components['schemas']['ErrorResponse'];
+export type HealthResponse = components['schemas']['HealthResponse'];
+export type ExtractionOptions = components['schemas']['ExtractionOptions'];
+export type { components, paths };
