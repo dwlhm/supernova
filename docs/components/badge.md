@@ -1,123 +1,89 @@
 # Badge
 
-Compact status badge indicator used for categorization, counters, and highlights.
+A compact label used to communicate status, category, or supporting metadata without interrupting the main content.
 
----
 
-## Interactive Preview
+When to useShow a concise status, classification, or attribute.
+Help users scan and compare items quickly.
+Use alongside primary content, not as a replacement for buttons or alerts.
 
-<ComponentSandbox name="Badge" />
 
----
+Usage guidelinesKeep labels short, clear, and sentence case.
+Choose the variant by meaning, not decoration.
+Use one semantic meaning consistently across the product.
+Avoid placing several high-emphasis badges next to each other.
+Do not use a Badge for interactive actions.
 
-## Code Examples
+
+PropertiesVariant: primary, secondary, destructive, success, warning, info, or outline.
+Label: Editable text displayed inside the badge.
+
+## Usage
 
 ::: code-group
 
 ```tsx [React]
-import { Badge } from '@dwlhm/ui-react'
+import { Badge } from './Badge';
 
-export default function Demo() {
+export default function Example() {
   return (
-    <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-      <Badge variant="primary">New</Badge>
-      <Badge variant="success" rounded>Completed</Badge>
-      <Badge variant="warning">Pending</Badge>
-      <Badge variant="danger">Failed</Badge>
-    </div>
-  )
+    <Badge label="Badge" variant="primary">
+      Badge
+    </Badge>
+  );
 }
-```
-
-```svelte [Svelte]
-<script>
-  import Badge from '@dwlhm/ui-svelte/Badge.svelte'
-</script>
-
-<div style="display: flex; gap: 8px; align-items: center;">
-  <Badge variant="primary">New</Badge>
-  <Badge variant="success" rounded={true}>Completed</Badge>
-  <Badge variant="warning">Pending</Badge>
-  <Badge variant="danger">Failed</Badge>
-</div>
 ```
 
 ```vue [Vue 3]
-<template>
-  <Badge />
-</template>
-
 <script setup lang="ts">
-import { Badge } from '@dwlhm/ui-vue'
+import { Badge } from './Badge';
 </script>
+
+<template>
+  <Badge label="Badge" variant="primary">
+    Badge
+  </Badge>
+</template>
 ```
 
-```vue [Vue 2]
-<template>
-  <Badge />
-</template>
-
-<script>
-import { Badge } from '@dwlhm/ui-vue2'
-
-export default {
-  components: { Badge }
-}
+```svelte [Svelte]
+<script lang="ts">
+  import Badge from './Badge.svelte';
 </script>
+
+<Badge label="Badge" variant="primary">
+  Badge
+</Badge>
+```
+
+```ts [Angular]
+import { Component } from '@angular/core';
+import { BadgeComponent } from './badge.component';
+
+@Component({
+  selector: 'app-root',
+  standalone: true,
+  imports: [BadgeComponent],
+  template: `
+    <app-badge label="Badge" variant="primary">
+      Badge
+    </app-badge>
+  `,
+})
+export class AppComponent {}
 ```
 
 :::
 
----
-
-## Props Reference
+## Props & Variants
 
 | Property | Type | Default | Description |
 | :--- | :--- | :--- | :--- |
-| `label` | `string` | `-` | - |
-| `Label` | `string` | `-` | - |
-| `variant` | `"primary" \| "secondary" \| "destructive" \| "success" \| "warning" \| "info" \| "outline"` | `'primary'` | Color tone indicating status or category |
-| `Variant` | `"primary" \| "secondary" \| "destructive" \| "success" \| "warning" \| "info" \| "outline"` | `-` | - |
-| `children` | `any` | `-` | Text content or indicator symbol |
-| `className` | `string` | `-` | - |
+| `Label` | `text` | `Badge` | - |
+| `Variant` | ``primary` \| `secondary` \| `destructive` \| `success` \| `warning` \| `info` \| `outline`` | `primary` | - |
 
+## Accessibility (a11y)
 
----
-
-## Framework Integration
-
-### React
-
-```tsx
-import { Badge } from '@dwlhm/ui-react'
-```
-
-### Svelte
-
-```svelte
-<script>
-  import Badge from '@dwlhm/ui-svelte/Badge.svelte'
-</script>
-```
-
-### Vue 3
-
-```vue
-<script setup lang="ts">
-import { Badge } from '@dwlhm/ui-vue'
-</script>
-```
-
-### Vue 2 (Webpack 4 Compatible)
-
-```vue
-<script>
-import { Badge } from '@dwlhm/ui-vue2'
-
-export default {
-  components: {
-    Badge
-  }
-}
-</script>
-```
+- **Keyboard Navigation**: Ensure interactive child elements are reachable and operable via standard keyboard sequences (<kbd>Tab</kbd>, <kbd>Enter</kbd>, <kbd>Space</kbd>).
+- **WAI-ARIA Roles & States**: Appropriate ARIA roles and dynamic state attributes (e.g. `aria-expanded`, `aria-selected`, `aria-hidden`) reflect component status.
+- **Color Contrast**: All typography and interactive UI boundaries satisfy WCAG 2.1 AA requirements (4.5:1 for normal text, 3:1 for large text and UI components).
