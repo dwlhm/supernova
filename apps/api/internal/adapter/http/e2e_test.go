@@ -46,7 +46,7 @@ func TestE2E_ExtractionPipelineWithRealCompiler(t *testing.T) {
 	repoRoot := filepath.Join(wd, "..", "..", "..", "..", "..")
 	cliPath := filepath.Join(repoRoot, "packages", "mitosis-compiler", "dist", "cli.js")
 	if _, err := os.Stat(cliPath); err != nil {
-		t.Fatalf("compiler CLI not found at %s: %v", cliPath, err)
+		t.Skipf("compiler CLI not found at %s (run 'pnpm build' first): %v", cliPath, err)
 	}
 
 	// 2. Wire Hexagonal dependencies

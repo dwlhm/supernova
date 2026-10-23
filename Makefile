@@ -45,7 +45,7 @@ typecheck:
 build:
 	pnpm build
 
-check: fmt-check vet test-go build typecheck test-ts
+check: fmt-check vet build test-go typecheck test-ts
 	@echo "All checks passed successfully."
 
 clean:
