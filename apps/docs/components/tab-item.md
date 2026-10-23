@@ -19,6 +19,10 @@ Properties
 • Num — Sets the displayed numeric value.
 • State — Selects Default or Active.
 
+## Live Preview
+
+<FrameworkPreview name="TabItem" />
+
 ## Usage
 
 ::: code-group

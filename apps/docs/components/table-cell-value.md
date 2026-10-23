@@ -23,6 +23,10 @@ Show Affiliate, Show Komlabs, Show Raja Ongkir, Show Komads, Show Komcards, Show
 Show Edit, Show Delete, Show More — Controls visible actions in Action (Icon).
 Slot — Replaces the custom content in the Slot variant.
 
+## Live Preview
+
+<FrameworkPreview name="TableCellValue" />
+
 ## Usage
 
 ::: code-group

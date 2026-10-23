@@ -1,10 +1,11 @@
-import type { FigmaDocument, FigmaToken, FigmaComponentSpec } from '@supernova/contracts';
+import type { FigmaDocument, FigmaToken, FigmaComponentSpec, FigmaSceneNode, FigmaPaint } from '@supernova/contracts';
 import {
   extractLayout,
   formatVariableToken,
   formatComponentSpec,
   formatComponentSetSpec,
   serializeColor,
+  serializeStroke,
   serializeEffect,
   resolveVariableAliases,
   collectBoundVariableIds,
@@ -20,33 +21,78 @@ function postMessageSafe(message: any): void {
   figma.ui.postMessage(sanitizeForPostMessage(message));
 }
 
-function serializeNode(node: SceneNode, depth: number = 0): Record<string, any> {
-  if (depth > 5) {
+function serializeNode(node: SceneNode, depth: number = 0): FigmaSceneNode {
+  if (depth > 10) {
     return { id: node.id, name: node.name, type: node.type };
   }
 
-  const base: Record<string, any> = {
+  const base: FigmaSceneNode = {
     id: node.id,
     name: node.name,
     type: node.type,
-    visible: node.visible,
+    visible: node.visible !== false,
     layout: extractLayout(node as any),
   };
 
-  // Fills & Strokes
-  if ('fills' in node && Array.isArray(node.fills)) {
-    base.fills = node.fills
-      .filter((f) => f.visible !== false && f.type === 'SOLID')
-      .map((f: any) => ({
-        type: f.type,
-        color: serializeColor(f.color, f.opacity),
-      }));
+  if (typeof (node as any).opacity === 'number' && (node as any).opacity < 1) {
+    base.opacity = (node as any).opacity;
   }
 
-  // Text content
+  // Fills with boundVariables & solid/gradient
+  if ('fills' in node && Array.isArray(node.fills)) {
+    base.fills = (node.fills as readonly Paint[])
+      .filter((f) => f.visible !== false)
+      .map((f: any): FigmaPaint => {
+        const fillObj: FigmaPaint = {
+          type: f.type,
+        };
+        if (f.color) {
+          fillObj.color = serializeColor(f.color, f.opacity);
+        }
+        if (f.opacity !== undefined) fillObj.opacity = f.opacity;
+        if (f.blendMode) fillObj.blendMode = f.blendMode;
+        if (f.boundVariables) fillObj.boundVariables = f.boundVariables;
+        return fillObj;
+      });
+  }
+
+  // Strokes with weight, align, dashes, boundVariables
+  if ('strokes' in node && Array.isArray(node.strokes) && node.strokes.length > 0) {
+    const strokeNode = node as any;
+    base.strokes = strokeNode.strokes
+      .filter((s: any) => s.visible !== false)
+      .map((s: any) => serializeStroke(s, strokeNode.strokeWeight, strokeNode.strokeAlign, strokeNode.strokeDashes));
+  }
+
+  // Effects with shadows, blurs, boundVariables
+  if ('effects' in node && Array.isArray(node.effects) && node.effects.length > 0) {
+    base.effects = (node.effects as readonly Effect[])
+      .filter((e) => e.visible !== false)
+      .map((e: any) => serializeEffect(e));
+  }
+
+  // Text content & complete typography
   if (node.type === 'TEXT') {
-    base.characters = node.characters;
-    base.fontSize = typeof node.fontSize === 'number' ? node.fontSize : undefined;
+    const textNode = node as TextNode;
+    base.typography = {
+      characters: textNode.characters,
+      fontSize: typeof textNode.fontSize === 'number' ? textNode.fontSize : undefined,
+      fontFamily: typeof textNode.fontName === 'object' ? textNode.fontName.family : undefined,
+      fontStyle: typeof textNode.fontName === 'object' ? textNode.fontName.style : undefined,
+      fontWeight: typeof textNode.fontWeight === 'number' ? String(textNode.fontWeight) : undefined,
+      lineHeight: typeof textNode.lineHeight === 'object' ? textNode.lineHeight : undefined,
+      letterSpacing: typeof textNode.letterSpacing === 'object' ? textNode.letterSpacing : undefined,
+      paragraphSpacing: typeof textNode.paragraphSpacing === 'number' ? textNode.paragraphSpacing : undefined,
+      textAlignHorizontal: textNode.textAlignHorizontal,
+      textAlignVertical: textNode.textAlignVertical,
+      textCase: typeof textNode.textCase === 'string' ? textNode.textCase : undefined,
+      textDecoration: typeof textNode.textDecoration === 'string' ? textNode.textDecoration : undefined,
+    };
+  }
+
+  // Bound variables on the node itself (layout, fills, strokes, etc.)
+  if ('boundVariables' in node && (node as any).boundVariables) {
+    base.boundVariables = (node as any).boundVariables;
   }
 
   // Children
@@ -77,6 +123,7 @@ async function extractWholeDocument(): Promise<FigmaDocument> {
   const knownVariableIds = new Set<string>();
   const missingVariableIds = new Set<string>();
   const collectionMap = new Map<string, string>();
+  const collectionModesMap = new Map<string, Record<string, string>>();
 
   // 2. Extract Variables
   if (figma.variables && typeof figma.variables.getLocalVariablesAsync === 'function') {
@@ -88,12 +135,20 @@ async function extractWholeDocument(): Promise<FigmaDocument> {
 
       for (const col of collections) {
         collectionMap.set(col.id, col.name);
+        const modeMap: Record<string, string> = {};
+        if (Array.isArray(col.modes)) {
+          for (const m of col.modes) {
+            modeMap[m.modeId] = m.name;
+          }
+        }
+        collectionModesMap.set(col.id, modeMap);
       }
 
       for (const v of variables) {
         markKnownVariableId(v.id, knownVariableIds);
         const colName = collectionMap.get(v.variableCollectionId) || '';
-        tokens.push(formatVariableToken(v as any, colName));
+        const modes = collectionModesMap.get(v.variableCollectionId) || {};
+        tokens.push(formatVariableToken(v as any, colName, undefined, modes));
 
         if (v.valuesByMode) {
           for (const modeVal of Object.values(v.valuesByMode)) {
@@ -235,15 +290,25 @@ async function extractWholeDocument(): Promise<FigmaDocument> {
           const variable = await figma.variables.getVariableByIdAsync(id);
           if (variable) {
             let colName = '';
+            let modes: Record<string, string> = {};
             if (variable.variableCollectionId) {
               if (collectionMap.has(variable.variableCollectionId)) {
                 colName = collectionMap.get(variable.variableCollectionId)!;
+                modes = collectionModesMap.get(variable.variableCollectionId) || {};
               } else if (typeof figma.variables.getVariableCollectionByIdAsync === 'function') {
                 try {
                   const col = await figma.variables.getVariableCollectionByIdAsync(variable.variableCollectionId);
                   if (col) {
                     colName = col.name;
                     collectionMap.set(col.id, col.name);
+                    const modeMap: Record<string, string> = {};
+                    if (Array.isArray(col.modes)) {
+                      for (const m of col.modes) {
+                        modeMap[m.modeId] = m.name;
+                      }
+                    }
+                    collectionModesMap.set(col.id, modeMap);
+                    modes = modeMap;
                   }
                 } catch {
                   // Ignore collection fetch error
@@ -251,7 +316,7 @@ async function extractWholeDocument(): Promise<FigmaDocument> {
               }
             }
 
-            tokens.push(formatVariableToken(variable as any, colName));
+            tokens.push(formatVariableToken(variable as any, colName, undefined, modes));
 
             if (variable.valuesByMode) {
               for (const modeVal of Object.values(variable.valuesByMode)) {

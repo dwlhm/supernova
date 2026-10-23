@@ -3,7 +3,9 @@ package app
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"io/fs"
 	"log/slog"
 	"os"
 	"path/filepath"
@@ -28,10 +30,20 @@ const (
 type Service struct {
 	store       out.JobStore
 	author      out.MitosisAuthor
-	compiler    out.MitosisCompiler
 	publishers  map[string]out.ArtifactPublisher
+	prManager   out.PullRequestManager
+	paths       Paths
 	maxRetries  int
 	concurrency int
+	broker      *EventBroker
+}
+
+// Paths are the filesystem locations the service reads and writes. Empty DocsDir/GeneratedDir
+// disables syncing into those directories.
+type Paths struct {
+	ExtractionsDir string
+	DocsDir        string
+	GeneratedDir   string
 }
 
 var _ in.Service = (*Service)(nil)
@@ -40,22 +52,43 @@ var _ in.Service = (*Service)(nil)
 func NewService(
 	store out.JobStore,
 	author out.MitosisAuthor,
-	compiler out.MitosisCompiler,
 	publishers []out.ArtifactPublisher,
+	paths Paths,
+	prManager ...out.PullRequestManager,
 ) *Service {
 	pubMap := make(map[string]out.ArtifactPublisher, len(publishers))
+	var pm out.PullRequestManager
 	for _, p := range publishers {
 		pubMap[p.Name()] = p
+		if pm == nil {
+			if m, ok := p.(out.PullRequestManager); ok {
+				pm = m
+			}
+		}
+	}
+	if len(prManager) > 0 && prManager[0] != nil {
+		pm = prManager[0]
 	}
 
 	return &Service{
 		store:       store,
 		author:      author,
-		compiler:    compiler,
 		publishers:  pubMap,
+		prManager:   pm,
+		paths:       paths,
 		maxRetries:  defaultMaxRetries,
 		concurrency: defaultConcurrency,
+		broker:      NewEventBroker(),
 	}
+}
+
+// SubscribeJobEvents provides a real-time event channel for SSE subscribers.
+func (s *Service) SubscribeJobEvents(ctx context.Context, jobID string) (<-chan contracts.JobEvent, func(), error) {
+	if _, err := s.store.Get(ctx, jobID); err != nil {
+		return nil, nil, err
+	}
+	ch, unsub := s.broker.Subscribe(jobID)
+	return ch, unsub, nil
 }
 
 // SetConcurrency overrides default worker pool concurrency limit (useful for testing).
@@ -68,13 +101,6 @@ func (s *Service) SetConcurrency(concurrency int) {
 // SetMaxRetries overrides default repair loop retries (useful for testing).
 func (s *Service) SetMaxRetries(retries int) {
 	s.maxRetries = retries
-}
-
-func getExtractionsDir() string {
-	if dir := os.Getenv("EXTRACTIONS_DIR"); dir != "" {
-		return dir
-	}
-	return "var/extractions"
 }
 
 // SubmitExtraction validates and enqueues a new extraction request, launching asynchronous processing.
@@ -126,7 +152,7 @@ func (s *Service) SubmitExtraction(ctx context.Context, req contracts.Extraction
 		UpdatedAt:      now,
 	}
 
-	extractionsDir := getExtractionsDir()
+	extractionsDir := s.paths.ExtractionsDir
 	if err := os.MkdirAll(extractionsDir, 0755); err == nil {
 		if data, err := json.MarshalIndent(req, "", "  "); err == nil {
 			jobFile := filepath.Join(extractionsDir, fmt.Sprintf("%s.json", jobID))
@@ -152,23 +178,20 @@ func (s *Service) SubmitExtraction(ctx context.Context, req contracts.Extraction
 	return jobID, nil
 }
 
-// ReplayExtraction reads a previously persisted extraction request from disk and enqueues a new job.
-func (s *Service) ReplayExtraction(ctx context.Context, fileOrJobID string) (string, error) {
-	extractionsDir := getExtractionsDir()
-	var targetPath string
-
-	trimmed := strings.TrimSpace(fileOrJobID)
-	if trimmed == "" || trimmed == "latest" {
-		targetPath = filepath.Join(extractionsDir, "latest.json")
-	} else if strings.HasSuffix(trimmed, ".json") || strings.Contains(trimmed, string(filepath.Separator)) {
-		targetPath = trimmed
-	} else {
-		targetPath = filepath.Join(extractionsDir, fmt.Sprintf("%s.json", trimmed))
+// ReplayExtraction re-enqueues a previously persisted extraction request. target must be
+// empty/"latest" or a job ID; arbitrary paths are rejected so callers cannot read other files.
+func (s *Service) ReplayExtraction(ctx context.Context, target string) (string, error) {
+	targetPath, err := s.replayPath(target)
+	if err != nil {
+		return "", err
 	}
 
 	data, err := os.ReadFile(targetPath)
+	if errors.Is(err, fs.ErrNotExist) {
+		return "", domain.ErrExtractionNotFound
+	}
 	if err != nil {
-		return "", fmt.Errorf("extraction file not found: %w", err)
+		return "", fmt.Errorf("read persisted extraction: %w", err)
 	}
 
 	var req contracts.ExtractionRequest
@@ -176,8 +199,20 @@ func (s *Service) ReplayExtraction(ctx context.Context, fileOrJobID string) (str
 		return "", fmt.Errorf("failed to parse persisted extraction payload: %w", err)
 	}
 
-	slog.Info(fmt.Sprintf("[REPLAY] Replaying extraction from %s (doc=%s, components=%d)", targetPath, req.Document.Name, len(req.Document.Components)))
+	slog.Info("[REPLAY] Replaying extraction", "path", targetPath, "doc", req.Document.Name, "components", len(req.Document.Components))
 	return s.SubmitExtraction(ctx, req)
+}
+
+func (s *Service) replayPath(target string) (string, error) {
+	target = strings.TrimSpace(target)
+	if target == "" || target == "latest" {
+		return filepath.Join(s.paths.ExtractionsDir, "latest.json"), nil
+	}
+	id, err := uuid.Parse(target)
+	if err != nil {
+		return "", fmt.Errorf("%w: replay target must be a job ID or \"latest\"", domain.ErrInvalidPayload)
+	}
+	return filepath.Join(s.paths.ExtractionsDir, id.String()+".json"), nil
 }
 
 // GetJob retrieves an extraction job by its identifier.
@@ -207,213 +242,9 @@ func (s *Service) GetDownloadZip(ctx context.Context, jobID string) ([]byte, err
 	return zipBytes, nil
 }
 
-// ExecuteJob drives the lifecycle of an extraction: holistic authoring -> token resolution -> publishing.
-func (s *Service) ExecuteJob(ctx context.Context, jobID string) {
-	job, err := s.store.Get(ctx, jobID)
-	if err != nil {
-		slog.Error(fmt.Sprintf("[JOB] [ERROR] [%s] Failed to fetch job from store: %v", jobID, err))
-		return
-	}
-
-	if err := s.store.UpdateStatus(ctx, jobID, contracts.JobStatusAuthoring, nil); err != nil {
-		slog.Warn(fmt.Sprintf("[JOB] [WARN] [%s] Failed to update status to Authoring: %v", jobID, err))
-	}
-
-	totalComponents := len(job.Document.Components)
-	slog.Info(fmt.Sprintf("[JOB] [%s] Processing started for %d component(s)", jobID, totalComponents))
-
-	// Mark all components as Authoring initially
-	for _, compSpec := range job.Document.Components {
-		compName := domain.NormalizeComponentName(compSpec.Name)
-		compGroup := resolveComponentGroup("", compName, compSpec)
-		if err := s.store.UpdateComponent(ctx, jobID, contracts.ComponentProgress{
-			Name:   compName,
-			Status: contracts.ComponentStatusAuthoring,
-			Group:  &compGroup,
-		}); err != nil {
-			slog.Warn(fmt.Sprintf("[JOB] [WARN] [%s] [%s] Failed to update component status to authoring: %v", jobID, compName, err))
-		}
-	}
-
-	// Retrieve existing component information from PullRequest publisher, if supported
-	var existingNames []string
-	var workspaceDir string
-	if pub, ok := s.publishers[string(contracts.PullRequest)]; ok {
-		if infoReader, ok := pub.(interface {
-			GetExistingComponentInfo(ctx context.Context) ([]string, string, func(), error)
-		}); ok {
-			names, wsDir, cleanup, err := infoReader.GetExistingComponentInfo(ctx)
-			if err != nil {
-				slog.Warn(fmt.Sprintf("[JOB] [WARN] [%s] Failed to get existing component info: %v", jobID, err))
-			} else {
-				if cleanup != nil {
-					defer cleanup()
-				}
-				existingNames = names
-				workspaceDir = wsDir
-				slog.Info(fmt.Sprintf("[JOB] [%s] Found %d existing component(s), workspaceDir=%s", jobID, len(existingNames), workspaceDir))
-			}
-		}
-	}
-
-	// Request holistic design system authoring
-	slog.Info(fmt.Sprintf("[JOB] [%s] Requesting holistic authoring for %d component(s)...", jobID, totalComponents))
-	authorReq := out.AuthorRequest{
-		Components:             job.Document.Components,
-		Tokens:                 job.Document.Tokens,
-		ExistingComponentNames: existingNames,
-		WorkspaceDir:           workspaceDir,
-		Targets:                job.Targets,
-		TokenClasses:           ExtractTailwindUtilityClasses(job.Document.Tokens),
-	}
-
-	result, authorErr := s.author.AuthorDesignSystem(ctx, authorReq)
-	if authorErr != nil {
-		slog.Error(fmt.Sprintf("[JOB] [ERROR] [%s] Authoring failed: %v", jobID, authorErr))
-		stageErr := &contracts.StageError{
-			Stage:   "authoring",
-			Message: authorErr.Error(),
-		}
-		for _, compSpec := range job.Document.Components {
-			compName := domain.NormalizeComponentName(compSpec.Name)
-			compGroup := resolveComponentGroup("", compName, compSpec)
-			_ = s.store.UpdateComponent(ctx, jobID, contracts.ComponentProgress{
-				Name:       compName,
-				Status:     contracts.ComponentStatusFailed,
-				Group:      &compGroup,
-				StageError: stageErr,
-			})
-		}
-		if err := s.store.UpdateStatus(ctx, jobID, contracts.JobStatusFailed, stageErr); err != nil {
-			slog.Warn(fmt.Sprintf("[JOB] [WARN] [%s] Failed to update status to failed: %v", jobID, err))
-		}
-		return
-	}
-
-	// 1. Merge discovered new tokens into catalog
-	if len(result.NewTokens) > 0 {
-		var tokensMu sync.Mutex
-		tokensMu.Lock()
-		existingTokenNames := make(map[string]struct{}, len(job.Document.Tokens))
-		for _, tok := range job.Document.Tokens {
-			existingTokenNames[tok.Name] = struct{}{}
-		}
-		hasNew := false
-		for _, tok := range result.NewTokens {
-			if _, exists := existingTokenNames[tok.Name]; !exists {
-				existingTokenNames[tok.Name] = struct{}{}
-				var desc *string
-				if tok.Description != "" {
-					d := tok.Description
-					desc = &d
-				}
-				job.Document.Tokens = append(job.Document.Tokens, contracts.FigmaToken{
-					Id:          uuid.NewString()[:8],
-					Name:        tok.Name,
-					Type:        tok.Type,
-					Value:       tok.Value,
-					Description: desc,
-				})
-				hasNew = true
-			}
-		}
-		tokensMu.Unlock()
-
-		if hasNew {
-			slog.Info(fmt.Sprintf("[JOB] [%s] Discovered %d new design token(s)", jobID, len(result.NewTokens)))
-			if currentJob, err := s.store.Get(ctx, jobID); err == nil {
-				currentJob.Document.Tokens = job.Document.Tokens
-				_ = s.store.Update(ctx, currentJob)
-			} else {
-				_ = s.store.Update(ctx, job)
-			}
-		}
-	}
-
-	// 2. Prepare and save artifacts
-	artifacts := result.Artifacts
-	if len(artifacts) == 0 && len(result.Components) > 0 {
-		for compName, code := range result.Components {
-			rawGroup := ""
-			if result.ComponentGroups != nil {
-				rawGroup = result.ComponentGroups[compName]
-			}
-			compGroup := resolveComponentGroup(rawGroup, compName, contracts.FigmaComponentSpec{Name: compName})
-			artifacts = append(artifacts, domain.CompiledArtifact{
-				Target:   contracts.Framework("mitosis"),
-				FileName: compName + ".lite.tsx",
-				Code:     code,
-				Group:    compGroup,
-			})
-		}
-	}
-
-	// Ensure group is resolved on all component artifacts
-	for i := range artifacts {
-		if artifacts[i].Group == "" && result.ComponentGroups != nil {
-			baseName := strings.Split(artifacts[i].FileName, ".")[0]
-			if g, ok := result.ComponentGroups[baseName]; ok {
-				artifacts[i].Group = domain.CamelToKebab(strings.ToLower(strings.TrimSpace(g)))
-			}
-		}
-	}
-
-	// Deterministic deduplication: ensure utils.ts is emitted into artifacts exactly once
-	hasUtils := false
-	for _, art := range artifacts {
-		if art.FileName == "utils.ts" || strings.HasSuffix(art.FileName, "/utils.ts") {
-			hasUtils = true
-			break
-		}
-	}
-	if !hasUtils {
-		if curJob, err := s.store.Get(ctx, jobID); err == nil {
-			for _, art := range curJob.Artifacts {
-				if art.FileName == "utils.ts" || strings.HasSuffix(art.FileName, "/utils.ts") {
-					hasUtils = true
-					break
-				}
-			}
-		}
-	}
-	if !hasUtils {
-		artifacts = append(artifacts, domain.CompiledArtifact{
-			Target:   contracts.Framework("mitosis"),
-			FileName: "utils.ts",
-			Group:    "components",
-			Code:     GenerateUtilsTS(),
-		})
-	}
-
-	if len(artifacts) > 0 {
-		if err := s.store.SaveArtifacts(ctx, jobID, artifacts); err != nil {
-			slog.Warn(fmt.Sprintf("[JOB] [WARN] [%s] Failed to save artifacts: %v", jobID, err))
-		}
-	}
-
-	// 3. Mark components with their respective compiled status / group
-	for _, compSpec := range job.Document.Components {
-		compName := domain.NormalizeComponentName(compSpec.Name)
-		rawGroup := ""
-		if result.ComponentGroups != nil {
-			rawGroup = result.ComponentGroups[compName]
-		}
-		compGroup := resolveComponentGroup(rawGroup, compName, compSpec)
-
-		if err := s.store.UpdateComponent(ctx, jobID, contracts.ComponentProgress{
-			Name:   compName,
-			Status: contracts.ComponentStatusDone,
-			Group:  &compGroup,
-		}); err != nil {
-			slog.Warn(fmt.Sprintf("[JOB] [WARN] [%s] [%s] Failed to update component status to done: %v", jobID, compName, err))
-		}
-	}
-
-	// 4. Token artifacts generation
-	tokens := make([]contracts.FigmaToken, len(job.Document.Tokens))
-	copy(tokens, job.Document.Tokens)
-
-	resolved := ResolveTokens(tokens)
+// saveTokenArtifacts generates tokens.json, theme.css, tokens.css, and tokens.ts
+// and persists them to the store and the configured docs theme directory.
+func (s *Service) saveTokenArtifacts(ctx context.Context, jobID string, resolved []contracts.FigmaToken) {
 	tokensJSON, err := json.MarshalIndent(resolved, "", "  ")
 	if err != nil {
 		tokensJSON = []byte("[]")
@@ -445,7 +276,496 @@ func (s *Service) ExecuteJob(ctx context.Context, jobID string) {
 		slog.Warn(fmt.Sprintf("[JOB] [WARN] [%s] Failed to save token artifacts: %v", jobID, err))
 	}
 
-	// 5. Documentation artifacts generation
+	if docsDir := s.paths.DocsDir; docsDir != "" {
+		tokensThemeDir := filepath.Join(docsDir, ".vitepress", "theme", "tokens")
+		if err := os.MkdirAll(tokensThemeDir, 0755); err == nil {
+			_ = os.WriteFile(filepath.Join(tokensThemeDir, "theme.css"), []byte(GenerateThemeCSS(resolved)), 0644)
+			_ = os.WriteFile(filepath.Join(tokensThemeDir, "tokens.css"), []byte(GenerateTokensCSS(resolved)), 0644)
+		}
+	}
+}
+
+// ExecuteJob drives the lifecycle of an extraction: worker pool task authoring -> token resolution -> publishing.
+func (s *Service) ExecuteJob(ctx context.Context, jobID string) {
+	job, err := s.store.Get(ctx, jobID)
+	if err != nil {
+		slog.Error(fmt.Sprintf("[JOB] [ERROR] [%s] Failed to fetch job from store: %v", jobID, err))
+		return
+	}
+
+	totalComponents := len(job.Document.Components)
+	slog.Info(fmt.Sprintf("[JOB] [%s] Processing started for %d component(s)", jobID, totalComponents))
+
+	now := time.Now().UTC()
+	runID := uuid.New().String()
+	run := &domain.Run{
+		ID:        runID,
+		JobID:     jobID,
+		Status:    domain.RunRunning,
+		CreatedAt: now,
+	}
+
+	tasks := make([]*domain.Task, totalComponents)
+	for i, compSpec := range job.Document.Components {
+		compName := domain.NormalizeComponentName(compSpec.Name)
+		compGroup := resolveComponentGroup("", compName, compSpec)
+		taskID := uuid.New().String()
+		tasks[i] = &domain.Task{
+			ID:            taskID,
+			RunID:         runID,
+			ComponentName: compName,
+			Status:        domain.TaskQueued,
+			AttemptCount:  0,
+			MaxAttempts:   s.maxRetries + 1,
+			CreatedAt:     now,
+			UpdatedAt:     now,
+		}
+		_ = s.store.UpdateComponent(ctx, jobID, contracts.ComponentProgress{
+			Name:   compName,
+			Status: contracts.ComponentStatusPending,
+			Group:  &compGroup,
+		})
+	}
+	run.Tasks = tasks
+	_ = s.store.SaveRun(ctx, run)
+	job.RunID = runID
+	job.Tasks = tasks
+	_ = s.store.Update(ctx, job)
+
+	if err := s.store.UpdateStatus(ctx, jobID, contracts.JobStatusAuthoring, nil); err != nil {
+		slog.Warn(fmt.Sprintf("[JOB] [WARN] [%s] Failed to update status to Authoring: %v", jobID, err))
+	}
+
+	s.broker.Publish(jobID, contracts.JobEvent{
+		EventType: "job_status",
+		JobId:     jobID,
+		RunId:     &runID,
+		Status:    StringPtr(string(contracts.JobStatusAuthoring)),
+	})
+
+	// Retrieve existing component information from PullRequest publisher, only if PR publisher is active (R7 guard)
+	var existingNames []string
+	var workspaceDir string
+	var infoCleanup func()
+	hasPRPublisher := false
+	for _, p := range job.Publishers {
+		if p == contracts.PullRequest {
+			hasPRPublisher = true
+			break
+		}
+	}
+	if !hasPRPublisher && len(s.publishers) == 1 {
+		if _, ok := s.publishers[string(contracts.PullRequest)]; ok {
+			hasPRPublisher = true
+		}
+	}
+	if hasPRPublisher {
+		if pub, ok := s.publishers[string(contracts.PullRequest)]; ok {
+			if infoReader, ok := pub.(interface {
+				GetExistingComponentInfo(ctx context.Context) ([]string, string, func(), error)
+			}); ok {
+				names, wsDir, cleanup, err := infoReader.GetExistingComponentInfo(ctx)
+				if err != nil {
+					slog.Warn(fmt.Sprintf("[JOB] [WARN] [%s] Failed to get existing component info: %v", jobID, err))
+				} else {
+					infoCleanup = cleanup
+					existingNames = names
+					workspaceDir = wsDir
+					slog.Info(fmt.Sprintf("[JOB] [%s] Found %d existing component(s), workspaceDir=%s", jobID, len(existingNames), workspaceDir))
+				}
+			}
+		}
+	}
+
+	// 1. Resolve tokens and extract deterministic utility classes BEFORE authoring
+	tokens := make([]contracts.FigmaToken, len(job.Document.Tokens))
+	copy(tokens, job.Document.Tokens)
+	resolvedTokens := ResolveTokens(tokens)
+	tokenClasses := ExtractTailwindUtilityClasses(resolvedTokens)
+
+	// Persist initial token artifacts before starting authoring
+	s.saveTokenArtifacts(ctx, jobID, resolvedTokens)
+
+	// Retrieve existing snapshots for incremental sync diffing
+	docName := job.DocumentName
+	if docName == "" {
+		docName = job.Document.Name
+	}
+	if docName == "" {
+		docName = "Design System"
+	}
+	existingComps, _ := s.store.GetComponentSnapshots(ctx, docName)
+	if existingComps == nil {
+		existingComps = make(map[string]*domain.ComponentSnapshot)
+	}
+
+	// 2. Launch worker pool for single-component authoring tasks
+	type compTaskItem struct {
+		spec           contracts.FigmaComponentSpec
+		task           *domain.Task
+		diffStatus     contracts.DiffStatus
+		existingSource string
+		currHash       string
+	}
+
+	taskCh := make(chan compTaskItem, totalComponents)
+	for i, compSpec := range job.Document.Components {
+		compName := domain.NormalizeComponentName(compSpec.Name)
+		currHash := domain.HashComponentSpec(compSpec)
+		status := contracts.New
+		existingSource := ""
+
+		if prevComp, ok := existingComps[compName]; ok && prevComp != nil {
+			if prevComp.ContentHash == currHash && prevComp.SourceCode != "" {
+				status = contracts.Unchanged
+				existingSource = prevComp.SourceCode
+			} else {
+				status = contracts.Changed
+				existingSource = prevComp.SourceCode
+			}
+		}
+
+		taskCh <- compTaskItem{
+			spec:           compSpec,
+			task:           tasks[i],
+			diffStatus:     status,
+			existingSource: existingSource,
+			currHash:       currHash,
+		}
+	}
+	close(taskCh)
+
+	workerCount := s.concurrency
+	if workerCount <= 0 {
+		workerCount = defaultConcurrency
+	}
+	if workerCount > totalComponents {
+		workerCount = totalComponents
+	}
+
+	var workerWg sync.WaitGroup
+	var resultsMu sync.Mutex
+	authoredComponents := make(map[string]string)
+	componentGroups := make(map[string]string)
+	allArtifacts := make([]domain.CompiledArtifact, 0)
+	var allNewTokens []out.DiscoveredToken
+	var successCount, failureCount int
+
+	slog.Info(fmt.Sprintf("[JOB] [%s] Starting worker pool with %d workers for %d tasks", jobID, workerCount, totalComponents))
+
+	for w := 0; w < workerCount; w++ {
+		workerWg.Add(1)
+		go func(workerIdx int) {
+			defer workerWg.Done()
+			for item := range taskCh {
+				compName := item.task.ComponentName
+				compGroup := resolveComponentGroup("", compName, item.spec)
+
+				// Transition task to authoring
+				item.task.Status = domain.TaskAuthoring
+				item.task.UpdatedAt = time.Now().UTC()
+				_ = s.store.UpdateTask(ctx, jobID, item.task)
+				_ = s.store.UpdateComponent(ctx, jobID, contracts.ComponentProgress{
+					Name:   compName,
+					Status: contracts.ComponentStatusAuthoring,
+					Group:  &compGroup,
+				})
+
+				s.broker.Publish(jobID, contracts.JobEvent{
+					EventType: "task_status",
+					JobId:     jobID,
+					RunId:     &runID,
+					Status:    StringPtr(string(domain.TaskAuthoring)),
+					Task: func() *contracts.ComponentTask {
+						t := item.task.ToContract()
+						return &t
+					}(),
+				})
+
+				var compArtifacts []domain.CompiledArtifact
+				var compSource string
+				var compErr error
+				var compTokens []out.DiscoveredToken
+
+				// If component is UNCHANGED, compile existing source directly (0 LLM calls)
+				compileOnly := (item.diffStatus == contracts.Unchanged)
+				if compileOnly {
+					slog.Info(fmt.Sprintf("[JOB] [%s] Component %s is UNCHANGED (hash=%s), compiling existing source without LLM", jobID, compName, item.currHash))
+				} else if item.diffStatus == contracts.Changed {
+					slog.Info(fmt.Sprintf("[JOB] [%s] Component %s is CHANGED, authoring with existingSource context", jobID, compName))
+				}
+
+				// Deterministic attempt loop per component
+				for attempt := 1; attempt <= item.task.MaxAttempts; attempt++ {
+					item.task.AttemptCount = attempt
+					item.task.UpdatedAt = time.Now().UTC()
+
+					taskCtx, taskCancel := context.WithTimeout(ctx, 3*time.Minute)
+					singleReq := out.AuthorRequest{
+						ComponentName:          compName,
+						Components:             []contracts.FigmaComponentSpec{item.spec},
+						Tokens:                 resolvedTokens,
+						ExistingSource:         item.existingSource,
+						CompileOnly:            compileOnly,
+						ExistingComponentNames: existingNames,
+						WorkspaceDir:           workspaceDir,
+						Targets:                job.Targets,
+						TokenClasses:           tokenClasses,
+					}
+
+					res, err := s.author.AuthorDesignSystem(taskCtx, singleReq)
+					taskCancel()
+
+					if err == nil && res != nil {
+						if src, ok := res.Components[compName]; ok && src != "" {
+							compSource = src
+						}
+						if len(res.Artifacts) > 0 {
+							compArtifacts = res.Artifacts
+						}
+						if len(res.NewTokens) > 0 {
+							compTokens = res.NewTokens
+						}
+
+						// If we got authored components or artifacts, move to verifying
+						item.task.Status = domain.TaskVerifying
+						item.task.UpdatedAt = time.Now().UTC()
+						_ = s.store.UpdateTask(ctx, jobID, item.task)
+
+						s.broker.Publish(jobID, contracts.JobEvent{
+							EventType: "task_status",
+							JobId:     jobID,
+							RunId:     &runID,
+							Status:    StringPtr(string(domain.TaskVerifying)),
+							Task: func() *contracts.ComponentTask {
+								t := item.task.ToContract()
+								return &t
+							}(),
+						})
+
+						if len(compArtifacts) > 0 || compSource != "" {
+							compErr = nil
+							break
+						}
+					}
+
+					compErr = err
+					if compErr == nil {
+						compErr = fmt.Errorf("no code generated for %s", compName)
+					}
+					slog.Warn(fmt.Sprintf("[JOB] [%s] [%s] Attempt %d/%d failed: %v", jobID, compName, attempt, item.task.MaxAttempts, compErr))
+				}
+
+				if compErr != nil {
+					// Task failed permanently
+					item.task.Status = domain.TaskFailed
+					item.task.Error = compErr.Error()
+					item.task.UpdatedAt = time.Now().UTC()
+					_ = s.store.UpdateTask(ctx, jobID, item.task)
+
+					stageErr := &contracts.StageError{
+						Stage:   "authoring",
+						Message: compErr.Error(),
+					}
+					_ = s.store.UpdateComponent(ctx, jobID, contracts.ComponentProgress{
+						Name:       compName,
+						Status:     contracts.ComponentStatusFailed,
+						Group:      &compGroup,
+						StageError: stageErr,
+					})
+
+					s.broker.Publish(jobID, contracts.JobEvent{
+						EventType: "task_status",
+						JobId:     jobID,
+						RunId:     &runID,
+						Status:    StringPtr(string(domain.TaskFailed)),
+						Error:     &item.task.Error,
+						Task: func() *contracts.ComponentTask {
+							t := item.task.ToContract()
+							return &t
+						}(),
+					})
+
+					resultsMu.Lock()
+					failureCount++
+					resultsMu.Unlock()
+				} else {
+					// Task succeeded
+					item.task.Status = domain.TaskReady
+					item.task.Artifacts = compArtifacts
+					item.task.UpdatedAt = time.Now().UTC()
+					_ = s.store.UpdateTask(ctx, jobID, item.task)
+
+					_ = s.store.UpdateComponent(ctx, jobID, contracts.ComponentProgress{
+						Name:   compName,
+						Status: contracts.ComponentStatusDone,
+						Group:  &compGroup,
+					})
+
+					if len(compArtifacts) > 0 {
+						_ = s.store.SaveArtifacts(ctx, jobID, compArtifacts)
+					}
+
+					s.broker.Publish(jobID, contracts.JobEvent{
+						EventType: "task_status",
+						JobId:     jobID,
+						RunId:     &runID,
+						Status:    StringPtr(string(domain.TaskReady)),
+						Task: func() *contracts.ComponentTask {
+							t := item.task.ToContract()
+							return &t
+						}(),
+					})
+
+					resultsMu.Lock()
+					successCount++
+					if compSource != "" {
+						authoredComponents[compName] = compSource
+					}
+					componentGroups[compName] = compGroup
+					allArtifacts = append(allArtifacts, compArtifacts...)
+					allNewTokens = append(allNewTokens, compTokens...)
+					resultsMu.Unlock()
+				}
+			}
+		}(w)
+	}
+
+	workerWg.Wait()
+	if infoCleanup != nil {
+		infoCleanup()
+		infoCleanup = nil
+	}
+	finTime := time.Now().UTC()
+
+	// If no components succeeded, mark the entire job as failed
+	if successCount == 0 {
+		errMsg := "all component authoring tasks failed"
+		stageErr := &contracts.StageError{
+			Stage:   "authoring",
+			Message: errMsg,
+		}
+		_ = s.store.UpdateStatus(ctx, jobID, contracts.JobStatusFailed, stageErr)
+		run.Status = domain.RunFailed
+		run.FinishedAt = &finTime
+		_ = s.store.UpdateRun(ctx, run)
+
+		s.broker.Publish(jobID, contracts.JobEvent{
+			EventType: "job_failed",
+			JobId:     jobID,
+			RunId:     &runID,
+			Status:    StringPtr(string(contracts.JobStatusFailed)),
+			Error:     &errMsg,
+		})
+		slog.Error(fmt.Sprintf("[JOB] [ERROR] [%s] %s", jobID, errMsg))
+		return
+	}
+
+	// 3. Merge discovered new tokens into catalog
+	if len(allNewTokens) > 0 {
+		var tokensMu sync.Mutex
+		tokensMu.Lock()
+		existingTokenNames := make(map[string]struct{}, len(job.Document.Tokens))
+		for _, tok := range job.Document.Tokens {
+			existingTokenNames[tok.Name] = struct{}{}
+		}
+		hasNew := false
+		for _, tok := range allNewTokens {
+			if _, exists := existingTokenNames[tok.Name]; !exists {
+				existingTokenNames[tok.Name] = struct{}{}
+				var desc *string
+				if tok.Description != "" {
+					d := tok.Description
+					desc = &d
+				}
+				job.Document.Tokens = append(job.Document.Tokens, contracts.FigmaToken{
+					Id:          uuid.NewString()[:8],
+					Name:        tok.Name,
+					Type:        tok.Type,
+					Value:       tok.Value,
+					Description: desc,
+				})
+				hasNew = true
+			}
+		}
+		tokensMu.Unlock()
+
+		if hasNew {
+			slog.Info(fmt.Sprintf("[JOB] [%s] Discovered %d new design token(s)", jobID, len(allNewTokens)))
+			if currentJob, err := s.store.Get(ctx, jobID); err == nil {
+				currentJob.Document.Tokens = job.Document.Tokens
+				_ = s.store.Update(ctx, currentJob)
+			} else {
+				_ = s.store.Update(ctx, job)
+			}
+		}
+	}
+
+	// 4. Synthesize artifacts if only components map was returned
+	if len(allArtifacts) == 0 && len(authoredComponents) > 0 {
+		for compName, code := range authoredComponents {
+			compGroup := componentGroups[compName]
+			allArtifacts = append(allArtifacts, domain.CompiledArtifact{
+				Target:   contracts.Framework("mitosis"),
+				FileName: compName + ".lite.tsx",
+				Code:     code,
+				Group:    compGroup,
+			})
+		}
+	}
+
+	// Ensure group is resolved on all component artifacts
+	for i := range allArtifacts {
+		if allArtifacts[i].Group == "" {
+			baseName := strings.Split(allArtifacts[i].FileName, ".")[0]
+			if g, ok := componentGroups[baseName]; ok {
+				allArtifacts[i].Group = domain.NormalizeGroup(g)
+			}
+		}
+	}
+
+	// Deterministic deduplication: ensure utils.ts is emitted into artifacts exactly once
+	hasUtils := false
+	for _, art := range allArtifacts {
+		if art.FileName == "utils.ts" || strings.HasSuffix(art.FileName, "/utils.ts") {
+			hasUtils = true
+			break
+		}
+	}
+	if !hasUtils {
+		if curJob, err := s.store.Get(ctx, jobID); err == nil {
+			for _, art := range curJob.Artifacts {
+				if art.FileName == "utils.ts" || strings.HasSuffix(art.FileName, "/utils.ts") {
+					hasUtils = true
+					break
+				}
+			}
+		}
+	}
+	if !hasUtils {
+		allArtifacts = append(allArtifacts, domain.CompiledArtifact{
+			Target:   contracts.Framework("mitosis"),
+			FileName: "utils.ts",
+			Group:    "components",
+			Code:     GenerateUtilsTS(),
+		})
+	}
+
+	if len(allArtifacts) > 0 {
+		if err := s.store.SaveArtifacts(ctx, jobID, allArtifacts); err != nil {
+			slog.Warn(fmt.Sprintf("[JOB] [WARN] [%s] Failed to save artifacts: %v", jobID, err))
+		}
+	}
+
+	// 5. Update token artifacts if any new tokens were discovered
+	if len(allNewTokens) > 0 {
+		updatedTokens := make([]contracts.FigmaToken, len(job.Document.Tokens))
+		copy(updatedTokens, job.Document.Tokens)
+		updatedResolved := ResolveTokens(updatedTokens)
+		s.saveTokenArtifacts(ctx, jobID, updatedResolved)
+	}
+
+	// 6. Documentation artifacts generation
 	tokensDoc := GenerateTokensDoc(job.Document.Tokens)
 	indexDoc := GenerateComponentsIndexDoc(job.Document.Components)
 
@@ -483,8 +803,8 @@ func (s *Service) ExecuteJob(ctx context.Context, jobID string) {
 		job = curJob
 	}
 
-	// If local apps/docs directory exists, write these docs to apps/docs/tokens.md and apps/docs/components/
-	if docsDir := findAppsDocsDir(); docsDir != "" {
+	// If a docs directory is configured, write these docs to <docs>/tokens.md and <docs>/components/
+	if docsDir := s.paths.DocsDir; docsDir != "" {
 		tokensPath := filepath.Join(docsDir, "tokens.md")
 		if err := os.WriteFile(tokensPath, []byte(tokensDoc), 0644); err != nil {
 			slog.Warn(fmt.Sprintf("[JOB] [WARN] [%s] Failed to write tokens.md to %s: %v", jobID, docsDir, err))
@@ -505,12 +825,6 @@ func (s *Service) ExecuteJob(ctx context.Context, jobID string) {
 			}
 		}
 
-		tokensThemeDir := filepath.Join(docsDir, ".vitepress", "theme", "tokens")
-		if err := os.MkdirAll(tokensThemeDir, 0755); err == nil {
-			_ = os.WriteFile(filepath.Join(tokensThemeDir, "theme.css"), []byte(GenerateThemeCSS(resolved)), 0644)
-			_ = os.WriteFile(filepath.Join(tokensThemeDir, "tokens.css"), []byte(GenerateTokensCSS(resolved)), 0644)
-		}
-
 		srcCompDir := filepath.Join(docsDir, "src", "components")
 		_ = os.MkdirAll(filepath.Join(srcCompDir, "vue3"), 0755)
 		_ = os.MkdirAll(filepath.Join(srcCompDir, "react"), 0755)
@@ -529,7 +843,7 @@ func (s *Service) ExecuteJob(ctx context.Context, jobID string) {
 			case contracts.Svelte:
 				targetDir = filepath.Join(srcCompDir, "svelte")
 			}
-			if targetDir != "" {
+			if targetDir != "" && domain.ValidFileName(art.FileName) {
 				baseName := strings.TrimSuffix(strings.TrimSuffix(strings.TrimSuffix(art.FileName, ".vue"), ".tsx"), ".svelte")
 				componentNames[baseName] = true
 				_ = os.WriteFile(filepath.Join(targetDir, art.FileName), []byte(art.Code), 0644)
@@ -574,7 +888,7 @@ func (s *Service) ExecuteJob(ctx context.Context, jobID string) {
 			slog.Warn(fmt.Sprintf("[JOB] [WARN] [%s] Failed to save figma document artifact: %v", jobID, err))
 		}
 
-		if genDir := findGeneratedDir(); genDir != "" {
+		if genDir := s.paths.GeneratedDir; genDir != "" {
 			figmaPath := filepath.Join(genDir, "figma-document.json")
 			if err := os.WriteFile(figmaPath, docJSON, 0644); err != nil {
 				slog.Warn(fmt.Sprintf("[JOB] [WARN] [%s] Failed to write figma-document.json to %s: %v", jobID, genDir, err))
@@ -594,7 +908,7 @@ func (s *Service) ExecuteJob(ctx context.Context, jobID string) {
 		slog.Warn(fmt.Sprintf("[JOB] [WARN] [%s] Failed to fetch updated job for publishing: %v", jobID, err))
 	}
 
-	// 6. Move to publishing stage
+	// 7. Move to publishing stage
 	if err := s.store.UpdateStatus(ctx, jobID, contracts.JobStatusPublishing, nil); err != nil {
 		slog.Warn(fmt.Sprintf("[JOB] [WARN] [%s] Failed to update status to publishing: %v", jobID, err))
 	}
@@ -612,10 +926,50 @@ func (s *Service) ExecuteJob(ctx context.Context, jobID string) {
 		}
 	}
 
+	// Update snapshots in persistent store for incremental diffing
+	nowSnap := time.Now().UTC()
+	for compName, src := range authoredComponents {
+		for _, compSpec := range job.Document.Components {
+			if domain.NormalizeComponentName(compSpec.Name) == compName {
+				currHash := domain.HashComponentSpec(compSpec)
+				specCopy := compSpec
+				_ = s.store.SaveComponentSnapshot(ctx, &domain.ComponentSnapshot{
+					DocumentName:  docName,
+					ComponentName: compName,
+					ContentHash:   currHash,
+					Spec:          &specCopy,
+					SourceCode:    src,
+					UpdatedAt:     nowSnap,
+				})
+				break
+			}
+		}
+	}
+
+	_ = s.store.SaveSnapshot(ctx, &domain.Snapshot{
+		ID:           uuid.New().String(),
+		DocumentName: docName,
+		TokensHash:   domain.HashTokens(job.Document.Tokens),
+		Tokens:       job.Document.Tokens,
+		CreatedAt:    nowSnap,
+	})
+
 	if err := s.store.UpdateStatus(ctx, jobID, contracts.JobStatusSucceeded, nil); err != nil {
 		slog.Warn(fmt.Sprintf("[JOB] [WARN] [%s] Failed to update status to succeeded: %v", jobID, err))
 	}
-	slog.Info(fmt.Sprintf("[JOB] [%s] Extraction SUCCEEDED (%d components processed)", jobID, len(job.Document.Components)))
+	run.Status = domain.RunSucceeded
+	run.FinishedAt = &finTime
+	_ = s.store.UpdateRun(ctx, run)
+
+	s.broker.Publish(jobID, contracts.JobEvent{
+		EventType: "job_completed",
+		JobId:     jobID,
+		RunId:     &runID,
+		Status:    StringPtr(string(contracts.JobStatusSucceeded)),
+	})
+
+	slog.Info(fmt.Sprintf("[JOB] [%s] Extraction SUCCEEDED (%d succeeded, %d failed out of %d components)",
+		jobID, successCount, failureCount, totalComponents))
 }
 
 func (s *Service) processJob(ctx context.Context, jobID string) {
@@ -623,17 +977,16 @@ func (s *Service) processJob(ctx context.Context, jobID string) {
 }
 
 func resolveComponentGroup(rawGroup, compName string, compSpec contracts.FigmaComponentSpec) string {
-	group := strings.ToLower(strings.TrimSpace(rawGroup))
-	if group == "" {
-		if compSpec.PageName != nil && strings.EqualFold(*compSpec.PageName, "icons") {
-			return "icons"
-		}
-		if strings.Contains(strings.ToLower(compName), "icon") {
-			return "icons"
-		}
-		return "components"
+	if group := domain.NormalizeGroup(rawGroup); group != "" {
+		return group
 	}
-	return domain.CamelToKebab(group)
+	if compSpec.PageName != nil && strings.EqualFold(*compSpec.PageName, domain.GroupIcons) {
+		return domain.GroupIcons
+	}
+	if strings.Contains(strings.ToLower(compName), "icon") {
+		return domain.GroupIcons
+	}
+	return domain.GroupComponents
 }
 
 // GenerateUtilsTS returns the TypeScript source defining headless UI helpers and the standard cn utility.
@@ -1026,35 +1379,4 @@ export function getPieSlices(values: number[], radius: number = 50, innerRadius:
   });
 }
 `
-}
-
-func findAppsDocsDir() string {
-	if dir := os.Getenv("APPS_DOCS_DIR"); dir != "" {
-		return dir
-	}
-	candidates := []string{"apps/docs", "../docs", "../apps/docs", "../../apps/docs", "../../../apps/docs", "../../../../apps/docs"}
-	for _, dir := range candidates {
-		if info, err := os.Stat(dir); err == nil && info.IsDir() {
-			if vp, err := os.Stat(filepath.Join(dir, ".vitepress")); err == nil && vp.IsDir() {
-				return dir
-			}
-		}
-	}
-	return ""
-}
-
-func findGeneratedDir() string {
-	candidates := []string{
-		"generated/components",
-		"../generated/components",
-		"../../generated/components",
-		"../../../generated/components",
-		"../../../../generated/components",
-	}
-	for _, dir := range candidates {
-		if info, err := os.Stat(dir); err == nil && info.IsDir() {
-			return dir
-		}
-	}
-	return ""
 }

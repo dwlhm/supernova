@@ -28,6 +28,10 @@ Properties
 | showStatus | Boolean | true | Shows or hides the presence indicator. Enable only when live status is relevant. |
 | initialsText | Text | AB | Sets the initials shown by the initials variant. Use one or two uppercase characters. |
 
+## Live Preview
+
+<FrameworkPreview name="Avatar" />
+
 ## Usage
 
 ::: code-group

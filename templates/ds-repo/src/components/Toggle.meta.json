@@ -1,0 +1,17 @@
+{
+  "name": "Toggle",
+  "group": "components",
+  "variants": {
+    "Size": [
+      "Large",
+      "Medium",
+      "Small"
+    ],
+    "State": [
+      "Active",
+      "Default",
+      "Disabled"
+    ]
+  },
+  "totalVariants": 9
+}

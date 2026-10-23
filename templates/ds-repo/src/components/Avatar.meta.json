@@ -1,0 +1,19 @@
+{
+  "name": "Avatar",
+  "group": "components",
+  "variants": {
+    "size": [
+      "large",
+      "mini",
+      "regular",
+      "small",
+      "x-large"
+    ],
+    "type": [
+      "icon",
+      "image",
+      "initials"
+    ]
+  },
+  "totalVariants": 15
+}

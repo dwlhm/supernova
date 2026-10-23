@@ -1,0 +1,12 @@
+{
+  "name": "Breadcrumb",
+  "group": "components",
+  "variants": {
+    "Type": [
+      "1",
+      "2",
+      "deep"
+    ]
+  },
+  "totalVariants": 3
+}

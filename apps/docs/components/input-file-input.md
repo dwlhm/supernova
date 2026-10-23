@@ -23,6 +23,10 @@ PROPERTIES
 • Show required — Toggles the required indicator.
 • Show hint — Toggles supporting or error text.
 
+## Live Preview
+
+<FrameworkPreview name="InputFileInput" />
+
 ## Usage
 
 ::: code-group

@@ -367,6 +367,31 @@
     .badge-succeeded { background: #d1fae5; color: var(--success); }
     .badge-failed { background: #fee2e2; color: var(--error); }
     .badge-running { background: #dbeafe; color: var(--primary); }
+    .badge-new { background: #d1fae5; color: #065f46; font-weight: 600; }
+    .badge-changed { background: #fef3c7; color: #92400e; font-weight: 600; }
+    .badge-unchanged { background: #f3f4f6; color: #4b5563; font-weight: 500; }
+    .badge-removed { background: #fee2e2; color: #991b1b; font-weight: 600; }
+    .plan-card {
+      margin-top: 14px;
+      padding: 12px;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+    }
+    .plan-summary {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-bottom: 8px;
+    }
+    .plan-pill {
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 7px;
+      border-radius: 4px;
+      display: inline-flex;
+      align-items: center;
+    }
     .component-list {
       max-height: 180px;
       overflow-y: auto;
@@ -492,14 +517,22 @@
   </div>
 
   <div class="form-group">
-    <label>Publish Outputs</label>
-    <div class="checkbox-group">
-      <label class="checkbox-label"><input type="checkbox" name="publisher" value="download" checked /> Download ZIP</label>
-      <label class="checkbox-label"><input type="checkbox" name="publisher" value="pull_request" /> GitHub PR</label>
+    <label>Deployment Workflow</label>
+    <div class="output-preview-hint">
+      Changes are published directly to GitHub Design System repo (<code>Pull Request</code>)
     </div>
   </div>
 
-  <button type="button" id="startBtn" class="btn-primary" disabled>Export to Backend & Generate</button>
+  <button type="button" id="startBtn" class="btn-primary" disabled>Compute Sync Plan</button>
+
+  <div id="planPanel" class="plan-card" style="display: none;">
+    <div class="discovery-header">
+      <span class="discovery-title">Sync Execution Plan</span>
+    </div>
+    <div id="planSummary" class="plan-summary"></div>
+    <div id="planComponentList" class="component-list" style="max-height: 140px;"></div>
+    <button type="button" id="applyPlanBtn" class="btn-primary" style="margin-top: 10px; background: #059669;">Create / Update PR ↗</button>
+  </div>
 
   <div id="statusPanel" class="status-panel">
     <div class="status-title">

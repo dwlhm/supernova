@@ -24,6 +24,10 @@ Properties
 • State: indeterminate
 • Content: icon only
 
+## Live Preview
+
+<FrameworkPreview name="Spinner" />
+
 ## Usage
 
 ::: code-group

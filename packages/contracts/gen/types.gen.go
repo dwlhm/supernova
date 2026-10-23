@@ -22,6 +22,14 @@ const (
 	ComponentStatusPending   ComponentStatus = "pending"
 )
 
+// Defines values for DiffStatus.
+const (
+	Changed   DiffStatus = "changed"
+	New       DiffStatus = "new"
+	Removed   DiffStatus = "removed"
+	Unchanged DiffStatus = "unchanged"
+)
+
 // Defines values for Framework.
 const (
 	Angular Framework = "angular"
@@ -48,8 +56,37 @@ const (
 	PullRequest PublisherType = "pull_request"
 )
 
+// Defines values for TaskStatus.
+const (
+	Authoring TaskStatus = "authoring"
+	Failed    TaskStatus = "failed"
+	Queued    TaskStatus = "queued"
+	Ready     TaskStatus = "ready"
+	Verifying TaskStatus = "verifying"
+)
+
+// ApplySyncRequest defines model for ApplySyncRequest.
+type ApplySyncRequest struct {
+	Options    *ExtractionOptions `json:"options,omitempty"`
+	Publishers *[]PublisherType   `json:"publishers,omitempty"`
+
+	// SelectedComponents Optional subset of component names to author (defaults to all new & changed)
+	SelectedComponents *[]string    `json:"selectedComponents,omitempty"`
+	Targets            *[]Framework `json:"targets,omitempty"`
+}
+
+// ComponentDiff defines model for ComponentDiff.
+type ComponentDiff struct {
+	ChangeSummary *string    `json:"changeSummary,omitempty"`
+	CurrentHash   *string    `json:"currentHash,omitempty"`
+	Name          string     `json:"name"`
+	PreviousHash  *string    `json:"previousHash,omitempty"`
+	Status        DiffStatus `json:"status"`
+}
+
 // ComponentProgress defines model for ComponentProgress.
 type ComponentProgress struct {
+	// Group Group or category of the component, e.g. components, icons
 	Group      *string         `json:"group,omitempty"`
 	Name       string          `json:"name"`
 	StageError *StageError     `json:"stageError,omitempty"`
@@ -58,6 +95,22 @@ type ComponentProgress struct {
 
 // ComponentStatus defines model for ComponentStatus.
 type ComponentStatus string
+
+// ComponentTask defines model for ComponentTask.
+type ComponentTask struct {
+	AttemptCount  *int       `json:"attemptCount,omitempty"`
+	ComponentName string     `json:"componentName"`
+	CreatedAt     *time.Time `json:"createdAt,omitempty"`
+	Error         *string    `json:"error,omitempty"`
+	Id            string     `json:"id"`
+	MaxAttempts   *int       `json:"maxAttempts,omitempty"`
+	RunId         *string    `json:"runId,omitempty"`
+	Status        TaskStatus `json:"status"`
+	UpdatedAt     *time.Time `json:"updatedAt,omitempty"`
+}
+
+// DiffStatus defines model for DiffStatus.
+type DiffStatus string
 
 // ErrorResponse defines model for ErrorResponse.
 type ErrorResponse struct {
@@ -79,7 +132,10 @@ type ExtractionRequest struct {
 	Document   FigmaDocument      `json:"document"`
 	Options    *ExtractionOptions `json:"options,omitempty"`
 	Publishers *[]PublisherType   `json:"publishers,omitempty"`
-	Targets    *[]Framework       `json:"targets,omitempty"`
+
+	// SyncId Optional sync plan ID to apply incremental execution
+	SyncId  *string      `json:"syncId,omitempty"`
+	Targets *[]Framework `json:"targets,omitempty"`
 }
 
 // ExtractionResponse defines model for ExtractionResponse.
@@ -99,15 +155,14 @@ type FigmaColor struct {
 
 // FigmaComponentSpec defines model for FigmaComponentSpec.
 type FigmaComponentSpec struct {
-	ComponentSetName *string `json:"componentSetName,omitempty"`
-	Description      *string `json:"description,omitempty"`
-	Id               string  `json:"id"`
-	Key              *string `json:"key,omitempty"`
-	Name             string  `json:"name"`
+	ComponentSetName *string        `json:"componentSetName,omitempty"`
+	Description      *string        `json:"description,omitempty"`
+	Id               string         `json:"id"`
+	Key              *string        `json:"key,omitempty"`
+	Name             string         `json:"name"`
+	Node             FigmaSceneNode `json:"node"`
 
-	// Node Figma scene node representation (type, layout, fills, strokes, children, etc.)
-	Node map[string]interface{} `json:"node"`
-
+	// PageName Name of the Figma page the component belongs to
 	PageName *string `json:"pageName,omitempty"`
 
 	// Properties Variant properties, booleans, text, instanceSwap
@@ -123,15 +178,146 @@ type FigmaDocument struct {
 	Version      *string              `json:"version,omitempty"`
 }
 
+// FigmaEffect defines model for FigmaEffect.
+type FigmaEffect struct {
+	BoundVariables *map[string]interface{} `json:"boundVariables,omitempty"`
+	Color          *string                 `json:"color,omitempty"`
+	Offset         *struct {
+		X *float32 `json:"x,omitempty"`
+		Y *float32 `json:"y,omitempty"`
+	} `json:"offset,omitempty"`
+	Radius *float32 `json:"radius,omitempty"`
+	Spread *float32 `json:"spread,omitempty"`
+
+	// Type DROP_SHADOW, INNER_SHADOW, LAYER_BLUR, BACKGROUND_BLUR
+	Type    string `json:"type"`
+	Visible *bool  `json:"visible,omitempty"`
+}
+
+// FigmaLayout defines model for FigmaLayout.
+type FigmaLayout struct {
+	// CornerRadius Numeric uniform radius or per-corner object
+	CornerRadius    *interface{} `json:"cornerRadius,omitempty"`
+	CornerSmoothing *float32     `json:"cornerSmoothing,omitempty"`
+
+	// CounterAxisAlignItems MIN, CENTER, MAX, BASELINE
+	CounterAxisAlignItems *string `json:"counterAxisAlignItems,omitempty"`
+
+	// CounterAxisSizingMode FIXED, AUTO
+	CounterAxisSizingMode *string  `json:"counterAxisSizingMode,omitempty"`
+	CounterAxisSpacing    *float32 `json:"counterAxisSpacing,omitempty"`
+	Height                *float32 `json:"height,omitempty"`
+	ItemSpacing           *float32 `json:"itemSpacing,omitempty"`
+
+	// LayoutMode NONE, HORIZONTAL, VERTICAL
+	LayoutMode *string `json:"layoutMode,omitempty"`
+
+	// LayoutWrap NO_WRAP, WRAP
+	LayoutWrap    *string  `json:"layoutWrap,omitempty"`
+	MaxHeight     *float32 `json:"maxHeight,omitempty"`
+	MaxWidth      *float32 `json:"maxWidth,omitempty"`
+	MinHeight     *float32 `json:"minHeight,omitempty"`
+	MinWidth      *float32 `json:"minWidth,omitempty"`
+	PaddingBottom *float32 `json:"paddingBottom,omitempty"`
+	PaddingLeft   *float32 `json:"paddingLeft,omitempty"`
+	PaddingRight  *float32 `json:"paddingRight,omitempty"`
+	PaddingTop    *float32 `json:"paddingTop,omitempty"`
+
+	// PrimaryAxisAlignItems MIN, CENTER, MAX, SPACE_BETWEEN
+	PrimaryAxisAlignItems *string `json:"primaryAxisAlignItems,omitempty"`
+
+	// PrimaryAxisSizingMode FIXED, AUTO
+	PrimaryAxisSizingMode *string  `json:"primaryAxisSizingMode,omitempty"`
+	Width                 *float32 `json:"width,omitempty"`
+}
+
+// FigmaPaint defines model for FigmaPaint.
+type FigmaPaint struct {
+	BlendMode      *string                 `json:"blendMode,omitempty"`
+	BoundVariables *map[string]interface{} `json:"boundVariables,omitempty"`
+
+	// Color Serialized rgba string (e.g. rgb(229, 85, 20) or rgba(0, 0, 0, 0.5))
+	Color   *string  `json:"color,omitempty"`
+	Opacity *float32 `json:"opacity,omitempty"`
+
+	// Type SOLID, GRADIENT_LINEAR, GRADIENT_RADIAL, IMAGE, etc.
+	Type    string `json:"type"`
+	Visible *bool  `json:"visible,omitempty"`
+}
+
+// FigmaSceneNode defines model for FigmaSceneNode.
+type FigmaSceneNode struct {
+	BoundVariables *map[string]interface{}   `json:"boundVariables,omitempty"`
+	Children       *[]FigmaSceneNode         `json:"children,omitempty"`
+	Effects        *[]FigmaEffect            `json:"effects,omitempty"`
+	Fills          *[]FigmaPaint             `json:"fills,omitempty"`
+	Id             string                    `json:"id"`
+	Layout         *FigmaLayout              `json:"layout,omitempty"`
+	Name           string                    `json:"name"`
+	Opacity        *float32                  `json:"opacity,omitempty"`
+	Strokes        *[]FigmaStroke            `json:"strokes,omitempty"`
+	Type           string                    `json:"type"`
+	Typography     *FigmaTypography          `json:"typography,omitempty"`
+	VariantCount   *float32                  `json:"variantCount,omitempty"`
+	Variants       *[]map[string]interface{} `json:"variants,omitempty"`
+	Visible        *bool                     `json:"visible,omitempty"`
+}
+
+// FigmaStroke defines model for FigmaStroke.
+type FigmaStroke struct {
+	// Align INSIDE, OUTSIDE, CENTER
+	Align          *string                 `json:"align,omitempty"`
+	BoundVariables *map[string]interface{} `json:"boundVariables,omitempty"`
+	Cap            *string                 `json:"cap,omitempty"`
+	Color          *string                 `json:"color,omitempty"`
+	Dashes         *[]float32              `json:"dashes,omitempty"`
+	Join           *string                 `json:"join,omitempty"`
+	Opacity        *float32                `json:"opacity,omitempty"`
+	Type           *string                 `json:"type,omitempty"`
+	Visible        *bool                   `json:"visible,omitempty"`
+	Weight         *float32                `json:"weight,omitempty"`
+}
+
 // FigmaToken defines model for FigmaToken.
 type FigmaToken struct {
-	Description *string `json:"description,omitempty"`
-	Id          string  `json:"id"`
-	Name        string  `json:"name"`
-	Type        string  `json:"type"`
+	CollectionName *string            `json:"collectionName,omitempty"`
+	Description    *string            `json:"description,omitempty"`
+	Id             string             `json:"id"`
+	Modes          *map[string]string `json:"modes,omitempty"`
+	Name           string             `json:"name"`
+	ResolvedType   *string            `json:"resolvedType,omitempty"`
+	Scopes         *[]string          `json:"scopes,omitempty"`
+	Type           string             `json:"type"`
 
 	// Value Token value of arbitrary type
-	Value interface{} `json:"value"`
+	Value        interface{}             `json:"value"`
+	ValuesByMode *map[string]interface{} `json:"valuesByMode,omitempty"`
+}
+
+// FigmaTypography defines model for FigmaTypography.
+type FigmaTypography struct {
+	Characters    *string  `json:"characters,omitempty"`
+	FontFamily    *string  `json:"fontFamily,omitempty"`
+	FontSize      *float32 `json:"fontSize,omitempty"`
+	FontStyle     *string  `json:"fontStyle,omitempty"`
+	FontWeight    *string  `json:"fontWeight,omitempty"`
+	LetterSpacing *struct {
+		Unit  *string  `json:"unit,omitempty"`
+		Value *float32 `json:"value,omitempty"`
+	} `json:"letterSpacing,omitempty"`
+	LineHeight *struct {
+		Unit  *string  `json:"unit,omitempty"`
+		Value *float32 `json:"value,omitempty"`
+	} `json:"lineHeight,omitempty"`
+	ParagraphSpacing *float32 `json:"paragraphSpacing,omitempty"`
+
+	// TextAlignHorizontal LEFT, CENTER, RIGHT, JUSTIFIED
+	TextAlignHorizontal *string `json:"textAlignHorizontal,omitempty"`
+
+	// TextAlignVertical TOP, CENTER, BOTTOM
+	TextAlignVertical *string `json:"textAlignVertical,omitempty"`
+	TextCase          *string `json:"textCase,omitempty"`
+	TextDecoration    *string `json:"textDecoration,omitempty"`
 }
 
 // Framework defines model for Framework.
@@ -143,6 +329,19 @@ type HealthResponse struct {
 	Version string `json:"version"`
 }
 
+// JobEvent defines model for JobEvent.
+type JobEvent struct {
+	Error *string `json:"error,omitempty"`
+
+	// EventType Event type (e.g. job_status, task_status, task_artifact, job_completed, job_failed)
+	EventType string         `json:"eventType"`
+	JobId     string         `json:"jobId"`
+	RunId     *string        `json:"runId,omitempty"`
+	Status    *string        `json:"status,omitempty"`
+	Task      *ComponentTask `json:"task,omitempty"`
+	Timestamp time.Time      `json:"timestamp"`
+}
+
 // JobResponse defines model for JobResponse.
 type JobResponse struct {
 	Components     []ComponentProgress `json:"components"`
@@ -151,9 +350,21 @@ type JobResponse struct {
 	JobId          string              `json:"jobId"`
 	PublishResults *PublishResults     `json:"publishResults,omitempty"`
 	Publishers     []PublisherType     `json:"publishers"`
+	RunId          *string             `json:"runId,omitempty"`
 	Status         JobStatus           `json:"status"`
 	Targets        []Framework         `json:"targets"`
+	Tasks          *[]ComponentTask    `json:"tasks,omitempty"`
 	UpdatedAt      time.Time           `json:"updatedAt"`
+}
+
+// JobRun defines model for JobRun.
+type JobRun struct {
+	CreatedAt  *time.Time       `json:"createdAt,omitempty"`
+	FinishedAt *time.Time       `json:"finishedAt,omitempty"`
+	Id         string           `json:"id"`
+	JobId      string           `json:"jobId"`
+	Status     string           `json:"status"`
+	Tasks      *[]ComponentTask `json:"tasks,omitempty"`
 }
 
 // JobStatus defines model for JobStatus.
@@ -161,6 +372,8 @@ type JobStatus string
 
 // PublishResults defines model for PublishResults.
 type PublishResults struct {
+	BranchName     *string `json:"branchName,omitempty"`
+	CommitSha      *string `json:"commitSha,omitempty"`
 	DownloadUrl    *string `json:"downloadUrl,omitempty"`
 	PullRequestUrl *string `json:"pullRequestUrl,omitempty"`
 }
@@ -174,5 +387,52 @@ type StageError struct {
 	Stage   string `json:"stage"`
 }
 
+// SyncPlanResponse defines model for SyncPlanResponse.
+type SyncPlanResponse struct {
+	Components   []ComponentDiff `json:"components"`
+	CreatedAt    time.Time       `json:"createdAt"`
+	DocumentName string          `json:"documentName"`
+	Summary      SyncSummary     `json:"summary"`
+	SyncId       string          `json:"syncId"`
+	Tokens       TokenDiff       `json:"tokens"`
+}
+
+// SyncRequest defines model for SyncRequest.
+type SyncRequest struct {
+	Document   FigmaDocument      `json:"document"`
+	Options    *ExtractionOptions `json:"options,omitempty"`
+	Publishers *[]PublisherType   `json:"publishers,omitempty"`
+	Targets    *[]Framework       `json:"targets,omitempty"`
+}
+
+// SyncSummary defines model for SyncSummary.
+type SyncSummary struct {
+	Changed       int  `json:"changed"`
+	New           int  `json:"new"`
+	Removed       int  `json:"removed"`
+	TokensChanged bool `json:"tokensChanged"`
+	Total         int  `json:"total"`
+	Unchanged     int  `json:"unchanged"`
+}
+
+// TaskStatus defines model for TaskStatus.
+type TaskStatus string
+
+// TokenDiff defines model for TokenDiff.
+type TokenDiff struct {
+	Added        *[]string `json:"added,omitempty"`
+	Changed      bool      `json:"changed"`
+	CurrentHash  *string   `json:"currentHash,omitempty"`
+	Modified     *[]string `json:"modified,omitempty"`
+	PreviousHash *string   `json:"previousHash,omitempty"`
+	Removed      *[]string `json:"removed,omitempty"`
+}
+
 // SubmitExtractionJSONRequestBody defines body for SubmitExtraction for application/json ContentType.
 type SubmitExtractionJSONRequestBody = ExtractionRequest
+
+// SubmitSyncJSONRequestBody defines body for SubmitSync for application/json ContentType.
+type SubmitSyncJSONRequestBody = SyncRequest
+
+// ApplySyncJSONRequestBody defines body for ApplySync for application/json ContentType.
+type ApplySyncJSONRequestBody = ApplySyncRequest

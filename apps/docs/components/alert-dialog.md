@@ -25,6 +25,10 @@ Description content — Sets the supporting explanation or consequence.
 Cancel button — Controls the content and configuration of the safe action.
 Continue button — Controls the content and configuration of the primary action.
 
+## Live Preview
+
+<FrameworkPreview name="AlertDialog" />
+
 ## Usage
 
 ::: code-group

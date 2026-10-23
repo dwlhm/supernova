@@ -26,6 +26,10 @@ PROPERTIES
 • Show custom text: Shows or hides supplementary copy.
 • Editable text properties: Custom text, Text message, File name, File metadata, Image name, Image metadata, Video name, Video metadata, Incoming status text, Outgoing status text, Error status text, Incoming time text, Outgoing time text.
 
+## Live Preview
+
+<FrameworkPreview name="BubbleChat" />
+
 ## Usage
 
 ::: code-group

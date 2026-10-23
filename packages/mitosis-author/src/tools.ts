@@ -2,7 +2,7 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { tool } from 'ai';
 import { z } from 'zod';
-import { compileMitosis } from '@supernova/mitosis-compiler';
+import { compileMitosis, COMPONENT_NAME_PATTERN } from '@supernova/mitosis-compiler';
 
 export interface DiscoveredToken {
   name: string;
@@ -21,6 +21,7 @@ export interface AuthorToolContext {
   componentGroups: Record<string, ComponentGroup>;
   newTokens: DiscoveredToken[];
   finished: { value: boolean; summary?: string };
+  abortController?: AbortController;
   lastCompiledSource?: Record<string, string>;
   tokenClasses?: string[];
   rawTokens?: any;
@@ -63,39 +64,46 @@ async function findFileRecursive(dir: string, targetFileName: string): Promise<s
 function extractLayoutAndVisual(node: any): { layout: Record<string, any>; visual: Record<string, any> } | null {
   if (!node || typeof node !== 'object') return null;
 
+  const nodeLayout = node.layout || node;
   const layout: Record<string, any> = {};
-  if (node.layoutMode && node.layoutMode !== 'NONE') {
-    layout.layoutMode = node.layoutMode;
+  if (nodeLayout.layoutMode && nodeLayout.layoutMode !== 'NONE') {
+    layout.layoutMode = nodeLayout.layoutMode;
   }
-  if (node.primaryAxisAlignItems) layout.primaryAxisAlignItems = node.primaryAxisAlignItems;
-  if (node.counterAxisAlignItems) layout.counterAxisAlignItems = node.counterAxisAlignItems;
-  if (node.itemSpacing !== undefined && node.itemSpacing !== 0) layout.itemSpacing = node.itemSpacing;
+  if (nodeLayout.primaryAxisAlignItems) layout.primaryAxisAlignItems = nodeLayout.primaryAxisAlignItems;
+  if (nodeLayout.counterAxisAlignItems) layout.counterAxisAlignItems = nodeLayout.counterAxisAlignItems;
+  if (nodeLayout.itemSpacing !== undefined && nodeLayout.itemSpacing !== 0) layout.itemSpacing = nodeLayout.itemSpacing;
 
   const hasPadding =
-    (node.paddingLeft !== undefined && node.paddingLeft !== 0) ||
-    (node.paddingRight !== undefined && node.paddingRight !== 0) ||
-    (node.paddingTop !== undefined && node.paddingTop !== 0) ||
-    (node.paddingBottom !== undefined && node.paddingBottom !== 0);
+    (nodeLayout.paddingLeft !== undefined && nodeLayout.paddingLeft !== 0) ||
+    (nodeLayout.paddingRight !== undefined && nodeLayout.paddingRight !== 0) ||
+    (nodeLayout.paddingTop !== undefined && nodeLayout.paddingTop !== 0) ||
+    (nodeLayout.paddingBottom !== undefined && nodeLayout.paddingBottom !== 0);
   if (hasPadding) {
     layout.padding = {
-      left: node.paddingLeft ?? 0,
-      right: node.paddingRight ?? 0,
-      top: node.paddingTop ?? 0,
-      bottom: node.paddingBottom ?? 0,
+      left: nodeLayout.paddingLeft ?? 0,
+      right: nodeLayout.paddingRight ?? 0,
+      top: nodeLayout.paddingTop ?? 0,
+      bottom: nodeLayout.paddingBottom ?? 0,
     };
   }
-  if (node.layoutSizingHorizontal) layout.layoutSizingHorizontal = node.layoutSizingHorizontal;
-  if (node.layoutSizingVertical) layout.layoutSizingVertical = node.layoutSizingVertical;
+  if (nodeLayout.layoutSizingHorizontal) layout.layoutSizingHorizontal = nodeLayout.layoutSizingHorizontal;
+  if (nodeLayout.layoutSizingVertical) layout.layoutSizingVertical = nodeLayout.layoutSizingVertical;
 
   const visual: Record<string, any> = {};
-  if (node.cornerRadius !== undefined && node.cornerRadius !== 0) {
-    visual.cornerRadius = node.cornerRadius;
+  if (nodeLayout.cornerRadius !== undefined && nodeLayout.cornerRadius !== 0) {
+    visual.cornerRadius = nodeLayout.cornerRadius;
   }
   if (Array.isArray(node.rectangleCornerRadii)) {
     visual.rectangleCornerRadii = node.rectangleCornerRadii;
   }
   if (node.strokeWeight !== undefined && node.strokeWeight !== 0) {
     visual.strokeWeight = node.strokeWeight;
+  }
+  if (node.boundVariables) {
+    visual.boundVariables = node.boundVariables;
+  }
+  if (node.typography) {
+    visual.typography = node.typography;
   }
   if (Array.isArray(node.fills) && node.fills.length > 0) {
     const visibleFills = node.fills.filter((f: any) => f && f.visible !== false);
@@ -104,6 +112,7 @@ function extractLayoutAndVisual(node: any): { layout: Record<string, any>; visua
         type: f.type,
         color: f.color,
         opacity: f.opacity,
+        boundVariables: f.boundVariables,
       }));
     }
   }
@@ -114,6 +123,10 @@ function extractLayoutAndVisual(node: any): { layout: Record<string, any>; visua
         type: s.type,
         color: s.color,
         opacity: s.opacity,
+        weight: s.weight,
+        align: s.align,
+        dashes: s.dashes,
+        boundVariables: s.boundVariables,
       }));
     }
   }
@@ -125,6 +138,8 @@ function extractLayoutAndVisual(node: any): { layout: Record<string, any>; visua
         radius: e.radius,
         color: e.color,
         offset: e.offset,
+        spread: e.spread,
+        boundVariables: e.boundVariables,
       }));
     }
   }
@@ -161,7 +176,10 @@ export function createAuthorTools(context: AuthorToolContext) {
       description:
         'Read an existing Mitosis component (.lite.tsx) from the workspace JIT for inspection or refactoring',
       parameters: z.object({
-        componentName: z.string().describe('The name of the component to read, e.g. Button'),
+        componentName: z
+          .string()
+          .regex(COMPONENT_NAME_PATTERN, 'PascalCase identifier, letters and digits only')
+          .describe('The name of the component to read, e.g. Button'),
       }),
       execute: async ({ componentName }) => {
         console.error(`[AGENT:TOOL] readExistingComponent: querying "${componentName}"...`);
@@ -485,7 +503,10 @@ export function createAuthorTools(context: AuthorToolContext) {
     saveComponent: tool({
       description: 'Save the authored Mitosis component source code',
       parameters: z.object({
-        componentName: z.string().describe('The name of the component, e.g. Button'),
+        componentName: z
+          .string()
+          .regex(COMPONENT_NAME_PATTERN, 'PascalCase identifier, letters and digits only')
+          .describe('The name of the component, e.g. Button'),
         source: z.string().describe('Complete, valid Mitosis .lite.tsx JSX source code'),
         group: z
           .enum(['components', 'icons'])
@@ -523,6 +544,9 @@ export function createAuthorTools(context: AuthorToolContext) {
         );
         context.finished.value = true;
         context.finished.summary = summary;
+        if (context.abortController) {
+          context.abortController.abort();
+        }
         return {
           success: true,
           summary: summary || 'Authoring completed.',

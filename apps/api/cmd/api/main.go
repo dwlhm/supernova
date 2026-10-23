@@ -9,16 +9,17 @@ import (
 	"os"
 	"os/signal"
 	"path/filepath"
-	"strings"
 	"syscall"
 	"time"
 
 	authoradapter "github.com/dwlhm/supernova/apps/api/internal/adapter/author"
-	"github.com/dwlhm/supernova/apps/api/internal/adapter/compiler"
 	httpadapter "github.com/dwlhm/supernova/apps/api/internal/adapter/http"
 	"github.com/dwlhm/supernova/apps/api/internal/adapter/memstore"
+	"github.com/dwlhm/supernova/apps/api/internal/adapter/nodecli"
 	"github.com/dwlhm/supernova/apps/api/internal/adapter/publisher/download"
 	"github.com/dwlhm/supernova/apps/api/internal/adapter/publisher/github"
+	"github.com/dwlhm/supernova/apps/api/internal/adapter/sqlite"
+	"github.com/dwlhm/supernova/apps/api/internal/config"
 	"github.com/dwlhm/supernova/apps/api/internal/core/app"
 	"github.com/dwlhm/supernova/apps/api/internal/core/port/out"
 	"github.com/dwlhm/supernova/apps/api/internal/infra/logger"
@@ -27,131 +28,122 @@ import (
 func main() {
 	logger.Init(slog.LevelInfo)
 
-	loadDotEnv(".env", "../.env", "../../.env")
+	cfg, err := loadConfig()
+	if err != nil {
+		slog.Error("invalid configuration", "error", err)
+		os.Exit(1)
+	}
+	logConfig(cfg)
 
-	port := getEnv("PORT", "8080")
-	apiToken := getEnv("API_TOKEN", "")
-	compilerBin := getEnv("COMPILER_BIN", "../../packages/mitosis-compiler/bin/cli.js")
-	authorBin := getEnv("AUTHOR_BIN", "../../packages/mitosis-author/dist/cli.js")
-	githubToken := getEnv("GITHUB_TOKEN", "")
-	githubRepo := getEnv("GITHUB_REPO", "")
-	githubBaseBranch := getEnv("GITHUB_BASE_BRANCH", "main")
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	defer stop()
 
-	slog.Info("==================================================")
-	slog.Info("  SUPERNOVA API SERVER STARTING")
-	slog.Info("==================================================")
-	slog.Info(fmt.Sprintf("Config: PORT=%s", port))
-	slog.Info(fmt.Sprintf("Config: API_TOKEN=%s", logger.MaskSecret(apiToken)))
-	slog.Info(fmt.Sprintf("Config: COMPILER_BIN=%s", compilerBin))
-	slog.Info(fmt.Sprintf("Config: AUTHOR_BIN=%s", authorBin))
-	slog.Info(fmt.Sprintf("Config: GITHUB_REPO=%s", githubRepo))
-	slog.Info(fmt.Sprintf("Config: GITHUB_TOKEN=%s", logger.MaskSecret(githubToken)))
-	slog.Info(fmt.Sprintf("Config: GITHUB_BASE_BRANCH=%s", githubBaseBranch))
-	slog.Info("==================================================")
+	if err := run(ctx, newServer(cfg)); err != nil {
+		slog.Error("server stopped with error", "error", err)
+		os.Exit(1)
+	}
+	slog.Info("Server stopped cleanly")
+}
 
-	if _, err := os.Stat(compilerBin); err != nil {
-		if alt := "packages/mitosis-compiler/bin/cli.js"; fileExists(alt) {
-			compilerBin = alt
-		} else {
-			slog.Warn(fmt.Sprintf("Warning: COMPILER_BIN %q not found: %v", compilerBin, err))
+func loadConfig() (config.Config, error) {
+	cwd, err := os.Getwd()
+	if err != nil {
+		return config.Config{}, err
+	}
+	root := config.FindRepoRoot(cwd)
+	if root != "" {
+		if err := config.LoadDotEnv(filepath.Join(root, ".env")); err != nil {
+			return config.Config{}, fmt.Errorf("load .env: %w", err)
 		}
 	}
-	if abs, err := filepath.Abs(compilerBin); err == nil {
-		compilerBin = abs
-	}
+	return config.Load(os.Getenv, root)
+}
 
-	if _, err := os.Stat(authorBin); err != nil {
-		if alt := "packages/mitosis-author/dist/cli.js"; fileExists(alt) {
-			authorBin = alt
+func logConfig(cfg config.Config) {
+	slog.Info("Supernova API configured",
+		"port", cfg.Port,
+		"auth_enabled", cfg.APIToken != "",
+		"author_bin", cfg.AuthorBin,
+		"compiler_bin", cfg.CompilerBin,
+		"extractions_dir", cfg.ExtractionsDir,
+		"docs_dir", cfg.DocsDir,
+		"generated_dir", cfg.GeneratedDir,
+		"node_read_paths", cfg.NodeReadPaths,
+		"github_repo", cfg.GitHub.Repo,
+		"github_token_set", cfg.GitHub.Token != "",
+		"github_base_branch", cfg.GitHub.BaseBranch,
+	)
+	if cfg.APIToken == "" {
+		slog.Warn("AUTH DISABLED via SUPERNOVA_INSECURE_NO_AUTH=true — never use this outside local development")
+	}
+}
+
+func newServer(cfg config.Config) *http.Server {
+	var store out.JobStore
+	if cfg.DatabasePath != "" {
+		if err := os.MkdirAll(filepath.Dir(cfg.DatabasePath), 0o755); err != nil {
+			slog.Warn("failed to create db directory, using memstore", "error", err)
+			store = memstore.New()
 		} else {
-			slog.Warn(fmt.Sprintf("Warning: AUTHOR_BIN %q not found: %v", authorBin, err))
+			sqlStore, err := sqlite.New(cfg.DatabasePath)
+			if err != nil {
+				slog.Warn("failed to open sqlite database, using memstore", "error", err)
+				store = memstore.New()
+			} else {
+				slog.Info("SQLite database initialized", "path", cfg.DatabasePath)
+				store = sqlStore
+			}
 		}
+	} else {
+		store = memstore.New()
 	}
-	if abs, err := filepath.Abs(authorBin); err == nil {
-		authorBin = abs
-	}
-
-	authorAdapter := authoradapter.NewCLIAuthor(authorBin)
-	compilerAdapter := compiler.NewCLICompiler(compilerBin)
-	store := memstore.New()
-
-	downloadPub := download.NewPublisher(store)
-	githubPub := github.NewPublisher(githubToken, githubRepo, githubBaseBranch, store)
-
+	sandbox := nodecli.Sandbox{ReadPaths: cfg.NodeReadPaths}
 	publishers := []out.ArtifactPublisher{
-		downloadPub,
-		githubPub,
+		download.NewPublisher(store),
+		github.NewPublisher(cfg.GitHub.Token, cfg.GitHub.Repo, cfg.GitHub.BaseBranch, store),
+	}
+	var author out.MitosisAuthor
+	if cfg.DevMockLLM {
+		slog.Warn("Running in DEV MOCK LLM mode: authoring will use fast deterministic mock components (SUPERNOVA_DEV_MOCK_LLM=true)")
+		author = authoradapter.NewDevMockAuthor()
+	} else {
+		author = authoradapter.NewCLIAuthor(cfg.AuthorBin, sandbox)
 	}
 
-	svc := app.NewService(store, authorAdapter, compilerAdapter, publishers)
-	router := httpadapter.NewRouter(svc, apiToken)
-
-	server := &http.Server{
-		Addr:         ":" + port,
-		Handler:      router,
+	svc := app.NewService(
+		store,
+		author,
+		publishers,
+		app.Paths{ExtractionsDir: cfg.ExtractionsDir, DocsDir: cfg.DocsDir, GeneratedDir: cfg.GeneratedDir},
+	)
+	return &http.Server{
+		Addr:         ":" + cfg.Port,
+		Handler:      httpadapter.NewRouter(svc, cfg.APIToken, cfg.GitHub.WebhookSecret),
 		ReadTimeout:  15 * time.Second,
 		WriteTimeout: 15 * time.Second,
 		IdleTimeout:  60 * time.Second,
 	}
+}
 
-	stop := make(chan os.Signal, 1)
-	signal.Notify(stop, os.Interrupt, syscall.SIGTERM)
-
+// run serves until ctx is cancelled, then shuts the HTTP server down gracefully.
+func run(ctx context.Context, server *http.Server) error {
+	errCh := make(chan error, 1)
 	go func() {
-		slog.Info(fmt.Sprintf("Starting Supernova API server on port %s", port))
+		slog.Info("Starting Supernova API server", "addr", server.Addr)
 		if err := server.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
-			slog.Error(fmt.Sprintf("Server failed to start: %v", err))
-			os.Exit(1)
+			errCh <- err
 		}
+		close(errCh)
 	}()
 
-	<-stop
+	select {
+	case err := <-errCh:
+		return err
+	case <-ctx.Done():
+	}
+
 	slog.Info("Shutting down server gracefully...")
-
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	shutdownCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-
-	if err := server.Shutdown(ctx); err != nil {
-		slog.Error(fmt.Sprintf("Server forced to shutdown: %v", err))
-		os.Exit(1)
-	}
-
-	slog.Info("Server stopped cleanly")
-}
-
-func getEnv(key, defaultVal string) string {
-	if val := os.Getenv(key); val != "" {
-		return val
-	}
-	return defaultVal
-}
-
-func fileExists(path string) bool {
-	info, err := os.Stat(path)
-	return err == nil && !info.IsDir()
-}
-
-func loadDotEnv(filenames ...string) {
-	for _, filename := range filenames {
-		data, err := os.ReadFile(filename)
-		if err != nil {
-			continue
-		}
-		lines := strings.Split(string(data), "\n")
-		for _, line := range lines {
-			line = strings.TrimSpace(line)
-			if line == "" || strings.HasPrefix(line, "#") {
-				continue
-			}
-			parts := strings.SplitN(line, "=", 2)
-			if len(parts) == 2 {
-				key := strings.TrimSpace(parts[0])
-				val := strings.TrimSpace(parts[1])
-				val = strings.Trim(val, `"'`)
-				if os.Getenv(key) == "" {
-					os.Setenv(key, val)
-				}
-			}
-		}
-	}
+	return server.Shutdown(shutdownCtx)
 }

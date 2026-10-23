@@ -1,0 +1,24 @@
+{
+  "name": "TableCellValue",
+  "group": "components",
+  "variants": {
+    "Type": [
+      "Action",
+      "Action (Icon)",
+      "Avatar Text",
+      "Badge",
+      "Checkbox",
+      "Image",
+      "Image Text",
+      "Link",
+      "Number",
+      "Product",
+      "Slot",
+      "Stacked Text",
+      "Status",
+      "Text",
+      "Toggle"
+    ]
+  },
+  "totalVariants": 15
+}

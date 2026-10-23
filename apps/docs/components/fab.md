@@ -27,6 +27,10 @@ Size: Small (40×40), Regular (56×56), Large (96×96), Extended (120×56)
 State: Default, Hover, Focus, Disabled
 Label: Editable text shown only in the Extended size
 
+## Live Preview
+
+<FrameworkPreview name="FAB" />
+
 ## Usage
 
 ::: code-group

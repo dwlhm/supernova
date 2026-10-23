@@ -821,3 +821,27 @@ describe('Mitosis Author - CLI Subprocess', () => {
     assert.match(parsed.error, /Missing required environment variable/);
   });
 });
+
+describe('Mitosis Author - Component name trust boundary', () => {
+  const tools = createAuthorTools({
+    components: {},
+    componentGroups: {},
+    newTokens: [],
+    finished: { value: false },
+    lastCompiledSource: {},
+  });
+
+  for (const toolName of ['saveComponent', 'readExistingComponent']) {
+    it(`${toolName} schema rejects names that could escape paths or inject code`, () => {
+      const base = toolName === 'saveComponent' ? { source: 'x', group: 'components' } : {};
+      for (const bad of ['../../etc/passwd', 'button', 'Card;import("x")', 'A/B', '']) {
+        const res = tools[toolName].parameters.safeParse({ ...base, componentName: bad });
+        assert.equal(res.success, false, `expected ${JSON.stringify(bad)} to be rejected`);
+      }
+      assert.equal(
+        tools[toolName].parameters.safeParse({ ...base, componentName: 'IconSearch2' }).success,
+        true
+      );
+    });
+  }
+});

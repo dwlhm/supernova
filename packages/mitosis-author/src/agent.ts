@@ -28,10 +28,12 @@ export interface AuthorAgentRequest {
   tokenClasses?: string[];
   repairErrors?: string[];
   existingSource?: string;
+  feedbackNotes?: string;
   components?: ComponentRequestItem[];
   existingComponentNames?: string[];
   workspaceDir?: string;
   targets?: TargetFramework[];
+  compileOnly?: boolean;
 }
 
 export interface AuthorAgentResponse {
@@ -62,8 +64,28 @@ export async function runAuthorAgent(
   const lastCompiledSource: Record<string, string> = {};
 
   try {
-    const config = getAuthorConfig();
-    const model = getAuthorModel(config);
+    const targets: TargetFramework[] =
+      req.targets && req.targets.length > 0 ? req.targets : DEFAULT_TARGETS;
+
+    if (req.compileOnly) {
+      const compName =
+        req.componentName ||
+        (req.components &&
+          req.components[0] &&
+          (req.components[0].componentName || req.components[0].name));
+      const source =
+        req.existingSource ||
+        (req.components && req.components[0] && req.components[0].existingSource);
+      if (compName && source) {
+        components[compName] = source;
+        componentGroups[compName] = 'components';
+        console.error(
+          `[AGENT] Compile-only mode: using existing source for ${compName}`
+        );
+      }
+    } else {
+      const config = getAuthorConfig();
+      const model = getAuthorModel(config);
 
     const existingSources: Record<string, string> = {};
     if (req.componentName && req.existingSource) {
@@ -94,6 +116,7 @@ export async function runAuthorAgent(
       }
     }
 
+    const abortController = new AbortController();
     const tools = createAuthorTools({
       workspaceDir: req.workspaceDir || process.cwd(),
       existingSources,
@@ -102,16 +125,13 @@ export async function runAuthorAgent(
       componentGroups,
       newTokens,
       finished,
+      abortController,
       lastCompiledSource,
       tokenClasses: req.tokenClasses,
       rawTokens: req.tokens,
     });
 
     const userPrompt = buildAuthorUserPrompt(req);
-
-    // Determine target frameworks for compilation
-    const targets: TargetFramework[] =
-      req.targets && req.targets.length > 0 ? req.targets : DEFAULT_TARGETS;
 
     const requestedComponentNames: string[] = [];
     if (req.componentName) {
@@ -145,40 +165,54 @@ export async function runAuthorAgent(
     console.error(`[AGENT] Max allowed tool steps: ${maxSteps}`);
 
     let stepIndex = 0;
-    await generateText({
-      model,
-      system: SYSTEM_PROMPT,
-      prompt: userPrompt,
-      tools,
-      maxSteps,
-      onStepFinish: (step) => {
-        stepIndex++;
-        console.error(
-          `[AGENT] Step ${stepIndex} (${step.stepType}) finished. Reason: ${step.finishReason}`
-        );
+    try {
+      await generateText({
+        model,
+        system: SYSTEM_PROMPT,
+        prompt: userPrompt,
+        tools,
+        maxSteps,
+        abortSignal: abortController.signal,
+        onStepFinish: (step) => {
+          stepIndex++;
+          console.error(
+            `[AGENT] Step ${stepIndex} (${step.stepType}) finished. Reason: ${step.finishReason}`
+          );
 
-        if (step.reasoning && step.reasoning.trim()) {
-          const r = step.reasoning.trim();
-          const preview = r.length > 300 ? r.slice(0, 300) + '...' : r;
-          console.error(`[AGENT:THOUGHT] ${preview}`);
-        } else if (step.text && step.text.trim()) {
-          const t = step.text.trim();
-          const preview = t.length > 300 ? t.slice(0, 300) + '...' : t;
-          console.error(`[AGENT:THOUGHT] ${preview}`);
-        }
-
-        if (step.toolCalls && step.toolCalls.length > 0) {
-          for (const call of step.toolCalls) {
-            const argsStr = JSON.stringify((call as any).args ?? {});
-            const argsPreview =
-              argsStr.length > 200 ? argsStr.slice(0, 200) + '...' : argsStr;
-            console.error(
-              `[AGENT:TOOL-CALL] ${(call as any).toolName}(${argsPreview})`
-            );
+          if (step.reasoning && step.reasoning.trim()) {
+            const r = step.reasoning.trim();
+            const preview = r.length > 300 ? r.slice(0, 300) + '...' : r;
+            console.error(`[AGENT:THOUGHT] ${preview}`);
+          } else if (step.text && step.text.trim()) {
+            const t = step.text.trim();
+            const preview = t.length > 300 ? t.slice(0, 300) + '...' : t;
+            console.error(`[AGENT:THOUGHT] ${preview}`);
           }
-        }
-      },
-    });
+
+          if (step.toolCalls && step.toolCalls.length > 0) {
+            for (const call of step.toolCalls) {
+              const argsStr = JSON.stringify((call as any).args ?? {});
+              const argsPreview =
+                argsStr.length > 200 ? argsStr.slice(0, 200) + '...' : argsStr;
+              console.error(
+                `[AGENT:TOOL-CALL] ${(call as any).toolName}(${argsPreview})`
+              );
+            }
+          }
+
+          if (finished.value) {
+            abortController.abort();
+          }
+        },
+      });
+    } catch (genErr: any) {
+      if (finished.value || genErr?.name === 'AbortError' || genErr?.message?.includes('aborted')) {
+        console.error('[AGENT] Authoring loop concluded cleanly via finishAuthoring.');
+      } else {
+        throw genErr;
+      }
+    }
+    }
 
     // Fallback: If no components were explicitly saved via saveComponent,
     // recover from last successful testCompile

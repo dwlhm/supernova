@@ -23,6 +23,8 @@ type Job struct {
 	Targets        []contracts.Framework         `json:"targets"`
 	Publishers     []contracts.PublisherType     `json:"publishers"`
 	Status         contracts.JobStatus           `json:"status"`
+	RunID          string                        `json:"runId,omitempty"`
+	Tasks          []*Task                       `json:"tasks,omitempty"`
 	Components     []contracts.ComponentProgress `json:"components"`
 	Artifacts      []CompiledArtifact            `json:"artifacts,omitempty"`
 	PublishResults *contracts.PublishResults     `json:"publishResults,omitempty"`

@@ -32,6 +32,10 @@ Show Description — Shows or hides the empty-state supporting text.
 Show CTA — Shows or hides the empty-state action.
 Icon — Swaps the empty-state icon.
 
+## Live Preview
+
+<FrameworkPreview name="Table" />
+
 ## Usage
 
 ::: code-group

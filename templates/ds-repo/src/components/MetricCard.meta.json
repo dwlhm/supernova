@@ -1,0 +1,19 @@
+{
+  "name": "MetricCard",
+  "group": "components",
+  "variants": {
+    "Type": [
+      "Comparison",
+      "Default",
+      "Leaderboard",
+      "List",
+      "Mini Bar",
+      "Multi-Metric",
+      "Progress",
+      "Radial",
+      "Sparkline",
+      "Target"
+    ]
+  },
+  "totalVariants": 10
+}

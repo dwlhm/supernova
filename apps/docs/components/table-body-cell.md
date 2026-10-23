@@ -18,6 +18,10 @@ Maintain consistent alignment for cells in the same column.
 Properties
 Cell Value — Swaps the nested Table Cell Value component used by the cell.
 
+## Live Preview
+
+<FrameworkPreview name="TableBodyCell" />
+
 ## Usage
 
 ::: code-group

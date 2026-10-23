@@ -1,4 +1,7 @@
 @import "tailwindcss";
+@source "./preview";
+@source "./components";
+@source "../..";
 @import "./tokens/theme.css";
 @import "./tokens/tokens.css";
 
@@ -8,6 +11,65 @@
   --vp-c-brand-soft: var(--color-background-muted, #f5f5f5);
 }
 
+.dark {
+  --color-background-default: #1b1b1f;
+  --color-background-subtle: #202127;
+  --color-background-interactive: #2b2b30;
+  --color-background-muted: #2e2e32;
+  --color-border-default: #3c3f44;
+  --color-border-subtle: #2e2e32;
+  --color-foreground-default: #f3f4f6;
+  --color-foreground-muted: #9ca3af;
+
+  /* Switch button tokens in dark mode */
+  --color-components-switch-off-color-track-background-default: #4b5563;
+  --color-components-switch-off-color-thumb-background-default: #d1d5db;
+  --color-components-switch-on-color-track-background-default: rgb(229, 85, 20);
+  --color-components-switch-on-color-thumb-background-default: #ffffff;
+
+  /* Checkbox & RadioButton tokens in dark mode */
+  --color-components-checkbox-off-color-box-background-default: #2b2b30;
+  --color-components-checkbox-off-color-box-border-default: #6b7280;
+  --color-components-checkbox-off-color-container-background-default: #2b2b30;
+  --color-components-checkbox-off-color-container-border-default: #6b7280;
+  --color-components-checkbox-all-color-label-foreground-default: #f3f4f6;
+  --color-components-radio-off-color-circle-background-default: #2b2b30;
+  --color-components-radio-off-color-circle-border-default: #6b7280;
+  --color-components-radio-button-all-color-circle-background-default: #2b2b30;
+  --color-components-radio-button-all-color-label-foreground-default: #f3f4f6;
+
+  /* Button tokens in dark mode */
+  --color-components-button-secondary-color-button-background-default: #2b2b30;
+  --color-components-button-secondary-color-button-border-default: #4b5563;
+  --color-components-button-secondary-color-label-foreground-default: #f3f4f6;
+  --color-components-button-outline-color-container-background-default: transparent;
+  --color-components-button-outline-color-container-border-default: #4b5563;
+  --color-components-button-outline-color-label-foreground-default: #f3f4f6;
+
+  /* Input tokens in dark mode */
+  --color-components-input-all-color-container-background-default: #202127;
+  --color-components-input-all-color-container-border-default: #3c3f44;
+  --color-components-input-all-color-label-foreground-default: #f3f4f6;
+  --color-components-input-all-color-input-foreground-default: #f3f4f6;
+  --color-components-input-all-color-placeholder-foreground-default: #9ca3af;
+}
+
+/* Explicit component classes for guaranteed cross-framework rendering */
+.bg-components-switch-on-color-track-background-default {
+  background-color: var(--color-components-switch-on-color-track-background-default, rgb(229, 85, 20)) !important;
+}
+.bg-components-switch-off-color-track-background-default {
+  background-color: var(--color-components-switch-off-color-track-background-default, rgb(229, 229, 229)) !important;
+}
+.bg-components-switch-on-color-thumb-background-default,
+.bg-components-switch-off-color-thumb-background-default {
+  background-color: var(--color-components-switch-on-color-thumb-background-default, rgb(255, 255, 255)) !important;
+}
+.rounded-rounded-full {
+  border-radius: 9999px !important;
+}
+
 .vp-doc .framework-preview-container {
   margin: 1.5rem 0;
 }
+

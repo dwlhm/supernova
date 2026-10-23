@@ -18,6 +18,10 @@ Place row-level actions in the designated actions column.
 Properties
 Show Column 1–10 — Shows or hides each data column. Columns 1–5 are visible by default; columns 6–10 are optional.
 
+## Live Preview
+
+<FrameworkPreview name="TableBodyRow" />
+
 ## Usage
 
 ::: code-group

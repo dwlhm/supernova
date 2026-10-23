@@ -1,0 +1,19 @@
+{
+  "name": "Toast",
+  "group": "components",
+  "variants": {
+    "State": [
+      "Default",
+      "Hover",
+      "Pressed"
+    ],
+    "Type": [
+      "Default",
+      "Error",
+      "Info",
+      "Success",
+      "Warning"
+    ]
+  },
+  "totalVariants": 15
+}

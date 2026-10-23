@@ -1,4 +1,5 @@
 import type { CompiledArtifact, TargetFramework } from './types.js';
+import { isValidComponentName } from './names.js';
 
 const PASCAL_PREFIX_REGEX = /^([A-Z]+(?=[A-Z][a-z]|$)|[A-Z][a-z]+)/;
 
@@ -29,6 +30,11 @@ export function generateNamespaceIndex(
 ): CompiledArtifact | null {
   if (!componentNames || componentNames.length === 0 || target === 'mitosis') {
     return null;
+  }
+
+  const invalid = componentNames.filter((name) => !isValidComponentName(name));
+  if (invalid.length > 0) {
+    throw new Error(`Refusing to generate index for invalid component names: ${invalid.join(', ')}`);
   }
 
   const sortedNames = Array.from(new Set(componentNames)).sort((a, b) =>

@@ -1,0 +1,11 @@
+{
+  "name": "TabItem",
+  "group": "components",
+  "variants": {
+    "State": [
+      "Active",
+      "Default"
+    ]
+  },
+  "totalVariants": 2
+}

@@ -26,6 +26,10 @@ PROPERTIES
 • List Value — Slot for dropdown options.
 • Show Search Input — Toggles search within the option list.
 
+## Live Preview
+
+<FrameworkPreview name="InputDropdown" />
+
 ## Usage
 
 ::: code-group

@@ -1,4 +1,4 @@
-import type { FigmaDocument, ExtractionRequest, ExtractionResponse, JobResponse, Framework, PublisherType } from '@supernova/contracts';
+import type { FigmaDocument, SyncRequest, SyncPlanResponse, ApplySyncRequest, ExtractionResponse, JobResponse, JobEvent, Framework } from '@supernova/contracts';
 
 const startBtn = document.getElementById('startBtn') as HTMLButtonElement;
 const rescanBtn = document.getElementById('rescanBtn') as HTMLButtonElement;
@@ -21,6 +21,12 @@ const detectedTokensList = document.getElementById('detectedTokensList') as HTML
 
 const backendUrlInput = document.getElementById('backendUrl') as HTMLInputElement;
 const apiTokenInput = document.getElementById('apiToken') as HTMLInputElement;
+
+const planPanel = document.getElementById('planPanel') as HTMLDivElement;
+const planSummary = document.getElementById('planSummary') as HTMLDivElement;
+const planComponentList = document.getElementById('planComponentList') as HTMLDivElement;
+const applyPlanBtn = document.getElementById('applyPlanBtn') as HTMLButtonElement;
+
 const statusPanel = document.getElementById('statusPanel') as HTMLDivElement;
 const statusMessage = document.getElementById('statusMessage') as HTMLSpanElement;
 const statusBadge = document.getElementById('statusBadge') as HTMLSpanElement;
@@ -31,15 +37,11 @@ const errorArea = document.getElementById('errorArea') as HTMLDivElement;
 let scannedDocument: FigmaDocument | null = null;
 const selectedComponentIds: Set<string> = new Set();
 let isScanning = true;
-let pollingTimer: number | null = null;
+let currentPlan: SyncPlanResponse | null = null;
+let currentAbortController: AbortController | null = null;
 
 function notifyPlugin(message: string, error: boolean = false) {
   parent.postMessage({ pluginMessage: { type: 'notify', message, error } }, '*');
-}
-
-function getSelectedPublishers(): PublisherType[] {
-  const checkboxes = document.querySelectorAll('input[name="publisher"]:checked') as NodeListOf<HTMLInputElement>;
-  return Array.from(checkboxes).map((cb) => cb.value as PublisherType);
 }
 
 function setScanningState(scanning: boolean, message?: string) {
@@ -292,15 +294,7 @@ startBtn.addEventListener('click', async () => {
   }
 
   if (selectedComponentIds.size === 0) {
-    notifyPlugin('Please select at least one component to export.', true);
-    return;
-  }
-
-  const targets: Framework[] = ['mitosis' as Framework];
-
-  const publishers = getSelectedPublishers();
-  if (publishers.length === 0) {
-    notifyPlugin('Please select at least one publish output.', true);
+    notifyPlugin('Please select at least one component to sync.', true);
     return;
   }
 
@@ -315,18 +309,37 @@ startBtn.addEventListener('click', async () => {
   };
 
   startBtn.disabled = true;
+  startBtn.textContent = 'Computing Sync Plan...';
+  errorArea.style.display = 'none';
+
+  await computeSyncPlan({
+    document: exportDocument,
+    backendUrl,
+    apiToken,
+  });
+});
+
+applyPlanBtn.addEventListener('click', async () => {
+  if (!currentPlan) {
+    notifyPlugin('No sync plan computed yet.', true);
+    return;
+  }
+
+  const backendUrl = backendUrlInput.value.trim().replace(/\/+$/, '');
+  const apiToken = apiTokenInput.value.trim();
+
+  applyPlanBtn.disabled = true;
+  applyPlanBtn.textContent = 'Submitting PR...';
   statusPanel.style.display = 'block';
-  statusMessage.textContent = 'Submitting extraction to backend...';
+  statusMessage.textContent = 'Enqueuing execution job...';
   statusBadge.textContent = 'submitting';
   statusBadge.className = 'status-badge badge-running';
   componentList.innerHTML = '';
   actionArea.style.display = 'none';
   errorArea.style.display = 'none';
 
-  await submitToBackend({
-    document: exportDocument,
-    targets,
-    publishers,
+  await applySyncPlan({
+    syncId: currentPlan.syncId,
     backendUrl,
     apiToken,
   });
@@ -348,6 +361,7 @@ window.onmessage = async (event) => {
 
   if (msg.type === 'extraction-error') {
     startBtn.disabled = false;
+    startBtn.textContent = 'Compute Sync Plan';
     statusBadge.textContent = 'failed';
     statusBadge.className = 'status-badge badge-failed';
     statusMessage.textContent = 'Extraction failed';
@@ -357,27 +371,24 @@ window.onmessage = async (event) => {
   }
 
   if (msg.type === 'extraction-data') {
-    await submitToBackend({
-      ...msg,
-      targets: msg.targets && msg.targets.length > 0 ? msg.targets : (['mitosis' as Framework]),
+    await computeSyncPlan({
+      document: msg.document,
+      backendUrl: backendUrlInput.value.trim().replace(/\/+$/, ''),
+      apiToken: apiTokenInput.value.trim(),
     });
   }
 };
 
-async function submitToBackend(data: {
+async function computeSyncPlan(data: {
   document: FigmaDocument;
-  targets: Framework[];
-  publishers: PublisherType[];
   backendUrl: string;
   apiToken?: string;
 }) {
-  const { document, targets, publishers, backendUrl, apiToken } = data;
-  statusMessage.textContent = 'Submitting extraction to backend...';
-
-  const payload: ExtractionRequest = {
+  const { document, backendUrl, apiToken } = data;
+  const payload: SyncRequest = {
     document,
-    targets,
-    publishers,
+    targets: ['mitosis' as Framework],
+    publishers: ['pull_request'],
   };
 
   const headers: Record<string, string> = {
@@ -388,7 +399,7 @@ async function submitToBackend(data: {
   }
 
   try {
-    const res = await fetch(`${backendUrl}/v1/extractions`, {
+    const res = await fetch(`${backendUrl}/v1/syncs`, {
       method: 'POST',
       headers,
       body: JSON.stringify(payload),
@@ -399,115 +410,241 @@ async function submitToBackend(data: {
       throw new Error(errJson.message || `HTTP ${res.status}: ${res.statusText}`);
     }
 
-    const extractionResp: ExtractionResponse = await res.json();
-    statusMessage.textContent = `Job enqueued (${extractionResp.jobId.slice(0, 8)}...)`;
-    statusBadge.textContent = 'queued';
-    statusBadge.className = 'status-badge badge-running';
-
-    startPolling(backendUrl, extractionResp.jobId, apiToken);
+    const plan: SyncPlanResponse = await res.json();
+    currentPlan = plan;
+    renderPlanPanel(plan);
+    startBtn.disabled = false;
+    startBtn.textContent = 'Recompute Sync Plan';
+    notifyPlugin(`Sync plan: ${plan.summary.new} new, ${plan.summary.changed} changed, ${plan.summary.unchanged} unchanged`);
   } catch (err: any) {
     startBtn.disabled = false;
-    statusBadge.textContent = 'failed';
-    statusBadge.className = 'status-badge badge-failed';
-    statusMessage.textContent = 'Failed to submit extraction';
+    startBtn.textContent = 'Compute Sync Plan';
     errorArea.textContent = err.message;
     errorArea.style.display = 'block';
     notifyPlugin(`Backend error: ${err.message}`, true);
   }
 }
 
-function startPolling(backendUrl: string, jobId: string, apiToken?: string) {
-  if (pollingTimer) {
-    clearInterval(pollingTimer);
-  }
+function renderPlanPanel(plan: SyncPlanResponse) {
+  planPanel.style.display = 'block';
+  planSummary.innerHTML = `
+    <span class="plan-pill badge-new">+ ${plan.summary.new} New</span>
+    <span class="plan-pill badge-changed">~ ${plan.summary.changed} Changed</span>
+    <span class="plan-pill badge-unchanged">= ${plan.summary.unchanged} Unchanged</span>
+    ${plan.summary.removed > 0 ? `<span class="plan-pill badge-removed">- ${plan.summary.removed} Removed</span>` : ''}
+    <span class="plan-pill" style="background: #f3f4f6; color: #374151;">${plan.summary.tokensChanged ? 'Tokens: Changed' : 'Tokens: Unchanged'}</span>
+  `;
 
-  pollingTimer = window.setInterval(async () => {
-    try {
-      const headers: Record<string, string> = {};
-      if (apiToken) {
-        headers['Authorization'] = `Bearer ${apiToken}`;
-      }
-
-      const res = await fetch(`${backendUrl}/v1/jobs/${jobId}`, { headers });
-      if (!res.ok) {
-        throw new Error(`Polling failed: HTTP ${res.status}`);
-      }
-
-      const job: JobResponse = await res.json();
-      updateJobProgress(backendUrl, job);
-
-      if (job.status === 'succeeded' || job.status === 'failed') {
-        if (pollingTimer) clearInterval(pollingTimer);
-        startBtn.disabled = false;
-      }
-    } catch (err: any) {
-      if (pollingTimer) clearInterval(pollingTimer);
-      startBtn.disabled = false;
-      statusBadge.textContent = 'error';
-      statusBadge.className = 'status-badge badge-failed';
-      errorArea.textContent = err.message;
-      errorArea.style.display = 'block';
-    }
-  }, 1000);
-}
-
-function updateJobProgress(backendUrl: string, job: JobResponse) {
-  statusBadge.textContent = job.status;
-  if (job.status === 'succeeded') {
-    statusBadge.className = 'status-badge badge-succeeded';
-    statusMessage.textContent = 'Compilation complete!';
-  } else if (job.status === 'failed') {
-    statusBadge.className = 'status-badge badge-failed';
-    statusMessage.textContent = 'Generation failed';
-  } else {
-    statusBadge.className = 'status-badge badge-running';
-    statusMessage.textContent = `Processing: ${job.status}...`;
-  }
-
-  // Render components progress list
-  componentList.innerHTML = '';
-  for (const comp of job.components || []) {
+  planComponentList.innerHTML = '';
+  for (const comp of plan.components) {
     const row = document.createElement('div');
     row.className = 'component-row';
 
     const nameSpan = document.createElement('span');
     nameSpan.textContent = comp.name;
 
-    const compBadge = document.createElement('span');
-    compBadge.className = `status-badge ${comp.status === 'done' ? 'badge-succeeded' : comp.status === 'failed' ? 'badge-failed' : 'badge-running'}`;
-    compBadge.textContent = comp.status;
+    const badge = document.createElement('span');
+    badge.className = `status-badge badge-${comp.status}`;
+    badge.textContent = comp.status;
 
     row.appendChild(nameSpan);
-    row.appendChild(compBadge);
-    componentList.appendChild(row);
+    row.appendChild(badge);
+    planComponentList.appendChild(row);
   }
 
-  // Handle completion actions
-  if (job.status === 'succeeded') {
-    actionArea.innerHTML = '';
-    actionArea.style.display = 'flex';
+  applyPlanBtn.disabled = false;
+  applyPlanBtn.textContent = 'Create / Update PR ↗';
+}
 
-    if (job.publishResults?.downloadUrl) {
-      const downloadBtn = document.createElement('a');
-      downloadBtn.className = 'link-btn';
-      downloadBtn.href = `${backendUrl}${job.publishResults.downloadUrl}`;
-      downloadBtn.target = '_blank';
-      downloadBtn.textContent = 'Download Multi-Framework ZIP';
-      actionArea.appendChild(downloadBtn);
+async function applySyncPlan(data: {
+  syncId: string;
+  backendUrl: string;
+  apiToken?: string;
+}) {
+  const { syncId, backendUrl, apiToken } = data;
+  const payload: ApplySyncRequest = {
+    publishers: ['pull_request'],
+    targets: ['mitosis' as Framework],
+  };
+
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+  };
+  if (apiToken) {
+    headers['Authorization'] = `Bearer ${apiToken}`;
+  }
+
+  try {
+    const res = await fetch(`${backendUrl}/v1/syncs/${syncId}/apply`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(payload),
+    });
+
+    if (!res.ok) {
+      const errJson = await res.json().catch(() => ({}));
+      throw new Error(errJson.message || `HTTP ${res.status}: ${res.statusText}`);
     }
 
-    if (job.publishResults?.pullRequestUrl) {
+    const extResp: ExtractionResponse = await res.json();
+    statusMessage.textContent = `Job enqueued (${extResp.jobId.slice(0, 8)}...)`;
+    statusBadge.textContent = 'queued';
+    statusBadge.className = 'status-badge badge-running';
+
+    startEventStreaming(backendUrl, extResp.jobId, apiToken);
+  } catch (err: any) {
+    applyPlanBtn.disabled = false;
+    applyPlanBtn.textContent = 'Create / Update PR ↗';
+    statusBadge.textContent = 'failed';
+    statusBadge.className = 'status-badge badge-failed';
+    statusMessage.textContent = 'Failed to apply plan';
+    errorArea.textContent = err.message;
+    errorArea.style.display = 'block';
+    notifyPlugin(`Backend error: ${err.message}`, true);
+  }
+}
+
+async function startEventStreaming(backendUrl: string, jobId: string, apiToken?: string) {
+  if (currentAbortController) {
+    currentAbortController.abort();
+  }
+  currentAbortController = new AbortController();
+
+  const headers: Record<string, string> = {
+    Accept: 'text/event-stream',
+  };
+  if (apiToken) {
+    headers['Authorization'] = `Bearer ${apiToken}`;
+  }
+
+  const tasksMap: Record<string, string> = {};
+
+  try {
+    const response = await fetch(`${backendUrl}/v1/jobs/${jobId}/events`, {
+      headers,
+      signal: currentAbortController.signal,
+    });
+
+    if (!response.ok || !response.body) {
+      throw new Error(`SSE stream failed: HTTP ${response.status}`);
+    }
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split('\n');
+      buffer = lines.pop() || '';
+
+      for (const line of lines) {
+        const trimmed = line.trim();
+        if (!trimmed || trimmed.startsWith(':')) continue;
+        if (trimmed.startsWith('data: ')) {
+          const jsonStr = trimmed.slice(6);
+          try {
+            const ev: JobEvent = JSON.parse(jsonStr);
+            handleJobEvent(backendUrl, jobId, ev, tasksMap, apiToken);
+          } catch {
+            // ignore non-json SSE lines
+          }
+        }
+      }
+    }
+  } catch (err: any) {
+    if (err.name === 'AbortError') return;
+    console.error('SSE connection closed or failed:', err);
+    await fetchFinalJobStatus(backendUrl, jobId, apiToken);
+  }
+}
+
+async function handleJobEvent(
+  backendUrl: string,
+  jobId: string,
+  ev: JobEvent,
+  tasksMap: Record<string, string>,
+  apiToken?: string
+) {
+  if (ev.eventType === 'task_status' && ev.task) {
+    tasksMap[ev.task.componentName] = ev.task.status;
+    renderTasksList(tasksMap);
+  } else if (ev.eventType === 'job_status' && ev.status) {
+    statusBadge.textContent = ev.status;
+    statusBadge.className = 'status-badge badge-running';
+    statusMessage.textContent = `Job status: ${ev.status}`;
+  } else if (ev.eventType === 'job_completed') {
+    statusBadge.textContent = 'succeeded';
+    statusBadge.className = 'status-badge badge-succeeded';
+    statusMessage.textContent = 'PR Published Successfully!';
+    applyPlanBtn.disabled = false;
+    applyPlanBtn.textContent = 'Create / Update PR ↗';
+    await fetchFinalJobStatus(backendUrl, jobId, apiToken);
+  } else if (ev.eventType === 'job_failed') {
+    statusBadge.textContent = 'failed';
+    statusBadge.className = 'status-badge badge-failed';
+    statusMessage.textContent = ev.error || 'Job execution failed';
+    applyPlanBtn.disabled = false;
+    applyPlanBtn.textContent = 'Create / Update PR ↗';
+    if (ev.error) {
+      errorArea.textContent = ev.error;
+      errorArea.style.display = 'block';
+    }
+  }
+}
+
+function renderTasksList(tasksMap: Record<string, string>) {
+  componentList.innerHTML = '';
+  for (const [name, status] of Object.entries(tasksMap)) {
+    const row = document.createElement('div');
+    row.className = 'component-row';
+
+    const nameSpan = document.createElement('span');
+    nameSpan.textContent = name;
+
+    const badge = document.createElement('span');
+    const isDone = status === 'ready' || status === 'done';
+    const isFailed = status === 'failed';
+    badge.className = `status-badge ${isDone ? 'badge-succeeded' : isFailed ? 'badge-failed' : 'badge-running'}`;
+    badge.textContent = status;
+
+    row.appendChild(nameSpan);
+    row.appendChild(badge);
+    componentList.appendChild(row);
+  }
+}
+
+async function fetchFinalJobStatus(backendUrl: string, jobId: string, apiToken?: string) {
+  try {
+    const headers: Record<string, string> = {};
+    if (apiToken) {
+      headers['Authorization'] = `Bearer ${apiToken}`;
+    }
+    const res = await fetch(`${backendUrl}/v1/jobs/${jobId}`, { headers });
+    if (!res.ok) return;
+
+    const job: JobResponse = await res.json();
+    if (job.status === 'succeeded' && job.publishResults?.pullRequestUrl) {
+      actionArea.innerHTML = '';
+      actionArea.style.display = 'flex';
+
       const prLink = document.createElement('a');
       prLink.className = 'link-btn';
       prLink.href = job.publishResults.pullRequestUrl;
       prLink.target = '_blank';
-      prLink.textContent = 'View Created Pull Request';
+      prLink.style.background = '#18a0fb';
+      prLink.style.color = '#ffffff';
+      prLink.style.padding = '9px 14px';
+      prLink.style.fontWeight = '600';
+      prLink.textContent = 'Open Pull Request on GitHub ↗';
       actionArea.appendChild(prLink);
-    }
-  }
 
-  if (job.status === 'failed' && job.error) {
-    errorArea.textContent = `[${job.error.stage}] ${job.error.message}`;
-    errorArea.style.display = 'block';
+      notifyPlugin(`PR ready: ${job.publishResults.pullRequestUrl}`);
+    }
+  } catch (e) {
+    console.error('Failed to fetch final job status:', e);
   }
 }

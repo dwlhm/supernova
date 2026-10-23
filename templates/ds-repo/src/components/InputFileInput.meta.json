@@ -1,0 +1,14 @@
+{
+  "name": "InputFileInput",
+  "group": "components",
+  "variants": {
+    "State": [
+      "Default",
+      "Disabled",
+      "Error",
+      "Filled",
+      "Focus"
+    ]
+  },
+  "totalVariants": 5
+}

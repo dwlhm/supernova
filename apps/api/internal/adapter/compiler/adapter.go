@@ -6,9 +6,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"log/slog"
-	"os/exec"
 	"strings"
 
+	"github.com/dwlhm/supernova/apps/api/internal/adapter/nodecli"
 	"github.com/dwlhm/supernova/apps/api/internal/core/domain"
 	"github.com/dwlhm/supernova/apps/api/internal/core/port/out"
 	contracts "github.com/dwlhm/supernova/packages/contracts/gen"
@@ -41,42 +41,14 @@ type compileResponse struct {
 // CLICompiler implements out.MitosisCompiler by invoking the Node.js compiler CLI.
 type CLICompiler struct {
 	cliPath string
+	sandbox nodecli.Sandbox
 }
 
 var _ out.MitosisCompiler = (*CLICompiler)(nil)
 
 // NewCLICompiler creates a new CLICompiler for the given cli.js path.
-func NewCLICompiler(cliPath string) *CLICompiler {
-	return &CLICompiler{
-		cliPath: cliPath,
-	}
-}
-
-func extractJSON(data []byte) []byte {
-	trimmed := bytes.TrimSpace(data)
-	if json.Valid(trimmed) {
-		return trimmed
-	}
-	start := bytes.IndexByte(trimmed, '{')
-	end := bytes.LastIndexByte(trimmed, '}')
-	if start != -1 && end != -1 && end > start {
-		candidate := trimmed[start : end+1]
-		if json.Valid(candidate) {
-			return candidate
-		}
-	}
-	// If there are multiple JSON-like chunks (e.g. error replacing { ... } then {"success": ...}),
-	// locate {"success" or "success" key
-	if idx := bytes.Index(trimmed, []byte(`"success"`)); idx != -1 {
-		startCandidate := bytes.LastIndexByte(trimmed[:idx], '{')
-		if startCandidate != -1 && end > startCandidate {
-			candidate := trimmed[startCandidate : end+1]
-			if json.Valid(candidate) {
-				return candidate
-			}
-		}
-	}
-	return trimmed
+func NewCLICompiler(cliPath string, sandbox nodecli.Sandbox) *CLICompiler {
+	return &CLICompiler{cliPath: cliPath, sandbox: sandbox}
 }
 
 // Compile executes the Mitosis compiler CLI passing component details via stdin.
@@ -99,7 +71,7 @@ func (c *CLICompiler) Compile(
 
 	slog.Info(fmt.Sprintf("[COMPILER-CLI] Running compiler CLI: %s for component %s", c.cliPath, componentName))
 
-	cmd := exec.CommandContext(ctx, "node", c.cliPath)
+	cmd := nodecli.Command(ctx, c.cliPath, c.sandbox)
 	cmd.Stdin = bytes.NewReader(reqBytes)
 
 	var stdoutBuf, stderrBuf bytes.Buffer
@@ -114,7 +86,7 @@ func (c *CLICompiler) Compile(
 
 	if stdoutBuf.Len() > 0 {
 		var resp compileResponse
-		if jsonErr := json.Unmarshal(extractJSON(stdoutBuf.Bytes()), &resp); jsonErr == nil {
+		if jsonErr := json.Unmarshal(nodecli.ExtractJSON(stdoutBuf.Bytes()), &resp); jsonErr == nil {
 			artifacts := make([]domain.CompiledArtifact, 0, len(resp.Artifacts))
 			for _, art := range resp.Artifacts {
 				artifacts = append(artifacts, domain.CompiledArtifact{

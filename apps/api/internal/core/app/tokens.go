@@ -127,6 +127,19 @@ func ResolveTokens(tokens []contracts.FigmaToken) []contracts.FigmaToken {
 
 		tokCopy := tok
 		tokCopy.Value = resolveValue(tok.Value, visited)
+
+		if tok.ValuesByMode != nil && len(*tok.ValuesByMode) > 0 {
+			resModes := make(map[string]any, len(*tok.ValuesByMode))
+			for mID, mVal := range *tok.ValuesByMode {
+				mVisited := make(map[string]bool)
+				if tok.Id != "" {
+					mVisited[tok.Id] = true
+				}
+				resModes[mID] = resolveValue(mVal, mVisited)
+			}
+			tokCopy.ValuesByMode = &resModes
+		}
+
 		resolved[i] = tokCopy
 	}
 
@@ -162,32 +175,105 @@ func GenerateThemeCSS(tokens []contracts.FigmaToken) string {
 	return sb.String()
 }
 
-// GenerateTokensCSS generates standard :root { ... } CSS variables for all tokens.
+// GenerateTokensCSS generates standard :root { ... } CSS variables and an optional
+// .dark { ... } block for Dark mode variables from Figma tokens.
 func GenerateTokensCSS(tokens []contracts.FigmaToken) string {
 	varMap := buildCSSVarMap(tokens)
+	darkMap := buildDarkCSSVarMap(tokens)
 
-	if len(varMap) == 0 {
+	if len(varMap) == 0 && len(darkMap) == 0 {
 		return ":root {}\n"
 	}
 
-	names := make([]string, 0, len(varMap))
-	for name := range varMap {
-		names = append(names, name)
-	}
-	sort.Strings(names)
-
 	var sb strings.Builder
-	sb.WriteString(":root {\n")
-	for _, name := range names {
-		sb.WriteString("  ")
-		sb.WriteString(name)
-		sb.WriteString(": ")
-		sb.WriteString(varMap[name])
-		sb.WriteString(";\n")
+
+	if len(varMap) > 0 {
+		names := make([]string, 0, len(varMap))
+		for name := range varMap {
+			names = append(names, name)
+		}
+		sort.Strings(names)
+
+		sb.WriteString(":root {\n")
+		for _, name := range names {
+			sb.WriteString("  ")
+			sb.WriteString(name)
+			sb.WriteString(": ")
+			sb.WriteString(varMap[name])
+			sb.WriteString(";\n")
+		}
+		sb.WriteString("}\n")
 	}
-	sb.WriteString("}\n")
+
+	if len(darkMap) > 0 {
+		if sb.Len() > 0 {
+			sb.WriteString("\n")
+		}
+		darkNames := make([]string, 0, len(darkMap))
+		for name := range darkMap {
+			darkNames = append(darkNames, name)
+		}
+		sort.Strings(darkNames)
+
+		sb.WriteString(".dark {\n")
+		for _, name := range darkNames {
+			sb.WriteString("  ")
+			sb.WriteString(name)
+			sb.WriteString(": ")
+			sb.WriteString(darkMap[name])
+			sb.WriteString(";\n")
+		}
+		sb.WriteString("}\n")
+	}
 
 	return sb.String()
+}
+
+// buildDarkCSSVarMap builds CSS variables specifically for Dark mode
+func buildDarkCSSVarMap(tokens []contracts.FigmaToken) map[string]string {
+	resolved := ResolveTokens(tokens)
+	darkMap := make(map[string]string)
+	priorities := make(map[string]int)
+
+	for _, tok := range resolved {
+		if tok.ValuesByMode == nil || len(*tok.ValuesByMode) == 0 || tok.Modes == nil {
+			continue
+		}
+
+		// Find which modeId represents Dark mode
+		var darkVal any
+		foundDark := false
+		for mID, mName := range *tok.Modes {
+			if strings.Contains(strings.ToLower(mName), "dark") {
+				if v, ok := (*tok.ValuesByMode)[mID]; ok {
+					darkVal = v
+					foundDark = true
+					break
+				}
+			}
+		}
+
+		if !foundDark {
+			continue
+		}
+
+		// Create a temporary token with dark value to evaluate CSS var & value
+		darkTok := tok
+		darkTok.Value = darkVal
+		name, val, ok := tokenToCSS(darkTok)
+		if !ok {
+			continue
+		}
+
+		prio := tokenTierPriority(darkTok)
+		if existing, seen := priorities[name]; seen && prio < existing {
+			continue
+		}
+		darkMap[name] = val
+		priorities[name] = prio
+	}
+
+	return darkMap
 }
 
 // GenerateTokensTS generates a TypeScript tokens definition file exporting a 'tokens'

@@ -48,15 +48,25 @@ func TestExtractionRequest_RoundTrip(t *testing.T) {
 						"disabled": false,
 						"label":    "Click me",
 					},
-					Node: map[string]any{
-						"type":       "FRAME",
-						"name":       "Button",
-						"layoutMode": "HORIZONTAL",
-						"fills": []any{
-							map[string]any{"type": "SOLID", "color": map[string]any{"r": 0.1, "g": 0.5, "b": 0.9}},
+					Node: contracts.FigmaSceneNode{
+						Id:   "node-1",
+						Type: "FRAME",
+						Name: "Button",
+						Layout: &contracts.FigmaLayout{
+							LayoutMode: ptr("HORIZONTAL"),
 						},
-						"children": []any{
-							map[string]any{"type": "TEXT", "characters": "Click me"},
+						Fills: &[]contracts.FigmaPaint{
+							{Type: "SOLID", Color: ptr("rgba(26, 128, 230, 1)")},
+						},
+						Children: &[]contracts.FigmaSceneNode{
+							{
+								Id:   "text-1",
+								Type: "TEXT",
+								Name: "Text",
+								Typography: &contracts.FigmaTypography{
+									Characters: ptr("Click me"),
+								},
+							},
 						},
 					},
 				},
@@ -126,7 +136,7 @@ func TestExtractionRequest_RoundTrip(t *testing.T) {
 	if *comp.Key != *origComp.Key || *comp.Description != *origComp.Description || *comp.ComponentSetName != *origComp.ComponentSetName {
 		t.Errorf("Component optional fields mismatch")
 	}
-	if comp.Node["type"] != "FRAME" || comp.Node["layoutMode"] != "HORIZONTAL" {
+	if comp.Node.Type != "FRAME" || comp.Node.Layout == nil || comp.Node.Layout.LayoutMode == nil || *comp.Node.Layout.LayoutMode != "HORIZONTAL" {
 		t.Errorf("Component.Node content mismatch: %+v", comp.Node)
 	}
 
@@ -355,18 +365,79 @@ func TestEnums(t *testing.T) {
 		}
 	}
 
-	// ComponentStatus
-	compStatuses := []contracts.ComponentStatus{
-		contracts.ComponentStatusPending,
-		contracts.ComponentStatusAuthoring,
-		contracts.ComponentStatusCompiling,
-		contracts.ComponentStatusDone,
-		contracts.ComponentStatusFailed,
+	// DiffStatus
+	diffStatuses := []contracts.DiffStatus{
+		contracts.New,
+		contracts.Changed,
+		contracts.Unchanged,
+		contracts.Removed,
 	}
-	expectedComp := []string{"pending", "authoring", "compiling", "done", "failed"}
-	for i, cs := range compStatuses {
-		if string(cs) != expectedComp[i] {
-			t.Errorf("ComponentStatus[%d]: got %q, want %q", i, cs, expectedComp[i])
+	expectedDiff := []string{"new", "changed", "unchanged", "removed"}
+	for i, ds := range diffStatuses {
+		if string(ds) != expectedDiff[i] {
+			t.Errorf("DiffStatus[%d]: got %q, want %q", i, ds, expectedDiff[i])
 		}
+	}
+}
+
+func TestSyncPlanResponse_RoundTrip(t *testing.T) {
+	plan := contracts.SyncPlanResponse{
+		SyncId:       uuid.New().String(),
+		DocumentName: "Design System",
+		CreatedAt:    time.Now().UTC(),
+		Summary: contracts.SyncSummary{
+			Total:         3,
+			New:           1,
+			Changed:       1,
+			Unchanged:     1,
+			Removed:       0,
+			TokensChanged: true,
+		},
+		Components: []contracts.ComponentDiff{
+			{
+				Name:          "Button",
+				Status:        contracts.Changed,
+				PreviousHash:  ptr("hash-old-btn"),
+				CurrentHash:   ptr("hash-new-btn"),
+				ChangeSummary: ptr("Updated border radius"),
+			},
+			{
+				Name:         "Badge",
+				Status:       contracts.Unchanged,
+				PreviousHash: ptr("hash-badge"),
+				CurrentHash:  ptr("hash-badge"),
+			},
+			{
+				Name:        "Card",
+				Status:      contracts.New,
+				CurrentHash: ptr("hash-card"),
+			},
+		},
+		Tokens: contracts.TokenDiff{
+			Changed:  true,
+			Added:    &[]string{"color.brand.accent"},
+			Modified: &[]string{"color.brand.primary"},
+			Removed:  &[]string{},
+		},
+	}
+
+	data, err := json.Marshal(plan)
+	if err != nil {
+		t.Fatalf("failed to marshal SyncPlanResponse: %v", err)
+	}
+
+	var parsed contracts.SyncPlanResponse
+	if err := json.Unmarshal(data, &parsed); err != nil {
+		t.Fatalf("failed to unmarshal SyncPlanResponse: %v", err)
+	}
+
+	if parsed.SyncId != plan.SyncId || parsed.Summary.Total != 3 || !parsed.Summary.TokensChanged {
+		t.Errorf("mismatch in parsed SyncPlanResponse: %+v", parsed)
+	}
+	if len(parsed.Components) != 3 {
+		t.Fatalf("expected 3 component diffs, got %d", len(parsed.Components))
+	}
+	if parsed.Components[0].Status != contracts.Changed {
+		t.Errorf("expected status 'changed', got %s", parsed.Components[0].Status)
 	}
 }

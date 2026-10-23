@@ -1,0 +1,21 @@
+{
+  "name": "BubbleChat",
+  "group": "components",
+  "variants": {
+    "Direction": [
+      "Incoming",
+      "Outgoing"
+    ],
+    "State": [
+      "Default",
+      "Error"
+    ],
+    "Type": [
+      "File",
+      "Image",
+      "Text",
+      "Video"
+    ]
+  },
+  "totalVariants": 16
+}

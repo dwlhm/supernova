@@ -26,7 +26,7 @@ Submits an extracted Figma document payload for asynchronous component authoring
 
 **Headers:**
 - `Content-Type: application/json`
-- `Authorization: Bearer <token>` (required if `API_TOKEN` is configured)
+- `Authorization: Bearer <token>` (required; auth can only be disabled locally with `SUPERNOVA_INSECURE_NO_AUTH=true`)
 
 **Request Body:**
 ```json

@@ -1,0 +1,12 @@
+{
+  "name": "MenuItem",
+  "group": "components",
+  "variants": {
+    "State": [
+      "Active",
+      "Default",
+      "Hover"
+    ]
+  },
+  "totalVariants": 3
+}

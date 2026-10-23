@@ -22,6 +22,10 @@ Brand content — Slot for product or workspace identity.
 Navigation content — Slot for the main navigation menu.
 Account content — Slot for user and account controls.
 
+## Live Preview
+
+<FrameworkPreview name="Sidebar" />
+
 ## Usage
 
 ::: code-group

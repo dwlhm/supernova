@@ -25,6 +25,10 @@ PROPERTIES
 • File name — Selected-image name.
 • File metadata — Dimensions, size, or upload status.
 
+## Live Preview
+
+<FrameworkPreview name="InputImageUploader" />
+
 ## Usage
 
 ::: code-group

@@ -1,0 +1,20 @@
+{
+  "name": "RadioButton",
+  "group": "components",
+  "variants": {
+    "Disabled": [
+      "false",
+      "true"
+    ],
+    "Size": [
+      "Large",
+      "Medium",
+      "Small"
+    ],
+    "State": [
+      "off",
+      "on"
+    ]
+  },
+  "totalVariants": 12
+}

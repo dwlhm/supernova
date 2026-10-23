@@ -17,6 +17,10 @@ Do not use it for an editable boolean data field.
 Properties
 Checkbox state — Configure the nested checkbox instance.
 
+## Live Preview
+
+<FrameworkPreview name="TableCheckboxBodyCell" />
+
 ## Usage
 
 ::: code-group

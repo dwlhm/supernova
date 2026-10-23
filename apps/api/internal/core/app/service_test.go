@@ -19,19 +19,10 @@ import (
 	contracts "github.com/dwlhm/supernova/packages/contracts/gen"
 )
 
-func TestMain(m *testing.M) {
-	tmpDir, err := os.MkdirTemp("", "supernova-extractions-test-*")
-	if err == nil {
-		_ = os.Setenv("EXTRACTIONS_DIR", tmpDir)
-		defer os.RemoveAll(tmpDir)
-	}
-	tmpDocs, err := os.MkdirTemp("", "supernova-docs-test-*")
-	if err == nil {
-		_ = os.MkdirAll(filepath.Join(tmpDocs, ".vitepress"), 0755)
-		_ = os.Setenv("APPS_DOCS_DIR", tmpDocs)
-		defer os.RemoveAll(tmpDocs)
-	}
-	os.Exit(m.Run())
+// testPaths isolates every filesystem side effect of the service in per-test temp dirs.
+func testPaths(t *testing.T) app.Paths {
+	t.Helper()
+	return app.Paths{ExtractionsDir: t.TempDir(), DocsDir: t.TempDir(), GeneratedDir: ""}
 }
 
 type mockAuthor struct {
@@ -163,6 +154,12 @@ func (m *mockPublisherWithComponentInfo) GetExistingComponentInfo(ctx context.Co
 	return m.names, m.workspaceDir, cleanup, nil
 }
 
+func (m *mockPublisherWithComponentInfo) CleanedUp() bool {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	return m.cleanedUp
+}
+
 func waitForJob(t *testing.T, svc *app.Service, jobID string, timeout time.Duration) *domain.Job {
 	t.Helper()
 	deadline := time.Now().Add(timeout)
@@ -180,15 +177,8 @@ func waitForJob(t *testing.T, svc *app.Service, jobID string, timeout time.Durat
 func TestService_SubmitAndProcess_HappyPath(t *testing.T) {
 	store := memstore.New()
 	author := &mockAuthor{source: "export default function Button() { return <button /> }"}
-	compiler := &mockCompiler{
-		defaultResp: compileResult{
-			artifacts: []domain.CompiledArtifact{
-				{Target: contracts.React, FileName: "Button.tsx", Code: "export const Button = () => <button />"},
-			},
-		},
-	}
 	pub := &mockPublisher{name: "download"}
-	svc := app.NewService(store, author, compiler, []out.ArtifactPublisher{pub})
+	svc := app.NewService(store, author, []out.ArtifactPublisher{pub}, testPaths(t))
 
 	req := contracts.ExtractionRequest{
 		Document: contracts.FigmaDocument{
@@ -307,9 +297,8 @@ func TestService_RepairLoop_SuccessOnRetry(t *testing.T) {
 			},
 		},
 	}
-	compiler := &mockCompiler{}
 	pub := &mockPublisher{name: "download"}
-	svc := app.NewService(store, author, compiler, []out.ArtifactPublisher{pub})
+	svc := app.NewService(store, author, []out.ArtifactPublisher{pub}, testPaths(t))
 
 	req := contracts.ExtractionRequest{
 		Document: contracts.FigmaDocument{
@@ -352,8 +341,7 @@ func TestService_RepairLoop_ExceedsMaxRetries(t *testing.T) {
 	author := &mockAuthor{
 		err: errors.New("Fatal LLM authoring error"),
 	}
-	compiler := &mockCompiler{}
-	svc := app.NewService(store, author, compiler, nil)
+	svc := app.NewService(store, author, nil, testPaths(t))
 
 	req := contracts.ExtractionRequest{
 		Document: contracts.FigmaDocument{
@@ -379,14 +367,14 @@ func TestService_RepairLoop_ExceedsMaxRetries(t *testing.T) {
 	if job.Components[0].StageError == nil || job.Components[0].StageError.Stage != "authoring" {
 		t.Fatalf("expected authoring stage error, got %+v", job.Components[0].StageError)
 	}
-	if author.calls != 1 {
-		t.Fatalf("expected 1 author call, got %d", author.calls)
+	if author.calls != 3 {
+		t.Fatalf("expected 3 author calls (1 initial + 2 retries), got %d", author.calls)
 	}
 }
 
 func TestService_SubmitExtraction_EmptyComponents(t *testing.T) {
 	store := memstore.New()
-	svc := app.NewService(store, &mockAuthor{}, &mockCompiler{}, nil)
+	svc := app.NewService(store, &mockAuthor{}, nil, testPaths(t))
 
 	req := contracts.ExtractionRequest{
 		Document: contracts.FigmaDocument{
@@ -403,7 +391,7 @@ func TestService_SubmitExtraction_EmptyComponents(t *testing.T) {
 
 func TestService_GetJob_NotFound(t *testing.T) {
 	store := memstore.New()
-	svc := app.NewService(store, &mockAuthor{}, &mockCompiler{}, nil)
+	svc := app.NewService(store, &mockAuthor{}, nil, testPaths(t))
 
 	_, err := svc.GetJob(context.Background(), "non-existent-id")
 	if !errors.Is(err, domain.ErrJobNotFound) {
@@ -413,7 +401,7 @@ func TestService_GetJob_NotFound(t *testing.T) {
 
 func TestService_GetDownloadZip(t *testing.T) {
 	store := memstore.New()
-	svc := app.NewService(store, &mockAuthor{}, &mockCompiler{}, nil)
+	svc := app.NewService(store, &mockAuthor{}, nil, testPaths(t))
 
 	_, err := svc.GetDownloadZip(context.Background(), "job-1")
 	if !errors.Is(err, domain.ErrJobNotFound) {
@@ -450,13 +438,12 @@ func TestService_GetDownloadZip(t *testing.T) {
 func TestService_IncrementalAuthoring_WithBatchExistingSources(t *testing.T) {
 	store := memstore.New()
 	author := &mockAuthor{source: "export default function Button() { return <button>Updated</button> }"}
-	compiler := &mockCompiler{}
 	pub := &mockPublisherWithComponentInfo{
 		mockPublisher: mockPublisher{name: string(contracts.PullRequest)},
 		names:         []string{"Button"},
 		workspaceDir:  "/tmp/workspace-clone",
 	}
-	svc := app.NewService(store, author, compiler, []out.ArtifactPublisher{pub})
+	svc := app.NewService(store, author, []out.ArtifactPublisher{pub}, testPaths(t))
 
 	req := contracts.ExtractionRequest{
 		Document: contracts.FigmaDocument{
@@ -480,7 +467,7 @@ func TestService_IncrementalAuthoring_WithBatchExistingSources(t *testing.T) {
 	if pub.calls != 1 {
 		t.Fatalf("expected 1 call with existing component info, got %d", pub.calls)
 	}
-	if !pub.cleanedUp {
+	if !pub.CleanedUp() {
 		t.Errorf("expected cleanup() to have been called")
 	}
 	if len(author.requests) != 1 {
@@ -497,13 +484,12 @@ func TestService_IncrementalAuthoring_WithBatchExistingSources(t *testing.T) {
 func TestService_IncrementalAuthoring_PrefersBatchOverIndividual(t *testing.T) {
 	store := memstore.New()
 	author := &mockAuthor{source: "export default function Button() { return <button>Updated</button> }"}
-	compiler := &mockCompiler{}
 	pub := &mockPublisherWithComponentInfo{
 		mockPublisher: mockPublisher{name: string(contracts.PullRequest)},
 		names:         []string{"Button"},
 		workspaceDir:  "/tmp/repo",
 	}
-	svc := app.NewService(store, author, compiler, []out.ArtifactPublisher{pub})
+	svc := app.NewService(store, author, []out.ArtifactPublisher{pub}, testPaths(t))
 
 	req := contracts.ExtractionRequest{
 		Document: contracts.FigmaDocument{
@@ -535,13 +521,12 @@ func TestService_IncrementalAuthoring_PrefersBatchOverIndividual(t *testing.T) {
 func TestService_IncrementalAuthoring_WithExistingSource(t *testing.T) {
 	store := memstore.New()
 	author := &mockAuthor{source: "export default function Button() { return <button>Updated</button> }"}
-	compiler := &mockCompiler{}
 	pub := &mockPublisherWithComponentInfo{
 		mockPublisher: mockPublisher{name: string(contracts.PullRequest)},
 		names:         []string{"Button"},
 		workspaceDir:  "/tmp/existing-dir",
 	}
-	svc := app.NewService(store, author, compiler, []out.ArtifactPublisher{pub})
+	svc := app.NewService(store, author, []out.ArtifactPublisher{pub}, testPaths(t))
 
 	req := contracts.ExtractionRequest{
 		Document: contracts.FigmaDocument{
@@ -589,8 +574,7 @@ func TestService_TokenDiscovery_MergedIntoCatalog(t *testing.T) {
 		source:    "export default function Button() { return <button /> }",
 		newTokens: discoveredTokens,
 	}
-	compiler := &mockCompiler{}
-	svc := app.NewService(store, author, compiler, nil)
+	svc := app.NewService(store, author, nil, testPaths(t))
 
 	req := contracts.ExtractionRequest{
 		Document: contracts.FigmaDocument{
@@ -686,9 +670,8 @@ func TestService_ConcurrentComponentProcessing(t *testing.T) {
 			return &out.AuthorResult{Components: comps}, nil
 		},
 	}
-	compiler := &mockCompiler{}
 	pub := &mockPublisher{name: "download"}
-	svc := app.NewService(store, author, compiler, []out.ArtifactPublisher{pub})
+	svc := app.NewService(store, author, []out.ArtifactPublisher{pub}, testPaths(t))
 
 	componentNames := []string{"Avatar", "Alert", "Button"}
 	specs := make([]contracts.FigmaComponentSpec, len(componentNames))
@@ -752,8 +735,7 @@ func TestService_ConcurrentComponentProcessing_BoundedConcurrencyLimit(t *testin
 	author := &mockAuthor{
 		source: "export default function Comp() { return <div /> }",
 	}
-	compiler := &mockCompiler{}
-	svc := app.NewService(store, author, compiler, nil)
+	svc := app.NewService(store, author, nil, testPaths(t))
 
 	compNames := []string{"Avatar", "Alert", "Button", "Card", "Badge", "Modal"}
 	specs := make([]contracts.FigmaComponentSpec, len(compNames))
@@ -805,9 +787,8 @@ func TestService_BatchAuthoring_HappyPath(t *testing.T) {
 		},
 	}
 
-	compiler := &mockCompiler{}
 	pub := &mockPublisher{name: "download"}
-	svc := app.NewService(store, author, compiler, []out.ArtifactPublisher{pub})
+	svc := app.NewService(store, author, []out.ArtifactPublisher{pub}, testPaths(t))
 
 	specs := []contracts.FigmaComponentSpec{
 		{Id: "comp-1", Name: "Avatar"},
@@ -835,8 +816,8 @@ func TestService_BatchAuthoring_HappyPath(t *testing.T) {
 		t.Fatalf("expected succeeded, got %v", job.Status)
 	}
 
-	if author.calls != 1 {
-		t.Fatalf("expected 1 author call, got %d", author.calls)
+	if author.calls != 3 {
+		t.Fatalf("expected 3 author calls (1 per component), got %d", author.calls)
 	}
 
 	// Verify all components done
@@ -888,8 +869,7 @@ func TestService_BatchAuthoring_PartialFailure_RepairLoop(t *testing.T) {
 		err: errors.New("author agent execution failed"),
 	}
 
-	compiler := &mockCompiler{}
-	svc := app.NewService(store, author, compiler, nil)
+	svc := app.NewService(store, author, nil, testPaths(t))
 
 	req := contracts.ExtractionRequest{
 		Document: contracts.FigmaDocument{
@@ -921,8 +901,7 @@ func TestService_BatchAuthoring_FallbackToIndividualOnBatchError(t *testing.T) {
 	author := &mockAuthor{
 		err: errors.New("LLM endpoint unavailable (400 Bad Request)"),
 	}
-	compiler := &mockCompiler{}
-	svc := app.NewService(store, author, compiler, nil)
+	svc := app.NewService(store, author, nil, testPaths(t))
 
 	req := contracts.ExtractionRequest{
 		Document: contracts.FigmaDocument{
@@ -948,8 +927,7 @@ func TestService_BatchAuthoring_FallbackToIndividualOnBatchError(t *testing.T) {
 func TestService_DefaultTargets_Mitosis(t *testing.T) {
 	store := memstore.New()
 	author := &mockAuthor{source: "export default function Button() { return <button /> }"}
-	compiler := &mockCompiler{}
-	svc := app.NewService(store, author, compiler, nil)
+	svc := app.NewService(store, author, nil, testPaths(t))
 
 	req := contracts.ExtractionRequest{
 		Document: contracts.FigmaDocument{
@@ -975,15 +953,14 @@ func TestService_DefaultTargets_Mitosis(t *testing.T) {
 	}
 }
 
-func TestService_SkipBatchAuthoring_WhenMoreThanFourComponents(t *testing.T) {
+func TestService_WorkerPool_SingleComponentTaskPerAuthorCall(t *testing.T) {
 	store := memstore.New()
 	author := &mockAuthor{}
-	compiler := &mockCompiler{}
-	svc := app.NewService(store, author, compiler, nil)
+	svc := app.NewService(store, author, nil, testPaths(t))
 
 	req := contracts.ExtractionRequest{
 		Document: contracts.FigmaDocument{
-			Name: "Holistic Authoring Test",
+			Name: "Worker Pool Task Test",
 			Components: []contracts.FigmaComponentSpec{
 				{Id: "c-1", Name: "Button"},
 				{Id: "c-2", Name: "Card"},
@@ -1004,12 +981,14 @@ func TestService_SkipBatchAuthoring_WhenMoreThanFourComponents(t *testing.T) {
 		t.Fatalf("expected job succeeded, got %v", job.Status)
 	}
 
-	// In the holistic architecture, all 5 components are handled in 1 AuthorDesignSystem call
-	if author.calls != 1 {
-		t.Errorf("expected exactly 1 holistic author call, got %d", author.calls)
+	// In the worker pool architecture, 5 components are handled in 5 separate AuthorDesignSystem calls
+	if author.calls != 5 {
+		t.Errorf("expected exactly 5 author calls (1 per component), got %d", author.calls)
 	}
-	if len(author.requests) != 1 || len(author.requests[0].Components) != 5 {
-		t.Errorf("expected 5 components in author request, got %+v", author.requests)
+	for _, req := range author.requests {
+		if len(req.Components) != 1 {
+			t.Errorf("expected 1 component per author request, got %d", len(req.Components))
+		}
 	}
 }
 
@@ -1028,8 +1007,7 @@ func TestService_ComponentGrouping_IconsAndComponents(t *testing.T) {
 			},
 		},
 	}
-	compiler := &mockCompiler{}
-	svc := app.NewService(store, author, compiler, nil)
+	svc := app.NewService(store, author, nil, testPaths(t))
 
 	req := contracts.ExtractionRequest{
 		Document: contracts.FigmaDocument{
@@ -1118,8 +1096,7 @@ func TestService_ComponentGrouping_BatchAuthoring(t *testing.T) {
 			},
 		},
 	}
-	compiler := &mockCompiler{}
-	svc := app.NewService(store, author, compiler, nil)
+	svc := app.NewService(store, author, nil, testPaths(t))
 
 	req := contracts.ExtractionRequest{
 		Document: contracts.FigmaDocument{
@@ -1199,11 +1176,11 @@ func TestGenerateUtilsTS(t *testing.T) {
 		}
 	}
 
-	// Verify exact match with generated/components/src/components/utils.ts
+	// Verify exact match with templates/ds-repo/src/components/utils.ts
 	for _, p := range []string{
-		"../../../../generated/components/src/components/utils.ts",
-		"../../../generated/components/src/components/utils.ts",
-		"generated/components/src/components/utils.ts",
+		"../../../../templates/ds-repo/src/components/utils.ts",
+		"../../../templates/ds-repo/src/components/utils.ts",
+		"templates/ds-repo/src/components/utils.ts",
 	} {
 		if data, err := os.ReadFile(p); err == nil {
 			if string(data) != code {
@@ -1234,8 +1211,7 @@ func TestService_DeterministicDeduplication_UtilsTS(t *testing.T) {
 			},
 		},
 	}
-	compiler := &mockCompiler{}
-	svc := app.NewService(store, author, compiler, nil)
+	svc := app.NewService(store, author, nil, testPaths(t))
 
 	req := contracts.ExtractionRequest{
 		Document: contracts.FigmaDocument{
@@ -1269,13 +1245,11 @@ func TestService_DeterministicDeduplication_UtilsTS(t *testing.T) {
 
 func TestService_SubmitExtraction_PersistsPayload(t *testing.T) {
 	tempDir := t.TempDir()
-	t.Setenv("EXTRACTIONS_DIR", tempDir)
 
 	store := memstore.New()
 	author := &mockAuthor{}
-	compiler := &mockCompiler{}
 	pub := &mockPublisher{}
-	svc := app.NewService(store, author, compiler, []out.ArtifactPublisher{pub})
+	svc := app.NewService(store, author, []out.ArtifactPublisher{pub}, app.Paths{ExtractionsDir: tempDir})
 
 	req := contracts.ExtractionRequest{
 		Document: contracts.FigmaDocument{
@@ -1284,7 +1258,7 @@ func TestService_SubmitExtraction_PersistsPayload(t *testing.T) {
 				{
 					Id:   "c1",
 					Name: "Button",
-					Node: map[string]interface{}{"type": "COMPONENT"},
+					Node: contracts.FigmaSceneNode{Id: "c1", Name: "Button", Type: "COMPONENT"},
 				},
 			},
 		},
@@ -1326,13 +1300,11 @@ func TestService_SubmitExtraction_PersistsPayload(t *testing.T) {
 
 func TestService_ReplayExtraction(t *testing.T) {
 	tempDir := t.TempDir()
-	t.Setenv("EXTRACTIONS_DIR", tempDir)
 
 	store := memstore.New()
 	author := &mockAuthor{}
-	compiler := &mockCompiler{}
 	pub := &mockPublisher{}
-	svc := app.NewService(store, author, compiler, []out.ArtifactPublisher{pub})
+	svc := app.NewService(store, author, []out.ArtifactPublisher{pub}, app.Paths{ExtractionsDir: tempDir})
 
 	req := contracts.ExtractionRequest{
 		Document: contracts.FigmaDocument{
@@ -1341,7 +1313,7 @@ func TestService_ReplayExtraction(t *testing.T) {
 				{
 					Id:   "c1",
 					Name: "Card",
-					Node: map[string]interface{}{"type": "COMPONENT"},
+					Node: contracts.FigmaSceneNode{Id: "c1", Name: "Card", Type: "COMPONENT"},
 				},
 			},
 		},
@@ -1379,35 +1351,31 @@ func TestService_ReplayExtraction(t *testing.T) {
 		t.Errorf("expected a new job ID from replay, got %s", replayedJobID3)
 	}
 
-	// 4. Replay with direct file path
-	directPath := filepath.Join(tempDir, fmt.Sprintf("%s.json", jobID))
-	replayedJobID4, err := svc.ReplayExtraction(context.Background(), directPath)
-	if err != nil {
-		t.Fatalf("ReplayExtraction(directPath) failed: %v", err)
+	// 4. Paths and non-UUID targets are rejected before touching the filesystem.
+	outside := filepath.Join(t.TempDir(), "secret.json")
+	if err := os.WriteFile(outside, []byte(`{"document":{"name":"x","components":[{"id":"1","name":"X","node":{}}]}}`), 0o644); err != nil {
+		t.Fatal(err)
 	}
-	if replayedJobID4 == "" {
-		t.Errorf("expected valid job ID from directPath replay")
-	}
-
-	// 5. Replay non-existent job / file
-	_, err = svc.ReplayExtraction(context.Background(), "nonexistent-job-id")
-	if err == nil {
-		t.Fatalf("expected error for nonexistent job ID, got nil")
-	}
-	if !strings.Contains(err.Error(), "extraction file not found") {
-		t.Errorf("expected 'extraction file not found' error, got %v", err)
+	for _, target := range []string{
+		filepath.Join(tempDir, jobID+".json"), outside, "../" + jobID, "/etc/passwd", "nonexistent-job-id", jobID + "/../latest",
+	} {
+		if _, err := svc.ReplayExtraction(context.Background(), target); !errors.Is(err, domain.ErrInvalidPayload) {
+			t.Errorf("ReplayExtraction(%q): expected ErrInvalidPayload, got %v", target, err)
+		}
 	}
 
-	// 6. Replay invalid JSON
-	invalidFile := filepath.Join(tempDir, "invalid.json")
-	if err := os.WriteFile(invalidFile, []byte("{invalid-json"), 0644); err != nil {
+	// 5. A well-formed but unknown job ID is reported as not found.
+	if _, err := svc.ReplayExtraction(context.Background(), "00000000-0000-0000-0000-000000000000"); !errors.Is(err, domain.ErrExtractionNotFound) {
+		t.Errorf("expected ErrExtractionNotFound, got %v", err)
+	}
+
+	// 6. A corrupt persisted payload surfaces a parse error.
+	corruptID := "11111111-1111-1111-1111-111111111111"
+	if err := os.WriteFile(filepath.Join(tempDir, corruptID+".json"), []byte("{invalid-json"), 0o644); err != nil {
 		t.Fatalf("failed to write invalid JSON file: %v", err)
 	}
-	_, err = svc.ReplayExtraction(context.Background(), invalidFile)
-	if err == nil {
-		t.Fatalf("expected error for invalid JSON file, got nil")
-	}
-	if !strings.Contains(err.Error(), "failed to parse persisted extraction payload") {
+	_, err = svc.ReplayExtraction(context.Background(), corruptID)
+	if err == nil || !strings.Contains(err.Error(), "failed to parse persisted extraction payload") {
 		t.Errorf("expected payload parse error, got %v", err)
 	}
 }
@@ -1415,7 +1383,6 @@ func TestService_ReplayExtraction(t *testing.T) {
 func TestService_DocsSync_WithFrameworkArtifacts(t *testing.T) {
 	tempDocs := t.TempDir()
 	_ = os.MkdirAll(filepath.Join(tempDocs, ".vitepress"), 0755)
-	t.Setenv("APPS_DOCS_DIR", tempDocs)
 
 	store := memstore.New()
 	author := &mockAuthor{
@@ -1434,9 +1401,8 @@ func TestService_DocsSync_WithFrameworkArtifacts(t *testing.T) {
 			},
 		},
 	}
-	compiler := &mockCompiler{}
 	pub := &mockPublisher{name: "download"}
-	svc := app.NewService(store, author, compiler, []out.ArtifactPublisher{pub})
+	svc := app.NewService(store, author, []out.ArtifactPublisher{pub}, app.Paths{ExtractionsDir: t.TempDir(), DocsDir: tempDocs})
 
 	btnDesc := "Button component"
 	cardDesc := "Card component"
@@ -1556,4 +1522,278 @@ func TestService_DocsSync_WithFrameworkArtifacts(t *testing.T) {
 	if !strings.Contains(regStr, "svelte: () => import('./svelte/Button.svelte')") {
 		t.Errorf("expected svelte loader for Button")
 	}
+}
+
+func TestService_WorkerPool_IsolatedComponentFailure_AndSSE(t *testing.T) {
+	store := memstore.New()
+	author := &mockAuthor{
+		authorFn: func(ctx context.Context, req out.AuthorRequest) (*out.AuthorResult, error) {
+			if len(req.Components) == 0 {
+				return nil, errors.New("empty components")
+			}
+			compName := domain.NormalizeComponentName(req.Components[0].Name)
+			if compName == "BrokenInput" {
+				return nil, errors.New("LLM syntax error in BrokenInput")
+			}
+			return &out.AuthorResult{
+				Components: map[string]string{
+					compName: fmt.Sprintf("export default function %s() { return <div>%s</div>; }", compName, compName),
+				},
+				Artifacts: []domain.CompiledArtifact{
+					{
+						Target:   contracts.Mitosis,
+						FileName: compName + ".lite.tsx",
+						Code:     fmt.Sprintf("export default function %s() { return <div>%s</div>; }", compName, compName),
+						Group:    "components",
+					},
+				},
+			}, nil
+		},
+	}
+	pub := &mockPublisher{name: "download"}
+	svc := app.NewService(store, author, []out.ArtifactPublisher{pub}, testPaths(t))
+	svc.SetMaxRetries(1) // 1 initial + 1 retry
+
+	req := contracts.ExtractionRequest{
+		Document: contracts.FigmaDocument{
+			Name: "Isolated Failure DS",
+			Components: []contracts.FigmaComponentSpec{
+				{Id: "c-1", Name: "Button"},
+				{Id: "c-2", Name: "BrokenInput"},
+				{Id: "c-3", Name: "Badge"},
+			},
+		},
+	}
+
+	jobID, err := svc.SubmitExtraction(context.Background(), req)
+	if err != nil {
+		t.Fatalf("unexpected error submitting: %v", err)
+	}
+
+	// Subscribe to SSE events
+	eventsCh, unsub, err := svc.SubscribeJobEvents(context.Background(), jobID)
+	if err != nil {
+		t.Fatalf("failed to subscribe to job events: %v", err)
+	}
+	defer unsub()
+
+	var receivedEvents []contracts.JobEvent
+	var eventsMu sync.Mutex
+	stopListening := make(chan struct{})
+	go func() {
+		for {
+			select {
+			case <-stopListening:
+				return
+			case ev, ok := <-eventsCh:
+				if !ok {
+					return
+				}
+				eventsMu.Lock()
+				receivedEvents = append(receivedEvents, ev)
+				eventsMu.Unlock()
+			}
+		}
+	}()
+
+	job := waitForJob(t, svc, jobID, 4*time.Second)
+	close(stopListening)
+
+	// Since Button and Badge succeeded, the overall job succeeded
+	if job.Status != contracts.JobStatusSucceeded {
+		t.Fatalf("expected job status succeeded, got %s", job.Status)
+	}
+
+	// Verify granular component statuses
+	compMap := make(map[string]contracts.ComponentProgress)
+	for _, c := range job.Components {
+		compMap[c.Name] = c
+	}
+
+	if compMap["Button"].Status != contracts.ComponentStatusDone {
+		t.Errorf("expected Button done, got %s", compMap["Button"].Status)
+	}
+	if compMap["Badge"].Status != contracts.ComponentStatusDone {
+		t.Errorf("expected Badge done, got %s", compMap["Badge"].Status)
+	}
+	if compMap["BrokenInput"].Status != contracts.ComponentStatusFailed {
+		t.Errorf("expected BrokenInput failed, got %s", compMap["BrokenInput"].Status)
+	}
+
+	// Verify granular tasks
+	tasks, err := store.GetTasks(context.Background(), jobID)
+	if err != nil {
+		t.Fatalf("failed to get tasks from store: %v", err)
+	}
+	taskMap := make(map[string]*domain.Task)
+	for _, tk := range tasks {
+		taskMap[tk.ComponentName] = tk
+	}
+
+	if taskMap["Button"].Status != domain.TaskReady {
+		t.Errorf("expected Button task ready, got %s", taskMap["Button"].Status)
+	}
+	if taskMap["Badge"].Status != domain.TaskReady {
+		t.Errorf("expected Badge task ready, got %s", taskMap["Badge"].Status)
+	}
+	if taskMap["BrokenInput"].Status != domain.TaskFailed {
+		t.Errorf("expected BrokenInput task failed, got %s", taskMap["BrokenInput"].Status)
+	}
+	if taskMap["BrokenInput"].AttemptCount != 2 {
+		t.Errorf("expected BrokenInput attempt count 2, got %d", taskMap["BrokenInput"].AttemptCount)
+	}
+
+	// Verify SSE events were delivered
+	eventsMu.Lock()
+	count := len(receivedEvents)
+	eventsMu.Unlock()
+	if count == 0 {
+		t.Errorf("expected to receive SSE events during execution, got 0")
+	}
+}
+
+func TestService_IncrementalSync_ZeroLLMCallsOnUnchanged(t *testing.T) {
+	ctx := context.Background()
+	store := memstore.New()
+	author := &mockAuthor{}
+	pub := &mockPublisher{name: "download"}
+	svc := app.NewService(store, author, []out.ArtifactPublisher{pub}, testPaths(t))
+
+	docName := "Incremental DS"
+	btnSpec := contracts.FigmaComponentSpec{
+		Id:   "btn-1",
+		Name: "Button",
+		Node: contracts.FigmaSceneNode{Id: "n-btn", Name: "Button", Type: "FRAME"},
+	}
+
+	author.source = "export default function Button() { return <button>Click</button>; }"
+	author.group = "components"
+
+	// 1. Initial Job: Button is brand new -> requires LLM authoring (CompileOnly = false)
+	req1 := contracts.ExtractionRequest{
+		Document: contracts.FigmaDocument{
+			Name:       docName,
+			Components: []contracts.FigmaComponentSpec{btnSpec},
+			Tokens: []contracts.FigmaToken{
+				{Id: "t1", Name: "color.primary", Type: "color", Value: "#e55514"},
+			},
+		},
+		Targets:    &[]contracts.Framework{contracts.Mitosis},
+		Publishers: &[]contracts.PublisherType{contracts.Download},
+	}
+
+	jobID1, err := svc.SubmitExtraction(ctx, req1)
+	if err != nil {
+		t.Fatalf("failed to submit extraction 1: %v", err)
+	}
+
+	// Wait for Job 1 to succeed
+	var job1 *domain.Job
+	for i := 0; i < 40; i++ {
+		time.Sleep(25 * time.Millisecond)
+		job1, _ = store.Get(ctx, jobID1)
+		if job1 != nil && job1.Status == contracts.JobStatusSucceeded {
+			break
+		}
+	}
+	if job1 == nil || job1.Status != contracts.JobStatusSucceeded {
+		t.Fatalf("job 1 failed to succeed in time: %+v", job1)
+	}
+
+	// Verify Job 1 called author in generative mode (CompileOnly = false)
+	author.mu.Lock()
+	if len(author.requests) != 1 {
+		t.Fatalf("expected 1 author request for job 1, got %d", len(author.requests))
+	}
+	if author.requests[0].CompileOnly {
+		t.Errorf("expected job 1 to NOT be compileOnly")
+	}
+	author.mu.Unlock()
+
+	// Verify snapshot persisted
+	snap, err := store.GetComponentSnapshot(ctx, docName, "Button")
+	if err != nil {
+		t.Fatalf("failed to get component snapshot for Button: %v", err)
+	}
+	if snap.SourceCode == "" {
+		t.Fatalf("expected non-empty snapshot source code")
+	}
+
+	// 2. Second Job: Identical Button spec -> UNCHANGED!
+	// Must compile existing source directly (CompileOnly = true, 0 LLM authoring calls!)
+	author.mu.Lock()
+	author.requests = nil // reset requests
+	author.mu.Unlock()
+
+	jobID2, err := svc.SubmitExtraction(ctx, req1)
+	if err != nil {
+		t.Fatalf("failed to submit extraction 2: %v", err)
+	}
+
+	var job2 *domain.Job
+	for i := 0; i < 40; i++ {
+		time.Sleep(25 * time.Millisecond)
+		job2, _ = store.Get(ctx, jobID2)
+		if job2 != nil && job2.Status == contracts.JobStatusSucceeded {
+			break
+		}
+	}
+	if job2 == nil || job2.Status != contracts.JobStatusSucceeded {
+		t.Fatalf("job 2 failed to succeed in time: %+v", job2)
+	}
+
+	author.mu.Lock()
+	if len(author.requests) != 1 {
+		t.Fatalf("expected 1 author request for job 2, got %d", len(author.requests))
+	}
+	if !author.requests[0].CompileOnly {
+		t.Errorf("expected job 2 to run in CompileOnly mode (0 LLM authoring), but CompileOnly was false")
+	}
+	if author.requests[0].ExistingSource != snap.SourceCode {
+		t.Errorf("expected job 2 to pass existing source code to compiler")
+	}
+	author.mu.Unlock()
+
+	// 3. Third Job: Modified Button spec -> CHANGED!
+	// Must pass ExistingSource to LLM authoring (CompileOnly = false)
+	modBtnSpec := btnSpec
+	desc := "Updated button with new radius"
+	modBtnSpec.Description = &desc
+
+	req3 := req1
+	req3.Document.Components = []contracts.FigmaComponentSpec{modBtnSpec}
+
+	author.mu.Lock()
+	author.requests = nil
+	author.source = "export default function Button() { return <button className=\"rounded-lg\">Click</button>; }"
+	author.mu.Unlock()
+
+	jobID3, err := svc.SubmitExtraction(ctx, req3)
+	if err != nil {
+		t.Fatalf("failed to submit extraction 3: %v", err)
+	}
+
+	var job3 *domain.Job
+	for i := 0; i < 40; i++ {
+		time.Sleep(25 * time.Millisecond)
+		job3, _ = store.Get(ctx, jobID3)
+		if job3 != nil && job3.Status == contracts.JobStatusSucceeded {
+			break
+		}
+	}
+	if job3 == nil || job3.Status != contracts.JobStatusSucceeded {
+		t.Fatalf("job 3 failed to succeed in time: %+v", job3)
+	}
+
+	author.mu.Lock()
+	if len(author.requests) != 1 {
+		t.Fatalf("expected 1 author request for job 3, got %d", len(author.requests))
+	}
+	if author.requests[0].CompileOnly {
+		t.Errorf("expected job 3 to NOT be compileOnly (it was modified and needs LLM authoring)")
+	}
+	if author.requests[0].ExistingSource != snap.SourceCode {
+		t.Errorf("expected job 3 to pass existing source code context to LLM authoring")
+	}
+	author.mu.Unlock()
 }

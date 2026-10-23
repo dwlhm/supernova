@@ -1,0 +1,11 @@
+{
+  "name": "Table",
+  "group": "components",
+  "variants": {
+    "State": [
+      "Default",
+      "Empty"
+    ]
+  },
+  "totalVariants": 2
+}

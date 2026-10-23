@@ -19,6 +19,10 @@ Properties
 • Size — Small: compact layouts; Medium: standard interfaces; Large: prominent or touch-focused layouts.
 • Show Text — Shows or hides the accompanying text label.
 
+## Live Preview
+
+<FrameworkPreview name="Toggle" />
+
 ## Usage
 
 ::: code-group

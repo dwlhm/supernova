@@ -211,3 +211,12 @@ describe('generateNamespaceIndex', () => {
     assert.deepStrictEqual(complex1, complex2);
   });
 });
+
+describe('generateNamespaceIndex name validation', () => {
+  it('refuses names that would inject code into index.ts', () => {
+    assert.throws(
+      () => generateNamespaceIndex(['Button', "X'; import('evil"], 'react'),
+      /invalid component names/
+    );
+  });
+});

@@ -16,6 +16,10 @@ Use consistently with the table's Show No option.
 Properties
 No exposed properties.
 
+## Live Preview
+
+<FrameworkPreview name="TableNoHeaderCell" />
+
 ## Usage
 
 ::: code-group

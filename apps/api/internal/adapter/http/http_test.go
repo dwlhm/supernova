@@ -4,10 +4,11 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
-	"os"
 	"testing"
+	"time"
 
 	httpadapter "github.com/dwlhm/supernova/apps/api/internal/adapter/http"
 	"github.com/dwlhm/supernova/apps/api/internal/adapter/memstore"
@@ -17,15 +18,6 @@ import (
 	"github.com/dwlhm/supernova/apps/api/internal/core/port/out"
 	contracts "github.com/dwlhm/supernova/packages/contracts/gen"
 )
-
-func TestMain(m *testing.M) {
-	tmpDir, err := os.MkdirTemp("", "supernova-extractions-http-test-*")
-	if err == nil {
-		_ = os.Setenv("EXTRACTIONS_DIR", tmpDir)
-		defer os.RemoveAll(tmpDir)
-	}
-	os.Exit(m.Run())
-}
 
 type mockAuthor struct{}
 
@@ -61,18 +53,18 @@ func (m *mockCompiler) Compile(ctx context.Context, compName string, src string,
 	}, nil, nil
 }
 
-func setupTestServer() (http.Handler, *memstore.MemoryStore) {
+func setupTestServer(t *testing.T) (http.Handler, *memstore.MemoryStore) {
+	t.Helper()
 	store := memstore.New()
 	author := &mockAuthor{}
-	comp := &mockCompiler{}
 	downloadPub := download.NewPublisher(store)
-	svc := app.NewService(store, author, comp, []out.ArtifactPublisher{downloadPub})
+	svc := app.NewService(store, author, []out.ArtifactPublisher{downloadPub}, app.Paths{ExtractionsDir: t.TempDir()})
 	router := httpadapter.NewRouter(svc, "secret-token")
 	return router, store
 }
 
 func TestHealthEndpoint(t *testing.T) {
-	router, _ := setupTestServer()
+	router, _ := setupTestServer(t)
 
 	req := httptest.NewRequest(http.MethodGet, "/v1/health", nil)
 	rec := httptest.NewRecorder()
@@ -93,7 +85,7 @@ func TestHealthEndpoint(t *testing.T) {
 }
 
 func TestAuthMiddleware(t *testing.T) {
-	router, _ := setupTestServer()
+	router, _ := setupTestServer(t)
 
 	// Missing auth header
 	req := httptest.NewRequest(http.MethodPost, "/v1/extractions", bytes.NewReader([]byte("{}")))
@@ -114,7 +106,7 @@ func TestAuthMiddleware(t *testing.T) {
 }
 
 func TestSubmitAndGetJob(t *testing.T) {
-	router, store := setupTestServer()
+	router, store := setupTestServer(t)
 
 	extractReq := contracts.ExtractionRequest{
 		Document: contracts.FigmaDocument{
@@ -123,7 +115,7 @@ func TestSubmitAndGetJob(t *testing.T) {
 				{
 					Id:   "comp-1",
 					Name: "Button",
-					Node: map[string]interface{}{"type": "COMPONENT"},
+					Node: contracts.FigmaSceneNode{Id: "comp-1", Name: "Button", Type: "COMPONENT"},
 				},
 			},
 		},
@@ -190,7 +182,7 @@ func TestSubmitAndGetJob(t *testing.T) {
 }
 
 func TestCORSPreflight(t *testing.T) {
-	router, _ := setupTestServer()
+	router, _ := setupTestServer(t)
 
 	req := httptest.NewRequest(http.MethodOptions, "/v1/extractions", nil)
 	rec := httptest.NewRecorder()
@@ -205,10 +197,7 @@ func TestCORSPreflight(t *testing.T) {
 }
 
 func TestReplayExtractionEndpoint(t *testing.T) {
-	tempDir := t.TempDir()
-	t.Setenv("EXTRACTIONS_DIR", tempDir)
-
-	router, _ := setupTestServer()
+	router, _ := setupTestServer(t)
 
 	// 1. Replay when no extraction exists returns 404
 	replayReq := httptest.NewRequest(http.MethodPost, "/v1/extractions/replay", bytes.NewReader([]byte("{}")))
@@ -228,7 +217,7 @@ func TestReplayExtractionEndpoint(t *testing.T) {
 				{
 					Id:   "comp-1",
 					Name: "Button",
-					Node: map[string]interface{}{"type": "COMPONENT"},
+					Node: contracts.FigmaSceneNode{Id: "comp-1", Name: "Button", Type: "COMPONENT"},
 				},
 			},
 		},
@@ -279,15 +268,21 @@ func TestReplayExtractionEndpoint(t *testing.T) {
 		t.Fatalf("expected 202 Accepted on replay by jobId, got %d (body: %s)", replayByIDRec.Code, replayByIDRec.Body.String())
 	}
 
-	// 5. Replay with nonexistent JobID -> 404 Not Found
-	nonexistentPayload, _ := json.Marshal(map[string]string{"jobId": "unknown-job-id"})
-	nonexistentReq := httptest.NewRequest(http.MethodPost, "/v1/extractions/replay", bytes.NewReader(nonexistentPayload))
-	nonexistentReq.Header.Set("Authorization", "Bearer secret-token")
-	nonexistentRec := httptest.NewRecorder()
-	router.ServeHTTP(nonexistentRec, nonexistentReq)
-
-	if nonexistentRec.Code != http.StatusNotFound {
-		t.Fatalf("expected 404 Not Found for nonexistent jobId, got %d", nonexistentRec.Code)
+	// 5. Unknown but well-formed job ID -> 404; paths, non-UUIDs and malformed JSON -> 400
+	for body, want := range map[string]int{
+		`{"jobId":"00000000-0000-0000-0000-000000000000"}`: http.StatusNotFound,
+		`{"jobId":"unknown-job-id"}`:                       http.StatusBadRequest,
+		`{"jobId":"../../.env.json"}`:                      http.StatusBadRequest,
+		`{"jobId":"/etc/passwd"}`:                          http.StatusBadRequest,
+		`{"jobId":`:                                        http.StatusBadRequest,
+	} {
+		req := httptest.NewRequest(http.MethodPost, "/v1/extractions/replay", bytes.NewReader([]byte(body)))
+		req.Header.Set("Authorization", "Bearer secret-token")
+		rec := httptest.NewRecorder()
+		router.ServeHTTP(rec, req)
+		if rec.Code != want {
+			t.Errorf("replay %s: expected %d, got %d (body: %s)", body, want, rec.Code, rec.Body.String())
+		}
 	}
 
 	// 6. Method not allowed for GET /v1/extractions/replay
@@ -298,5 +293,261 @@ func TestReplayExtractionEndpoint(t *testing.T) {
 
 	if getReplayRec.Code != http.StatusMethodNotAllowed {
 		t.Fatalf("expected 405 Method Not Allowed for GET, got %d", getReplayRec.Code)
+	}
+}
+
+func TestAuthMiddleware_RejectsWrongOrMalformedTokens(t *testing.T) {
+	router, _ := setupTestServer(t)
+	cases := map[string]int{
+		"":                     http.StatusUnauthorized,
+		"secret-token":         http.StatusUnauthorized,
+		"Bearer ":              http.StatusUnauthorized,
+		"Bearer secret-toke":   http.StatusUnauthorized,
+		"Bearer secret-token!": http.StatusUnauthorized,
+		"Basic secret-token":   http.StatusUnauthorized,
+		"Bearer secret-token":  http.StatusNotFound,
+	}
+	for header, want := range cases {
+		req := httptest.NewRequest(http.MethodGet, "/v1/jobs/00000000-0000-0000-0000-000000000000", nil)
+		if header != "" {
+			req.Header.Set("Authorization", header)
+		}
+		rec := httptest.NewRecorder()
+		router.ServeHTTP(rec, req)
+		if rec.Code != want {
+			t.Errorf("Authorization %q: expected %d, got %d", header, want, rec.Code)
+		}
+	}
+}
+
+func TestHandleJobEvents_SSEStream(t *testing.T) {
+	router, _ := setupTestServer(t)
+
+	// 1. Submit extraction
+	extReq := contracts.ExtractionRequest{
+		Document: contracts.FigmaDocument{
+			Name: "SSE Test",
+			Components: []contracts.FigmaComponentSpec{
+				{Id: "btn-1", Name: "Button"},
+			},
+		},
+	}
+	body, _ := json.Marshal(extReq)
+	req := httptest.NewRequest(http.MethodPost, "/v1/extractions", bytes.NewReader(body))
+	req.Header.Set("Authorization", "Bearer secret-token")
+	rec := httptest.NewRecorder()
+	router.ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusAccepted {
+		t.Fatalf("expected 202 Accepted, got %d", rec.Code)
+	}
+
+	var extResp contracts.ExtractionResponse
+	if err := json.Unmarshal(rec.Body.Bytes(), &extResp); err != nil {
+		t.Fatalf("failed to unmarshal extraction response: %v", err)
+	}
+
+	// 2. Connect to SSE events
+	eventsReq := httptest.NewRequest(http.MethodGet, "/v1/jobs/"+extResp.JobId.String()+"/events", nil)
+	eventsReq.Header.Set("Authorization", "Bearer secret-token")
+	eventsRec := httptest.NewRecorder()
+	router.ServeHTTP(eventsRec, eventsReq)
+
+	if eventsRec.Code != http.StatusOK {
+		t.Fatalf("expected 200 OK for SSE, got %d", eventsRec.Code)
+	}
+	contentType := eventsRec.Header().Get("Content-Type")
+	if contentType != "text/event-stream" {
+		t.Errorf("expected text/event-stream, got %q", contentType)
+	}
+
+	// 3. 404 for non-existent job
+	badReq := httptest.NewRequest(http.MethodGet, "/v1/jobs/00000000-0000-0000-0000-000000000000/events", nil)
+	badReq.Header.Set("Authorization", "Bearer secret-token")
+	badRec := httptest.NewRecorder()
+	router.ServeHTTP(badRec, badReq)
+	if badRec.Code != http.StatusNotFound {
+		t.Errorf("expected 404 for unknown job, got %d", badRec.Code)
+	}
+}
+
+func TestSubmitSyncAndApply(t *testing.T) {
+	router, _ := setupTestServer(t)
+
+	syncReq := contracts.SyncRequest{
+		Document: contracts.FigmaDocument{
+			Name: "HTTP Test Design System",
+			Components: []contracts.FigmaComponentSpec{
+				{
+					Id:   "comp-btn",
+					Name: "Button",
+					Node: contracts.FigmaSceneNode{Id: "n-btn", Name: "Button", Type: "FRAME"},
+				},
+			},
+			Tokens: []contracts.FigmaToken{
+				{Id: "tok-1", Name: "color.primary", Type: "color", Value: "#e55514"},
+			},
+		},
+	}
+
+	bodyBytes, _ := json.Marshal(syncReq)
+
+	// 1. First sync -> expect 1 new component
+	req := httptest.NewRequest(http.MethodPost, "/v1/syncs", bytes.NewReader(bodyBytes))
+	req.Header.Set("Authorization", "Bearer secret-token")
+	req.Header.Set("Content-Type", "application/json")
+	rec := httptest.NewRecorder()
+	router.ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Fatalf("expected 200 for submit sync, got %d: %s", rec.Code, rec.Body.String())
+	}
+
+	var planResp contracts.SyncPlanResponse
+	if err := json.NewDecoder(rec.Body).Decode(&planResp); err != nil {
+		t.Fatalf("failed to decode sync plan: %v", err)
+	}
+
+	if planResp.Summary.New != 1 || planResp.Summary.Unchanged != 0 {
+		t.Fatalf("expected 1 new component, got: %+v", planResp.Summary)
+	}
+
+	// 2. Apply sync plan -> expect 202 Accepted
+	applyURL := fmt.Sprintf("/v1/syncs/%s/apply", planResp.SyncId)
+	applyReq := httptest.NewRequest(http.MethodPost, applyURL, nil)
+	applyReq.Header.Set("Authorization", "Bearer secret-token")
+	applyRec := httptest.NewRecorder()
+	router.ServeHTTP(applyRec, applyReq)
+
+	if applyRec.Code != http.StatusAccepted {
+		t.Fatalf("expected 202 for apply sync, got %d: %s", applyRec.Code, applyRec.Body.String())
+	}
+
+	var extResp contracts.ExtractionResponse
+	if err := json.NewDecoder(applyRec.Body).Decode(&extResp); err != nil {
+		t.Fatalf("failed to decode extraction response: %v", err)
+	}
+
+	// Wait for background job to finish
+	time.Sleep(100 * time.Millisecond)
+
+	// 3. Second sync with identical document -> expect 0 new, 1 unchanged!
+	req2 := httptest.NewRequest(http.MethodPost, "/v1/syncs", bytes.NewReader(bodyBytes))
+	req2.Header.Set("Authorization", "Bearer secret-token")
+	req2.Header.Set("Content-Type", "application/json")
+	rec2 := httptest.NewRecorder()
+	router.ServeHTTP(rec2, req2)
+
+	if rec2.Code != http.StatusOK {
+		t.Fatalf("expected 200 for second sync, got %d: %s", rec2.Code, rec2.Body.String())
+	}
+
+	var planResp2 contracts.SyncPlanResponse
+	if err := json.NewDecoder(rec2.Body).Decode(&planResp2); err != nil {
+		t.Fatalf("failed to decode second sync plan: %v", err)
+	}
+
+	if planResp2.Summary.New != 0 || planResp2.Summary.Unchanged != 1 {
+		t.Fatalf("expected 0 new and 1 unchanged on identical second sync, got: %+v", planResp2.Summary)
+	}
+	if planResp2.Components[0].Status != contracts.Unchanged {
+		t.Errorf("expected component status unchanged, got %s", planResp2.Components[0].Status)
+	}
+
+	// 4. Apply second sync plan -> should succeed immediately using unchanged snapshot
+	applyURL2 := fmt.Sprintf("/v1/syncs/%s/apply", planResp2.SyncId)
+	applyReq2 := httptest.NewRequest(http.MethodPost, applyURL2, nil)
+	applyReq2.Header.Set("Authorization", "Bearer secret-token")
+	applyRec2 := httptest.NewRecorder()
+	router.ServeHTTP(applyRec2, applyReq2)
+
+	if applyRec2.Code != http.StatusAccepted {
+		t.Fatalf("expected 202 for second apply sync, got %d: %s", applyRec2.Code, applyRec2.Body.String())
+	}
+}
+
+func TestReplaySyncEndpoint(t *testing.T) {
+	router, _ := setupTestServer(t)
+
+	// 1. Replay when no extraction exists returns 404
+	replayReq := httptest.NewRequest(http.MethodPost, "/v1/syncs/replay", bytes.NewReader([]byte("{}")))
+	replayReq.Header.Set("Authorization", "Bearer secret-token")
+	rec := httptest.NewRecorder()
+	router.ServeHTTP(rec, replayReq)
+
+	if rec.Code != http.StatusNotFound {
+		t.Fatalf("expected 404 Not Found when no extraction exists, got %d", rec.Code)
+	}
+
+	// 2. Submit initial extraction to persist latest.json
+	extractReq := contracts.ExtractionRequest{
+		Document: contracts.FigmaDocument{
+			Name: "Replay Sync DS",
+			Components: []contracts.FigmaComponentSpec{
+				{
+					Id:   "comp-replay-1",
+					Name: "Button",
+					Node: contracts.FigmaSceneNode{Id: "comp-replay-1", Name: "Button", Type: "COMPONENT"},
+				},
+			},
+		},
+	}
+	body, _ := json.Marshal(extractReq)
+
+	subReq := httptest.NewRequest(http.MethodPost, "/v1/extractions", bytes.NewReader(body))
+	subReq.Header.Set("Authorization", "Bearer secret-token")
+	subRec := httptest.NewRecorder()
+	router.ServeHTTP(subRec, subReq)
+
+	if subRec.Code != http.StatusAccepted {
+		t.Fatalf("expected 202 Accepted on submit, got %d", subRec.Code)
+	}
+
+	// 3. Call POST /v1/syncs/replay with empty body (defaults to latest)
+	replayLatestReq := httptest.NewRequest(http.MethodPost, "/v1/syncs/replay", bytes.NewReader([]byte("{}")))
+	replayLatestReq.Header.Set("Authorization", "Bearer secret-token")
+	replayLatestRec := httptest.NewRecorder()
+	router.ServeHTTP(replayLatestRec, replayLatestReq)
+
+	if replayLatestRec.Code != http.StatusOK {
+		t.Fatalf("expected 200 OK on replay sync latest, got %d: %s", replayLatestRec.Code, replayLatestRec.Body.String())
+	}
+
+	var planResp contracts.SyncPlanResponse
+	if err := json.Unmarshal(replayLatestRec.Body.Bytes(), &planResp); err != nil {
+		t.Fatalf("failed to decode replay sync plan: %v", err)
+	}
+
+	if planResp.DocumentName != "Replay Sync DS" {
+		t.Errorf("expected doc name 'Replay Sync DS', got %s", planResp.DocumentName)
+	}
+	if planResp.Summary.Total != 1 {
+		t.Errorf("expected total 1 component, got %d", planResp.Summary.Total)
+	}
+	if planResp.SyncId == "" {
+		t.Fatalf("expected non-empty sync ID")
+	}
+
+	// 4. Apply the sync plan obtained from replay
+	applyURL := fmt.Sprintf("/v1/syncs/%s/apply", planResp.SyncId)
+	applyReq := httptest.NewRequest(http.MethodPost, applyURL, nil)
+	applyReq.Header.Set("Authorization", "Bearer secret-token")
+	applyRec := httptest.NewRecorder()
+	router.ServeHTTP(applyRec, applyReq)
+
+	if applyRec.Code != http.StatusAccepted {
+		t.Fatalf("expected 202 Accepted on apply replayed sync, got %d", applyRec.Code)
+	}
+
+	// 5. Invalid target paths rejected with 400
+	for _, badTarget := range []string{"../../etc/passwd", "/etc/passwd", "not-a-uuid"} {
+		badBody := fmt.Sprintf(`{"jobId": %q}`, badTarget)
+		badReq := httptest.NewRequest(http.MethodPost, "/v1/syncs/replay", bytes.NewReader([]byte(badBody)))
+		badReq.Header.Set("Authorization", "Bearer secret-token")
+		badRec := httptest.NewRecorder()
+		router.ServeHTTP(badRec, badReq)
+		if badRec.Code != http.StatusBadRequest {
+			t.Errorf("expected 400 for bad replay target %s, got %d", badTarget, badRec.Code)
+		}
 	}
 }

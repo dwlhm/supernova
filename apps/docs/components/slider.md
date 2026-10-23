@@ -33,6 +33,10 @@ Label / Value display — Optional supporting content that should be composed ou
 
 Current Figma component properties: None exposed.
 
+## Live Preview
+
+<FrameworkPreview name="Slider" />
+
 ## Usage
 
 ::: code-group

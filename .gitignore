@@ -8,8 +8,11 @@ var/
 *.log
 
 # VitePress docs
+.vitepress/cache/
+.vitepress/dist/
 apps/docs/.vitepress/cache/
 apps/docs/.vitepress/dist/
+docs/
 
 # Environment
 .env

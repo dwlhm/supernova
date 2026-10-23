@@ -10,18 +10,23 @@ const __dirname = path.dirname(__filename);
 const docsRoot = path.resolve(__dirname, '..');
 const repoRoot = path.resolve(docsRoot, '../..');
 
-// Source paths
-const componentsSrcDir = path.resolve(repoRoot, 'generated/components/src/components');
-const iconsSrcDir = path.resolve(repoRoot, 'generated/components/src/icons');
-const utilsSrcFile = path.resolve(repoRoot, 'generated/components/src/components/utils.ts');
-const tokensSrcDir = path.resolve(repoRoot, 'generated/components/src/tokens');
+// Source paths: resolve from DS_REPO_DIR if set, otherwise from templates/ds-repo
+const dsRepoRoot = process.env.DS_REPO_DIR
+  ? path.resolve(process.env.DS_REPO_DIR)
+  : path.resolve(repoRoot, 'templates/ds-repo');
+
+const componentsSrcDir = path.resolve(dsRepoRoot, 'src/components');
+const iconsSrcDir = path.resolve(dsRepoRoot, 'src/icons');
+const utilsSrcFile = path.resolve(dsRepoRoot, 'src/components/utils.ts');
+const tokensSrcDir = path.resolve(dsRepoRoot, 'src/tokens');
 
 // Target paths
-const targetVue3Dir = path.resolve(docsRoot, 'src/components/vue3');
-const targetReactDir = path.resolve(docsRoot, 'src/components/react');
-const targetSvelteDir = path.resolve(docsRoot, 'src/components/svelte');
-const targetUtilsFile = path.resolve(docsRoot, 'src/components/utils.ts');
-const targetRegistryFile = path.resolve(docsRoot, 'src/components/registry.ts');
+const targetPreviewDir = path.resolve(docsRoot, '.vitepress/theme/preview');
+const targetVue3Dir = path.resolve(targetPreviewDir, 'vue3');
+const targetReactDir = path.resolve(targetPreviewDir, 'react');
+const targetSvelteDir = path.resolve(targetPreviewDir, 'svelte');
+const targetUtilsFile = path.resolve(targetPreviewDir, 'utils.ts');
+const targetRegistryFile = path.resolve(targetPreviewDir, 'registry.ts');
 const targetTokensDir = path.resolve(docsRoot, '.vitepress/theme/tokens');
 
 async function loadCompiler() {
@@ -108,12 +113,24 @@ async function main() {
 
   // Copy utils.ts
   await fs.copyFile(utilsSrcFile, targetUtilsFile);
-  console.log('[compile-docs-components] Copied utils.ts into src/components/utils.ts.');
+  console.log('[compile-docs-components] Copied utils.ts into .vitepress/theme/preview/utils.ts.');
 
   // Copy tokens
   await fs.copyFile(path.join(tokensSrcDir, 'theme.css'), path.join(targetTokensDir, 'theme.css'));
   await fs.copyFile(path.join(tokensSrcDir, 'tokens.css'), path.join(targetTokensDir, 'tokens.css'));
   console.log('[compile-docs-components] Copied theme.css and tokens.css into .vitepress/theme/tokens/.');
+
+  // Read all metadata files
+  const metaMap = {};
+  for (const { name } of componentEntries) {
+    const metaPath = path.join(componentsSrcDir, `${name}.meta.json`);
+    try {
+      const metaContent = await fs.readFile(metaPath, 'utf-8');
+      metaMap[name] = JSON.parse(metaContent);
+    } catch {
+      // No meta file found, keep entry empty or basic
+    }
+  }
 
   // Generate registry.ts
   const registryLines = componentEntries.map(
@@ -128,13 +145,22 @@ export interface ComponentLoader {
   svelte?: () => Promise<any>;
 }
 
+export interface ComponentMeta {
+  name: string;
+  group?: string;
+  variants?: Record<string, string[]>;
+  totalVariants?: number;
+}
+
 export const componentRegistry: Record<string, ComponentLoader> = {
 ${registryLines.join('\n')}
 };
+
+export const componentMetadata: Record<string, ComponentMeta> = ${JSON.stringify(metaMap, null, 2)};
 `;
 
   await fs.writeFile(targetRegistryFile, registryContent, 'utf-8');
-  console.log('[compile-docs-components] Generated src/components/registry.ts.');
+  console.log('[compile-docs-components] Generated .vitepress/theme/preview/registry.ts with metadata.');
   console.log('[compile-docs-components] Compilation completed successfully.');
 }
 

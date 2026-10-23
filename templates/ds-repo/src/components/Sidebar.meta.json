@@ -1,0 +1,11 @@
+{
+  "name": "Sidebar",
+  "group": "components",
+  "variants": {
+    "Expanded": [
+      "False",
+      "True"
+    ]
+  },
+  "totalVariants": 2
+}

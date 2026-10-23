@@ -25,6 +25,10 @@ PROPERTIES
 • Description Text: Overrides the default supporting description.
 • Content: Accepts optional custom content for the selected chart variant.
 
+## Live Preview
+
+<FrameworkPreview name="Chart" />
+
 ## Usage
 
 ::: code-group

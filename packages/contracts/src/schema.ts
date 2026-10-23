@@ -21,6 +21,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/syncs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Submit document sync and compute diff plan */
+        post: operations["submitSync"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/syncs/{id}/apply": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Apply sync plan and trigger incremental execution job */
+        post: operations["applySync"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/jobs/{id}": {
         parameters: {
             query?: never;
@@ -47,6 +81,23 @@ export interface paths {
         };
         /** Download zip archive of components */
         get: operations["downloadJobArchive"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/jobs/{id}/events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Stream real-time job and component events via SSE */
+        get: operations["streamJobEvents"];
         put?: never;
         post?: never;
         delete?: never;
@@ -83,12 +134,129 @@ export interface components {
         /** @enum {string} */
         JobStatus: "queued" | "authoring" | "compiling" | "publishing" | "succeeded" | "failed";
         /** @enum {string} */
+        TaskStatus: "queued" | "authoring" | "verifying" | "ready" | "failed";
+        /** @enum {string} */
         ComponentStatus: "pending" | "authoring" | "compiling" | "done" | "failed";
+        /** @enum {string} */
+        DiffStatus: "new" | "changed" | "unchanged" | "removed";
         FigmaColor: {
             r: number;
             g: number;
             b: number;
             a: number;
+        };
+        FigmaPaint: {
+            /** @description SOLID, GRADIENT_LINEAR, GRADIENT_RADIAL, IMAGE, etc. */
+            type: string;
+            /** @description Serialized rgba string (e.g. rgb(229, 85, 20) or rgba(0, 0, 0, 0.5)) */
+            color?: string;
+            opacity?: number;
+            visible?: boolean;
+            blendMode?: string;
+            boundVariables?: {
+                [key: string]: unknown;
+            };
+        };
+        FigmaStroke: {
+            type?: string;
+            color?: string;
+            opacity?: number;
+            visible?: boolean;
+            weight?: number;
+            /** @description INSIDE, OUTSIDE, CENTER */
+            align?: string;
+            dashes?: number[];
+            cap?: string;
+            join?: string;
+            boundVariables?: {
+                [key: string]: unknown;
+            };
+        };
+        FigmaEffect: {
+            /** @description DROP_SHADOW, INNER_SHADOW, LAYER_BLUR, BACKGROUND_BLUR */
+            type: string;
+            visible?: boolean;
+            radius?: number;
+            color?: string;
+            offset?: {
+                x?: number;
+                y?: number;
+            };
+            spread?: number;
+            boundVariables?: {
+                [key: string]: unknown;
+            };
+        };
+        FigmaLayout: {
+            width?: number;
+            height?: number;
+            minWidth?: number;
+            maxWidth?: number;
+            minHeight?: number;
+            maxHeight?: number;
+            /** @description NONE, HORIZONTAL, VERTICAL */
+            layoutMode?: string;
+            /** @description NO_WRAP, WRAP */
+            layoutWrap?: string;
+            /** @description MIN, CENTER, MAX, SPACE_BETWEEN */
+            primaryAxisAlignItems?: string;
+            /** @description MIN, CENTER, MAX, BASELINE */
+            counterAxisAlignItems?: string;
+            /** @description FIXED, AUTO */
+            primaryAxisSizingMode?: string;
+            /** @description FIXED, AUTO */
+            counterAxisSizingMode?: string;
+            paddingTop?: number;
+            paddingRight?: number;
+            paddingBottom?: number;
+            paddingLeft?: number;
+            itemSpacing?: number;
+            counterAxisSpacing?: number;
+            /** @description Numeric uniform radius or per-corner object */
+            cornerRadius?: unknown;
+            cornerSmoothing?: number;
+        };
+        FigmaTypography: {
+            characters?: string;
+            fontFamily?: string;
+            fontStyle?: string;
+            fontWeight?: string;
+            fontSize?: number;
+            lineHeight?: {
+                value?: number;
+                unit?: string;
+            };
+            letterSpacing?: {
+                value?: number;
+                unit?: string;
+            };
+            paragraphSpacing?: number;
+            /** @description LEFT, CENTER, RIGHT, JUSTIFIED */
+            textAlignHorizontal?: string;
+            /** @description TOP, CENTER, BOTTOM */
+            textAlignVertical?: string;
+            textCase?: string;
+            textDecoration?: string;
+        };
+        FigmaSceneNode: {
+            id: string;
+            name: string;
+            type: string;
+            visible?: boolean;
+            opacity?: number;
+            layout?: components["schemas"]["FigmaLayout"];
+            fills?: components["schemas"]["FigmaPaint"][];
+            strokes?: components["schemas"]["FigmaStroke"][];
+            effects?: components["schemas"]["FigmaEffect"][];
+            typography?: components["schemas"]["FigmaTypography"];
+            boundVariables?: {
+                [key: string]: unknown;
+            };
+            variantCount?: number;
+            variants?: {
+                [key: string]: unknown;
+            }[];
+            children?: components["schemas"]["FigmaSceneNode"][];
         };
         FigmaToken: {
             id: string;
@@ -97,6 +265,15 @@ export interface components {
             /** @description Token value of arbitrary type */
             value: unknown;
             description?: string;
+            collectionName?: string;
+            resolvedType?: string;
+            scopes?: string[];
+            valuesByMode?: {
+                [key: string]: unknown;
+            };
+            modes?: {
+                [key: string]: string;
+            };
         };
         FigmaComponentSpec: {
             id: string;
@@ -110,10 +287,7 @@ export interface components {
             properties?: {
                 [key: string]: unknown;
             };
-            /** @description Figma scene node representation (type, layout, fills, strokes, children, etc.) */
-            node: {
-                [key: string]: unknown;
-            };
+            node: components["schemas"]["FigmaSceneNode"];
         };
         FigmaDocument: {
             name: string;
@@ -128,6 +302,8 @@ export interface components {
         };
         ExtractionRequest: {
             document: components["schemas"]["FigmaDocument"];
+            /** @description Optional sync plan ID to apply incremental execution */
+            syncId?: string;
             /**
              * @default [
              *       "mitosis"
@@ -149,6 +325,51 @@ export interface components {
             /** Format: date-time */
             createdAt: string;
         };
+        ComponentDiff: {
+            name: string;
+            status: components["schemas"]["DiffStatus"];
+            previousHash?: string;
+            currentHash?: string;
+            changeSummary?: string;
+        };
+        TokenDiff: {
+            changed: boolean;
+            added?: string[];
+            modified?: string[];
+            removed?: string[];
+            previousHash?: string;
+            currentHash?: string;
+        };
+        SyncSummary: {
+            total: number;
+            new: number;
+            changed: number;
+            unchanged: number;
+            removed: number;
+            tokensChanged: boolean;
+        };
+        SyncRequest: {
+            document: components["schemas"]["FigmaDocument"];
+            targets?: components["schemas"]["Framework"][];
+            publishers?: components["schemas"]["PublisherType"][];
+            options?: components["schemas"]["ExtractionOptions"];
+        };
+        SyncPlanResponse: {
+            syncId: string;
+            documentName: string;
+            summary: components["schemas"]["SyncSummary"];
+            components: components["schemas"]["ComponentDiff"][];
+            tokens: components["schemas"]["TokenDiff"];
+            /** Format: date-time */
+            createdAt: string;
+        };
+        ApplySyncRequest: {
+            targets?: components["schemas"]["Framework"][];
+            publishers?: components["schemas"]["PublisherType"][];
+            options?: components["schemas"]["ExtractionOptions"];
+            /** @description Optional subset of component names to author (defaults to all new & changed) */
+            selectedComponents?: string[];
+        };
         StageError: {
             stage: string;
             message: string;
@@ -160,9 +381,45 @@ export interface components {
             group?: string;
             stageError?: components["schemas"]["StageError"];
         };
+        ComponentTask: {
+            id: string;
+            runId?: string;
+            componentName: string;
+            status: components["schemas"]["TaskStatus"];
+            attemptCount?: number;
+            maxAttempts?: number;
+            error?: string;
+            /** Format: date-time */
+            createdAt?: string;
+            /** Format: date-time */
+            updatedAt?: string;
+        };
+        JobRun: {
+            id: string;
+            jobId: string;
+            status: string;
+            tasks?: components["schemas"]["ComponentTask"][];
+            /** Format: date-time */
+            createdAt?: string;
+            /** Format: date-time */
+            finishedAt?: string;
+        };
+        JobEvent: {
+            /** @description Event type (e.g. job_status, task_status, task_artifact, job_completed, job_failed) */
+            eventType: string;
+            jobId: string;
+            runId?: string;
+            /** Format: date-time */
+            timestamp: string;
+            task?: components["schemas"]["ComponentTask"];
+            status?: string;
+            error?: string;
+        };
         PublishResults: {
             downloadUrl?: string;
             pullRequestUrl?: string;
+            branchName?: string;
+            commitSha?: string;
         };
         JobResponse: {
             jobId: string;
@@ -170,6 +427,8 @@ export interface components {
             targets: components["schemas"]["Framework"][];
             publishers: components["schemas"]["PublisherType"][];
             components: components["schemas"]["ComponentProgress"][];
+            runId?: string;
+            tasks?: components["schemas"]["ComponentTask"][];
             publishResults?: components["schemas"]["PublishResults"];
             error?: components["schemas"]["StageError"];
             /** Format: date-time */
@@ -247,6 +506,111 @@ export interface operations {
             };
         };
     };
+    submitSync: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SyncRequest"];
+            };
+        };
+        responses: {
+            /** @description Sync diff plan computed successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SyncPlanResponse"];
+                };
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Payload too large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    applySync: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Sync plan identifier */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["ApplySyncRequest"];
+            };
+        };
+        responses: {
+            /** @description Extraction job accepted */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExtractionResponse"];
+                };
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Sync plan not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     getJob: {
         parameters: {
             query?: never;
@@ -311,6 +675,38 @@ export interface operations {
             };
             /** @description Job archive not ready */
             409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    streamJobEvents: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Unique job identifier */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Server-sent event stream of job and component status updates */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/event-stream": string;
+                };
+            };
+            /** @description Job not found */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };

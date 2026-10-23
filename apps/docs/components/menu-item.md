@@ -26,6 +26,10 @@ Show badge — Shows or hides the badge.
 Badge label — Sets the badge text.
 Submenu content — Slot for nested navigation content.
 
+## Live Preview
+
+<FrameworkPreview name="MenuItem" />
+
 ## Usage
 
 ::: code-group

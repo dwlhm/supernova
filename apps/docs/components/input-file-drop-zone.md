@@ -25,6 +25,10 @@ PROPERTIES
 • File name — Selected-file name.
 • File metadata — File size, type, or upload status.
 
+## Live Preview
+
+<FrameworkPreview name="InputFileDropZone" />
+
 ## Usage
 
 ::: code-group

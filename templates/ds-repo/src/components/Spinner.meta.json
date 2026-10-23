@@ -1,0 +1,13 @@
+{
+  "name": "Spinner",
+  "group": "components",
+  "variants": {
+    "Size": [
+      "12",
+      "16",
+      "24",
+      "32"
+    ]
+  },
+  "totalVariants": 4
+}

@@ -2,6 +2,7 @@ import * as mitosisModule from '@builder.io/mitosis';
 import { lintSource } from './lint.js';
 import { renderCheck } from './render-check.js';
 import { validateArtifact } from './validate.js';
+import { COMPONENT_NAME_PATTERN, isValidComponentName } from './names.js';
 import type {
   CompileError,
   CompileRequest,
@@ -98,6 +99,18 @@ export async function compileMitosis(req: CompileRequest): Promise<CompileRespon
   }
 
   const componentName = req.componentName || parsed?.name || 'Component';
+  if (!isValidComponentName(componentName)) {
+    return {
+      success: false,
+      artifacts: [],
+      errors: [
+        {
+          target: 'mitosis',
+          message: `Invalid component name "${componentName}": must match ${COMPONENT_NAME_PATTERN}`,
+        },
+      ],
+    };
+  }
   const artifacts: CompiledArtifact[] = [];
   const errors: CompileError[] = [];
 

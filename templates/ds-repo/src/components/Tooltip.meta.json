@@ -1,0 +1,13 @@
+{
+  "name": "Tooltip",
+  "group": "components",
+  "variants": {
+    "Position": [
+      "Bottom",
+      "Left",
+      "Right",
+      "Top"
+    ]
+  },
+  "totalVariants": 4
+}

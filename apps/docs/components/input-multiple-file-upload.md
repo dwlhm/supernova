@@ -26,6 +26,10 @@ PROPERTIES
 • File 1 name / File 2 name — Example file names.
 • File 1 status / File 2 status — Example upload statuses.
 
+## Live Preview
+
+<FrameworkPreview name="InputMultipleFileUpload" />
+
 ## Usage
 
 ::: code-group

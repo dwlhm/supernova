@@ -26,6 +26,10 @@ PROPERTIES
 • Show hint — Toggles supporting or error text.
 • Show left icon / Show right icon — Toggles leading and trailing icons.
 
+## Live Preview
+
+<FrameworkPreview name="InputTextArea" />
+
 ## Usage
 
 ::: code-group

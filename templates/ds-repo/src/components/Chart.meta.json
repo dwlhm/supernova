@@ -1,0 +1,21 @@
+{
+  "name": "Chart",
+  "group": "components",
+  "variants": {
+    "Type": [
+      "Area",
+      "Bar",
+      "Donut",
+      "Funnel",
+      "Gauge",
+      "Horizontal Bar",
+      "Line",
+      "Pie",
+      "Radar",
+      "Scatter",
+      "Stacked Bar",
+      "Waterfall"
+    ]
+  },
+  "totalVariants": 12
+}

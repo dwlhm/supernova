@@ -391,6 +391,33 @@ func TestGenerateCSS_SemanticWinsCollision(t *testing.T) {
 	}
 }
 
+func TestGenerateTokensCSS_MultiModeDark(t *testing.T) {
+	modes := map[string]string{
+		"m1": "Light",
+		"m2": "Dark",
+	}
+	values := map[string]any{
+		"m1": "#ffffff",
+		"m2": "#1b1b1f",
+	}
+	token := contracts.FigmaToken{
+		Id:           "tok-surface",
+		Name:         "🌱 Semantic/colors/background/default",
+		Type:         "color",
+		Value:        "#ffffff",
+		Modes:        &modes,
+		ValuesByMode: &values,
+	}
+
+	css := app.GenerateTokensCSS([]contracts.FigmaToken{token})
+	if !strings.Contains(css, ":root {") || !strings.Contains(css, "--color-background-default: #ffffff;") {
+		t.Errorf("expected :root block with light value, got:\n%s", css)
+	}
+	if !strings.Contains(css, ".dark {") || !strings.Contains(css, "--color-background-default: #1b1b1f;") {
+		t.Errorf("expected .dark block with dark value, got:\n%s", css)
+	}
+}
+
 func tierCatalogTokens() []contracts.FigmaToken {
 	return []contracts.FigmaToken{
 		{Id: "p1", Name: "🌍 Primitive/colors/neutral/100", Type: "color", Value: "#f5f5f5"},

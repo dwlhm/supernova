@@ -340,3 +340,14 @@ export default function SvgIcon() {
     assert.strictEqual(angularErrors[0].rule, 'target-invalid');
   });
 });
+
+describe('compileMitosis component name validation', () => {
+  for (const bad of ['../../x', 'button', 'Bad-Name', 'A'.repeat(65)]) {
+    it(`rejects componentName ${JSON.stringify(bad.slice(0, 12))}`, async () => {
+      const res = await compileMitosis({ componentName: bad, source: VALID_COMPONENT_SOURCE, targets: ['react'] });
+      assert.equal(res.success, false);
+      assert.deepEqual(res.artifacts, []);
+      assert.match(res.errors[0].message, /Invalid component name/);
+    });
+  }
+});

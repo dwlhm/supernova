@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { compileMitosis } from '../dist/index.js';
+import { compileMitosis, renderCheck } from '../dist/index.js';
 
 describe('renderCheck - variant-identical', () => {
   it('fails when different union variant values render identical markup', async () => {
@@ -242,5 +242,29 @@ describe('renderCheck - render-crash', () => {
       err.message.includes('data'),
       `Expected error message to mention prop "data", got: ${err.message}`
     );
+  });
+});
+
+describe("renderCheck - worker_threads timeout & sandboxing", () => {
+  it("terminates infinite loops gracefully via timeout", async () => {
+    const infiniteLoopSource = `
+      export default function HangComp() {
+        return (
+          <div>
+            {(() => {
+              while (true) {}
+              return "stuck";
+            })()}
+          </div>
+        );
+      }
+    `;
+    const errors = await renderCheck({
+      componentName: "HangComp",
+      source: infiniteLoopSource,
+    }, 1000);
+    const timeoutErr = errors.find((e) => e.rule === "render-timeout");
+    assert.ok(timeoutErr, "Expected render-timeout error");
+    assert.match(timeoutErr.message, /timed out/);
   });
 });

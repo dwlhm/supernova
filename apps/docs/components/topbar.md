@@ -18,6 +18,10 @@ Avoid duplicating navigation or actions already provided by the sidebar or page 
 Properties
 Topbar Content — Slot for contextual or global header content.
 
+## Live Preview
+
+<FrameworkPreview name="Topbar" />
+
 ## Usage
 
 ::: code-group

@@ -26,6 +26,10 @@ Show Toggle 3: Shows or hides the third toggle row.
 Show Toggle 4: Shows or hides the fourth toggle row.
 Show Toggle 5: Shows or hides the fifth toggle row.
 
+## Live Preview
+
+<FrameworkPreview name="ToggleGroup" />
+
 ## Usage
 
 ::: code-group

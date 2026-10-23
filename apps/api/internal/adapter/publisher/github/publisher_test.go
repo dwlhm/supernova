@@ -23,53 +23,6 @@ func TestGitHubPublisher_Name(t *testing.T) {
 	}
 }
 
-func TestGitHubPublisher_GetExistingSources_EmptyConfig(t *testing.T) {
-	ctx := context.Background()
-
-	// Empty token and repo
-	pub := github.NewPublisher("", "", "main")
-	sources, err := pub.GetExistingSources(ctx)
-	if err != nil {
-		t.Fatalf("expected nil error for empty config, got %v", err)
-	}
-	if len(sources) != 0 {
-		t.Errorf("expected empty map for empty config, got %v", sources)
-	}
-
-	// Empty repo only
-	pubWithToken := github.NewPublisher("some-token", "", "main")
-	sources, err = pubWithToken.GetExistingSources(ctx)
-	if err != nil {
-		t.Fatalf("expected nil error for empty repo, got %v", err)
-	}
-	if len(sources) != 0 {
-		t.Errorf("expected empty map for empty repo, got %v", sources)
-	}
-
-	// Invalid repo format
-	pubBadRepo := github.NewPublisher("some-token", "invalid-repo-without-slash", "main")
-	_, err = pubBadRepo.GetExistingSources(ctx)
-	if err == nil {
-		t.Fatalf("expected error for invalid repo format, got nil")
-	}
-}
-
-func TestGitHubPublisher_GetExistingSources_CloneFailureRecovery(t *testing.T) {
-	ctx := context.Background()
-
-	// Non-routable host should log warning, mask token, and recover gracefully with empty map
-	pub := github.NewPublisher("secret-gh-token", "owner/repo", "main")
-	pub.SetBaseURL("http://127.0.0.1:0")
-
-	sources, err := pub.GetExistingSources(ctx)
-	if err != nil {
-		t.Fatalf("expected nil error on clone failure (recoverable), got %v", err)
-	}
-	if len(sources) != 0 {
-		t.Errorf("expected empty map on clone failure, got %v", sources)
-	}
-}
-
 func TestGitHubPublisher_GetExistingComponentInfo_EmptyConfig(t *testing.T) {
 	ctx := context.Background()
 
@@ -209,12 +162,16 @@ func TestGitHubPublisher_Publish_PureMitosisAndTokens(t *testing.T) {
 		path := r.URL.Path
 
 		switch {
-		case r.Method == http.MethodGet && strings.HasPrefix(path, "/repos/owner/repo/git/ref/"):
+		case r.Method == http.MethodGet && path == "/repos/owner/repo/git/ref/heads/main":
 			_ = json.NewEncoder(w).Encode(map[string]interface{}{
 				"ref": "refs/heads/main",
 				"object": map[string]string{
 					"sha": "base-sha-123",
 				},
+			})
+		case r.Method == http.MethodGet && path == "/repos/owner/repo/contents/package.json":
+			_ = json.NewEncoder(w).Encode(map[string]interface{}{
+				"name": "package.json",
 			})
 		case r.Method == http.MethodPost && path == "/repos/owner/repo/git/trees":
 			body, _ := io.ReadAll(r.Body)
@@ -367,12 +324,16 @@ func TestGitHubPublisher_IconsDirectoryPlacement(t *testing.T) {
 		path := r.URL.Path
 
 		switch {
-		case r.Method == http.MethodGet && strings.HasPrefix(path, "/repos/owner/repo/git/ref/"):
+		case r.Method == http.MethodGet && path == "/repos/owner/repo/git/ref/heads/main":
 			_ = json.NewEncoder(w).Encode(map[string]interface{}{
 				"ref": "refs/heads/main",
 				"object": map[string]string{
 					"sha": "base-sha-123",
 				},
+			})
+		case r.Method == http.MethodGet && path == "/repos/owner/repo/contents/package.json":
+			_ = json.NewEncoder(w).Encode(map[string]interface{}{
+				"name": "package.json",
 			})
 		case r.Method == http.MethodPost && path == "/repos/owner/repo/git/trees":
 			body, _ := io.ReadAll(r.Body)
@@ -473,12 +434,16 @@ func TestGitHubPublisher_UtilsPlacement_Deduplication(t *testing.T) {
 		path := r.URL.Path
 
 		switch {
-		case r.Method == http.MethodGet && strings.HasPrefix(path, "/repos/owner/repo/git/ref/"):
+		case r.Method == http.MethodGet && path == "/repos/owner/repo/git/ref/heads/main":
 			_ = json.NewEncoder(w).Encode(map[string]interface{}{
 				"ref": "refs/heads/main",
 				"object": map[string]string{
 					"sha": "base-sha-123",
 				},
+			})
+		case r.Method == http.MethodGet && path == "/repos/owner/repo/contents/package.json":
+			_ = json.NewEncoder(w).Encode(map[string]interface{}{
+				"name": "package.json",
 			})
 		case r.Method == http.MethodPost && path == "/repos/owner/repo/git/trees":
 			body, _ := io.ReadAll(r.Body)
@@ -539,7 +504,7 @@ func TestGitHubPublisher_UtilsPlacement_Deduplication(t *testing.T) {
 			},
 			{
 				Target:   contracts.Framework("mitosis"),
-				FileName: "src/components/utils.ts",
+				FileName: "utils.ts",
 				Code:     "export function cn() { return ''; }",
 				Group:    "components",
 			},
@@ -576,12 +541,16 @@ func TestGitHubPublisher_DocumentationArtifactsRouting(t *testing.T) {
 		path := r.URL.Path
 
 		switch {
-		case r.Method == http.MethodGet && strings.HasPrefix(path, "/repos/owner/repo/git/ref/"):
+		case r.Method == http.MethodGet && path == "/repos/owner/repo/git/ref/heads/main":
 			_ = json.NewEncoder(w).Encode(map[string]interface{}{
 				"ref": "refs/heads/main",
 				"object": map[string]string{
 					"sha": "base-sha-123",
 				},
+			})
+		case r.Method == http.MethodGet && path == "/repos/owner/repo/contents/package.json":
+			_ = json.NewEncoder(w).Encode(map[string]interface{}{
+				"name": "package.json",
 			})
 		case r.Method == http.MethodPost && path == "/repos/owner/repo/git/trees":
 			body, _ := io.ReadAll(r.Body)
@@ -691,6 +660,222 @@ func TestGitHubPublisher_DocumentationArtifactsRouting(t *testing.T) {
 		}
 		if treePathCounts[expectedPath] != 1 {
 			t.Errorf("expected exactly 1 entry in tree for %s, got %d", expectedPath, treePathCounts[expectedPath])
+		}
+	}
+}
+
+func TestGitHubPublisher_UpdateExistingBranchAndPR(t *testing.T) {
+	ctx := context.Background()
+	var patchedRef string
+	var prCreated bool
+
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		path := r.URL.Path
+
+		switch {
+		case r.Method == http.MethodGet && path == "/repos/owner/repo/git/ref/heads/main":
+			_ = json.NewEncoder(w).Encode(map[string]interface{}{
+				"ref": "refs/heads/main",
+				"object": map[string]string{
+					"sha": "base-sha-123",
+				},
+			})
+		case r.Method == http.MethodGet && path == "/repos/owner/repo/contents/package.json":
+			_ = json.NewEncoder(w).Encode(map[string]interface{}{
+				"name": "package.json",
+			})
+		case r.Method == http.MethodGet && path == "/repos/owner/repo/git/ref/heads/supernova/my-ds":
+			_ = json.NewEncoder(w).Encode(map[string]interface{}{
+				"ref": "refs/heads/supernova/my-ds",
+				"object": map[string]string{
+					"sha": "old-branch-sha-000",
+				},
+			})
+		case r.Method == http.MethodPatch && path == "/repos/owner/repo/git/refs/heads/supernova/my-ds":
+			patchedRef = path
+			_ = json.NewEncoder(w).Encode(map[string]interface{}{
+				"ref": "refs/heads/supernova/my-ds",
+				"object": map[string]string{
+					"sha": "commit-sha-789",
+				},
+			})
+		case r.Method == http.MethodPost && path == "/repos/owner/repo/git/trees":
+			_ = json.NewEncoder(w).Encode(map[string]interface{}{
+				"sha": "tree-sha-456",
+			})
+		case r.Method == http.MethodGet && strings.HasPrefix(path, "/repos/owner/repo/git/commits/"):
+			_ = json.NewEncoder(w).Encode(map[string]interface{}{
+				"sha": "base-sha-123",
+			})
+		case r.Method == http.MethodPost && path == "/repos/owner/repo/git/commits":
+			_ = json.NewEncoder(w).Encode(map[string]interface{}{
+				"sha": "commit-sha-789",
+			})
+		case r.Method == http.MethodGet && path == "/repos/owner/repo/pulls":
+			_ = json.NewEncoder(w).Encode([]map[string]interface{}{
+				{
+					"number":   42,
+					"html_url": "https://github.com/owner/repo/pull/42",
+				},
+			})
+		case r.Method == http.MethodPost && path == "/repos/owner/repo/pulls":
+			prCreated = true
+			_ = json.NewEncoder(w).Encode(map[string]interface{}{
+				"number":   999,
+				"html_url": "https://github.com/owner/repo/pull/999",
+			})
+		default:
+			http.NotFound(w, r)
+		}
+	}))
+	defer server.Close()
+
+	pub := github.NewPublisher("mock-token", "owner/repo", "main")
+	pub.SetBaseURL(server.URL)
+
+	job := &domain.Job{
+		ID:           "job-update-test",
+		DocumentName: "My DS",
+		Artifacts: []domain.CompiledArtifact{
+			{
+				Target:   contracts.Framework("mitosis"),
+				FileName: "Button.lite.tsx",
+				Code:     "export default function Button() { return <button />; }",
+			},
+		},
+	}
+
+	if err := pub.Publish(ctx, job); err != nil {
+		t.Fatalf("Publish failed: %v", err)
+	}
+
+	if patchedRef != "/repos/owner/repo/git/refs/heads/supernova/my-ds" {
+		t.Errorf("expected branch ref to be updated via PATCH, got %s", patchedRef)
+	}
+	if prCreated {
+		t.Errorf("expected existing PR to be reused without creating a new PR")
+	}
+	if job.PublishResults == nil || job.PublishResults.PullRequestUrl == nil {
+		t.Fatalf("expected PublishResults with PullRequestUrl")
+	}
+	if *job.PublishResults.PullRequestUrl != "https://github.com/owner/repo/pull/42" {
+		t.Errorf("unexpected PR url: %s", *job.PublishResults.PullRequestUrl)
+	}
+	if job.PublishResults.BranchName == nil || *job.PublishResults.BranchName != "supernova/my-ds" {
+		t.Errorf("unexpected branch name: %+v", job.PublishResults.BranchName)
+	}
+	if job.PublishResults.CommitSha == nil || *job.PublishResults.CommitSha != "commit-sha-789" {
+		t.Errorf("unexpected commit sha: %+v", job.PublishResults.CommitSha)
+	}
+}
+
+func TestGitHubPublisher_BootstrapNewRepository(t *testing.T) {
+	ctx := context.Background()
+	var createdTreeEntries []struct {
+		Path    string `json:"path"`
+		Mode    string `json:"mode"`
+		Type    string `json:"type"`
+		Content string `json:"content"`
+	}
+
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		path := r.URL.Path
+
+		switch {
+		case r.Method == http.MethodGet && path == "/repos/owner/repo/git/ref/heads/main":
+			_ = json.NewEncoder(w).Encode(map[string]interface{}{
+				"ref": "refs/heads/main",
+				"object": map[string]string{
+					"sha": "base-sha-123",
+				},
+			})
+		case r.Method == http.MethodGet && path == "/repos/owner/repo/contents/package.json":
+			// Repository is brand new: package.json not found
+			http.NotFound(w, r)
+		case r.Method == http.MethodPost && path == "/repos/owner/repo/git/trees":
+			body, _ := io.ReadAll(r.Body)
+			var payload struct {
+				BaseTree string `json:"base_tree"`
+				Tree     []struct {
+					Path    string `json:"path"`
+					Mode    string `json:"mode"`
+					Type    string `json:"type"`
+					Content string `json:"content"`
+				} `json:"tree"`
+			}
+			_ = json.Unmarshal(body, &payload)
+			createdTreeEntries = payload.Tree
+			_ = json.NewEncoder(w).Encode(map[string]interface{}{
+				"sha": "tree-sha-bootstrapped",
+			})
+		case r.Method == http.MethodGet && strings.HasPrefix(path, "/repos/owner/repo/git/commits/"):
+			_ = json.NewEncoder(w).Encode(map[string]interface{}{
+				"sha": "base-sha-123",
+			})
+		case r.Method == http.MethodPost && path == "/repos/owner/repo/git/commits":
+			_ = json.NewEncoder(w).Encode(map[string]interface{}{
+				"sha": "commit-sha-bootstrapped",
+			})
+		case r.Method == http.MethodPost && path == "/repos/owner/repo/git/refs":
+			_ = json.NewEncoder(w).Encode(map[string]interface{}{
+				"ref": "refs/heads/supernova/bootstrap-ds",
+				"object": map[string]string{
+					"sha": "commit-sha-bootstrapped",
+				},
+			})
+		case r.Method == http.MethodPost && path == "/repos/owner/repo/pulls":
+			_ = json.NewEncoder(w).Encode(map[string]interface{}{
+				"number":   1,
+				"html_url": "https://github.com/owner/repo/pull/1",
+			})
+		default:
+			http.NotFound(w, r)
+		}
+	}))
+	defer server.Close()
+
+	pub := github.NewPublisher("mock-token", "owner/repo", "main")
+	pub.SetBaseURL(server.URL)
+
+	job := &domain.Job{
+		ID:           "job-bootstrap-test",
+		DocumentName: "Bootstrap DS",
+		Artifacts: []domain.CompiledArtifact{
+			{
+				Target:   contracts.Framework("mitosis"),
+				FileName: "Button.lite.tsx",
+				Code:     "export default function Button() { return <button />; }",
+			},
+		},
+	}
+
+	if err := pub.Publish(ctx, job); err != nil {
+		t.Fatalf("Publish failed: %v", err)
+	}
+
+	treePaths := make(map[string]bool)
+	for _, entry := range createdTreeEntries {
+		treePaths[entry.Path] = true
+	}
+
+	// Verify both component artifact AND bootstrap scaffolding were included
+	expectedPaths := []string{
+		"src/components/Button.lite.tsx",
+		"package.json",
+		"tsconfig.json",
+		"README.md",
+		".changeset/config.json",
+		".changeset/README.md",
+		".github/workflows/ci.yml",
+		".github/workflows/release.yml",
+		"scripts/compile.mjs",
+	}
+
+	for _, ep := range expectedPaths {
+		if !treePaths[ep] {
+			t.Errorf("expected tree to contain bootstrapped path %s", ep)
 		}
 	}
 }

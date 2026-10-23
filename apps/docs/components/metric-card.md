@@ -32,6 +32,10 @@ Properties
 • List: Supplies list content for the List variant.
 • Leaderboard: Supplies ranked content for the Leaderboard variant.
 
+## Live Preview
+
+<FrameworkPreview name="MetricCard" />
+
 ## Usage
 
 ::: code-group

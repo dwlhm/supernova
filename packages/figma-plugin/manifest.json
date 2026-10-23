@@ -6,10 +6,10 @@
   "ui": "dist/ui.html",
   "editorType": ["figma"],
   "networkAccess": {
-    "allowedDomains": ["*"],
+    "allowedDomains": ["none"],
     "devAllowedDomains": [
       "http://localhost:8080"
     ],
-    "reasoning": "Sync design tokens and components to local Go REST API"
+    "reasoning": "Sends extracted tokens and components to the Supernova API. Add the production API origin to allowedDomains before publishing."
   }
 }

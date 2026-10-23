@@ -1,4 +1,13 @@
-import type { FigmaColor, FigmaToken, FigmaComponentSpec } from '@supernova/contracts';
+import type {
+  FigmaColor,
+  FigmaToken,
+  FigmaComponentSpec,
+  FigmaSceneNode,
+  FigmaStroke,
+  FigmaEffect,
+  FigmaLayout,
+  FigmaPaint,
+} from '@supernova/contracts';
 
 /**
  * Converts a Figma RGB/RGBA color object to standard rgba string.
@@ -14,8 +23,8 @@ export function serializeColor(color: { r: number; g: number; b: number; a?: num
 /**
  * Extracts AutoLayout and geometry parameters from a Figma node structure.
  */
-export function extractLayout(node: Record<string, any>): Record<string, any> {
-  const layout: Record<string, any> = {
+export function extractLayout(node: Record<string, any>): FigmaLayout {
+  const layout: FigmaLayout = {
     width: node.width ?? 0,
     height: node.height ?? 0,
     layoutMode: node.layoutMode ?? 'NONE',
@@ -24,12 +33,23 @@ export function extractLayout(node: Record<string, any>): Record<string, any> {
   if (node.layoutMode && node.layoutMode !== 'NONE') {
     layout.primaryAxisAlignItems = node.primaryAxisAlignItems ?? 'MIN';
     layout.counterAxisAlignItems = node.counterAxisAlignItems ?? 'MIN';
+    layout.primaryAxisSizingMode = node.primaryAxisSizingMode ?? 'AUTO';
+    layout.counterAxisSizingMode = node.counterAxisSizingMode ?? 'AUTO';
+    layout.layoutWrap = node.layoutWrap ?? 'NO_WRAP';
     layout.paddingTop = node.paddingTop ?? 0;
     layout.paddingRight = node.paddingRight ?? 0;
     layout.paddingBottom = node.paddingBottom ?? 0;
     layout.paddingLeft = node.paddingLeft ?? 0;
     layout.itemSpacing = node.itemSpacing ?? 0;
+    if (typeof node.counterAxisSpacing === 'number') {
+      layout.counterAxisSpacing = node.counterAxisSpacing;
+    }
   }
+
+  if (typeof node.minWidth === 'number') layout.minWidth = node.minWidth;
+  if (typeof node.maxWidth === 'number') layout.maxWidth = node.maxWidth;
+  if (typeof node.minHeight === 'number') layout.minHeight = node.minHeight;
+  if (typeof node.maxHeight === 'number') layout.maxHeight = node.maxHeight;
 
   if (typeof node.cornerRadius === 'number') {
     layout.cornerRadius = node.cornerRadius;
@@ -47,18 +67,29 @@ export function extractLayout(node: Record<string, any>): Record<string, any> {
     };
   }
 
+  if (typeof node.cornerSmoothing === 'number') {
+    layout.cornerSmoothing = node.cornerSmoothing;
+  }
+
   return layout;
 }
 
 /**
- * Normalizes a variable into a unified FigmaToken format.
+ * Normalizes a variable into a unified FigmaToken format preserving all modes and metadata.
  */
 export function formatVariableToken(
-  variable: { id: string; name: string; resolvedType: string; valuesByMode: Record<string, any>; description?: string },
+  variable: {
+    id: string;
+    name: string;
+    resolvedType: string;
+    valuesByMode: Record<string, any>;
+    description?: string;
+    scopes?: string[];
+  },
   collectionName: string = '',
-  tokensOrMap?: FigmaToken[] | Map<string, FigmaToken>
+  tokensOrMap?: FigmaToken[] | Map<string, FigmaToken>,
+  modesMap?: Record<string, string>
 ): FigmaToken {
-  // Use first mode value available
   const modeKeys = Object.keys(variable.valuesByMode || {});
   let rawValue = modeKeys.length > 0 ? variable.valuesByMode[modeKeys[0]!] : null;
 
@@ -76,12 +107,17 @@ export function formatVariableToken(
     type: variable.resolvedType.toLowerCase(),
     value: rawValue,
     description: variable.description || undefined,
+    collectionName: collectionName || undefined,
+    resolvedType: variable.resolvedType,
+    scopes: variable.scopes || undefined,
+    valuesByMode: variable.valuesByMode || undefined,
+    modes: modesMap || undefined,
   };
 }
 
 /**
- * Resolves all VARIABLE_ALIAS values across tokens with recursive cycle detection
- * and color normalization.
+ * Resolves all VARIABLE_ALIAS values across tokens with recursive cycle detection,
+ * multi-mode preservation, and color normalization.
  */
 export function resolveVariableAliases(tokens: FigmaToken[]): FigmaToken[] {
   const tokenMap = new Map<string, FigmaToken>();
@@ -150,19 +186,66 @@ export function resolveVariableAliases(tokens: FigmaToken[]): FigmaToken[] {
       resolvedVal = serializeColor(resolvedVal, resolvedVal.a);
     }
 
+    // Also resolve all values in valuesByMode
+    let resolvedValuesByMode: Record<string, any> | undefined = undefined;
+    if (token.valuesByMode && typeof token.valuesByMode === 'object') {
+      resolvedValuesByMode = {};
+      for (const [mId, mVal] of Object.entries(token.valuesByMode)) {
+        const modeVisited = new Set<string>();
+        if (token.id) modeVisited.add(token.id);
+        let resModeVal = resolveVal(mVal, modeVisited);
+        if (isColorObject(resModeVal)) {
+          resModeVal = serializeColor(resModeVal, resModeVal.a);
+        }
+        resolvedValuesByMode[mId] = resModeVal;
+      }
+    }
+
     return {
       ...token,
       value: resolvedVal,
+      valuesByMode: resolvedValuesByMode || token.valuesByMode,
     };
   });
 }
 
 /**
+ * Serializes a Figma stroke with weight, align, dash pattern, and boundVariables.
+ */
+export function serializeStroke(
+  stroke: any,
+  strokeWeight?: number,
+  strokeAlign?: string,
+  strokeDashes?: readonly number[] | number[]
+): FigmaStroke {
+  const serialized: FigmaStroke = {
+    type: stroke.type || 'SOLID',
+    visible: stroke.visible !== false,
+  };
+  if (stroke.color) {
+    serialized.color = serializeColor(stroke.color, stroke.opacity ?? 1);
+  }
+  if (typeof strokeWeight === 'number') {
+    serialized.weight = strokeWeight;
+  }
+  if (strokeAlign) {
+    serialized.align = strokeAlign;
+  }
+  if (Array.isArray(strokeDashes) && strokeDashes.length > 0) {
+    serialized.dashes = Array.from(strokeDashes);
+  }
+  if (stroke.boundVariables) {
+    serialized.boundVariables = stroke.boundVariables;
+  }
+  return serialized;
+}
+
+/**
  * Serializes a Figma effect (drop shadow, inner shadow, blur) into a standard object.
  */
-export function serializeEffect(effect: any): Record<string, any> {
-  const serialized: Record<string, any> = {
-    type: effect.type,
+export function serializeEffect(effect: any): FigmaEffect {
+  const serialized: FigmaEffect = {
+    type: effect.type || 'DROP_SHADOW',
     visible: effect.visible !== false,
     radius: typeof effect.radius === 'number' ? effect.radius : 0,
   };
@@ -182,6 +265,10 @@ export function serializeEffect(effect: any): Record<string, any> {
     serialized.spread = effect.spread;
   }
 
+  if (effect.boundVariables) {
+    serialized.boundVariables = effect.boundVariables;
+  }
+
   return serialized;
 }
 
@@ -190,7 +277,7 @@ export function serializeEffect(effect: any): Record<string, any> {
  */
 export function formatComponentSpec(
   node: { id: string; name: string; key?: string; description?: string; parent?: { name?: string; type?: string } },
-  serializedNodeData: Record<string, any>,
+  serializedNodeData: FigmaSceneNode,
   pageName?: string
 ): FigmaComponentSpec {
   const spec: FigmaComponentSpec = {
@@ -242,7 +329,10 @@ export function formatComponentSetSpec(
     name: componentSet.name,
     properties,
     node: {
-      ...(layoutData || {}),
+      id: componentSet.id,
+      name: componentSet.name,
+      type: 'COMPONENT_SET',
+      layout: layoutData,
       variantCount: variants.length,
       variants,
     },

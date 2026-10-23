@@ -1,4 +1,4 @@
-.PHONY: install fmt-check vet test-go test-ts typecheck build check clean run dev
+.PHONY: install fmt-check vet test-go test-ts typecheck build check clean run dev review dev-sync
 
 GO_MODULES := apps/api packages/contracts
 
@@ -9,6 +9,12 @@ run:
 	go run ./apps/api/cmd/api
 
 dev: run
+
+review:
+	pnpm --dir apps/docs dev
+
+dev-sync:
+	@./scripts/dev-sync.sh $(ARGS)
 
 fmt-check:
 	@diff=$$(gofmt -l $(GO_MODULES)); \
@@ -39,7 +45,7 @@ typecheck:
 build:
 	pnpm build
 
-check: fmt-check vet test-go typecheck test-ts build
+check: fmt-check vet test-go build typecheck test-ts
 	@echo "All checks passed successfully."
 
 clean:

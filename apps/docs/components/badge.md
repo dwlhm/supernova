@@ -18,6 +18,10 @@ Do not use a Badge for interactive actions.
 PropertiesVariant: primary, secondary, destructive, success, warning, info, or outline.
 Label: Editable text displayed inside the badge.
 
+## Live Preview
+
+<FrameworkPreview name="Badge" />
+
 ## Usage
 
 ::: code-group

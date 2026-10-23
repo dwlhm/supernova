@@ -1,0 +1,16 @@
+{
+  "name": "Badge",
+  "group": "components",
+  "variants": {
+    "Variant": [
+      "destructive",
+      "info",
+      "outline",
+      "primary",
+      "secondary",
+      "success",
+      "warning"
+    ]
+  },
+  "totalVariants": 7
+}

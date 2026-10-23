@@ -28,6 +28,10 @@ PROPERTIES
 • Show left icon / Show right icon — Toggles the leading or trailing icon.
 • Left icon / Right icon — Swaps the icon shown in the corresponding position.
 
+## Live Preview
+
+<FrameworkPreview name="Button" />
+
 ## Usage
 
 ::: code-group

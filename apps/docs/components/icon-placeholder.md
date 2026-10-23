@@ -13,6 +13,10 @@ Usage guidelines
 Properties
 This component has no exposed properties.
 
+## Live Preview
+
+<FrameworkPreview name="IconPlaceholder" />
+
 ## Usage
 
 ::: code-group

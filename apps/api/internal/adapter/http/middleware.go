@@ -1,6 +1,7 @@
 package http
 
 import (
+	"crypto/subtle"
 	"encoding/json"
 	"fmt"
 	"log/slog"
@@ -8,7 +9,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/dwlhm/supernova/apps/api/internal/infra/logger"
 	contracts "github.com/dwlhm/supernova/packages/contracts/gen"
 	"github.com/google/uuid"
 )
@@ -43,6 +43,12 @@ func (r *responseRecorder) Write(b []byte) (int, error) {
 	n, err := r.ResponseWriter.Write(b)
 	r.bytesWritten += int64(n)
 	return n, err
+}
+
+func (r *responseRecorder) Flush() {
+	if flusher, ok := r.ResponseWriter.(http.Flusher); ok {
+		flusher.Flush()
+	}
 }
 
 // LoggingMiddleware logs incoming HTTP requests and their responses.
@@ -93,31 +99,22 @@ func CORSMiddleware(next http.Handler) http.Handler {
 	})
 }
 
-// AuthMiddleware validates the Bearer token when apiToken is configured.
+// AuthMiddleware validates the Bearer token. An empty apiToken disables auth; config.Load only
+// allows that with the explicit SUPERNOVA_INSECURE_NO_AUTH opt-in.
 func AuthMiddleware(apiToken string) func(http.Handler) http.Handler {
+	expected := []byte(apiToken)
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			if apiToken == "" {
+			if apiToken == "" || r.Method == http.MethodOptions ||
+				r.URL.Path == "/v1/health" || r.URL.Path == "/v1/health/" ||
+				strings.HasPrefix(r.URL.Path, "/v1/webhooks/") {
 				next.ServeHTTP(w, r)
 				return
 			}
 
-			if r.URL.Path == "/v1/health" || r.URL.Path == "/v1/health/" {
-				next.ServeHTTP(w, r)
-				return
-			}
-
-			if r.Method == http.MethodOptions {
-				next.ServeHTTP(w, r)
-				return
-			}
-
-			authHeader := r.Header.Get("Authorization")
-			token := strings.TrimPrefix(authHeader, "Bearer ")
-
-			if authHeader == "" || !strings.HasPrefix(authHeader, "Bearer ") || token != apiToken {
-				masked := logger.MaskSecret(token)
-				slog.Warn(fmt.Sprintf("[AUTH] [WARN] Unauthorized request to %s: missing or invalid Bearer token (token preview: %s)", r.URL.Path, masked))
+			token, ok := strings.CutPrefix(r.Header.Get("Authorization"), "Bearer ")
+			if !ok || subtle.ConstantTimeCompare([]byte(token), expected) != 1 {
+				slog.Warn("[AUTH] Unauthorized request", "path", r.URL.Path, "remote", r.RemoteAddr, "has_bearer", ok)
 				w.Header().Set("Content-Type", "application/json")
 				w.WriteHeader(http.StatusUnauthorized)
 				_ = json.NewEncoder(w).Encode(contracts.ErrorResponse{

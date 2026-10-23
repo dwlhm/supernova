@@ -163,6 +163,11 @@ When translating Figma specifications and Auto Layout parameters into Tailwind u
   * Success: bg-success-default, text-success-foreground, bg-success-subtle
   * Warning: bg-warning-default, text-warning-foreground, bg-warning-subtle
   * Info: bg-info-default, text-info-foreground, bg-info-subtle
+- FIGMA BOUND VARIABLES TO TOKEN CLASSES:
+  When a node, fill, stroke, or effect in the Figma specification has "boundVariables":
+  * Match the referenced variable ID against the Design Tokens catalog to find the exact token name.
+  * Use the corresponding Tailwind token utility class (e.g. bg-components-button-primary-color-container-background-default or text-foreground-default).
+  * Do NOT guess or invent colors when boundVariables are present—they define the authoritative design token binding.
 - TOKEN DISCOVERY: If a required style/color/radius cannot be mapped to existing design tokens, call the "registerNewToken" tool to register it with hierarchical naming (category/component-or-system/role-state, e.g. color/button-secondary-hover).
 
 ================================================================================
@@ -409,6 +414,7 @@ export interface PromptAuthorRequest {
   tokenClasses?: string[];
   repairErrors?: string[];
   existingSource?: string;
+  feedbackNotes?: string;
   existingComponentNames?: string[];
   components?: Array<{
     componentName?: string;
@@ -518,6 +524,9 @@ export function buildAuthorUserPrompt(req: PromptAuthorRequest): string {
     }
     if (req.existingSource) {
       parts.push(`Existing Source:\n${req.existingSource}`);
+    }
+    if (req.feedbackNotes) {
+      parts.push(`User Feedback / Review Notes for Regeneration:\n${req.feedbackNotes}`);
     }
     if (req.repairErrors && req.repairErrors.length > 0) {
       parts.push(

@@ -24,6 +24,10 @@ Properties
 Type — Controls the hierarchy depth: 1, 2, or deep.
 Show Ellipsis — Shows or hides the collapsed-path indicator. Use primarily with Type=deep when intermediate levels are omitted.
 
+## Live Preview
+
+<FrameworkPreview name="Breadcrumb" />
+
 ## Usage
 
 ::: code-group

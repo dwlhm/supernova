@@ -2,6 +2,7 @@ import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   serializeColor,
+  serializeStroke,
   extractLayout,
   formatVariableToken,
   formatComponentSpec,
@@ -67,6 +68,54 @@ describe('Figma Extractor Utilities', () => {
     assert.equal(token.type, 'color');
     assert.equal(token.value, '#18a0fb');
     assert.equal(token.description, 'Brand primary color');
+  });
+
+  test('formatVariableToken preserves multiple modes and mode mapping', () => {
+    const token = formatVariableToken(
+      {
+        id: 'var-theme',
+        name: 'bg-surface',
+        resolvedType: 'COLOR',
+        valuesByMode: {
+          'mode:1': '#ffffff',
+          'mode:2': '#121212',
+        },
+      },
+      'Semantic',
+      undefined,
+      { 'mode:1': 'Light', 'mode:2': 'Dark' }
+    );
+
+    assert.equal(token.name, 'Semantic/bg-surface');
+    assert.equal(token.value, '#ffffff');
+    assert.deepEqual(token.valuesByMode, {
+      'mode:1': '#ffffff',
+      'mode:2': '#121212',
+    });
+    assert.deepEqual(token.modes, { 'mode:1': 'Light', 'mode:2': 'Dark' });
+  });
+
+  test('serializeStroke preserves stroke weight, alignment, dashes, and boundVariables', () => {
+    const stroke = serializeStroke(
+      {
+        type: 'SOLID',
+        color: { r: 0.1, g: 0.2, b: 0.3 },
+        opacity: 0.9,
+        boundVariables: {
+          color: { id: 'var-border', type: 'VARIABLE_ALIAS' },
+        },
+      },
+      2,
+      'INSIDE',
+      [4, 2]
+    );
+
+    assert.equal(stroke.type, 'SOLID');
+    assert.equal(stroke.weight, 2);
+    assert.equal(stroke.align, 'INSIDE');
+    assert.deepEqual(stroke.dashes, [4, 2]);
+    assert.equal(stroke.color, 'rgba(26, 51, 77, 0.9)');
+    assert.deepEqual(stroke.boundVariables?.color?.id, 'var-border');
   });
 
   test('formatComponentSpec preserves component set hierarchy', () => {
@@ -193,8 +242,8 @@ describe('Figma Extractor Utilities', () => {
     assert.equal(spec.properties?.Size?.defaultValue, 'Medium');
     assert.equal(spec.properties?.Status?.defaultValue, 'Online');
     assert.equal(spec.node.variantCount, 3);
-    assert.equal(spec.node.width, 120);
-    assert.equal(spec.node.layoutMode, 'HORIZONTAL');
+    assert.equal(spec.node.layout?.width, 120);
+    assert.equal(spec.node.layout?.layoutMode, 'HORIZONTAL');
     assert.equal(spec.node.variants.length, 3);
     assert.equal(spec.node.variants[0].name, 'Size=Small, Status=Online');
     assert.equal(spec.pageName, undefined);

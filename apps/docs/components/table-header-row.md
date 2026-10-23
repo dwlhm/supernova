@@ -18,6 +18,10 @@ Avoid wrapping header labels when a shorter label is available.
 Properties
 Show Column 1–10 — Shows or hides each header column. Columns 1–5 are visible by default; columns 6–10 are optional.
 
+## Live Preview
+
+<FrameworkPreview name="TableHeaderRow" />
+
 ## Usage
 
 ::: code-group

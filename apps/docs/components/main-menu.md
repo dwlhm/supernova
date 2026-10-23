@@ -26,6 +26,10 @@ Show trailing icon — Shows or hides the trailing icon.
 Show badge — Shows or hides the badge.
 Badge label — Sets the badge text.
 
+## Live Preview
+
+<FrameworkPreview name="MainMenu" />
+
 ## Usage
 
 ::: code-group

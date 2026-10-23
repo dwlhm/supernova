@@ -1,0 +1,30 @@
+{
+  "name": "Button",
+  "group": "components",
+  "variants": {
+    "Roundness": [
+      "Default",
+      "Round"
+    ],
+    "Size": [
+      "Large",
+      "Mini",
+      "Regular",
+      "Small"
+    ],
+    "State": [
+      "Default",
+      "Disabled",
+      "Focus",
+      "Pressed"
+    ],
+    "Style": [
+      "Destructive",
+      "Link",
+      "Outline",
+      "Primary",
+      "Secondary"
+    ]
+  },
+  "totalVariants": 160
+}

@@ -44,6 +44,85 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
+  /v1/syncs:
+    post:
+      summary: Submit document sync and compute diff plan
+      operationId: submitSync
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SyncRequest'
+      responses:
+        '200':
+          description: Sync diff plan computed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SyncPlanResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '413':
+          description: Payload too large
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /v1/syncs/{id}/apply:
+    post:
+      summary: Apply sync plan and trigger incremental execution job
+      operationId: applySync
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Sync plan identifier
+          schema:
+            type: string
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApplySyncRequest'
+      responses:
+        '202':
+          description: Extraction job accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExtractionResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Sync plan not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
   /v1/jobs/{id}:
     get:
       summary: Get job progress
@@ -101,6 +180,31 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
+  /v1/jobs/{id}/events:
+    get:
+      summary: Stream real-time job and component events via SSE
+      operationId: streamJobEvents
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Unique job identifier
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Server-sent event stream of job and component status updates
+          content:
+            text/event-stream:
+              schema:
+                type: string
+        '404':
+          description: Job not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
   /v1/health:
     get:
       summary: Health status
@@ -148,6 +252,15 @@ components:
         - succeeded
         - failed
 
+    TaskStatus:
+      type: string
+      enum:
+        - queued
+        - authoring
+        - verifying
+        - ready
+        - failed
+
     ComponentStatus:
       type: string
       enum:
@@ -156,6 +269,14 @@ components:
         - compiling
         - done
         - failed
+
+    DiffStatus:
+      type: string
+      enum:
+        - new
+        - changed
+        - unchanged
+        - removed
 
     FigmaColor:
       type: object
@@ -173,6 +294,220 @@ components:
           type: number
         a:
           type: number
+
+    FigmaPaint:
+      type: object
+      required:
+        - type
+      properties:
+        type:
+          type: string
+          description: SOLID, GRADIENT_LINEAR, GRADIENT_RADIAL, IMAGE, etc.
+        color:
+          type: string
+          description: Serialized rgba string (e.g. rgb(229, 85, 20) or rgba(0, 0, 0, 0.5))
+        opacity:
+          type: number
+        visible:
+          type: boolean
+        blendMode:
+          type: string
+        boundVariables:
+          type: object
+          additionalProperties: true
+
+    FigmaStroke:
+      type: object
+      properties:
+        type:
+          type: string
+        color:
+          type: string
+        opacity:
+          type: number
+        visible:
+          type: boolean
+        weight:
+          type: number
+        align:
+          type: string
+          description: INSIDE, OUTSIDE, CENTER
+        dashes:
+          type: array
+          items:
+            type: number
+        cap:
+          type: string
+        join:
+          type: string
+        boundVariables:
+          type: object
+          additionalProperties: true
+
+    FigmaEffect:
+      type: object
+      required:
+        - type
+      properties:
+        type:
+          type: string
+          description: DROP_SHADOW, INNER_SHADOW, LAYER_BLUR, BACKGROUND_BLUR
+        visible:
+          type: boolean
+        radius:
+          type: number
+        color:
+          type: string
+        offset:
+          type: object
+          properties:
+            x:
+              type: number
+            y:
+              type: number
+        spread:
+          type: number
+        boundVariables:
+          type: object
+          additionalProperties: true
+
+    FigmaLayout:
+      type: object
+      properties:
+        width:
+          type: number
+        height:
+          type: number
+        minWidth:
+          type: number
+        maxWidth:
+          type: number
+        minHeight:
+          type: number
+        maxHeight:
+          type: number
+        layoutMode:
+          type: string
+          description: NONE, HORIZONTAL, VERTICAL
+        layoutWrap:
+          type: string
+          description: NO_WRAP, WRAP
+        primaryAxisAlignItems:
+          type: string
+          description: MIN, CENTER, MAX, SPACE_BETWEEN
+        counterAxisAlignItems:
+          type: string
+          description: MIN, CENTER, MAX, BASELINE
+        primaryAxisSizingMode:
+          type: string
+          description: FIXED, AUTO
+        counterAxisSizingMode:
+          type: string
+          description: FIXED, AUTO
+        paddingTop:
+          type: number
+        paddingRight:
+          type: number
+        paddingBottom:
+          type: number
+        paddingLeft:
+          type: number
+        itemSpacing:
+          type: number
+        counterAxisSpacing:
+          type: number
+        cornerRadius:
+          description: Numeric uniform radius or per-corner object
+        cornerSmoothing:
+          type: number
+
+    FigmaTypography:
+      type: object
+      properties:
+        characters:
+          type: string
+        fontFamily:
+          type: string
+        fontStyle:
+          type: string
+        fontWeight:
+          type: string
+        fontSize:
+          type: number
+        lineHeight:
+          type: object
+          properties:
+            value:
+              type: number
+            unit:
+              type: string
+        letterSpacing:
+          type: object
+          properties:
+            value:
+              type: number
+            unit:
+              type: string
+        paragraphSpacing:
+          type: number
+        textAlignHorizontal:
+          type: string
+          description: LEFT, CENTER, RIGHT, JUSTIFIED
+        textAlignVertical:
+          type: string
+          description: TOP, CENTER, BOTTOM
+        textCase:
+          type: string
+        textDecoration:
+          type: string
+
+    FigmaSceneNode:
+      type: object
+      required:
+        - id
+        - name
+        - type
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        type:
+          type: string
+        visible:
+          type: boolean
+        opacity:
+          type: number
+        layout:
+          $ref: '#/components/schemas/FigmaLayout'
+        fills:
+          type: array
+          items:
+            $ref: '#/components/schemas/FigmaPaint'
+        strokes:
+          type: array
+          items:
+            $ref: '#/components/schemas/FigmaStroke'
+        effects:
+          type: array
+          items:
+            $ref: '#/components/schemas/FigmaEffect'
+        typography:
+          $ref: '#/components/schemas/FigmaTypography'
+        boundVariables:
+          type: object
+          additionalProperties: true
+        variantCount:
+          type: number
+        variants:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        children:
+          type: array
+          items:
+            $ref: '#/components/schemas/FigmaSceneNode'
 
     FigmaToken:
       type: object
@@ -192,6 +527,21 @@ components:
           description: Token value of arbitrary type
         description:
           type: string
+        collectionName:
+          type: string
+        resolvedType:
+          type: string
+        scopes:
+          type: array
+          items:
+            type: string
+        valuesByMode:
+          type: object
+          additionalProperties: true
+        modes:
+          type: object
+          additionalProperties:
+            type: string
 
     FigmaComponentSpec:
       type: object
@@ -218,9 +568,7 @@ components:
           description: Variant properties, booleans, text, instanceSwap
           additionalProperties: true
         node:
-          type: object
-          description: Figma scene node representation (type, layout, fills, strokes, children, etc.)
-          additionalProperties: true
+          $ref: '#/components/schemas/FigmaSceneNode'
 
     FigmaDocument:
       type: object
@@ -259,6 +607,9 @@ components:
       properties:
         document:
           $ref: '#/components/schemas/FigmaDocument'
+        syncId:
+          type: string
+          description: Optional sync plan ID to apply incremental execution
         targets:
           type: array
           items:
@@ -290,6 +641,133 @@ components:
           type: string
           format: date-time
 
+    ComponentDiff:
+      type: object
+      required:
+        - name
+        - status
+      properties:
+        name:
+          type: string
+        status:
+          $ref: '#/components/schemas/DiffStatus'
+        previousHash:
+          type: string
+        currentHash:
+          type: string
+        changeSummary:
+          type: string
+
+    TokenDiff:
+      type: object
+      required:
+        - changed
+      properties:
+        changed:
+          type: boolean
+        added:
+          type: array
+          items:
+            type: string
+        modified:
+          type: array
+          items:
+            type: string
+        removed:
+          type: array
+          items:
+            type: string
+        previousHash:
+          type: string
+        currentHash:
+          type: string
+
+    SyncSummary:
+      type: object
+      required:
+        - total
+        - new
+        - changed
+        - unchanged
+        - removed
+        - tokensChanged
+      properties:
+        total:
+          type: integer
+        new:
+          type: integer
+        changed:
+          type: integer
+        unchanged:
+          type: integer
+        removed:
+          type: integer
+        tokensChanged:
+          type: boolean
+
+    SyncRequest:
+      type: object
+      required:
+        - document
+      properties:
+        document:
+          $ref: '#/components/schemas/FigmaDocument'
+        targets:
+          type: array
+          items:
+            $ref: '#/components/schemas/Framework'
+        publishers:
+          type: array
+          items:
+            $ref: '#/components/schemas/PublisherType'
+        options:
+          $ref: '#/components/schemas/ExtractionOptions'
+
+    SyncPlanResponse:
+      type: object
+      required:
+        - syncId
+        - documentName
+        - summary
+        - components
+        - tokens
+        - createdAt
+      properties:
+        syncId:
+          type: string
+        documentName:
+          type: string
+        summary:
+          $ref: '#/components/schemas/SyncSummary'
+        components:
+          type: array
+          items:
+            $ref: '#/components/schemas/ComponentDiff'
+        tokens:
+          $ref: '#/components/schemas/TokenDiff'
+        createdAt:
+          type: string
+          format: date-time
+
+    ApplySyncRequest:
+      type: object
+      properties:
+        targets:
+          type: array
+          items:
+            $ref: '#/components/schemas/Framework'
+        publishers:
+          type: array
+          items:
+            $ref: '#/components/schemas/PublisherType'
+        options:
+          $ref: '#/components/schemas/ExtractionOptions'
+        selectedComponents:
+          type: array
+          items:
+            type: string
+          description: Optional subset of component names to author (defaults to all new & changed)
+
     StageError:
       type: object
       required:
@@ -317,12 +795,92 @@ components:
         stageError:
           $ref: '#/components/schemas/StageError'
 
+    ComponentTask:
+      type: object
+      required:
+        - id
+        - componentName
+        - status
+      properties:
+        id:
+          type: string
+        runId:
+          type: string
+        componentName:
+          type: string
+        status:
+          $ref: '#/components/schemas/TaskStatus'
+        attemptCount:
+          type: integer
+        maxAttempts:
+          type: integer
+        error:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    JobRun:
+      type: object
+      required:
+        - id
+        - jobId
+        - status
+      properties:
+        id:
+          type: string
+        jobId:
+          type: string
+        status:
+          type: string
+        tasks:
+          type: array
+          items:
+            $ref: '#/components/schemas/ComponentTask'
+        createdAt:
+          type: string
+          format: date-time
+        finishedAt:
+          type: string
+          format: date-time
+
+    JobEvent:
+      type: object
+      required:
+        - eventType
+        - jobId
+        - timestamp
+      properties:
+        eventType:
+          type: string
+          description: Event type (e.g. job_status, task_status, task_artifact, job_completed, job_failed)
+        jobId:
+          type: string
+        runId:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+        task:
+          $ref: '#/components/schemas/ComponentTask'
+        status:
+          type: string
+        error:
+          type: string
+
     PublishResults:
       type: object
       properties:
         downloadUrl:
           type: string
         pullRequestUrl:
+          type: string
+        branchName:
+          type: string
+        commitSha:
           type: string
 
     JobResponse:
@@ -352,6 +910,12 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ComponentProgress'
+        runId:
+          type: string
+        tasks:
+          type: array
+          items:
+            $ref: '#/components/schemas/ComponentTask'
         publishResults:
           $ref: '#/components/schemas/PublishResults'
         error:

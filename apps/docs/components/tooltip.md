@@ -20,6 +20,10 @@ PROPERTIES
 • Position: Top, Bottom, Left, or Right. Controls where the tooltip appears relative to its trigger.
 • Text content: Overrides the tooltip message for the instance.
 
+## Live Preview
+
+<FrameworkPreview name="Tooltip" />
+
 ## Usage
 
 ::: code-group

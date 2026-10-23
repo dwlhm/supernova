@@ -1,0 +1,19 @@
+{
+  "name": "DatePicker",
+  "group": "components",
+  "variants": {
+    "State": [
+      "Closed",
+      "Open"
+    ],
+    "Type": [
+      "Date and Time Picker",
+      "Date of Birth Picker",
+      "Natural Language Picker",
+      "Picker with Input",
+      "Range Picker",
+      "Year Picker"
+    ]
+  },
+  "totalVariants": 12
+}

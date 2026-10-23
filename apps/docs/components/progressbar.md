@@ -27,6 +27,10 @@ Component properties: No exposed component properties are currently configured.
 Variants
 No predefined variants are currently configured for this component.
 
+## Live Preview
+
+<FrameworkPreview name="Progressbar" />
+
 ## Usage
 
 ::: code-group

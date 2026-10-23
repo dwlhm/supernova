@@ -1,0 +1,14 @@
+{
+  "name": "MainMenu",
+  "group": "components",
+  "variants": {
+    "State": [
+      "Active",
+      "Active-Hover",
+      "Default",
+      "Hover",
+      "Pressed"
+    ]
+  },
+  "totalVariants": 5
+}

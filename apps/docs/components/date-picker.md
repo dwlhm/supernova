@@ -21,6 +21,10 @@ Type: Date of Birth Picker, Picker with Input, Date and Time Picker, Natural Lan
 State: Closed hides the selection surface; Open displays or activates it.
 Hint Text: Shows or hides supporting guidance beneath the field.
 
+## Live Preview
+
+<FrameworkPreview name="DatePicker" />
+
 ## Usage
 
 ::: code-group

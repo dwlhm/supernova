@@ -17,6 +17,10 @@ Properties
 • Tab 1 and Tab 2 are always visible.
 • Configure each nested Tab Item instance to set its label, icon, numeric value, and state.
 
+## Live Preview
+
+<FrameworkPreview name="Tabs" />
+
 ## Usage
 
 ::: code-group

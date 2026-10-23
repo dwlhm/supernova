@@ -4,6 +4,8 @@ import (
 	"archive/zip"
 	"bytes"
 	"context"
+	"errors"
+	"fmt"
 	"io"
 	"testing"
 	"time"
@@ -149,76 +151,31 @@ func TestDownloadPublisher(t *testing.T) {
 	}
 }
 
-func TestDownloadPublisher_PathNormalization(t *testing.T) {
-	ctx := context.Background()
-	store := memstore.New()
-	pub := download.NewPublisher(store)
-
-	job := &domain.Job{
-		ID:        "job-norm",
-		Status:    contracts.JobStatusPublishing,
-		CreatedAt: time.Now().UTC(),
-		UpdatedAt: time.Now().UTC(),
-		Artifacts: []domain.CompiledArtifact{
-			{
-				Target:   contracts.Framework("mitosis"),
-				FileName: "components/Card.lite.tsx",
-				Code:     "card-code",
-			},
-			{
-				Target:   contracts.Framework("mitosis"),
-				FileName: "src/components/Alert.lite.tsx",
-				Code:     "alert-code",
-			},
-			{
-				Target:   contracts.Framework("tokens"),
-				FileName: "tokens/tokens.json",
-				Code:     "{}",
-			},
-			{
-				Target:   contracts.Framework("tokens"),
-				FileName: "src/tokens/theme.css",
-				Code:     "@theme {}",
-			},
-		},
+func TestDownloadPublisher_RejectsUnsafeArtifactPaths(t *testing.T) {
+	unsafe := []domain.CompiledArtifact{
+		{Target: contracts.Mitosis, FileName: "../../../etc/cron.d/x", Code: "x"},
+		{Target: contracts.Mitosis, FileName: "components/Card.lite.tsx", Code: "x"},
+		{Target: contracts.Mitosis, FileName: "/abs.lite.tsx", Code: "x"},
+		{Target: contracts.Mitosis, FileName: "Card.lite.tsx", Group: "../escape", Code: "x"},
+		{Target: contracts.Framework("tokens"), FileName: "..", Code: "x"},
+		{Target: contracts.Framework("docs"), FileName: "a/../../b.md", Code: "x"},
 	}
-
-	if err := store.Save(ctx, job); err != nil {
-		t.Fatalf("failed to save job: %v", err)
-	}
-
-	if err := pub.Publish(ctx, job); err != nil {
-		t.Fatalf("Publish failed: %v", err)
-	}
-
-	zipBytes, err := store.GetZip(ctx, "job-norm")
-	if err != nil {
-		t.Fatalf("failed to get zip from store: %v", err)
-	}
-
-	zr, err := zip.NewReader(bytes.NewReader(zipBytes), int64(len(zipBytes)))
-	if err != nil {
-		t.Fatalf("failed to read zip: %v", err)
-	}
-
-	expectedPaths := map[string]bool{
-		"src/components/Card.lite.tsx":  false,
-		"src/components/Alert.lite.tsx": false,
-		"src/tokens/tokens.json":        false,
-		"src/tokens/theme.css":          false,
-	}
-
-	for _, f := range zr.File {
-		if _, ok := expectedPaths[f.Name]; ok {
-			expectedPaths[f.Name] = true
-		} else {
-			t.Errorf("unexpected entry in normalized zip: %s", f.Name)
+	for i, art := range unsafe {
+		store := memstore.New()
+		job := &domain.Job{
+			ID:        fmt.Sprintf("job-unsafe-%d", i),
+			Status:    contracts.JobStatusPublishing,
+			Artifacts: []domain.CompiledArtifact{art},
 		}
-	}
-
-	for path, found := range expectedPaths {
-		if !found {
-			t.Errorf("expected normalized path not found in zip: %s", path)
+		if err := store.Save(context.Background(), job); err != nil {
+			t.Fatal(err)
+		}
+		err := download.NewPublisher(store).Publish(context.Background(), job)
+		if !errors.Is(err, domain.ErrUnsafeArtifact) {
+			t.Errorf("artifact %+v: expected ErrUnsafeArtifact, got %v", art, err)
+		}
+		if _, zipErr := store.GetZip(context.Background(), job.ID); zipErr == nil {
+			t.Errorf("artifact %+v: zip must not be stored when an artifact is unsafe", art)
 		}
 	}
 }
@@ -315,7 +272,7 @@ func TestDownloadPublisher_UtilsPlacement_Deduplication(t *testing.T) {
 			},
 			{
 				Target:   contracts.Framework("mitosis"),
-				FileName: "src/components/utils.ts",
+				FileName: "utils.ts",
 				Code:     utilsCode,
 				Group:    "components",
 			},

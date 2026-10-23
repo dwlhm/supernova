@@ -2,6 +2,10 @@
 
 Tabler Icons — truck-delivery
 
+## Live Preview
+
+<FrameworkPreview name="IconTruckDelivery" />
+
 ## Usage
 
 ::: code-group

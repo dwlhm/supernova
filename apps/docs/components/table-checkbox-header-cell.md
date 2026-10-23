@@ -17,6 +17,10 @@ Disable or omit it when bulk selection is unavailable.
 Properties
 Checkbox state — Configure the nested checkbox instance.
 
+## Live Preview
+
+<FrameworkPreview name="TableCheckboxHeaderCell" />
+
 ## Usage
 
 ::: code-group

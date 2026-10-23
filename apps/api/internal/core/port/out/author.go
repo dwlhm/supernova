@@ -9,8 +9,12 @@ import (
 
 // AuthorRequest defines the payload for holistic design system authoring.
 type AuthorRequest struct {
+	ComponentName          string                         `json:"componentName,omitempty"`
 	Components             []contracts.FigmaComponentSpec `json:"components"`
 	Tokens                 []contracts.FigmaToken         `json:"tokens"`
+	ExistingSource         string                         `json:"existingSource,omitempty"`
+	FeedbackNotes          string                         `json:"feedbackNotes,omitempty"`
+	CompileOnly            bool                           `json:"compileOnly,omitempty"`
 	ExistingComponentNames []string                       `json:"existingComponentNames"`
 	WorkspaceDir           string                         `json:"workspaceDir,omitempty"`
 	Targets                []contracts.Framework          `json:"targets,omitempty"`

@@ -30,25 +30,6 @@ function writeOutput(response: AuthorAgentResponse, exitCode: number): void {
 }
 
 async function main(): Promise<void> {
-  // Pure environment variables guard
-  try {
-    getAuthorConfig();
-  } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : String(err);
-    writeOutput(
-      {
-        success: false,
-        components: {},
-        componentGroups: {},
-        artifacts: [],
-        newTokens: [],
-        error: message,
-      },
-      1
-    );
-    return;
-  }
-
   let rawInput = '';
   try {
     rawInput = await readStdin();
@@ -82,6 +63,38 @@ async function main(): Promise<void> {
           artifacts: [],
           newTokens: [],
           error: `Failed to parse JSON stdin: ${message}`,
+        },
+        1
+      );
+      return;
+    }
+  }
+
+  // CLI argument overrides
+  const args = process.argv.slice(2);
+  for (let i = 0; i < args.length; i++) {
+    if ((args[i] === '--component' || args[i] === '-c') && args[i + 1]) {
+      req.componentName = args[i + 1];
+      i++;
+    } else if (args[i] === '--compile-only') {
+      req.compileOnly = true;
+    }
+  }
+
+  // Pure environment variables guard only required when LLM generation is needed
+  if (!req.compileOnly) {
+    try {
+      getAuthorConfig();
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      writeOutput(
+        {
+          success: false,
+          components: {},
+          componentGroups: {},
+          artifacts: [],
+          newTokens: [],
+          error: message,
         },
         1
       );

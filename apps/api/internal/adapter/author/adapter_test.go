@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	authoradapter "github.com/dwlhm/supernova/apps/api/internal/adapter/author"
+	"github.com/dwlhm/supernova/apps/api/internal/adapter/nodecli"
 	"github.com/dwlhm/supernova/apps/api/internal/core/port/out"
 	contracts "github.com/dwlhm/supernova/packages/contracts/gen"
 )
@@ -67,7 +68,7 @@ process.stdout.write(JSON.stringify(resp));
 process.exit(0);
 `
 	cliPath := createTempCLIScript(t, script)
-	cliAuthor := authoradapter.NewCLIAuthor(cliPath)
+	cliAuthor := authoradapter.NewCLIAuthor(cliPath, nodecli.Sandbox{})
 
 	req := out.AuthorRequest{
 		Components: []contracts.FigmaComponentSpec{
@@ -129,7 +130,7 @@ process.stdout.write(JSON.stringify(resp));
 process.exit(0);
 `
 	cliPath := createTempCLIScript(t, script)
-	cliAuthor := authoradapter.NewCLIAuthor(cliPath)
+	cliAuthor := authoradapter.NewCLIAuthor(cliPath, nodecli.Sandbox{})
 
 	req := out.AuthorRequest{
 		Components: []contracts.FigmaComponentSpec{
@@ -171,7 +172,7 @@ process.stdout.write(JSON.stringify(resp));
 process.exit(1);
 `
 	cliPath := createTempCLIScript(t, script)
-	cliAuthor := authoradapter.NewCLIAuthor(cliPath)
+	cliAuthor := authoradapter.NewCLIAuthor(cliPath, nodecli.Sandbox{})
 
 	req := out.AuthorRequest{
 		Components: []contracts.FigmaComponentSpec{
@@ -196,7 +197,7 @@ process.stderr.write('Fatal node crash!\n');
 process.exit(1);
 `
 	cliPath := createTempCLIScript(t, script)
-	cliAuthor := authoradapter.NewCLIAuthor(cliPath)
+	cliAuthor := authoradapter.NewCLIAuthor(cliPath, nodecli.Sandbox{})
 
 	req := out.AuthorRequest{
 		Components: []contracts.FigmaComponentSpec{

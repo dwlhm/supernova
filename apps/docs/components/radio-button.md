@@ -26,6 +26,10 @@ Size: Small, Medium, or Large. Use one size consistently within a group.
 leftLabel: Shows or hides the optional label on the left.
 rightLabel: Shows or hides the optional label on the right. Prefer one label position at a time.
 
+## Live Preview
+
+<FrameworkPreview name="RadioButton" />
+
 ## Usage
 
 ::: code-group

@@ -17,6 +17,10 @@ Use with Table No Header Cell.
 Properties
 No — Sets the displayed row number.
 
+## Live Preview
+
+<FrameworkPreview name="TableNoBodyCell" />
+
 ## Usage
 
 ::: code-group

@@ -4,11 +4,10 @@ import (
 	"archive/zip"
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"log/slog"
-	"path/filepath"
-	"strings"
 
 	"github.com/dwlhm/supernova/apps/api/internal/core/domain"
 	"github.com/dwlhm/supernova/apps/api/internal/core/port/out"
@@ -43,36 +42,13 @@ func (p *DownloadPublisher) Publish(ctx context.Context, job *domain.Job) error 
 	seenZipPaths := make(map[string]bool)
 
 	for _, art := range job.Artifacts {
-		var entryPath string
-		switch art.Target {
-		case contracts.Framework("figma"):
-			entryPath = art.FileName
-		case contracts.Framework("mitosis"):
-			if art.FileName == "utils.ts" || art.FileName == "components/utils.ts" || art.FileName == "src/components/utils.ts" {
-				entryPath = "src/components/utils.ts"
-			} else {
-				dir := "src/components"
-				if art.Group == "icons" || strings.HasPrefix(art.FileName, "icons/") || strings.HasPrefix(art.FileName, "src/icons/") {
-					dir = "src/icons"
-				} else if art.Group != "" && art.Group != "components" {
-					dir = "src/" + art.Group
-				}
-				entryPath = normalizeZipPath(dir, art.FileName)
-			}
-		case contracts.Framework("tokens"):
-			entryPath = normalizeZipPath("src/tokens", art.FileName)
-		case contracts.Framework("docs"):
-			baseName := filepath.Base(art.FileName)
-			if baseName == "tokens.md" {
-				entryPath = "docs/tokens.md"
-			} else if baseName == "index.md" {
-				entryPath = "docs/components/index.md"
-			} else {
-				entryPath = "docs/components/" + baseName
-			}
-		default:
-			// Ensure no target framework folders (react/, vue2/, vue3/, svelte/, angular/) are included
+		entryPath, err := domain.ArtifactPath(art)
+		if errors.Is(err, domain.ErrUnpublishedTarget) {
 			continue
+		}
+		if err != nil {
+			slog.Error(fmt.Sprintf("[DOWNLOAD] [ERROR] [%s] Refusing artifact: %v", job.ID, err))
+			return err
 		}
 
 		if seenZipPaths[entryPath] {
@@ -119,14 +95,4 @@ func (p *DownloadPublisher) Publish(ctx context.Context, job *domain.Job) error 
 
 	slog.Info(fmt.Sprintf("[DOWNLOAD] [%s] Zip archive created (%d bytes, url: %s)", job.ID, buf.Len(), downloadURL))
 	return nil
-}
-
-func normalizeZipPath(defaultDir, fileName string) string {
-	if strings.HasPrefix(fileName, "src/") {
-		return fileName
-	}
-	trimmed := strings.TrimPrefix(fileName, "/")
-	subDir := strings.TrimPrefix(defaultDir, "src/") + "/"
-	trimmed = strings.TrimPrefix(trimmed, subDir)
-	return fmt.Sprintf("%s/%s", defaultDir, trimmed)
 }

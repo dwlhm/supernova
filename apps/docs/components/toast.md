@@ -27,6 +27,10 @@ PROPERTIES
 • Show Close Button — Shows or hides dismiss control.
 • clock — Shows or hides the timestamp.
 
+## Live Preview
+
+<FrameworkPreview name="Toast" />
+
 ## Usage
 
 ::: code-group

@@ -26,6 +26,10 @@ Properties
 • Step 3 label: Sets the third step label. Default: Payment.
 • Step 4 label: Sets the fourth step label. Default: Review.
 
+## Live Preview
+
+<FrameworkPreview name="Stepper" />
+
 ## Usage
 
 ::: code-group

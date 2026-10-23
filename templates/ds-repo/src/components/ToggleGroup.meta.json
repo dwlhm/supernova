@@ -1,0 +1,12 @@
+{
+  "name": "ToggleGroup",
+  "group": "components",
+  "variants": {
+    "Size": [
+      "Large",
+      "Medium",
+      "Small"
+    ]
+  },
+  "totalVariants": 3
+}

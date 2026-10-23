@@ -10,7 +10,6 @@ var (
 	reSplit   = regexp.MustCompile(`[^a-zA-Z0-9]+`)
 	reAcronym = regexp.MustCompile(`^[A-Z0-9]+$`)
 	reCamel   = regexp.MustCompile(`([a-z0-9])([A-Z])`)
-	reSafeKey = regexp.MustCompile(`[^a-zA-Z0-9_-]`)
 )
 
 // NormalizeComponentName sanitizes a raw Figma component name into a valid PascalCase identifier.
@@ -46,15 +45,6 @@ func NormalizeComponentName(rawName string) string {
 		return "Component"
 	}
 	return result
-}
-
-// SanitizeFileName ensures no path traversal or dangerous characters exist in a file or component name.
-func SanitizeFileName(name string) string {
-	cleaned := reSafeKey.ReplaceAllString(name, "")
-	if cleaned == "" {
-		return "unnamed"
-	}
-	return cleaned
 }
 
 // CamelToKebab converts camelCase or PascalCase strings to kebab-case.

@@ -27,6 +27,10 @@ Disabled: false for interactive use or true when the control is unavailable.
 leftLabel: Shows or hides the label on the left side.
 rightLabel: Shows or hides the label on the right side.
 
+## Live Preview
+
+<FrameworkPreview name="Checkbox" />
+
 ## Usage
 
 ::: code-group

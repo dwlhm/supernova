@@ -13,7 +13,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/dwlhm/supernova/apps/api/internal/adapter/compiler"
 	httpAdapter "github.com/dwlhm/supernova/apps/api/internal/adapter/http"
 	"github.com/dwlhm/supernova/apps/api/internal/adapter/memstore"
 	"github.com/dwlhm/supernova/apps/api/internal/adapter/publisher/download"
@@ -44,14 +43,14 @@ func TestE2E_ExtractionPipelineWithRealCompiler(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to get working dir: %v", err)
 	}
-	cliPath := filepath.Join(wd, "..", "..", "..", "..", "..", "packages", "mitosis-compiler", "bin", "cli.js")
+	repoRoot := filepath.Join(wd, "..", "..", "..", "..", "..")
+	cliPath := filepath.Join(repoRoot, "packages", "mitosis-compiler", "dist", "cli.js")
 	if _, err := os.Stat(cliPath); err != nil {
 		t.Fatalf("compiler CLI not found at %s: %v", cliPath, err)
 	}
 
 	// 2. Wire Hexagonal dependencies
 	store := memstore.New()
-	compilerAdapter := compiler.NewCLICompiler(cliPath)
 	authorMock := &e2eMockAuthor{
 		source: `
 import { useState } from '@builder.io/mitosis';
@@ -72,7 +71,7 @@ export default function Button(props: { text?: string; disabled?: boolean }) {
 `,
 	}
 	downloadPub := download.NewPublisher(store)
-	service := app.NewService(store, authorMock, compilerAdapter, []out.ArtifactPublisher{downloadPub})
+	service := app.NewService(store, authorMock, []out.ArtifactPublisher{downloadPub}, app.Paths{ExtractionsDir: t.TempDir()})
 	router := httpAdapter.NewRouter(service, "")
 	server := httptest.NewServer(router)
 	defer server.Close()
@@ -93,7 +92,7 @@ export default function Button(props: { text?: string; disabled?: boolean }) {
 				{
 					Id:   "btn-1",
 					Name: "Button",
-					Node: map[string]any{"width": 120, "height": 40},
+					Node: contracts.FigmaSceneNode{Id: "btn-1", Name: "Button", Type: "COMPONENT"},
 				},
 			},
 		},

@@ -6,6 +6,7 @@ import FrameworkPreview from './components/FrameworkPreview.vue';
 import ReactHost from './components/ReactHost.vue';
 import SvelteHost from './components/SvelteHost.vue';
 import ShowcaseDashboard from './components/ShowcaseDashboard.vue';
+import ComponentCatalog from './components/ComponentCatalog.vue';
 
 export default {
   extends: DefaultTheme,
@@ -14,5 +15,6 @@ export default {
     app.component('ReactHost', ReactHost);
     app.component('SvelteHost', SvelteHost);
     app.component('ShowcaseDashboard', ShowcaseDashboard);
+    app.component('ComponentCatalog', ComponentCatalog);
   },
 } satisfies Theme;

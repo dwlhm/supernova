@@ -94,8 +94,13 @@ Open `.env` and configure your settings:
 # ==============================================================================
 PORT=8080
 
-# Bearer Token for Backend API (leave empty for local dev to disable auth)
+# Bearer Token for the Backend API (required). Paste the same value into the Figma plugin.
+# Generate one with: openssl rand -hex 32
 API_TOKEN=
+
+# Local development only: run without auth. The server refuses to start with an empty
+# API_TOKEN unless this is exactly "true".
+# SUPERNOVA_INSECURE_NO_AUTH=true
 
 # ==============================================================================
 # LLM Provider Configuration (OpenAI-compatible)
@@ -190,7 +195,7 @@ This compiles `src/code.ts` and `src/ui.ts` into the `packages/figma-plugin/dist
 2. Type `Supernova` and launch **Supernova Design System Extractor**.
 3. In the plugin popup:
    - **Backend API URL**: Keep as `http://localhost:8080` (or your remote URL).
-   - **API Bearer Token**: Leave blank if `API_TOKEN` is unset in your `.env`.
+   - **API Bearer Token**: The `API_TOKEN` value from your `.env` (leave blank only when running with `SUPERNOVA_INSECURE_NO_AUTH=true`).
    - **Target Frameworks**: Check the frameworks you plan to build (React, Svelte, Vue 3, Vue 2, Angular).
    - **Publish Outputs**:
      - Check **GitHub PR** to create a clean reviewable Pull Request on GitHub.

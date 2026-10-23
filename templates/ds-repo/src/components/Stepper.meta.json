@@ -1,0 +1,17 @@
+{
+  "name": "Stepper",
+  "group": "components",
+  "variants": {
+    "Current": [
+      "1",
+      "2",
+      "3",
+      "4"
+    ],
+    "Type": [
+      "Horizontal",
+      "Vertical"
+    ]
+  },
+  "totalVariants": 8
+}

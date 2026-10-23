@@ -23,6 +23,10 @@ Properties
 • No configurable component properties are currently exposed.
 • The current page numbers and Previous/Next labels are defined by the component’s internal layers.
 
+## Live Preview
+
+<FrameworkPreview name="Pagination" />
+
 ## Usage
 
 ::: code-group

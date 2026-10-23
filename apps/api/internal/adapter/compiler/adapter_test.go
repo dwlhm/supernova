@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/dwlhm/supernova/apps/api/internal/adapter/compiler"
+	"github.com/dwlhm/supernova/apps/api/internal/adapter/nodecli"
 	contracts "github.com/dwlhm/supernova/packages/contracts/gen"
 )
 
@@ -31,7 +32,7 @@ console.log(JSON.stringify(res));
 		t.Fatalf("failed to write mock cli: %v", err)
 	}
 
-	comp := compiler.NewCLICompiler(scriptPath)
+	comp := compiler.NewCLICompiler(scriptPath, nodecli.Sandbox{})
 	artifacts, errors, err := comp.Compile(context.Background(), "Button", "const Button = 1;", []contracts.Framework{contracts.React})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -63,7 +64,7 @@ process.exit(1);
 		t.Fatalf("failed to write mock cli: %v", err)
 	}
 
-	comp := compiler.NewCLICompiler(scriptPath)
+	comp := compiler.NewCLICompiler(scriptPath, nodecli.Sandbox{})
 	artifacts, errMsgs, err := comp.Compile(context.Background(), "Button", "invalid code", []contracts.Framework{contracts.React})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -94,7 +95,7 @@ process.stdout.write(JSON.stringify(res));
 		t.Fatalf("failed to write mock cli: %v", err)
 	}
 
-	comp := compiler.NewCLICompiler(scriptPath)
+	comp := compiler.NewCLICompiler(scriptPath, nodecli.Sandbox{})
 	artifacts, errors, err := comp.Compile(context.Background(), "Button", "const Button = 1;", []contracts.Framework{contracts.React})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)

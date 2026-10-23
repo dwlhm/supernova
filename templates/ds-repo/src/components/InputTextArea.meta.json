@@ -1,0 +1,14 @@
+{
+  "name": "InputTextArea",
+  "group": "components",
+  "variants": {
+    "State": [
+      "Default",
+      "Disabled",
+      "Error",
+      "Filled",
+      "Focus"
+    ]
+  },
+  "totalVariants": 5
+}
