@@ -1,0 +1,73 @@
+"use client";
+import * as React from "react";
+
+export interface TableCheckboxHeaderCellProps {
+  checked?: boolean;
+  indeterminate?: boolean;
+  ariaLabel?: string;
+  className?: string;
+  onCheckedChange?: (checked: boolean) => void;
+}
+
+import { cn } from "./utils";
+
+function TableCheckboxHeaderCell(props: TableCheckboxHeaderCellProps) {
+  props = {
+    checked: false,
+    indeterminate: false,
+    ariaLabel: "Select all rows",
+    className: "",
+    ...props,
+  };
+  function handleChange() {
+    if (props.onCheckedChange) {
+      props.onCheckedChange(!props.checked);
+    }
+  }
+
+  return (
+    <th
+      scope="col"
+      className={cn(
+        "w-12 whitespace-nowrap bg-components-table-default-color-header-background-default px-4 py-3 text-center",
+        props.className
+      )}
+    >
+      <span className="relative inline-flex h-4 w-4 items-center justify-center">
+        <input
+          type="checkbox"
+          className="peer absolute inset-0 h-4 w-4 cursor-pointer appearance-none rounded-rounded-sm border border-components-checkbox-off-color-container-border-default bg-components-checkbox-off-color-container-background-default checked:border-components-checkbox-on-color-container-background-default checked:bg-components-checkbox-on-color-container-background-default peer-focus-visible:ring-2 peer-focus-visible:ring-focus-ring-primary"
+          checked={props.checked}
+          aria-label={props.ariaLabel}
+          onChange={(event) => handleChange()}
+        />
+        <span
+          aria-hidden="true"
+          className={cn(
+            "pointer-events-none absolute h-0.5 w-2 rounded-rounded-full bg-components-checkbox-on-color-icon-foreground-default",
+            props.checked && props.indeterminate ? "opacity-100" : "opacity-0"
+          )}
+        />
+        <svg
+          aria-hidden="true"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="3"
+          className={cn(
+            "pointer-events-none relative h-3 w-3 text-components-checkbox-on-color-icon-foreground-default",
+            props.checked && !props.indeterminate ? "opacity-100" : "opacity-0"
+          )}
+        >
+          <path
+            d="M5 13l4 4L19 7"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+      </span>
+    </th>
+  );
+}
+
+export default TableCheckboxHeaderCell;

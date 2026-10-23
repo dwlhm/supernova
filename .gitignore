@@ -12,7 +12,7 @@ var/
 .vitepress/dist/
 apps/docs/.vitepress/cache/
 apps/docs/.vitepress/dist/
-docs/
+/docs/
 
 # Environment
 .env
