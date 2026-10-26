@@ -1,0 +1,1 @@
+import{_ as e,o as i,a as s,aw as a}from"./chunks/framework.l_NNI0zP.js";const c=JSON.parse('{"title":"Design Tokens","description":"","frontmatter":{},"headers":[],"relativePath":"tokens.md","filePath":"tokens.md"}'),n={name:"tokens.md"};function l(d,t,o,r,p,h){return i(),s("div",null,[...t[0]||(t[0]=[a("",16)])])}const g=e(n,[["render",l]]);export{c as __pageData,g as default};
