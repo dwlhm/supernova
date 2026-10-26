@@ -826,27 +826,30 @@ func (s *Service) ExecuteJob(ctx context.Context, jobID string) {
 		}
 
 		srcCompDir := filepath.Join(docsDir, "src", "components")
-		_ = os.MkdirAll(filepath.Join(srcCompDir, "vue3"), 0755)
-		_ = os.MkdirAll(filepath.Join(srcCompDir, "react"), 0755)
-		_ = os.MkdirAll(filepath.Join(srcCompDir, "svelte"), 0755)
-
-		_ = os.WriteFile(filepath.Join(srcCompDir, "utils.ts"), []byte(GenerateUtilsTS()), 0644)
+		previewCompDir := filepath.Join(docsDir, ".vitepress", "theme", "preview")
+		for _, baseDir := range []string{srcCompDir, previewCompDir} {
+			_ = os.MkdirAll(filepath.Join(baseDir, "vue3"), 0755)
+			_ = os.MkdirAll(filepath.Join(baseDir, "react"), 0755)
+			_ = os.MkdirAll(filepath.Join(baseDir, "svelte"), 0755)
+			_ = os.WriteFile(filepath.Join(baseDir, "utils.ts"), []byte(GenerateUtilsTS()), 0644)
+		}
 
 		componentNames := make(map[string]bool)
 		for _, art := range job.Artifacts {
-			var targetDir string
+			var subDir string
 			switch art.Target {
 			case contracts.Vue3:
-				targetDir = filepath.Join(srcCompDir, "vue3")
+				subDir = "vue3"
 			case contracts.React:
-				targetDir = filepath.Join(srcCompDir, "react")
+				subDir = "react"
 			case contracts.Svelte:
-				targetDir = filepath.Join(srcCompDir, "svelte")
+				subDir = "svelte"
 			}
-			if targetDir != "" && domain.ValidFileName(art.FileName) {
+			if subDir != "" && domain.ValidFileName(art.FileName) {
 				baseName := strings.TrimSuffix(strings.TrimSuffix(strings.TrimSuffix(art.FileName, ".vue"), ".tsx"), ".svelte")
 				componentNames[baseName] = true
-				_ = os.WriteFile(filepath.Join(targetDir, art.FileName), []byte(art.Code), 0644)
+				_ = os.WriteFile(filepath.Join(srcCompDir, subDir, art.FileName), []byte(art.Code), 0644)
+				_ = os.WriteFile(filepath.Join(previewCompDir, subDir, art.FileName), []byte(art.Code), 0644)
 			}
 		}
 
@@ -856,12 +859,24 @@ func (s *Service) ExecuteJob(ctx context.Context, jobID string) {
 		}
 		sort.Strings(sortedNames)
 
+		metaByComp := buildComponentMetadataMap(job.Document.Components, componentGroups)
+		metaJSON, err := json.MarshalIndent(metaByComp, "", "  ")
+		if err != nil {
+			metaJSON = []byte("{}")
+		}
+
 		var regSb strings.Builder
 		regSb.WriteString("// Auto-generated component registry for VitePress Multi-Framework Preview\n")
 		regSb.WriteString("export interface ComponentLoader {\n")
 		regSb.WriteString("  vue3?: () => Promise<any>;\n")
 		regSb.WriteString("  react?: () => Promise<any>;\n")
 		regSb.WriteString("  svelte?: () => Promise<any>;\n")
+		regSb.WriteString("}\n\n")
+		regSb.WriteString("export interface ComponentMeta {\n")
+		regSb.WriteString("  name: string;\n")
+		regSb.WriteString("  group?: string;\n")
+		regSb.WriteString("  variants?: Record<string, string[]>;\n")
+		regSb.WriteString("  totalVariants?: number;\n")
 		regSb.WriteString("}\n\n")
 		regSb.WriteString("export const componentRegistry: Record<string, ComponentLoader> = {\n")
 		for _, name := range sortedNames {
@@ -871,8 +886,11 @@ func (s *Service) ExecuteJob(ctx context.Context, jobID string) {
 			regSb.WriteString(fmt.Sprintf("    svelte: () => import('./svelte/%s.svelte'),\n", name))
 			regSb.WriteString("  },\n")
 		}
-		regSb.WriteString("};\n")
-		_ = os.WriteFile(filepath.Join(srcCompDir, "registry.ts"), []byte(regSb.String()), 0644)
+		regSb.WriteString("};\n\n")
+		regSb.WriteString(fmt.Sprintf("export const componentMetadata: Record<string, ComponentMeta> = %s;\n", string(metaJSON)))
+		regContent := []byte(regSb.String())
+		_ = os.WriteFile(filepath.Join(srcCompDir, "registry.ts"), regContent, 0644)
+		_ = os.WriteFile(filepath.Join(previewCompDir, "registry.ts"), regContent, 0644)
 	}
 
 	// Figma document snapshot artifact generation
@@ -987,6 +1005,68 @@ func resolveComponentGroup(rawGroup, compName string, compSpec contracts.FigmaCo
 		return domain.GroupIcons
 	}
 	return domain.GroupComponents
+}
+
+type componentMetaEntry struct {
+	Name          string              `json:"name"`
+	Group         string              `json:"group,omitempty"`
+	Variants      map[string][]string `json:"variants"`
+	TotalVariants int                 `json:"totalVariants"`
+}
+
+func buildComponentMetadataMap(components []contracts.FigmaComponentSpec, groups map[string]string) map[string]componentMetaEntry {
+	res := make(map[string]componentMetaEntry, len(components))
+	for _, comp := range components {
+		compName := domain.NormalizeComponentName(comp.Name)
+		group := groups[compName]
+		if group == "" {
+			group = resolveComponentGroup("", compName, comp)
+		}
+		variants := make(map[string][]string)
+		if comp.Properties != nil {
+			for rawKey, val := range *comp.Properties {
+				cleanKey := strings.TrimSpace(strings.Split(rawKey, "#")[0])
+				if cleanKey == "" {
+					continue
+				}
+				if valMap, ok := val.(map[string]interface{}); ok {
+					var opts []string
+					if rawOpts, ok := valMap["variantOptions"].([]interface{}); ok {
+						for _, o := range rawOpts {
+							s := strings.TrimSpace(fmt.Sprintf("%v", o))
+							if s != "" {
+								opts = append(opts, s)
+							}
+						}
+					} else if rawOpts, ok := valMap["variantOptions"].([]string); ok {
+						for _, o := range rawOpts {
+							s := strings.TrimSpace(o)
+							if s != "" {
+								opts = append(opts, s)
+							}
+						}
+					}
+					if len(opts) > 0 {
+						variants[cleanKey] = opts
+					}
+				}
+			}
+		}
+		total := 0
+		if len(variants) > 0 {
+			total = 1
+			for _, opts := range variants {
+				total *= len(opts)
+			}
+		}
+		res[compName] = componentMetaEntry{
+			Name:          compName,
+			Group:         group,
+			Variants:      variants,
+			TotalVariants: total,
+		}
+	}
+	return res
 }
 
 // GenerateUtilsTS returns the TypeScript source defining headless UI helpers and the standard cn utility.

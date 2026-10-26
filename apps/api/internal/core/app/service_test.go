@@ -1522,6 +1522,19 @@ func TestService_DocsSync_WithFrameworkArtifacts(t *testing.T) {
 	if !strings.Contains(regStr, "svelte: () => import('./svelte/Button.svelte')") {
 		t.Errorf("expected svelte loader for Button")
 	}
+	if !strings.Contains(regStr, "export const componentMetadata: Record<string, ComponentMeta> =") {
+		t.Errorf("expected componentMetadata export in registry.ts")
+	}
+
+	// 5. Verify .vitepress/theme/preview sync
+	previewCompDir := filepath.Join(tempDocs, ".vitepress", "theme", "preview")
+	previewRegTS, err := os.ReadFile(filepath.Join(previewCompDir, "registry.ts"))
+	if err != nil || string(previewRegTS) != regStr {
+		t.Fatalf("expected .vitepress/theme/preview/registry.ts to match src/components/registry.ts: err=%v", err)
+	}
+	if _, err := os.Stat(filepath.Join(previewCompDir, "react", "Button.tsx")); err != nil {
+		t.Errorf("expected .vitepress/theme/preview/react/Button.tsx to exist: %v", err)
+	}
 }
 
 func TestService_WorkerPool_IsolatedComponentFailure_AndSSE(t *testing.T) {

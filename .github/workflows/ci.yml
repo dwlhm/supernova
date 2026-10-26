@@ -34,5 +34,15 @@ jobs:
       - name: Run checks
         run: make check
 
+      - name: Build Multi-Framework UI Preview (apps/docs)
+        run: pnpm --dir apps/docs build
+
+      - name: Upload UI Preview Bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: supernova-ui-preview
+          path: apps/docs/.vitepress/dist
+          retention-days: 14
+
       - name: Security audit (apps/api)
         run: cd apps/api && go run golang.org/x/vuln/cmd/govulncheck@latest ./...

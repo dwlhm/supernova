@@ -10,15 +10,24 @@ const __dirname = path.dirname(__filename);
 const docsRoot = path.resolve(__dirname, '..');
 const repoRoot = path.resolve(docsRoot, '../..');
 
-// Source paths: resolve from DS_REPO_DIR if set, otherwise from templates/ds-repo
-const dsRepoRoot = process.env.DS_REPO_DIR
-  ? path.resolve(process.env.DS_REPO_DIR)
-  : path.resolve(repoRoot, 'templates/ds-repo');
+async function hasLiteComponents(dir) {
+  try {
+    const entries = await fs.readdir(path.resolve(dir, 'src/components'));
+    return entries.some((f) => f.endsWith('.lite.tsx'));
+  } catch {
+    return false;
+  }
+}
 
-const componentsSrcDir = path.resolve(dsRepoRoot, 'src/components');
-const iconsSrcDir = path.resolve(dsRepoRoot, 'src/icons');
-const utilsSrcFile = path.resolve(dsRepoRoot, 'src/components/utils.ts');
-const tokensSrcDir = path.resolve(dsRepoRoot, 'src/tokens');
+async function resolveDsRepoRoot() {
+  if (process.env.DS_REPO_DIR) {
+    return path.resolve(process.env.DS_REPO_DIR);
+  }
+  if (await hasLiteComponents(repoRoot)) {
+    return repoRoot;
+  }
+  return path.resolve(repoRoot, 'templates/ds-repo');
+}
 
 // Target paths
 const targetPreviewDir = path.resolve(docsRoot, '.vitepress/theme/preview');
@@ -40,47 +49,130 @@ async function loadCompiler() {
   }
 }
 
-async function getLiteComponentFiles() {
-  const componentFiles = (await fs.readdir(componentsSrcDir))
+async function readDirSafe(dirPath) {
+  try {
+    return await fs.readdir(dirPath);
+  } catch {
+    return [];
+  }
+}
+
+async function getLiteComponentFiles(componentsSrcDir, iconsSrcDir) {
+  const componentFiles = (await readDirSafe(componentsSrcDir))
     .filter((f) => f.endsWith('.lite.tsx'))
     .map((f) => ({
       name: f.replace(/\.lite\.tsx$/, ''),
+      group: 'components',
       filePath: path.join(componentsSrcDir, f),
     }));
 
-  const iconFiles = (await fs.readdir(iconsSrcDir))
+  const iconFiles = (await readDirSafe(iconsSrcDir))
     .filter((f) => f.endsWith('.lite.tsx'))
     .map((f) => ({
       name: f.replace(/\.lite\.tsx$/, ''),
+      group: 'icons',
       filePath: path.join(iconsSrcDir, f),
     }));
 
   return [...componentFiles, ...iconFiles];
 }
 
+function extractMetadataFromSource(name, group, source) {
+  const variants = {};
+  const interfaceMatch = source.match(/export\s+interface\s+\w+Props\s*\{([\s\S]*?)\}/);
+  if (interfaceMatch) {
+    const body = interfaceMatch[1];
+    const propRegex = /^\s*([a-zA-Z0-9_]+)\??\s*:\s*([^;\n]+);/gm;
+    let match;
+    while ((match = propRegex.exec(body)) !== null) {
+      const propName = match[1];
+      const propType = match[2].trim();
+      if (propName === 'target' || propName === 'role' || propName === 'ariaHidden') continue;
+      if (propType.includes("'") || propType.includes('"')) {
+        const unionParts = propType
+          .split('|')
+          .map((p) => p.trim())
+          .filter((p) => /^['"][^'"]+['"]$/.test(p))
+          .map((p) => p.slice(1, -1));
+        if (unionParts.length >= 2) {
+          variants[propName] = unionParts;
+        }
+      }
+    }
+  }
+  const counts = Object.values(variants).map((v) => v.length);
+  const totalVariants = counts.length > 0 ? counts.reduce((acc, c) => acc * c, 1) : 0;
+  return {
+    name,
+    group,
+    variants,
+    totalVariants,
+  };
+}
+
+async function syncGeneratedDocs(dsRepoRoot) {
+  const srcDocsDir = path.resolve(dsRepoRoot, 'docs');
+  const srcTokensDoc = path.join(srcDocsDir, 'tokens.md');
+  const srcCompDocsDir = path.join(srcDocsDir, 'components');
+
+  try {
+    const tokensMd = await fs.readFile(srcTokensDoc, 'utf-8');
+    if (tokensMd.trim().length > 0) {
+      await fs.writeFile(path.resolve(docsRoot, 'tokens.md'), tokensMd, 'utf-8');
+      console.log('[compile-docs-components] Synced docs/tokens.md into apps/docs/tokens.md.');
+    }
+  } catch {
+    // No generated tokens.md in dsRepoRoot
+  }
+
+  const mdFiles = (await readDirSafe(srcCompDocsDir)).filter(
+    (f) => f.endsWith('.md') && f !== 'index.md'
+  );
+  if (mdFiles.length > 0) {
+    const destCompDocsDir = path.resolve(docsRoot, 'components');
+    await fs.mkdir(destCompDocsDir, { recursive: true });
+    for (const file of mdFiles) {
+      const content = await fs.readFile(path.join(srcCompDocsDir, file), 'utf-8');
+      await fs.writeFile(path.join(destCompDocsDir, file), content, 'utf-8');
+    }
+    console.log(
+      `[compile-docs-components] Synced ${mdFiles.length} component docs from ${srcCompDocsDir}.`
+    );
+  }
+}
+
 async function main() {
-  console.log('[compile-docs-components] Starting compilation for docs components...');
+  const dsRepoRoot = await resolveDsRepoRoot();
+  console.log(`[compile-docs-components] Using design system source root: ${dsRepoRoot}`);
+
+  const componentsSrcDir = path.resolve(dsRepoRoot, 'src/components');
+  const iconsSrcDir = path.resolve(dsRepoRoot, 'src/icons');
+  const utilsSrcFile = path.resolve(dsRepoRoot, 'src/components/utils.ts');
+  const tokensSrcDir = path.resolve(dsRepoRoot, 'src/tokens');
 
   const compileMitosis = await loadCompiler();
 
-  // Ensure target directories exist
-  await fs.mkdir(targetVue3Dir, { recursive: true });
-  await fs.mkdir(targetReactDir, { recursive: true });
-  await fs.mkdir(targetSvelteDir, { recursive: true });
+  // Ensure clean target directories exist
+  for (const dir of [targetVue3Dir, targetReactDir, targetSvelteDir]) {
+    await fs.rm(dir, { recursive: true, force: true });
+    await fs.mkdir(dir, { recursive: true });
+  }
   await fs.mkdir(path.dirname(targetUtilsFile), { recursive: true });
   await fs.mkdir(targetTokensDir, { recursive: true });
 
   // Read all .lite.tsx components
-  const componentEntries = await getLiteComponentFiles();
+  const componentEntries = await getLiteComponentFiles(componentsSrcDir, iconsSrcDir);
   console.log(`[compile-docs-components] Found ${componentEntries.length} component files.`);
 
   // Sort component names alphabetically
   componentEntries.sort((a, b) => a.name.localeCompare(b.name));
 
   const targets = ['vue3', 'react', 'svelte'];
+  const sourceByName = {};
 
   for (const { name, filePath } of componentEntries) {
     const source = await fs.readFile(filePath, 'utf-8');
+    sourceByName[name] = source;
 
     const result = await compileMitosis({
       componentName: name,
@@ -120,15 +212,24 @@ async function main() {
   await fs.copyFile(path.join(tokensSrcDir, 'tokens.css'), path.join(targetTokensDir, 'tokens.css'));
   console.log('[compile-docs-components] Copied theme.css and tokens.css into .vitepress/theme/tokens/.');
 
-  // Read all metadata files
+  // Sync generated markdown docs if present in dsRepoRoot/docs
+  await syncGeneratedDocs(dsRepoRoot);
+
+  // Read metadata files or fallback to source interface extraction
   const metaMap = {};
-  for (const { name } of componentEntries) {
+  for (const { name, group } of componentEntries) {
     const metaPath = path.join(componentsSrcDir, `${name}.meta.json`);
+    const sourceMeta = extractMetadataFromSource(name, group, sourceByName[name] || '');
     try {
       const metaContent = await fs.readFile(metaPath, 'utf-8');
-      metaMap[name] = JSON.parse(metaContent);
+      const parsed = JSON.parse(metaContent);
+      // Merge with source-extracted variants so exact literal casing from Props is preserved when available
+      if (Object.keys(sourceMeta.variants).length > 0) {
+        parsed.variants = { ...(parsed.variants || {}), ...sourceMeta.variants };
+      }
+      metaMap[name] = parsed;
     } catch {
-      // No meta file found, keep entry empty or basic
+      metaMap[name] = sourceMeta;
     }
   }
 

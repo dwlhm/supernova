@@ -60,6 +60,7 @@ function utilsResolverPlugin() {
 export default defineConfig({
   title: 'Supernova',
   description: 'Figma to Mitosis Multi-Framework Design System Pipeline',
+  base: process.env.VITEPRESS_BASE || '/',
   cleanUrls: true,
   vite: {
     css: {

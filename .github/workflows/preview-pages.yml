@@ -1,0 +1,153 @@
+name: UI Preview (GitHub Pages)
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types: [opened, synchronize, reopened, closed]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: pages-preview-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deploy-preview:
+    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed' && github.event.pull_request.head.repo.full_name == github.repository)
+    name: Build & Deploy Live UI Preview
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build compiler package
+        run: pnpm --filter @supernova/mitosis-compiler build
+
+      - name: Compute Preview Base & Destination
+        id: meta
+        run: |
+          REPO_NAME="${GITHUB_REPOSITORY#*/}"
+          OWNER="${GITHUB_REPOSITORY%/*}"
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            PR_NUM="${{ github.event.number }}"
+            echo "vitepress_base=/${REPO_NAME}/pr-preview/pr-${PR_NUM}/" >> "$GITHUB_OUTPUT"
+            echo "dest_dir=pr-preview/pr-${PR_NUM}" >> "$GITHUB_OUTPUT"
+            echo "preview_url=https://${OWNER}.github.io/${REPO_NAME}/pr-preview/pr-${PR_NUM}" >> "$GITHUB_OUTPUT"
+          else
+            echo "vitepress_base=/${REPO_NAME}/" >> "$GITHUB_OUTPUT"
+            echo "dest_dir=." >> "$GITHUB_OUTPUT"
+            echo "preview_url=https://${OWNER}.github.io/${REPO_NAME}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Build Multi-Framework UI Preview (VitePress)
+        env:
+          VITEPRESS_BASE: ${{ steps.meta.outputs.vitepress_base }}
+        run: pnpm --dir apps/docs build
+
+      - name: Ensure .nojekyll in bundle
+        run: touch apps/docs/.vitepress/dist/.nojekyll
+
+      - name: Deploy Main Preview to GitHub Pages
+        if: github.event_name == 'push'
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: apps/docs/.vitepress/dist
+          keep_files: true
+
+      - name: Deploy PR Preview to GitHub Pages
+        if: github.event_name == 'pull_request'
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: apps/docs/.vitepress/dist
+          destination_dir: ${{ steps.meta.outputs.dest_dir }}
+          keep_files: true
+
+      - name: Post or Update PR Comment with Live UI Preview Links
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        env:
+          PREVIEW_URL: ${{ steps.meta.outputs.preview_url }}
+        with:
+          script: |
+            const marker = '<!-- supernova-ui-preview-comment -->';
+            const previewUrl = process.env.PREVIEW_URL;
+            const sha = context.payload.pull_request.head.sha.slice(0, 7);
+            const body = [
+              marker,
+              '### 🚀 Supernova Live UI Preview Ready!',
+              '',
+              `Komponen Mitosis pada PR ini (\`${sha}\`) telah dikompilasi ke **React**, **Vue 3**, dan **Svelte** serta di-deploy ke GitHub Pages:`,
+              '',
+              '| Halaman Preview | Link Langsung |',
+              '| :--- | :--- |',
+              `| 🎨 **Multi-Framework Showcase** *(Single & Side-by-Side)* | [Buka Live Showcase ↗](${previewUrl}/showcase) |`,
+              `| 🧩 **Component Catalog** *(Interactive Variants & Dark Mode)* | [Buka Component Catalog ↗](${previewUrl}/components/) |`,
+              `| 🎛️ **Design Tokens Reference** | [Buka Design Tokens ↗](${previewUrl}/tokens) |`,
+              '',
+              '> 💡 *Tip: Gunakan komentar `/supernova regenerate <NamaKomponen>: <catatan>` di PR ini untuk merevisi komponen secara otomatis.*'
+            ].join('\n');
+
+            const { owner, repo } = context.repo;
+            const issue_number = context.issue.number;
+
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner,
+              repo,
+              issue_number,
+            });
+            const existing = comments.find((c) => c.body && c.body.includes(marker));
+
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner,
+                repo,
+                comment_id: existing.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner,
+                repo,
+                issue_number,
+                body,
+              });
+            }
+
+  cleanup-preview:
+    if: github.event_name == 'pull_request' && github.event.action == 'closed'
+    name: Cleanup Closed PR Preview
+    runs-on: ubuntu-latest
+    steps:
+      - name: Remove PR preview directory from gh-pages
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUM: ${{ github.event.number }}
+        run: |
+          git clone --depth 1 --branch gh-pages "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" gh-pages-clean || exit 0
+          cd gh-pages-clean
+          if [ -d "pr-preview/pr-${PR_NUM}" ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git rm -rf "pr-preview/pr-${PR_NUM}"
+            git commit -m "chore(preview): remove preview for closed PR #${PR_NUM}"
+            git push origin gh-pages
+          fi

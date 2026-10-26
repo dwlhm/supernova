@@ -176,18 +176,24 @@ const compMeta = computed(() => {
 const variantOptions = computed(() => {
   const variants = compMeta.value?.variants;
   if (!variants) return [];
-  return Object.entries(variants).map(([group, values]) => {
+  const seenKeys = new Set<string>();
+  const result: Array<{ group: string; propKey: string; values: Array<{ label: string; value: string }> }> = [];
+  for (const [group, values] of Object.entries(variants)) {
     let propKey = group.charAt(0).toLowerCase() + group.slice(1);
     if (group === 'Style') propKey = 'variant';
-    return {
-      group,
+    if (seenKeys.has(propKey)) continue;
+    seenKeys.add(propKey);
+    const label = group.charAt(0).toUpperCase() + group.slice(1);
+    result.push({
+      group: label,
       propKey,
       values: (values as string[]).map((v) => ({
         label: v,
-        value: v.toLowerCase(),
+        value: v,
       })),
-    };
-  });
+    });
+  }
+  return result;
 });
 
 const interactiveProps = ref<Record<string, any>>({});
@@ -200,14 +206,25 @@ function setProp(key: string, value: any) {
 }
 
 watch(
-  () => [props.name, props.defaultProps],
+  () => [props.name, props.defaultProps, variantOptions.value],
   () => {
     const compKey = normalizedComponentName.value;
-    const defaults = DEFAULT_PROPS_BY_COMPONENT[compKey] || DEFAULT_PROPS_BY_COMPONENT[props.name] || {};
-    interactiveProps.value = {
-      ...defaults,
+    const defaults = {
+      ...(DEFAULT_PROPS_BY_COMPONENT[compKey] || DEFAULT_PROPS_BY_COMPONENT[props.name] || {}),
       ...(props.defaultProps || {}),
     };
+    for (const opt of variantOptions.value) {
+      const curVal = defaults[opt.propKey];
+      if (typeof curVal === 'string') {
+        const match = opt.values.find((v) => v.value.toLowerCase() === curVal.toLowerCase());
+        if (match) {
+          defaults[opt.propKey] = match.value;
+        }
+      } else if (curVal === undefined && opt.values.length > 0) {
+        defaults[opt.propKey] = opt.values[0]!.value;
+      }
+    }
+    interactiveProps.value = defaults;
   },
   { immediate: true }
 );
@@ -250,8 +267,17 @@ function getLoader(name: string): ComponentLoader | undefined {
   const pascal = resolvePascalName(name);
   if (componentRegistry[pascal]) return componentRegistry[pascal];
 
-  if (pascal === 'TablerTruckDelivery' || pascal === 'TruckDelivery') {
-    return componentRegistry['IconTruckDelivery'];
+  if (pascal === 'TablerTruckDelivery' || pascal === 'TruckDelivery' || pascal === 'IconTruckDelivery') {
+    return componentRegistry['IconTruckDelivery'] || componentRegistry['TruckDelivery'];
+  }
+  if (pascal === 'IconPlaceholder' || pascal === 'Placeholder') {
+    return componentRegistry['IconPlaceholder'] || componentRegistry['Placeholder'];
+  }
+  if (pascal === 'InputFileInput' || pascal === 'FileInput') {
+    return componentRegistry['InputFileInput'] || componentRegistry['FileInput'];
+  }
+  if (pascal === 'InputMultipleFileUpload' || pascal === 'MultipleFileUpload') {
+    return componentRegistry['InputMultipleFileUpload'] || componentRegistry['MultipleFileUpload'];
   }
 
   const clean = name.toLowerCase().replace(/[^a-z0-9]/g, '');

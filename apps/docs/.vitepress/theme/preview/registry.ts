@@ -78,16 +78,22 @@ export const componentMetadata: Record<string, ComponentMeta> = {
     "group": "components",
     "variants": {
       "size": [
-        "large",
         "mini",
-        "regular",
         "small",
+        "regular",
+        "large",
         "x-large"
       ],
       "type": [
-        "icon",
         "image",
-        "initials"
+        "initials",
+        "icon"
+      ],
+      "status": [
+        "online",
+        "offline",
+        "busy",
+        "away"
       ]
     },
     "totalVariants": 15
@@ -104,6 +110,15 @@ export const componentMetadata: Record<string, ComponentMeta> = {
         "secondary",
         "success",
         "warning"
+      ],
+      "variant": [
+        "primary",
+        "secondary",
+        "destructive",
+        "success",
+        "warning",
+        "info",
+        "outline"
       ]
     },
     "totalVariants": 7
@@ -113,6 +128,11 @@ export const componentMetadata: Record<string, ComponentMeta> = {
     "group": "components",
     "variants": {
       "Type": [
+        "1",
+        "2",
+        "deep"
+      ],
+      "type": [
         "1",
         "2",
         "deep"
@@ -137,6 +157,20 @@ export const componentMetadata: Record<string, ComponentMeta> = {
         "Image",
         "Text",
         "Video"
+      ],
+      "direction": [
+        "incoming",
+        "outgoing"
+      ],
+      "type": [
+        "text",
+        "file",
+        "image",
+        "video"
+      ],
+      "messageState": [
+        "default",
+        "error"
       ]
     },
     "totalVariants": 16
@@ -167,6 +201,24 @@ export const componentMetadata: Record<string, ComponentMeta> = {
         "Outline",
         "Primary",
         "Secondary"
+      ],
+      "variant": [
+        "primary",
+        "secondary",
+        "outline",
+        "ghost",
+        "destructive",
+        "link"
+      ],
+      "size": [
+        "large",
+        "regular",
+        "small",
+        "mini"
+      ],
+      "roundness": [
+        "default",
+        "round"
       ]
     },
     "totalVariants": 160
@@ -232,6 +284,11 @@ export const componentMetadata: Record<string, ComponentMeta> = {
       "State": [
         "off",
         "on"
+      ],
+      "size": [
+        "small",
+        "medium",
+        "large"
       ]
     },
     "totalVariants": 12
@@ -258,6 +315,30 @@ export const componentMetadata: Record<string, ComponentMeta> = {
   "FAB": {
     "name": "FAB",
     "group": "components",
+    "variants": {
+      "variant": [
+        "primary",
+        "secondary",
+        "outline"
+      ],
+      "size": [
+        "small",
+        "regular",
+        "large",
+        "extended"
+      ]
+    },
+    "totalVariants": 0
+  },
+  "IconPlaceholder": {
+    "name": "IconPlaceholder",
+    "group": "icons",
+    "variants": {},
+    "totalVariants": 0
+  },
+  "IconTruckDelivery": {
+    "name": "IconTruckDelivery",
+    "group": "icons",
     "variants": {},
     "totalVariants": 0
   },
@@ -347,6 +428,15 @@ export const componentMetadata: Record<string, ComponentMeta> = {
         "Error",
         "Filled",
         "Focus"
+      ],
+      "type": [
+        "text",
+        "email",
+        "password",
+        "search",
+        "tel",
+        "url",
+        "number"
       ]
     },
     "totalVariants": 5
@@ -406,6 +496,18 @@ export const componentMetadata: Record<string, ComponentMeta> = {
         "Radial",
         "Sparkline",
         "Target"
+      ],
+      "trendDirection": [
+        "up",
+        "down",
+        "neutral"
+      ],
+      "statusVariant": [
+        "default",
+        "success",
+        "warning",
+        "error",
+        "info"
       ]
     },
     "totalVariants": 10
@@ -438,6 +540,11 @@ export const componentMetadata: Record<string, ComponentMeta> = {
       "State": [
         "off",
         "on"
+      ],
+      "size": [
+        "small",
+        "medium",
+        "large"
       ]
     },
     "totalVariants": 12
@@ -468,6 +575,12 @@ export const componentMetadata: Record<string, ComponentMeta> = {
         "16",
         "24",
         "32"
+      ],
+      "size": [
+        "12",
+        "16",
+        "24",
+        "32"
       ]
     },
     "totalVariants": 4
@@ -485,6 +598,10 @@ export const componentMetadata: Record<string, ComponentMeta> = {
       "Type": [
         "Horizontal",
         "Vertical"
+      ],
+      "orientation": [
+        "horizontal",
+        "vertical"
       ]
     },
     "totalVariants": 8
@@ -505,6 +622,11 @@ export const componentMetadata: Record<string, ComponentMeta> = {
       "State": [
         "Off",
         "On"
+      ],
+      "size": [
+        "small",
+        "medium",
+        "large"
       ]
     },
     "totalVariants": 12
@@ -534,7 +656,13 @@ export const componentMetadata: Record<string, ComponentMeta> = {
   "TableBodyCell": {
     "name": "TableBodyCell",
     "group": "components",
-    "variants": {},
+    "variants": {
+      "align": [
+        "left",
+        "center",
+        "right"
+      ]
+    },
     "totalVariants": 0
   },
   "TableBodyRow": {
@@ -563,6 +691,11 @@ export const componentMetadata: Record<string, ComponentMeta> = {
         "Status",
         "Text",
         "Toggle"
+      ],
+      "align": [
+        "left",
+        "center",
+        "right"
       ]
     },
     "totalVariants": 15
@@ -618,6 +751,13 @@ export const componentMetadata: Record<string, ComponentMeta> = {
         "Info",
         "Success",
         "Warning"
+      ],
+      "type": [
+        "default",
+        "success",
+        "error",
+        "warning",
+        "info"
       ]
     },
     "totalVariants": 15
@@ -635,6 +775,11 @@ export const componentMetadata: Record<string, ComponentMeta> = {
         "Active",
         "Default",
         "Disabled"
+      ],
+      "size": [
+        "small",
+        "medium",
+        "large"
       ]
     },
     "totalVariants": 9
@@ -647,6 +792,11 @@ export const componentMetadata: Record<string, ComponentMeta> = {
         "Large",
         "Medium",
         "Small"
+      ],
+      "size": [
+        "small",
+        "medium",
+        "large"
       ]
     },
     "totalVariants": 3
@@ -660,6 +810,12 @@ export const componentMetadata: Record<string, ComponentMeta> = {
         "Left",
         "Right",
         "Top"
+      ],
+      "position": [
+        "top",
+        "bottom",
+        "left",
+        "right"
       ]
     },
     "totalVariants": 4

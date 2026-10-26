@@ -1,4 +1,4 @@
-.PHONY: install fmt-check vet test-go test-ts typecheck build check clean run dev review dev-sync
+.PHONY: install fmt-check vet test-go test-ts typecheck build check clean run dev review preview-pr preview-build dev-sync
 
 GO_MODULES := apps/api packages/contracts
 
@@ -12,6 +12,12 @@ dev: run
 
 review:
 	pnpm --dir apps/docs dev
+
+preview-pr:
+	@./scripts/preview-pr.sh "$(BRANCH)" dev
+
+preview-build:
+	@./scripts/preview-pr.sh "$(BRANCH)" build
 
 dev-sync:
 	@./scripts/dev-sync.sh $(ARGS)

@@ -115,7 +115,7 @@
           <a
             v-for="comp in getComponentsForCategory(cat.id)"
             :key="comp.slug"
-            :href="`/components/${comp.slug}`"
+            :href="withBase(`/components/${comp.slug}`)"
             class="group p-5 rounded-xl border border-border-default bg-background-default hover:border-primary-default hover:shadow-md transition-all flex flex-col justify-between no-underline"
           >
             <div>
@@ -149,6 +149,8 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue';
+import { withBase } from 'vitepress';
+import { componentRegistry } from '../preview/registry';
 
 interface ComponentItem {
   name: string;
@@ -169,7 +171,7 @@ const categories = [
   { id: 'feedback', label: 'Feedback & Overlays', description: 'Alert dialogs, toasts, spinners, and tooltips' },
 ];
 
-const allComponents: ComponentItem[] = [
+const knownComponents: ComponentItem[] = [
   // General & Actions
   { name: 'Button', slug: 'button', category: 'general', description: 'Versatile interactive button supporting multiple styles, sizes, and states.' },
   { name: 'FAB', slug: 'fab', category: 'general', description: 'Floating action button representing the primary prominent action on a screen.' },
@@ -228,8 +230,49 @@ const allComponents: ComponentItem[] = [
   { name: 'BubbleChat', slug: 'bubble-chat', category: 'feedback', description: 'Message bubble for conversation threads with media attachments.' },
 ];
 
+function camelToKebab(str: string): string {
+  return str
+    .replace(/([a-z0-9])([A-Z])/g, '$1-$2')
+    .replace(/([A-Z]+)([A-Z][a-z])/g, '$1-$2')
+    .toLowerCase();
+}
+
+function inferCategory(name: string): ComponentItem['category'] {
+  const lower = name.toLowerCase();
+  if (lower.includes('input') || lower.includes('checkbox') || lower.includes('radio') || lower.includes('switch') || lower.includes('toggle') || lower.includes('slider') || lower.includes('picker') || lower.includes('upload')) return 'inputs';
+  if (lower.includes('table') || lower.includes('chart') || lower.includes('metric') || lower.includes('badge') || lower.includes('avatar') || lower.includes('progress')) return 'data-display';
+  if (lower.includes('menu') || lower.includes('bar') || lower.includes('tab') || lower.includes('breadcrumb') || lower.includes('pagination') || lower.includes('stepper')) return 'navigation';
+  if (lower.includes('dialog') || lower.includes('toast') || lower.includes('tooltip') || lower.includes('spinner') || lower.includes('chat')) return 'feedback';
+  return 'general';
+}
+
+const allComponents = computed<ComponentItem[]>(() => {
+  const seenNames = new Set(knownComponents.map((c) => c.name.toLowerCase()));
+  const dynamicExtras: ComponentItem[] = [];
+  for (const regName of Object.keys(componentRegistry || {})) {
+    const lower = regName.toLowerCase();
+    if (
+      seenNames.has(lower) ||
+      lower === 'icontruckdelivery' ||
+      lower === 'placeholder' ||
+      lower === 'fileinput' ||
+      lower === 'multiplefileupload' ||
+      lower.startsWith('chart')
+    ) {
+      continue;
+    }
+    dynamicExtras.push({
+      name: regName,
+      slug: camelToKebab(regName),
+      category: inferCategory(regName),
+      description: `${regName} universal design system component compiled from Figma.`,
+    });
+  }
+  return [...knownComponents, ...dynamicExtras];
+});
+
 const filteredComponents = computed(() => {
-  return allComponents.filter((comp) => {
+  return allComponents.value.filter((comp) => {
     const matchesCategory =
       selectedCategory.value === 'all' || comp.category === selectedCategory.value;
     const q = searchQuery.value.trim().toLowerCase();
