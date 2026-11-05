@@ -1,5 +1,5 @@
-import { useStore, useDefaultProps, Show } from '@builder.io/mitosis';
-import { cn } from './utils';
+import { useDefaultProps, Show } from '@builder.io/mitosis';
+import { cn, cva, getAvatarState, bindControllerProps } from './utils';
 
 export interface AvatarProps {
   size?: 'mini' | 'small' | 'regular' | 'large' | 'x-large';
@@ -14,87 +14,37 @@ export interface AvatarProps {
 
 export default function Avatar(props: AvatarProps) {
   useDefaultProps({
-    size: 'regular',
-    type: 'initials',
-    showStatus: true,
-    initialsText: 'AB',
-    src: '',
-    alt: '',
-    status: 'online',
-    className: '',
-  });
-
-  const state = useStore({
-    get sizeClasses() {
-      switch (props.size) {
-        case 'mini':
-          return 'h-6 w-6 text-xs';
-        case 'small':
-          return 'h-8 w-8 text-xs';
-        case 'large':
-          return 'h-10 w-10 text-sm';
-        case 'x-large':
-          return 'h-14 w-14 text-lg';
-        case 'regular':
-        default:
-          return 'h-9 w-9 text-sm';
-      }
-    },
-    get iconClasses() {
-      switch (props.size) {
-        case 'mini':
-          return 'h-3 w-3';
-        case 'large':
-          return 'h-5 w-5';
-        case 'x-large':
-          return 'h-7 w-7';
-        case 'small':
-        case 'regular':
-        default:
-          return 'h-4 w-4';
-      }
-    },
-    get statusClasses() {
-      switch (props.status) {
-        case 'offline':
-          return 'bg-utility-spacer';
-        case 'busy':
-          return 'bg-destructive-default';
-        case 'away':
-          return 'bg-warning-default';
-        case 'online':
-        default:
-          return 'bg-components-avatar-all-color-status-background-online';
-      }
-    },
-    get accessibleName() {
-      if (props.alt) {
-        return props.alt;
-      }
-      if (props.initialsText) {
-        return props.initialsText;
-      }
-      return 'Avatar';
-    },
+    size: 'mini', type: 'image', showStatus: true, initialsText: 'AB',
+    src: '', alt: '', status: 'online', className: '',
   });
 
   return (
     <span
+      data-ctrl={typeof bindControllerProps}
       role="img"
-      aria-label={state.accessibleName}
+      aria-label={getAvatarState(props).accessibleName}
       class={cn(
-        'relative inline-flex shrink-0 items-center justify-center rounded-rounded-full bg-components-avatar-all-color-container-background-default',
-        state.sizeClasses,
+        'relative inline-flex shrink-0 items-center justify-center rounded-full bg-background-muted',
+        cva(props.size, {
+          mini: 'h-6 w-6 text-xs',
+          small: 'h-8 w-8 text-xs',
+          regular: 'h-9 w-9 text-sm',
+          large: 'h-10 w-10 text-base',
+          'x-large': 'h-14 w-14 text-lg',
+        }, 'mini'),
         props.className
       )}
     >
-      <Show when={props.type === 'image'}>
-        <img src={props.src} alt="" class="h-full w-full rounded-rounded-full object-cover" />
+      <Show when={props.type === 'image' && Boolean(props.src)}>
+        <img src={props.src} alt="" class="h-full w-full rounded-full object-cover" />
       </Show>
-      <Show when={props.type === 'icon'}>
+      <Show when={props.type === 'icon' || (props.type === 'image' && !props.src)}>
         <svg
           aria-hidden="true"
-          class={cn('shrink-0 text-components-avatar-all-color-icon-foreground-default', state.iconClasses)}
+          class={cn(
+            'shrink-0 text-foreground-subtle',
+            cva(props.size, { mini: 'h-3 w-3', small: 'h-4 w-4', regular: 'h-4 w-4', large: 'h-5 w-5', 'x-large': 'h-7 w-7' }, 'mini')
+          )}
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
@@ -105,15 +55,20 @@ export default function Avatar(props: AvatarProps) {
         </svg>
       </Show>
       <Show when={props.type === 'initials'}>
-        <span class="font-medium uppercase leading-none text-components-avatar-all-color-initials-foreground-default">
+        <span aria-hidden="true" class="font-medium uppercase leading-none text-foreground-subtle">
           {props.initialsText}
         </span>
       </Show>
       <Show when={props.showStatus}>
         <span
           class={cn(
-            'absolute bottom-0 right-0 h-2 w-2 rounded-rounded-full border-2 border-components-avatar-all-color-status-border-default',
-            state.statusClasses
+            'absolute bottom-0 right-0 h-2 w-2 rounded-full border-2 border-background-default',
+            cva(props.status, {
+              offline: 'bg-background-interactive',
+              busy: 'bg-destructive-default',
+              away: 'bg-warning-default',
+              online: 'bg-success-default',
+            }, 'online')
           )}
           aria-hidden="true"
         />

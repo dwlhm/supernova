@@ -1,8 +1,9 @@
-import { useStore, useDefaultProps, Show } from '@builder.io/mitosis';
-import { cn } from './utils';
+import { useDefaultProps, Show } from '@builder.io/mitosis';
+import { cn, getFileState, handleFileSelectEvent, clearFileInputEvent, ICON_PATHS, bindControllerProps } from './utils';
 
 export interface InputFileInputProps {
   id?: string;
+  name?: string;
   label?: string;
   buttonText?: string;
   fileName?: string;
@@ -15,129 +16,58 @@ export interface InputFileInputProps {
   showHint?: boolean;
   className?: string;
   onFileNameChange?: (fileName: string) => void;
+  onFilesChange?: (files: unknown[]) => void;
 }
 
 export default function InputFileInput(props: InputFileInputProps) {
   useDefaultProps({
-    id: 'input-file',
-    label: 'Picture',
-    buttonText: 'Choose File',
-    fileName: '',
-    hint: 'Supported formats: PNG, JPG, or PDF.',
-    errorMessage: '',
-    accept: 'image/png,image/jpeg,application/pdf',
-    disabled: false,
-    required: false,
-    showLabel: true,
-    showHint: true,
-    className: '',
-  });
-
-  const state = useStore({
-    get hasError() {
-      return props.errorMessage !== '';
-    },
-    get hasFile() {
-      return props.fileName !== '';
-    },
-    get containerClasses() {
-      if (state.hasError) {
-        return 'border-components-input-file-input-color-container-border-error';
-      }
-      return 'border-components-input-file-input-color-container-border-default focus-within:border-components-input-file-input-color-container-border-focus';
-    },
-    get supportingText() {
-      return state.hasError ? props.errorMessage : props.hint;
-    },
-    get supportingClasses() {
-      return state.hasError
-        ? 'text-components-input-file-input-color-supporting-text-foreground-error'
-        : 'text-components-input-file-input-color-supporting-text-foreground-default';
-    },
-    get displayName() {
-      return state.hasFile ? props.fileName : 'No file chosen';
-    },
-    setName(fileName: string) {
-      if (props.onFileNameChange) {
-        props.onFileNameChange(fileName);
-      }
-    },
-    clear() {
-      state.setName('');
-    },
+    id: 'input-file', name: 'file', label: 'Picture', buttonText: 'Choose File', fileName: '',
+    hint: 'Supported formats: PNG, JPG, or PDF.', errorMessage: '', accept: 'image/png,image/jpeg,application/pdf',
+    disabled: false, required: false, showLabel: true, showHint: true, className: '',
   });
 
   return (
-    <div class={cn('flex w-full flex-col gap-3', props.className)}>
+    <div data-ctrl={typeof bindControllerProps} class={cn('flex w-full flex-col gap-3', props.className)}>
       <Show when={props.showLabel && props.label !== ''}>
-        <span class="flex items-center gap-1 text-sm font-medium text-components-input-file-input-color-label-foreground-default">
+        <label for={props.id} class="flex items-center gap-1 text-sm font-medium text-foreground-default">
           {props.label}
-          <Show when={props.required}>
-            <span
-              aria-hidden="true"
-              class="text-components-input-file-input-color-required-indicator-foreground-default"
-            >
-              *
-            </span>
-          </Show>
-        </span>
+          <Show when={props.required}><span aria-hidden="true" class="text-destructive-default">*</span></Show>
+        </label>
       </Show>
-      <label
+      <div
         class={cn(
-          'flex items-center gap-2.5 rounded-rounded-lg border bg-components-input-file-input-color-container-background-default px-3 py-1 transition-colors',
-          state.containerClasses,
-          props.disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'
+          'flex items-center gap-3 rounded-lg border bg-background-default px-3 py-1 shadow-xs transition-colors',
+          getFileState(props).hasError
+            ? 'border-destructive-border focus-within:ring-2 focus-within:ring-focus-ring-error'
+            : 'border-border-default focus-within:border-primary-border-emphasis focus-within:ring-2 focus-within:ring-focus-ring-primary',
+          props.disabled && 'cursor-not-allowed opacity-50'
         )}
       >
-        <span class="inline-flex h-7 shrink-0 items-center rounded-rounded-sm bg-components-button-secondary-color-container-background-default px-3 text-xs font-medium text-components-input-file-input-color-button-label-foreground-default">
-          {props.buttonText}
-        </span>
-        <span
-          class={cn(
-            'truncate py-1 text-sm',
-            state.hasFile
-              ? 'text-components-input-file-input-color-file-name-foreground-filled'
-              : 'text-components-input-file-input-color-file-name-foreground-default'
-          )}
-        >
-          {state.displayName}
-        </span>
-        <input
-          id={props.id}
-          type="file"
-          accept={props.accept}
-          disabled={props.disabled}
-          required={props.required}
-          aria-invalid={state.hasError}
-          class="sr-only"
-          onChange={(event) =>
-            state.setName(
-              event.target.files && event.target.files.length > 0 ? event.target.files[0].name : ''
-            )
-          }
-        />
-        <Show when={state.hasFile}>
+        <label for={props.id} class={cn('flex min-w-0 flex-1 items-center gap-3', props.disabled ? 'cursor-not-allowed' : 'cursor-pointer')}>
+          <span class="inline-flex h-7 shrink-0 items-center rounded-sm bg-secondary-default px-3 text-sm font-medium text-secondary-foreground">
+            {props.buttonText}
+          </span>
+          <span class={cn('truncate py-1 text-sm', getFileState(props).hasFile ? 'text-foreground-default' : 'text-foreground-subtle')}>
+            {getFileState(props).displayName}
+          </span>
+          <input
+            id={props.id} name={props.name} type="file" accept={props.accept} disabled={props.disabled} required={props.required}
+            aria-invalid={getFileState(props).hasError} aria-describedby={props.showHint ? props.id + '-hint' : undefined}
+            class="sr-only" onChange={(event) => !props.disabled && handleFileSelectEvent(event, props.onFileNameChange, props.onFilesChange)}
+          />
+        </label>
+        <Show when={getFileState(props).hasFile}>
           <button
-            type="button"
-            aria-label="Remove file"
-            class="ml-auto inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-rounded-full text-components-input-file-input-color-file-name-foreground-filled hover:bg-background-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring-primary"
-            onClick={() => state.clear()}
+            type="button" disabled={props.disabled} aria-label="Remove file"
+            class="ml-auto inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-foreground-default hover:bg-background-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring-primary disabled:pointer-events-none"
+            onClick={(event) => !props.disabled && clearFileInputEvent(event, props.onFileNameChange, props.onFilesChange)}
           >
-            <svg
-              aria-hidden="true"
-              class="h-3.5 w-3.5"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-            >
-              <path d="M6 6l12 12M18 6 6 18" stroke-linecap="round" />
-            </svg>
+            <svg aria-hidden="true" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d={ICON_PATHS.close} stroke-linecap="round" /></svg>
           </button>
         </Show>
-      </label>
+      </div>
       <Show when={props.showHint}>
-        <span class={cn('text-xs', state.supportingClasses)}>{state.supportingText}</span>
+        <span id={props.id + '-hint'} class={cn('text-sm', getFileState(props).hasError ? 'text-destructive-foreground' : 'text-foreground-muted')}>{getFileState(props).helpText}</span>
       </Show>
     </div>
   );

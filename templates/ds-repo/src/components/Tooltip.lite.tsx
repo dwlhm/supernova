@@ -1,5 +1,5 @@
-import { useStore, useDefaultProps } from '@builder.io/mitosis';
-import { cn } from './utils';
+import { useDefaultProps, Show } from '@builder.io/mitosis';
+import { cn, cva, bindControllerProps } from './utils';
 
 export interface TooltipProps {
   text?: string;
@@ -11,37 +11,39 @@ export interface TooltipProps {
 
 export default function Tooltip(props: TooltipProps) {
   useDefaultProps({
-    text: 'Label',
-    position: 'top',
-    id: 'tooltip',
-    className: '',
-  });
-
-  const state = useStore({
-    get positionClasses() {
-      switch (props.position) {
-        case 'bottom':
-          return 'left-1/2 top-full mt-2 -translate-x-1/2';
-        case 'left':
-          return 'right-full top-1/2 mr-2 -translate-y-1/2';
-        case 'right':
-          return 'left-full top-1/2 ml-2 -translate-y-1/2';
-        case 'top':
-        default:
-          return 'bottom-full left-1/2 mb-2 -translate-x-1/2';
-      }
-    },
+    text: 'Label', position: 'top', id: 'tooltip', className: '',
   });
 
   return (
-    <span class={cn('group relative inline-flex', props.className)}>
-      {props.children}
+    <span
+      data-ctrl={typeof bindControllerProps}
+      aria-describedby={props.id}
+      class={cn('group relative inline-flex items-center justify-center', props.className)}
+    >
+      <Show when={props.children}>{props.children}</Show>
+      <Show when={!props.children}>
+        <button
+          type="button"
+          aria-describedby={props.id}
+          class="inline-flex h-8 items-center justify-center rounded-lg border border-border-default bg-background-subtle px-3 text-xs font-medium text-foreground-default"
+        >
+          Hover target
+        </button>
+      </Show>
       <span
         role="tooltip"
         id={props.id}
         class={cn(
-          'pointer-events-none invisible absolute z-50 max-w-xs whitespace-nowrap rounded-rounded-lg bg-components-tooltip-accent-color-container-background-default px-2 py-1 text-xs font-medium text-components-tooltip-accent-color-label-text-default opacity-0 shadow-md transition-opacity group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100',
-          state.positionClasses
+          'pointer-events-none absolute z-50 max-w-xs whitespace-nowrap rounded-md bg-foreground-default px-3 py-2 text-sm font-normal text-background-default shadow-md transition-opacity',
+          props.children
+            ? 'invisible opacity-0 group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100'
+            : 'visible opacity-100',
+          cva(props.position, {
+            bottom: 'left-1/2 top-full mt-2 -translate-x-1/2',
+            left: 'right-full top-1/2 mr-2 -translate-y-1/2',
+            right: 'left-full top-1/2 ml-2 -translate-y-1/2',
+            top: 'bottom-full left-1/2 mb-2 -translate-x-1/2',
+          }, 'top')
         )}
       >
         {props.text}

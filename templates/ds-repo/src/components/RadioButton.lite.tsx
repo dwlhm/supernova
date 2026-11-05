@@ -1,9 +1,11 @@
-import { useStore, useDefaultProps, Show } from '@builder.io/mitosis';
-import { cn } from './utils';
+import { useDefaultProps, Show } from '@builder.io/mitosis';
+import { cn, cva, getChoiceState, bindControllerProps } from './utils';
 
 export interface RadioButtonProps {
+  id?: string;
   checked?: boolean;
   disabled?: boolean;
+  required?: boolean;
   size?: 'small' | 'medium' | 'large';
   label?: string;
   leftLabel?: boolean;
@@ -16,101 +18,41 @@ export interface RadioButtonProps {
 
 export default function RadioButton(props: RadioButtonProps) {
   useDefaultProps({
-    checked: false,
-    disabled: false,
-    size: 'medium',
-    label: 'Label',
-    leftLabel: false,
-    rightLabel: true,
-    name: 'radio-group',
-    value: '',
-    className: '',
-  });
-
-  const state = useStore({
-    get circleClasses() {
-      switch (props.size) {
-        case 'small':
-          return 'h-4 w-4';
-        case 'large':
-          return 'h-6 w-6';
-        case 'medium':
-        default:
-          return 'h-5 w-5';
-      }
-    },
-    get dotClasses() {
-      switch (props.size) {
-        case 'small':
-          return 'h-1.5 w-1.5';
-        case 'large':
-          return 'h-2.5 w-2.5';
-        case 'medium':
-        default:
-          return 'h-2 w-2';
-      }
-    },
-    get hasLabel() {
-      return props.label !== '';
-    },
-    handleChange() {
-      if (props.disabled) {
-        return;
-      }
-      if (props.onChange) {
-        props.onChange(props.value);
-      }
-    },
+    id: 'radio-button', checked: false, disabled: false, required: false,
+    size: 'medium', label: 'Label', leftLabel: false, rightLabel: false, name: 'radio-group', value: '', className: '',
   });
 
   return (
     <label
-      class={cn(
-        'inline-flex items-center gap-2',
-        props.disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer',
-        props.className
-      )}
+      data-ctrl={typeof bindControllerProps}
+      class={cn('inline-flex items-center', cva(props.size, { small: 'gap-1.5', medium: 'gap-2', large: 'gap-2.5' }, 'medium'), props.disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer', props.className)}
     >
-      <Show when={props.leftLabel && state.hasLabel}>
-        <span class="text-sm text-components-radio-button-all-color-label-foreground-default">
-          {props.label}
-        </span>
+      <Show when={getChoiceState(props).showLeft}>
+        <span class="text-sm text-foreground-default">{props.label}</span>
       </Show>
       <span class="relative inline-flex shrink-0 items-center justify-center">
         <input
-          type="radio"
-          name={props.name}
-          value={props.value}
-          checked={props.checked}
-          disabled={props.disabled}
-          aria-label={state.hasLabel ? props.label : 'Option'}
-          class="peer absolute inset-0 h-full w-full cursor-pointer appearance-none rounded-rounded-full opacity-0 disabled:cursor-not-allowed"
-          onChange={() => state.handleChange()}
+          id={props.id} type="radio" name={props.name} value={props.value}
+          checked={props.checked} disabled={props.disabled} required={props.required}
+          aria-label={!getChoiceState(props).showLeft && !getChoiceState(props).showRight ? (props.label || 'Option') : undefined}
+          class="peer absolute inset-0 h-full w-full cursor-pointer appearance-none rounded-full opacity-0 disabled:cursor-not-allowed"
+          onChange={() => !props.disabled && props.onChange && props.onChange(props.value || props.label || '')}
         />
         <span
-          class={cn(
-            'inline-flex items-center justify-center rounded-rounded-full border bg-components-radio-button-all-color-circle-background-default shadow-sm peer-focus-visible:ring-2 peer-focus-visible:ring-focus-ring-primary',
-            state.circleClasses,
-            props.checked
-              ? 'border-components-radio-button-on-color-indicator-fill-default'
-              : 'border-components-radio-button-all-color-circle-border-default'
-          )}
           aria-hidden="true"
+          class={cn(
+            'inline-flex items-center justify-center rounded-full border bg-background-default shadow-xs peer-focus-visible:ring-2 peer-focus-visible:ring-focus-ring-primary',
+            cva(props.size, { small: 'h-3 w-3', medium: 'h-3.5 w-3.5', large: 'h-4 w-4' }, 'medium'),
+            props.checked ? 'border-primary-default' : 'border-border-default'
+          )}
         >
           <Show when={props.checked}>
-            <span
-              class={cn(
-                'rounded-rounded-full bg-components-radio-button-on-color-indicator-fill-default',
-                state.dotClasses
-              )}
-            />
+            <span class={cn('rounded-full bg-primary-default', cva(props.size, { small: 'h-1.5 w-1.5', medium: 'h-2 w-2', large: 'h-2.5 w-2.5' }, 'medium'))} />
           </Show>
         </span>
       </span>
-      <Show when={props.rightLabel && state.hasLabel}>
-        <span class="text-sm text-components-radio-button-all-color-label-foreground-default">
-          {props.label}
-        </span>
+      <Show when={getChoiceState(props).showRight}>
+        <span class="text-sm text-foreground-default">{props.label}</span>
       </Show>
     </label>
   );

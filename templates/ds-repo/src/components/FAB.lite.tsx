@@ -1,7 +1,8 @@
-import { useStore, useDefaultProps, Show } from '@builder.io/mitosis';
-import { cn } from './utils';
+import { useDefaultProps, Show } from '@builder.io/mitosis';
+import { cn, cva, ICON_PATHS } from './utils';
 
 export interface FABProps {
+  type?: 'button' | 'submit' | 'reset';
   variant?: 'primary' | 'secondary' | 'outline';
   size?: 'small' | 'regular' | 'large' | 'extended';
   disabled?: boolean;
@@ -15,88 +16,31 @@ export interface FABProps {
 
 export default function FAB(props: FABProps) {
   useDefaultProps({
-    variant: 'primary',
-    size: 'regular',
-    disabled: false,
-    label: 'Label',
-    showLabel: true,
-    ariaLabel: '',
-    className: '',
-  });
-
-  const state = useStore({
-    get variantClasses() {
-      switch (props.variant) {
-        case 'secondary':
-          return 'bg-components-fab-secondary-color-container-background-default text-components-fab-secondary-color-label-foreground-default hover:bg-components-fab-secondary-color-container-background-hover';
-        case 'outline':
-          return 'bg-components-fab-surface-color-container-background-default text-components-fab-surface-color-label-foreground-default border border-border-default hover:bg-components-fab-surface-color-container-background-hover';
-        case 'primary':
-        default:
-          return 'bg-components-fab-primary-color-container-background-default text-components-fab-primary-color-label-foreground-default hover:bg-components-fab-primary-color-container-background-hover';
-      }
-    },
-    get sizeClasses() {
-      switch (props.size) {
-        case 'small':
-          return 'h-10 w-10';
-        case 'large':
-          return 'h-24 w-24';
-        case 'extended':
-          return 'h-14 w-auto gap-3 px-4';
-        case 'regular':
-        default:
-          return 'h-14 w-14';
-      }
-    },
-    get iconClasses() {
-      switch (props.size) {
-        case 'small':
-          return 'h-4 w-4';
-        case 'large':
-          return 'h-7 w-7';
-        case 'regular':
-        case 'extended':
-        default:
-          return 'h-5 w-5';
-      }
-    },
-    get accessibleName() {
-      return props.ariaLabel !== '' ? props.ariaLabel : props.label;
-    },
-    handleClick() {
-      if (!props.disabled && props.onClick) {
-        props.onClick();
-      }
-    },
+    type: 'button', variant: 'primary', size: 'small', disabled: false,
+    label: 'Label', showLabel: true, ariaLabel: '', className: '',
   });
 
   return (
     <button
-      type="button"
-      aria-label={state.accessibleName}
+      type={props.type || 'button'}
+      aria-label={props.ariaLabel || props.label || 'Action'}
       disabled={props.disabled}
       class={cn(
-        'inline-flex shrink-0 items-center justify-center rounded-rounded-full shadow-lg transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring-primary disabled:pointer-events-none disabled:opacity-50',
-        state.variantClasses,
-        state.sizeClasses,
+        'inline-flex shrink-0 items-center justify-center rounded-full shadow-md transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring-primary disabled:pointer-events-none disabled:opacity-50',
+        cva(props.variant, {
+          primary: 'bg-primary-default text-primary-foreground hover:bg-primary-hover active:bg-primary-pressed',
+          secondary: 'bg-secondary-default text-secondary-foreground hover:bg-secondary-hover active:bg-background-interactive',
+          outline: 'border border-border-default bg-background-default text-foreground-default hover:bg-background-muted active:bg-background-interactive',
+        }, 'primary'),
+        cva(props.size, { small: 'h-10 w-10', regular: 'h-14 w-14', large: 'h-24 w-24', extended: 'h-14 w-auto gap-3 px-4' }, 'small'),
         props.className
       )}
-      onClick={() => state.handleClick()}
+      onClick={() => !props.disabled && props.onClick && props.onClick()}
     >
-      <Show when={props.children}>
-        {props.children}
-      </Show>
+      <Show when={props.children}>{props.children}</Show>
       <Show when={!props.children}>
-        <svg
-          aria-hidden="true"
-          class={cn('shrink-0', state.iconClasses)}
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="1.5"
-        >
-          <path d="M12 5v14M5 12h14" stroke-linecap="round" />
+        <svg aria-hidden="true" class={cn('shrink-0', cva(props.size, { small: 'h-4 w-4', regular: 'h-5 w-5', large: 'h-7 w-7', extended: 'h-5 w-5' }, 'small'))} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d={ICON_PATHS.plus} stroke-linecap="round" />
         </svg>
       </Show>
       <Show when={props.size === 'extended' && props.showLabel}>

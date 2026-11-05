@@ -34,6 +34,19 @@ test('ds-repo compile.mjs compiles .lite.tsx into all 5 target frameworks and co
   const svelteBtn = await fs.readFile(path.join(distDir, 'svelte/Button.svelte'), 'utf-8');
   assert.ok(svelteBtn.length > 0, 'expected non-empty dist/svelte/Button.svelte');
 
+  const vue2Btn = await fs.readFile(path.join(distDir, 'vue2/Button.vue'), 'utf-8');
+  assert.ok(vue2Btn.length > 0, 'expected non-empty dist/vue2/Button.vue');
+
+  const angularBtn = await fs.readFile(path.join(distDir, 'angular/Button.ts'), 'utf-8');
+  assert.ok(angularBtn.length > 0, 'expected non-empty dist/angular/Button.ts');
+
+  // Verify all 5 framework barrel indexes
+  for (const target of ['react', 'vue3', 'svelte', 'vue2', 'angular']) {
+    const indexContent = await fs.readFile(path.join(distDir, target, 'index.ts'), 'utf-8');
+    assert.ok(indexContent.includes('Button'), `expected dist/${target}/index.ts to export Button`);
+    assert.ok(indexContent.includes("export * from './utils.ts'"), `expected dist/${target}/index.ts to re-export utils.ts`);
+  }
+
   // Verify tokens copied
   for (const tokenFile of ['tokens.json', 'theme.css', 'tokens.css', 'tokens.ts']) {
     const stat = await fs.stat(path.join(distDir, 'tokens', tokenFile));

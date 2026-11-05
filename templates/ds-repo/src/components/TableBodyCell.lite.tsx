@@ -1,11 +1,12 @@
-import { useStore, useDefaultProps, Show } from '@builder.io/mitosis';
-import { cn } from './utils';
+import { useDefaultProps, Show } from '@builder.io/mitosis';
+import { cn, cva, bindControllerProps } from './utils';
 import TableCellValue from './TableCellValue.lite';
 
 export interface TableBodyCellProps {
   value?: string;
   secondaryValue?: string;
   badgeLabel?: string;
+  buttonLabel?: string;
   statusLabel?: string;
   imageSrc?: string;
   avatarInitials?: string;
@@ -17,47 +18,26 @@ export interface TableBodyCellProps {
 
 export default function TableBodyCell(props: TableBodyCellProps) {
   useDefaultProps({
-    value: '',
-    secondaryValue: '',
-    badgeLabel: '',
-    statusLabel: '',
-    imageSrc: '',
-    avatarInitials: '',
-    href: '',
-    align: 'left',
-    className: '',
-  });
-
-  const state = useStore({
-    get cellClasses() {
-      switch (props.align) {
-        case 'center':
-          return 'text-center';
-        case 'right':
-          return 'text-right';
-        case 'left':
-        default:
-          return 'text-left';
-      }
-    },
+    value: 'Cell Value', secondaryValue: '', badgeLabel: '', buttonLabel: '', statusLabel: '',
+    imageSrc: '', avatarInitials: '', href: '', align: 'left', className: '',
   });
 
   return (
     <td
+      data-ctrl={typeof bindControllerProps}
       class={cn(
-        'border-t border-components-table-default-color-divider-border-default px-4 py-3 align-middle',
-        state.cellClasses,
+        'border-t border-border-default px-4 py-3 align-middle',
+        cva(props.align, { left: 'text-left', center: 'text-center', right: 'text-right' }, 'left'),
         props.className
       )}
     >
-      <Show when={props.children}>
-        {props.children}
-      </Show>
+      <Show when={props.children}>{props.children}</Show>
       <Show when={!props.children}>
         <TableCellValue
           value={props.value}
           secondaryValue={props.secondaryValue}
           badgeLabel={props.badgeLabel}
+          buttonLabel={props.buttonLabel}
           statusLabel={props.statusLabel}
           imageSrc={props.imageSrc}
           avatarInitials={props.avatarInitials}

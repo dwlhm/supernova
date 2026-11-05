@@ -17,12 +17,10 @@ const TARGETS = ['react', 'vue3', 'svelte', 'vue2', 'angular'];
 
 async function loadCompiler() {
   try {
-    const mod = await import('@supernova/mitosis-compiler');
-    return mod.compileMitosis;
+    return await import('@supernova/mitosis-compiler');
   } catch {
     const fallback = path.resolve(rootDir, '../../packages/mitosis-compiler/dist/index.js');
-    const mod = await import(fallback);
-    return mod.compileMitosis;
+    return await import(fallback);
   }
 }
 
@@ -59,7 +57,7 @@ async function main() {
   console.log('[compile] Multi-framework compilation for Supernova Design System...');
   await fs.mkdir(distDir, { recursive: true });
 
-  const compileMitosis = await loadCompiler();
+  const { compileMitosis, getUtilsSource } = await loadCompiler();
   const entries = await collectLiteFiles();
 
   for (const target of TARGETS) {
@@ -72,6 +70,7 @@ async function main() {
       componentName: name,
       source,
       targets: TARGETS,
+      normalize: true,
     });
 
     if (!result.success) {
@@ -85,11 +84,13 @@ async function main() {
     }
   }
 
-  // Copy shared utils.ts into each target directory and dist/components
+  // Write canonical utils.ts into each target directory and dist/components
+  const utilsContent = getUtilsSource ? getUtilsSource() : await fs.readFile(utilsSrcFile, 'utf-8');
   for (const target of TARGETS) {
-    await copyFileSafe(utilsSrcFile, path.join(distDir, target, 'utils.ts'));
+    await fs.writeFile(path.join(distDir, target, 'utils.ts'), utilsContent, 'utf-8');
   }
-  await copyFileSafe(utilsSrcFile, path.join(distDir, 'components/utils.ts'));
+  await fs.mkdir(path.join(distDir, 'components'), { recursive: true });
+  await fs.writeFile(path.join(distDir, 'components/utils.ts'), utilsContent, 'utf-8');
 
   // Copy tokens into dist/tokens
   for (const tokenFile of ['tokens.json', 'theme.css', 'tokens.css', 'tokens.ts']) {
@@ -105,6 +106,12 @@ async function main() {
 
   const svelteExports = entries.map(({ name }) => `export { default as ${name} } from './${name}.svelte';`).join('\n');
   await fs.writeFile(path.join(distDir, 'svelte/index.ts'), `${svelteExports}\nexport * from './utils.ts';\n`, 'utf-8');
+
+  const vue2Exports = entries.map(({ name }) => `export { default as ${name} } from './${name}.vue';`).join('\n');
+  await fs.writeFile(path.join(distDir, 'vue2/index.ts'), `${vue2Exports}\nexport * from './utils.ts';\n`, 'utf-8');
+
+  const angularExports = entries.map(({ name }) => `export { default as ${name}, ${name}Module } from './${name}.ts';`).join('\n');
+  await fs.writeFile(path.join(distDir, 'angular/index.ts'), `${angularExports}\nexport * from './utils.ts';\n`, 'utf-8');
 
   // Ensure src/index.ts barrel exists for tsc root compilation
   const srcIndex = `export * from './components/utils.js';\nexport * from './tokens/tokens.js';\n`;

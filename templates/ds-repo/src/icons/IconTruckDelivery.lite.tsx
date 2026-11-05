@@ -1,5 +1,5 @@
 import { useDefaultProps } from '@builder.io/mitosis';
-import { cn } from './utils';
+import { cn, bindControllerProps } from './utils';
 
 export interface IconTruckDeliveryProps {
   size?: number;
@@ -18,14 +18,12 @@ export default function IconTruckDelivery(props: IconTruckDeliveryProps) {
 
   return (
     <svg
+      data-ctrl={typeof bindControllerProps}
       role="img"
       aria-label={props.ariaLabel}
       width={props.size}
       height={props.size}
-      class={cn(
-        'inline-block shrink-0 text-components-icon-truck-delivery-color-root-fill-default',
-        props.className
-      )}
+      class={cn('inline-block shrink-0 text-foreground-default', props.className)}
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"

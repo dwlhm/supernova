@@ -1,5 +1,5 @@
-import { useStore, useDefaultProps, For } from '@builder.io/mitosis';
-import { cn } from './utils';
+import { useDefaultProps, For } from '@builder.io/mitosis';
+import { cn, bindControllerProps } from './utils';
 
 export interface ChartLegendItem {
   label: string;
@@ -13,23 +13,16 @@ export interface ChartLegendProps {
 
 export default function ChartLegend(props: ChartLegendProps) {
   useDefaultProps({
-    items: [],
-    className: '',
-  });
-
-  const state = useStore({
-    get dotClasses() {
-      return 'h-2 w-2 shrink-0 rounded-rounded-full';
-    },
+    items: [], className: '',
   });
 
   return (
-    <ul class={cn('flex flex-wrap items-center gap-4', props.className)}>
+    <ul data-ctrl={typeof bindControllerProps} class={cn('flex flex-wrap items-center gap-4', props.className)}>
       <For each={props.items}>
         {(item) => (
           <li key={item.label} class="flex items-center gap-2">
-            <span class={cn(state.dotClasses, item.colorClass)} aria-hidden="true" />
-            <span class="text-xs text-components-chart-all-color-legend-label-text-default">
+            <span class={cn('h-2 w-2 shrink-0 rounded-full', item.colorClass)} aria-hidden="true" />
+            <span class="text-xs text-foreground-muted">
               {item.label}
             </span>
           </li>

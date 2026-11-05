@@ -1,5 +1,5 @@
-import { useStore, useDefaultProps, Show } from '@builder.io/mitosis';
-import { cn } from './utils';
+import { useDefaultProps, Show } from '@builder.io/mitosis';
+import { cn, ICON_PATHS, bindControllerProps } from './utils';
 
 export interface TabItemProps {
   label?: string;
@@ -14,61 +14,38 @@ export interface TabItemProps {
 
 export default function TabItem(props: TabItemProps) {
   useDefaultProps({
-    label: 'Label',
-    active: false,
-    showIcon: false,
-    showNum: false,
-    num: '1',
-    className: '',
-  });
-
-  const state = useStore({
-    get tabClasses() {
-      return props.active
-        ? 'bg-components-tabs-active-color-tab-background-default border border-components-tabs-active-color-tab-border-default shadow-sm text-components-tabs-active-color-label-foreground-default'
-        : 'border border-transparent text-components-tabs-inactive-color-label-foreground-default hover:bg-background-default';
-    },
-    handleClick() {
-      if (props.onClick) {
-        props.onClick();
-      }
-    },
+    label: 'Label', active: false, showIcon: false, showNum: false, num: '1', className: '',
   });
 
   return (
     <button
+      data-ctrl={typeof bindControllerProps}
       type="button"
       role="tab"
       aria-selected={props.active}
+      tabIndex={props.active ? 0 : -1}
       class={cn(
-        'inline-flex h-8 shrink-0 items-center gap-1 whitespace-nowrap rounded-rounded-lg px-2 py-1 text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring-primary',
-        state.tabClasses,
+        'inline-flex h-7 shrink-0 items-center gap-1 whitespace-nowrap rounded-md px-2 py-1 text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring-primary',
+        props.active
+          ? 'bg-background-default text-foreground-default shadow-xs'
+          : 'text-foreground-muted hover:text-foreground-default',
         props.className
       )}
-      onClick={() => state.handleClick()}
+      onClick={() => props.onClick && props.onClick()}
     >
       <Show when={props.showIcon}>
-        <span class="flex shrink-0 items-center text-components-tabs-all-color-icon-foreground-default">
-          <Show when={props.children}>
-            {props.children}
-          </Show>
+        <span class="flex shrink-0 items-center text-foreground-muted">
+          <Show when={props.children}>{props.children}</Show>
           <Show when={!props.children}>
-            <svg
-              aria-hidden="true"
-              class="h-3 w-3"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.5"
-            >
-              <path d="M4 6h16M4 12h16M4 18h16" stroke-linecap="round" />
+            <svg aria-hidden="true" class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d={ICON_PATHS.menu} stroke-linecap="round" />
             </svg>
           </Show>
         </span>
       </Show>
       <span class="truncate">{props.label}</span>
       <Show when={props.showNum}>
-        <span class="inline-flex shrink-0 items-center rounded-rounded-full bg-components-tabs-all-color-num-background-default px-1 py-0.5 text-xs font-medium leading-none text-components-tabs-all-color-num-foreground-default">
+        <span class="inline-flex shrink-0 items-center rounded-full bg-background-muted px-1 py-0.5 text-xs font-medium leading-none text-foreground-muted">
           {props.num}
         </span>
       </Show>

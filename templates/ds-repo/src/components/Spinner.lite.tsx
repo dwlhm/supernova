@@ -1,5 +1,5 @@
-import { useStore, useDefaultProps } from '@builder.io/mitosis';
-import { cn } from './utils';
+import { useDefaultProps } from '@builder.io/mitosis';
+import { cn, cva, bindControllerProps } from './utils';
 
 export interface SpinnerProps {
   size?: '12' | '16' | '24' | '32';
@@ -9,36 +9,22 @@ export interface SpinnerProps {
 
 export default function Spinner(props: SpinnerProps) {
   useDefaultProps({
-    size: '24',
-    label: 'Loading',
-    className: '',
-  });
-
-  const state = useStore({
-    get sizeClasses() {
-      switch (props.size) {
-        case '12':
-          return 'h-3 w-3';
-        case '16':
-          return 'h-4 w-4';
-        case '32':
-          return 'h-8 w-8';
-        case '24':
-        default:
-          return 'h-6 w-6';
-      }
-    },
+    size: '12', label: 'Loading', className: '',
   });
 
   return (
     <span
+      data-ctrl={typeof bindControllerProps}
       role="status"
       aria-live="polite"
       class={cn('inline-flex items-center justify-center', props.className)}
     >
       <svg
         aria-hidden="true"
-        class={cn('animate-spin text-components-spinner-all-color-icon-stroke-default', state.sizeClasses)}
+        class={cn(
+          'animate-spin text-primary-default',
+          cva(props.size, { '12': 'h-3 w-3', '16': 'h-4 w-4', '24': 'h-6 w-6', '32': 'h-8 w-8' }, '12')
+        )}
         viewBox="0 0 24 24"
         fill="none"
       >

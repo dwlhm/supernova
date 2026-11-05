@@ -5,6 +5,17 @@
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": "./dist/index.js",
+    "./tokens": "./dist/tokens/tokens.js",
+    "./tokens.css": "./dist/tokens/tokens.css",
+    "./theme.css": "./dist/tokens/theme.css",
+    "./react": "./dist/react/index.js",
+    "./vue3": "./dist/vue3/index.js",
+    "./svelte": "./dist/svelte/index.js",
+    "./vue2": "./dist/vue2/index.js",
+    "./angular": "./dist/angular/index.js"
+  },
   "files": [
     "dist",
     "src"
