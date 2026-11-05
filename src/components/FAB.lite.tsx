@@ -1,112 +1,50 @@
-import { useStore, useDefaultProps, Show } from '@builder.io/mitosis';
-import { cn } from './utils';
+import { useDefaultProps, Show } from '@builder.io/mitosis';
+import { cn, cva, ICON_PATHS } from './utils';
 
 export interface FABProps {
-  /** Editable text label, rendered only for the `extended` size. */
-  label?: string;
-  /** Visual emphasis level. */
+  type?: 'button' | 'submit' | 'reset';
   variant?: 'primary' | 'secondary' | 'outline';
-  /** Container size: small (40x40), regular (56x56), large (96x96), extended (120x56). */
   size?: 'small' | 'regular' | 'large' | 'extended';
-  /** Disabled state (use sparingly; prefer validation / guidance). */
   disabled?: boolean;
-  /** Accessible name used when no visible label is rendered. */
+  label?: string;
+  showLabel?: boolean;
   ariaLabel?: string;
-  /** Additional classes for the root button element. */
   className?: string;
-  /** Icon content (SVG) rendered inside the FAB. */
   children?: any;
-  /** Fired on activation of the FAB. */
   onClick?: () => void;
 }
 
 export default function FAB(props: FABProps) {
   useDefaultProps({
-    label: 'Label',
-    variant: 'primary',
-    size: 'small',
-    disabled: false,
-    ariaLabel: '',
-    className: '',
-  });
-
-  const state = useStore({
-    get isExtended() {
-      return props.size === 'extended';
-    },
-    get accessibleName() {
-      return props.ariaLabel || props.label || 'Action';
-    },
-    get variantClasses() {
-      switch (props.variant) {
-        case 'secondary':
-          return 'bg-secondary-default text-secondary-foreground hover:bg-secondary-hover active:bg-secondary-default';
-        case 'outline':
-          return 'border border-border-default bg-background-default text-foreground-default hover:bg-background-muted active:bg-background-muted';
-        case 'primary':
-        default:
-          return 'bg-primary-default text-primary-on-primary hover:bg-primary-hover active:bg-primary-pressed';
-      }
-    },
-    get containerSizeClasses() {
-      switch (props.size) {
-        case 'regular':
-          return 'h-14 w-14';
-        case 'large':
-          return 'h-24 w-24';
-        case 'extended':
-          return 'h-14 px-4 py-2 gap-3';
-        case 'small':
-        default:
-          return 'h-10 w-10';
-      }
-    },
-    get iconSizeClasses() {
-      switch (props.size) {
-        case 'regular':
-          return 'h-5 w-5';
-        case 'large':
-          return 'h-7 w-7';
-        case 'extended':
-          return 'h-5 w-5';
-        case 'small':
-        default:
-          return 'h-4 w-4';
-      }
-    },
-    get labelClasses() {
-      return 'text-sm font-medium whitespace-nowrap';
-    },
-    handleClick() {
-      if (!props.disabled && props.onClick) {
-        props.onClick();
-      }
-    },
+    type: 'button', variant: 'primary', size: 'small', disabled: false,
+    label: 'Label', showLabel: true, ariaLabel: '', className: '',
   });
 
   return (
     <button
-      type="button"
-      aria-label={state.accessibleName}
+      type={props.type || 'button'}
+      aria-label={props.ariaLabel || props.label || 'Action'}
       disabled={props.disabled}
       class={cn(
-        'inline-flex items-center justify-center shrink-0 rounded-full font-body shadow-md transition-colors focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring-primary disabled:opacity-50 disabled:pointer-events-none',
-        state.variantClasses,
-        state.containerSizeClasses,
+        'inline-flex shrink-0 items-center justify-center rounded-full shadow-md transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring-primary disabled:pointer-events-none disabled:opacity-50',
+        cva(props.variant, {
+          primary: 'bg-primary-default text-primary-foreground hover:bg-primary-hover active:bg-primary-pressed',
+          secondary: 'bg-secondary-default text-secondary-foreground hover:bg-secondary-hover active:bg-background-interactive',
+          outline: 'border border-border-default bg-background-default text-foreground-default hover:bg-background-muted active:bg-background-interactive',
+        }, 'primary'),
+        cva(props.size, { small: 'h-10 w-10', regular: 'h-14 w-14', large: 'h-24 w-24', extended: 'h-14 w-auto gap-3 px-4' }, 'small'),
         props.className
       )}
-      onClick={() => state.handleClick()}
+      onClick={() => !props.disabled && props.onClick && props.onClick()}
     >
-      <Show when={props.children}>
-        <span
-          aria-hidden="true"
-          class={cn('inline-flex items-center justify-center shrink-0', state.iconSizeClasses)}
-        >
-          {props.children}
-        </span>
+      <Show when={props.children}>{props.children}</Show>
+      <Show when={!props.children}>
+        <svg aria-hidden="true" class={cn('shrink-0', cva(props.size, { small: 'h-4 w-4', regular: 'h-5 w-5', large: 'h-7 w-7', extended: 'h-5 w-5' }, 'small'))} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d={ICON_PATHS.plus} stroke-linecap="round" />
+        </svg>
       </Show>
-      <Show when={state.isExtended}>
-        <span class={state.labelClasses}>{props.label}</span>
+      <Show when={props.size === 'extended' && props.showLabel}>
+        <span class="truncate text-sm font-medium">{props.label}</span>
       </Show>
     </button>
   );

@@ -28,6 +28,13 @@ A Floating Action Button represents the most important action on a screen, such 
 
 | Prop | Type | Default | Options |
 | :--- | :--- | :--- | :--- |
-| `label` | `text` | `Label` | - |
-| `variant` | `'Primary' | 'Secondary' | 'Outline'` | `Primary` | Primary, Secondary, Outline |
-| `size` | `'Small' | 'Regular' | 'Large' | 'Extended'` | `Small` | Small, Regular, Large, Extended |
+| `type` | `'button' \| 'submit' \| 'reset'` | `'button'` | button, submit, reset |
+| `variant` | `'primary' \| 'secondary' \| 'outline'` | `'primary'` | primary, secondary, outline |
+| `size` | `'small' \| 'regular' \| 'large' \| 'extended'` | `'small'` | small, regular, large, extended |
+| `disabled` | `boolean` | `false` | - |
+| `label` | `string` | `'Label'` | - |
+| `showLabel` | `boolean` | `true` | - |
+| `ariaLabel` | `string` | `''` | - |
+| `className` | `string` | `''` | - |
+| `children` | `ReactNode \| Slot \| ng-content` | `-` | - |
+| `onClick` | `() => void` | `-` | - |
