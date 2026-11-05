@@ -12,6 +12,7 @@ import {
   SYSTEM_PROMPT,
   compactComponentSpec,
   compactTokens,
+  buildComponentBlueprint,
 } from '../dist/index.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -845,3 +846,238 @@ describe('Mitosis Author - Component name trust boundary', () => {
     });
   }
 });
+
+describe('Mitosis Author - Deterministic Blueprint Pre-Compiler', () => {
+  it('computes Tailwind Auto Layout classes, boundVariables, and canonicalProps', () => {
+    const spec = {
+      name: 'Button',
+      properties: {
+        'Variant#101': {
+          type: 'VARIANT',
+          defaultValue: 'primary',
+          variantOptions: ['primary', 'secondary'],
+        },
+        'State#102': {
+          type: 'VARIANT',
+          defaultValue: 'Default',
+          variantOptions: ['Default', 'Hover', 'Pressed'],
+        },
+        '⮑ Show Icon#103': {
+          type: 'BOOLEAN',
+          defaultValue: true,
+        },
+      },
+      node: {
+        type: 'COMPONENT_SET',
+        children: [
+          {
+            name: 'Variant=primary, State=Default',
+            type: 'COMPONENT',
+            layoutMode: 'HORIZONTAL',
+            primaryAxisAlignItems: 'CENTER',
+            counterAxisAlignItems: 'CENTER',
+            itemSpacing: 8,
+            paddingLeft: 16,
+            paddingRight: 16,
+            paddingTop: 8,
+            paddingBottom: 8,
+            cornerRadius: 6,
+            boundVariables: {
+              fills: [{ id: 'VariableID:1:10' }],
+            },
+            children: [
+              {
+                name: 'Label',
+                type: 'TEXT',
+                characters: 'Submit',
+              },
+            ],
+          },
+        ],
+      },
+    };
+
+    const rawTokens = [
+      { id: 'VariableID:1:10', name: 'primary/default', value: '#2563eb' },
+    ];
+
+    const bp = buildComponentBlueprint('Button', spec, rawTokens);
+    assert.equal(bp.componentName, 'Button');
+    assert.ok(bp.baseTailwindClasses.includes('flex'));
+    assert.ok(bp.baseTailwindClasses.includes('flex-row'));
+    assert.ok(bp.baseTailwindClasses.includes('justify-center'));
+    assert.ok(bp.baseTailwindClasses.includes('items-center'));
+    assert.ok(bp.baseTailwindClasses.includes('gap-2'));
+    assert.ok(bp.baseTailwindClasses.includes('px-4'));
+    assert.ok(bp.baseTailwindClasses.includes('py-2'));
+    assert.ok(bp.baseTailwindClasses.includes('rounded-md'));
+    assert.ok(bp.baseTailwindClasses.includes('bg-primary-default'));
+
+    // Filters out visual State prop and cleans up ⮑ prefix and #id suffix
+    const propNames = bp.canonicalProps.map((p) => p.name);
+    assert.deepEqual(propNames, ['variant', 'showIcon']);
+  });
+
+  it('unwraps COMPONENT_SET variants array, extracts typography.characters, filters visible:false, and maps stroke/shadow tokens', async () => {
+    const spec = {
+      name: 'AlertDialog',
+      node: {
+        type: 'COMPONENT_SET',
+        variantCount: 1,
+        variants: [
+          {
+            id: 'v1',
+            name: 'Default',
+            properties: {},
+            node: {
+              type: 'COMPONENT',
+              layout: { layoutMode: 'VERTICAL', itemSpacing: 16, paddingLeft: 24, paddingRight: 24, paddingTop: 24, paddingBottom: 24, cornerRadius: 10 },
+              strokes: [{ type: 'SOLID', visible: true, weight: 1, boundVariables: { color: { id: '3458:10' } } }],
+              effects: [{ type: 'DROP_SHADOW', visible: true, radius: 15 }],
+              children: [
+                {
+                  name: 'Heading',
+                  type: 'TEXT',
+                  visible: true,
+                  typography: { characters: 'Are you absolutely sure?' },
+                  fills: [{ type: 'SOLID', visible: true, boundVariables: { color: { id: '3458:11' } } }],
+                },
+                {
+                  name: 'HiddenSlot',
+                  type: 'FRAME',
+                  visible: false,
+                  children: [{ name: 'Secret', type: 'TEXT', typography: { characters: 'Hidden' } }],
+                },
+              ],
+            },
+          },
+        ],
+      },
+    };
+    const rawTokens = [
+      { id: 'VariableID:3458:10', name: '🧩 Components/alert-dialog/border', value: '#e5e5e5' },
+      { id: 'VariableID:3458:11', name: '🧩 Components/alert-dialog/heading', value: '#0a0a0a' },
+    ];
+
+    const bp = buildComponentBlueprint('AlertDialog', spec, rawTokens);
+    assert.ok(bp.baseTailwindClasses.includes('border'));
+    assert.ok(bp.baseTailwindClasses.includes('border-components-alert-dialog-border'));
+    assert.ok(bp.baseTailwindClasses.includes('shadow-lg'));
+    assert.equal(bp.hierarchy.length, 1);
+    assert.equal(bp.hierarchy[0].textContent, 'Are you absolutely sure?');
+    assert.ok(bp.hierarchy[0].tailwindClasses.includes('text-components-alert-dialog-heading'));
+  });
+
+  it('editComponent applies targeted replacements to base component source and compiles across all 6 targets', async () => {
+    const baseSource = `import { useDefaultProps } from '@builder.io/mitosis';
+import { cn } from './utils';
+
+export interface BadgeProps {
+  label?: string;
+  className?: string;
+}
+
+export default function Badge(props: BadgeProps) {
+  useDefaultProps({ label: 'Old', className: '' });
+  return <span class={cn('inline-flex items-center px-2 py-1', props.className)}>{props.label}</span>;
+}
+`;
+    const context = {
+      components: {},
+      componentGroups: {},
+      newTokens: [],
+      finished: { value: false },
+      existingSources: { Badge: baseSource },
+      lastCompiledSource: {},
+      lastAttemptedSource: {},
+    };
+    const tools = createAuthorTools(context);
+
+    const missRes = await tools.editComponent.execute({
+      componentName: 'Badge',
+      edits: [{ oldText: 'NON_EXISTENT_TEXT', newText: 'New' }],
+      group: 'components',
+    });
+    assert.equal(missRes.success, false);
+    assert.match(missRes.error, /oldText not found/);
+
+    const okRes = await tools.editComponent.execute({
+      componentName: 'Badge',
+      edits: [{ oldText: "label: 'Old'", newText: "label: 'Updated From Figma'" }],
+      group: 'components',
+      curatedDescription: 'Clean developer description.',
+    });
+    assert.equal(okRes.success, true);
+    assert.match(context.components['Badge'], /Updated From Figma/);
+  });
+
+  it('curates noisy Figma canvas mockup properties, collapses >10 Slot variant swaps to children, and extracts composedComponents & variantHierarchies', () => {
+    const spec = {
+      name: 'Table',
+      description: 'Description\nData table.\n\nProperties\nShow Column 1–10 — Hides columns.',
+      properties: {
+        'Show Column 1#2571:0': { type: 'BOOLEAN', defaultValue: true },
+        'Show Row 6#2571:15': { type: 'BOOLEAN', defaultValue: false },
+        'Show Komlabs#2927:16': { type: 'BOOLEAN', defaultValue: true },
+        'Slot#2945:18': { type: 'SLOT' },
+        'Type': {
+          type: 'VARIANT',
+          defaultValue: 'Text',
+          variantOptions: [
+            'Text', 'Image Text', 'Image', 'Action', 'Badge', 'Stacked Text',
+            'Link', 'Checkbox', 'Toggle', 'Avatar Text', 'Status', 'Number',
+            'Action (Icon)', 'Product', 'Slot',
+          ],
+        },
+        'State': {
+          type: 'VARIANT',
+          defaultValue: 'Default',
+          variantOptions: ['Default', 'Empty'],
+        },
+      },
+      node: {
+        type: 'COMPONENT_SET',
+        variants: [
+          {
+            name: 'State=Default',
+            node: {
+              type: 'COMPONENT',
+              children: [
+                { name: 'Pagination', type: 'INSTANCE', visible: true },
+                { name: 'Input/Dropdown', type: 'INSTANCE', visible: true },
+              ],
+            },
+          },
+          {
+            name: 'State=Empty',
+            node: {
+              type: 'COMPONENT',
+              children: [
+                { name: 'Icon Container', type: 'FRAME', visible: true },
+                { name: 'CTA', type: 'INSTANCE', visible: true },
+              ],
+            },
+          },
+        ],
+      },
+    };
+
+    const bp = buildComponentBlueprint('Table', spec, []);
+    const propNames = bp.canonicalProps.map((p) => p.name);
+    assert.ok(!propNames.includes('showColumn1'));
+    assert.ok(!propNames.includes('showRow6'));
+    assert.ok(!propNames.includes('showKomlabs'));
+    assert.ok(!propNames.includes('type'));
+    assert.ok(propNames.includes('children'));
+    assert.ok(propNames.includes('state'));
+    assert.ok(bp.composedComponents?.includes('Pagination'));
+    assert.ok(bp.composedComponents?.includes('Input/Dropdown'));
+    assert.ok(bp.variantHierarchies?.['State=Empty']);
+    assert.equal(bp.variantHierarchies['State=Empty'][0].name, 'Icon Container');
+
+    const compact = compactComponentSpec(spec);
+    assert.ok(!('Show Column 1' in compact.properties));
+    assert.ok(!compact.description?.includes('Show Column 1–10'));
+  });
+});
+
