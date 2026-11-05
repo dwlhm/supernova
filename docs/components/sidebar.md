@@ -15,7 +15,7 @@ A persistent vertical navigation shell that organizes brand, primary navigation,
 - Keep navigation order and icon meaning consistent between expanded and collapsed states.
 - Provide accessible labels or tooltips when labels are hidden.
 
-## Interactive Preview
+## Live Preview & Usage
 
 <ComponentPreview name="Sidebar" />
 
@@ -23,46 +23,11 @@ A persistent vertical navigation shell that organizes brand, primary navigation,
 
 | Prop | Type | Default | Options |
 | :--- | :--- | :--- | :--- |
-| `expanded` | `boolean` | `true` | - |
-| `brandLabel` | `string` | `'Komerce'` | - |
+| `expanded` | `boolean` | `false` | - |
+| `brand` | `string` | `'Komerce'` | - |
+| `accountLabel` | `string` | `'Lionel Messi'` | - |
+| `accountMeta` | `string` | `'messi@gmail.com'` | - |
+| `accountInitials` | `string` | `'LM'` | - |
 | `brandInitials` | `string` | `'K'` | - |
-| `navigationLabel` | `string` | `'Main'` | - |
-| `accountLabel` | `string` | `'Account'` | - |
-| `accountMeta` | `string` | `''` | - |
-| `accountInitials` | `string` | `'A'` | - |
-| `showAccount` | `boolean` | `true` | - |
-| `onAccountClick` | `() => void` | `-` | - |
 | `className` | `string` | `''` | - |
-| `children` | `any` | `-` | - |
-
-## Usage
-
-::: code-group
-
-```tsx [React]
-import { Sidebar } from '@supernova/design-system/react';
-
-export default function App() {
-  return <Sidebar expanded brandLabel="Komerce" brandInitials="K" />;
-}
-```
-
-```vue [Vue 3]
-<script setup lang="ts">
-import { Sidebar } from '@supernova/design-system/vue3';
-</script>
-
-<template>
-  <Sidebar expanded brandLabel="Komerce" brandInitials="K" />
-</template>
-```
-
-```svelte [Svelte]
-<script lang="ts">
-  import { Sidebar } from '@supernova/design-system/svelte';
-</script>
-
-<Sidebar expanded brandLabel="Komerce" brandInitials="K" />
-```
-
-:::
+| `children` | `ReactNode \| Slot \| ng-content` | `-` | - |

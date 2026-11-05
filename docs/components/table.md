@@ -1,7 +1,6 @@
 # Table
 
-Description
-A configurable data-table component with populated and empty states, up to ten columns and ten rows, optional row selection, and optional row numbering.
+A configurable data-table component with populated and empty states, optional row selection, and optional row numbering.
 
 ## When to Use
 
@@ -16,7 +15,7 @@ A configurable data-table component with populated and empty states, up to ten c
 - Use the Empty state for true no-data outcomes and provide a relevant next action when possible.
 - For complex sorting, filtering, pagination, or responsive behavior, pair this component with the appropriate surrounding controls and patterns.
 
-## Interactive Preview
+## Live Preview & Usage
 
 <ComponentPreview name="Table" />
 
@@ -24,11 +23,6 @@ A configurable data-table component with populated and empty states, up to ten c
 
 | Prop | Type | Default | Options |
 | :--- | :--- | :--- | :--- |
-| `columns` | `TableColumn[]` | `[]` | - |
-| `rows` | `TableRow[]` | `[]` | - |
-| `caption` | `string` | `'Data table'` | - |
-| `noLabel` | `string` | `'No'` | - |
-| `selectAllLabel` | `string` | `'Select all rows'` | - |
 | `showColumn1` | `boolean` | `true` | - |
 | `showColumn2` | `boolean` | `true` | - |
 | `showColumn3` | `boolean` | `true` | - |
@@ -51,47 +45,11 @@ A configurable data-table component with populated and empty states, up to ten c
 | `showRow10` | `boolean` | `true` | - |
 | `showCheckbox` | `boolean` | `false` | - |
 | `showNo` | `boolean` | `false` | - |
-| `title` | `string` | `'No Data Available'` | - |
-| `body` | `string` | `"There's nothing here yet. Try adding some data or adjusting your filters."` | - |
-| `cTALabel` | `string` | `'Add Data'` | - |
+| `title` | `text` | `No Data Available` | - |
+| `body` | `text` | `There's nothing here yet. Try adding some data or adjusting your filters.` | - |
+| `cTALabel` | `text` | `Add Data` | - |
 | `showIcon` | `boolean` | `true` | - |
 | `showTitle` | `boolean` | `true` | - |
 | `showDescription` | `boolean` | `true` | - |
 | `showCTA` | `boolean` | `true` | - |
-| `icon` | `string` | `'inbox'` | - |
-| `state` | `'Default' \| 'Empty'` | `'Default'` | Default, Empty |
-| `className` | `string` | `''` | - |
-| `onSelectionChange` | `(selectedIds: string[]) => void` | `-` | - |
-| `onCtaClick` | `() => void` | `-` | - |
-
-## Usage
-
-::: code-group
-
-```tsx [React]
-import { Table } from '@supernova/design-system/react';
-
-export default function App() {
-  return <Table caption="Data table" noLabel="No" selectAllLabel="Select all rows" />;
-}
-```
-
-```vue [Vue 3]
-<script setup lang="ts">
-import { Table } from '@supernova/design-system/vue3';
-</script>
-
-<template>
-  <Table caption="Data table" noLabel="No" selectAllLabel="Select all rows" />
-</template>
-```
-
-```svelte [Svelte]
-<script lang="ts">
-  import { Table } from '@supernova/design-system/svelte';
-</script>
-
-<Table caption="Data table" noLabel="No" selectAllLabel="Select all rows" />
-```
-
-:::
+| `state` | `'Default' | 'Empty'` | `Default` | Default, Empty |

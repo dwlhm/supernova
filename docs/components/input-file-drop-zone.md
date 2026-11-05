@@ -16,7 +16,7 @@ A large upload target for adding a file by drag and drop or by opening the devic
 - Allow replacement or removal before submission.
 - Explain upload failures and how to resolve them.
 
-## Interactive Preview
+## Live Preview & Usage
 
 <ComponentPreview name="InputFileDropZone" />
 
@@ -24,53 +24,21 @@ A large upload target for adding a file by drag and drop or by opening the devic
 
 | Prop | Type | Default | Options |
 | :--- | :--- | :--- | :--- |
-| `labelText` | `string` | `'Documents'` | - |
-| `hintErrorText` | `string` | `'You can upload one file.'` | - |
-| `showLabel` | `boolean` | `true` | - |
-| `showRequired` | `boolean` | `false` | - |
-| `showHint` | `boolean` | `true` | - |
-| `primaryText` | `string` | `'Drag and drop files here, or'` | - |
+| `id` | `string` | `'file-drop-zone'` | - |
+| `name` | `string` | `'drop-file'` | - |
+| `label` | `string` | `'Documents'` | - |
+| `primaryText` | `string` | `'or drag and drop files here'` | - |
 | `supportingText` | `string` | `'PNG, JPG, or PDF up to 10 MB'` | - |
-| `browseLabel` | `string` | `'Browse files'` | - |
+| `browseText` | `string` | `'Browse'` | - |
 | `fileName` | `string` | `''` | - |
 | `fileMetadata` | `string` | `''` | - |
-| `state` | `'Default' \| 'Focus' \| 'Filled' \| 'Error' \| 'Disabled'` | `'Default'` | Default, Focus, Filled, Error, Disabled |
-| `accept` | `string` | `''` | - |
-| `multiple` | `boolean` | `false` | - |
-| `id` | `string` | `'file-drop-zone'` | - |
+| `hint` | `string` | `'You can upload one file.'` | - |
+| `errorMessage` | `string` | `''` | - |
+| `accept` | `string` | `'image/png,image/jpeg,application/pdf'` | - |
+| `disabled` | `boolean` | `false` | - |
+| `required` | `boolean` | `false` | - |
+| `showLabel` | `boolean` | `true` | - |
+| `showHint` | `boolean` | `true` | - |
 | `className` | `string` | `''` | - |
-| `onFilesSelected` | `(fileName: string, fileCount: number) => void` | `-` | - |
-| `onRemove` | `() => void` | `-` | - |
-| `children` | `any` | `-` | - |
-
-## Usage
-
-::: code-group
-
-```tsx [React]
-import { InputFileDropZone } from '@supernova/design-system/react';
-
-export default function App() {
-  return <InputFileDropZone labelText="Documents" hintErrorText="You can upload one file." showLabel />;
-}
-```
-
-```vue [Vue 3]
-<script setup lang="ts">
-import { InputFileDropZone } from '@supernova/design-system/vue3';
-</script>
-
-<template>
-  <InputFileDropZone labelText="Documents" hintErrorText="You can upload one file." showLabel />
-</template>
-```
-
-```svelte [Svelte]
-<script lang="ts">
-  import { InputFileDropZone } from '@supernova/design-system/svelte';
-</script>
-
-<InputFileDropZone labelText="Documents" hintErrorText="You can upload one file." showLabel />
-```
-
-:::
+| `onFileNameChange` | `(fileName: string) => void` | `-` | - |
+| `onFilesChange` | `(files: unknown[]) => void` | `-` | - |

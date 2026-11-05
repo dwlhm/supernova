@@ -13,7 +13,7 @@ A single tab item used inside the Tabs component. It supports a text label, an o
 - Show an icon only when it improves recognition; use icons consistently across sibling tabs.
 - Use the numeric value for concise counts, such as unread or filtered items.
 
-## Interactive Preview
+## Live Preview & Usage
 
 <ComponentPreview name="TabItem" />
 
@@ -22,45 +22,10 @@ A single tab item used inside the Tabs component. It supports a text label, an o
 | Prop | Type | Default | Options |
 | :--- | :--- | :--- | :--- |
 | `label` | `string` | `'Label'` | - |
+| `active` | `boolean` | `false` | - |
 | `showIcon` | `boolean` | `false` | - |
 | `showNum` | `boolean` | `false` | - |
 | `num` | `string` | `'1'` | - |
-| `active` | `boolean` | `false` | - |
-| `disabled` | `boolean` | `false` | - |
-| `id` | `string` | `-` | - |
-| `controlsId` | `string` | `-` | - |
 | `className` | `string` | `''` | - |
-| `children` | `any` | `-` | - |
+| `children` | `ReactNode \| Slot \| ng-content` | `-` | - |
 | `onClick` | `() => void` | `-` | - |
-
-## Usage
-
-::: code-group
-
-```tsx [React]
-import { TabItem } from '@supernova/design-system/react';
-
-export default function App() {
-  return <TabItem label="Label" showIcon={false} showNum={false} />;
-}
-```
-
-```vue [Vue 3]
-<script setup lang="ts">
-import { TabItem } from '@supernova/design-system/vue3';
-</script>
-
-<template>
-  <TabItem label="Label" :showIcon="false" :showNum="false" />
-</template>
-```
-
-```svelte [Svelte]
-<script lang="ts">
-  import { TabItem } from '@supernova/design-system/svelte';
-</script>
-
-<TabItem label="Label" showIcon={false} showNum={false} />
-```
-
-:::

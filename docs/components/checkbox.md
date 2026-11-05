@@ -19,7 +19,7 @@ A checkbox lets users select or clear one or more independent options. It suppor
 - Avoid preselecting an option unless it is safe, expected, and easy to reverse.
 - Use the disabled state only when the option is unavailable, and explain why when the reason is not obvious.
 
-## Interactive Preview
+## Live Preview & Usage
 
 <ComponentPreview name="Checkbox" />
 
@@ -27,47 +27,16 @@ A checkbox lets users select or clear one or more independent options. It suppor
 
 | Prop | Type | Default | Options |
 | :--- | :--- | :--- | :--- |
+| `id` | `string` | `'checkbox'` | - |
 | `checked` | `boolean` | `false` | - |
-| `label` | `string` | `''` | - |
+| `indeterminate` | `boolean` | `false` | - |
+| `disabled` | `boolean` | `false` | - |
+| `required` | `boolean` | `false` | - |
+| `size` | `'small' \| 'medium' \| 'large'` | `'medium'` | small, medium, large |
+| `label` | `string` | `'Label'` | - |
 | `leftLabel` | `boolean` | `false` | - |
 | `rightLabel` | `boolean` | `false` | - |
-| `size` | `'Small' \| 'Medium' \| 'Large'` | `'Small'` | Small, Medium, Large |
-| `disabled` | `boolean` | `false` | - |
-| `id` | `string` | `''` | - |
-| `name` | `string` | `''` | - |
+| `name` | `string` | `'checkbox'` | - |
 | `value` | `string` | `''` | - |
-| `ariaLabel` | `string` | `''` | - |
 | `className` | `string` | `''` | - |
-| `onChange` | `(checked: boolean) => void` | `-` | - |
-
-## Usage
-
-::: code-group
-
-```tsx [React]
-import { Checkbox } from '@supernova/design-system/react';
-
-export default function App() {
-  return <Checkbox checked={false} leftLabel={false} rightLabel={false} />;
-}
-```
-
-```vue [Vue 3]
-<script setup lang="ts">
-import { Checkbox } from '@supernova/design-system/vue3';
-</script>
-
-<template>
-  <Checkbox :checked="false" :leftLabel="false" :rightLabel="false" />
-</template>
-```
-
-```svelte [Svelte]
-<script lang="ts">
-  import { Checkbox } from '@supernova/design-system/svelte';
-</script>
-
-<Checkbox checked={false} leftLabel={false} rightLabel={false} />
-```
-
-:::
+| `onCheckedChange` | `(checked: boolean) => void` | `-` | - |

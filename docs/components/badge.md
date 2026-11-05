@@ -16,7 +16,7 @@ A compact label used to communicate status, category, or supporting metadata wit
 - Avoid placing several high-emphasis badges next to each other.
 - Do not use a Badge for interactive actions.
 
-## Interactive Preview
+## Live Preview & Usage
 
 <ComponentPreview name="Badge" />
 
@@ -27,36 +27,4 @@ A compact label used to communicate status, category, or supporting metadata wit
 | `label` | `string` | `'Badge'` | - |
 | `variant` | `'primary' \| 'secondary' \| 'destructive' \| 'success' \| 'warning' \| 'info' \| 'outline'` | `'primary'` | primary, secondary, destructive, success, warning, info, outline |
 | `className` | `string` | `''` | - |
-| `children` | `any` | `-` | - |
-
-## Usage
-
-::: code-group
-
-```tsx [React]
-import { Badge } from '@supernova/design-system/react';
-
-export default function App() {
-  return <Badge label="Badge" variant="primary" />;
-}
-```
-
-```vue [Vue 3]
-<script setup lang="ts">
-import { Badge } from '@supernova/design-system/vue3';
-</script>
-
-<template>
-  <Badge label="Badge" variant="primary" />
-</template>
-```
-
-```svelte [Svelte]
-<script lang="ts">
-  import { Badge } from '@supernova/design-system/svelte';
-</script>
-
-<Badge label="Badge" variant="primary" />
-```
-
-:::
+| `children` | `ReactNode \| Slot \| ng-content` | `-` | - |

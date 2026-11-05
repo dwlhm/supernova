@@ -15,7 +15,7 @@ A primary navigation item used for top-level destinations in the sidebar. It sup
 - Show a trailing icon only when it communicates disclosure, navigation, or a relevant action.
 - Do not use hover as the only indication that an item is interactive.
 
-## Interactive Preview
+## Live Preview & Usage
 
 <ComponentPreview name="MainMenu" />
 
@@ -24,45 +24,12 @@ A primary navigation item used for top-level destinations in the sidebar. It sup
 | Prop | Type | Default | Options |
 | :--- | :--- | :--- | :--- |
 | `label` | `string` | `'Menu'` | - |
+| `active` | `boolean` | `false` | - |
 | `showLabel` | `boolean` | `true` | - |
 | `showLeadingIcon` | `boolean` | `true` | - |
 | `showTrailingIcon` | `boolean` | `true` | - |
 | `showBadge` | `boolean` | `false` | - |
 | `badgeLabel` | `string` | `'New'` | - |
-| `active` | `boolean` | `false` | - |
-| `href` | `string` | `-` | - |
-| `disabled` | `boolean` | `false` | - |
 | `className` | `string` | `''` | - |
+| `children` | `ReactNode \| Slot \| ng-content` | `-` | - |
 | `onClick` | `() => void` | `-` | - |
-
-## Usage
-
-::: code-group
-
-```tsx [React]
-import { MainMenu } from '@supernova/design-system/react';
-
-export default function App() {
-  return <MainMenu label="Menu" showLabel showLeadingIcon />;
-}
-```
-
-```vue [Vue 3]
-<script setup lang="ts">
-import { MainMenu } from '@supernova/design-system/vue3';
-</script>
-
-<template>
-  <MainMenu label="Menu" showLabel showLeadingIcon />
-</template>
-```
-
-```svelte [Svelte]
-<script lang="ts">
-  import { MainMenu } from '@supernova/design-system/svelte';
-</script>
-
-<MainMenu label="Menu" showLabel showLeadingIcon />
-```
-
-:::

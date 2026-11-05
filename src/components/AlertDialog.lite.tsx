@@ -1,188 +1,75 @@
-import { useStore, useDefaultProps, Show } from '@builder.io/mitosis';
-import { cn } from './utils';
+import { useDefaultProps, Show } from '@builder.io/mitosis';
+import { cn, createDialogState, bindControllerProps } from './utils';
 
 export interface AlertDialogProps {
-  /** Controls whether the alert dialog is rendered. */
   open?: boolean;
-  /** Base id used to wire aria-labelledby / aria-describedby. */
-  id?: string;
-  /** Heading. Should state the decision the user must make. */
+  inline?: boolean;
   heading?: string;
-  /** Supporting copy explaining the consequence and affected item. */
   description?: string;
-  /** Hides the supporting description (only for low-risk actions). */
   showDescription?: boolean;
-  /** Shows the dismiss (X) control in the header. */
-  showClose?: boolean;
-  /** Label of the safe / cancel action. */
+  showCloseButton?: boolean;
   cancelLabel?: string;
-  /** Label of the primary / confirming action. */
-  continueLabel?: string;
-  /** Style of the confirming action. Use destructive for risky actions. */
-  continueVariant?: 'primary' | 'destructive';
-  /** Fired when the safe action is chosen, or when the dialog is dismissed. */
-  onCancel?: () => void;
-  /** Fired when the primary action is confirmed. */
-  onContinue?: () => void;
-  /** Fired when the open state should change. */
-  onOpenChange?: (open: boolean) => void;
-  /** Additional classes on the overlay root. */
+  confirmLabel?: string;
+  destructive?: boolean;
   className?: string;
-  /** Custom body content rendered between the header and the actions. */
   children?: any;
+  onCancel?: () => void;
+  onConfirm?: () => void;
 }
 
 export default function AlertDialog(props: AlertDialogProps) {
   useDefaultProps({
-    open: true,
-    id: 'alert-dialog',
-    heading: 'Are you absolutely sure?',
-    description:
-      'This action cannot be undone. This will permanently delete your account and remove your data from our servers.',
-    showDescription: true,
-    showClose: true,
-    cancelLabel: 'Cancel',
-    continueLabel: 'Continue',
-    continueVariant: 'primary',
-    className: '',
-  });
-
-  const state = useStore({
-    get headingId() {
-      return props.id + '-heading';
-    },
-    get descriptionId() {
-      return props.id + '-description';
-    },
-    get hasDescription() {
-      return props.showDescription === true && !!props.description;
-    },
-    get baseButtonClasses() {
-      return 'inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 disabled:pointer-events-none disabled:opacity-50';
-    },
-    get cancelButtonClasses() {
-      return (
-        state.baseButtonClasses +
-        ' bg-components-button-secondary-color-container-background-default text-components-button-secondary-color-label-foreground-default hover:bg-components-button-secondary-color-container-background-hover active:bg-components-button-secondary-color-container-background-pressed focus-visible:ring-focus-ring-default'
-      );
-    },
-    get continueButtonClasses() {
-      if (props.continueVariant === 'destructive') {
-        return (
-          state.baseButtonClasses +
-          ' bg-components-button-destructive-color-container-background-default text-components-button-destructive-color-label-foreground-default hover:bg-components-button-destructive-color-container-background-hover active:bg-components-button-destructive-color-container-background-pressed focus-visible:ring-focus-ring-error'
-        );
-      }
-      return (
-        state.baseButtonClasses +
-        ' bg-components-button-primary-color-container-background-default text-components-button-primary-color-label-foreground-default hover:bg-components-button-primary-color-container-background-hover active:bg-components-button-primary-color-container-background-pressed focus-visible:ring-focus-ring-primary'
-      );
-    },
-    requestClose() {
-      if (props.onCancel) {
-        props.onCancel();
-      }
-      if (props.onOpenChange) {
-        props.onOpenChange(false);
-      }
-    },
-    handleCancel() {
-      state.requestClose();
-    },
-    handleContinue() {
-      if (props.onContinue) {
-        props.onContinue();
-      }
-    },
-    handleKeyDown(key) {
-      if (key === 'Escape') {
-        state.requestClose();
-      }
-    },
+    open: true, inline: false, heading: 'Are you absolutely sure?',
+    description: 'This action cannot be undone. This will permanently delete your account and remove your data from our servers.',
+    showDescription: true, showCloseButton: true, cancelLabel: 'Cancel', confirmLabel: 'Continue', destructive: false, className: '',
   });
 
   return (
     <Show when={props.open}>
-      <div
-        class={cn(
-          'fixed inset-0 z-50 flex items-center justify-center p-4',
-          props.className
-        )}
-      >
+      <div data-ctrl={typeof bindControllerProps} class={props.inline ? 'relative flex w-full items-center justify-center p-4' : 'fixed inset-0 z-50 flex items-center justify-center p-4'}>
+        <Show when={!props.inline}>
+          <div class="absolute inset-0 bg-overlay-backdrop" aria-hidden="true" onClick={() => props.onCancel && props.onCancel()} />
+        </Show>
         <div
-          aria-hidden="true"
-          class="absolute inset-0 bg-components-alert-dialog-default-color-backdrop-background-default"
-          onClick={() => state.requestClose()}
-        />
-        <div
-          id={props.id}
-          role="alertdialog"
-          aria-modal="true"
-          aria-labelledby={state.headingId}
-          aria-describedby={state.hasDescription ? state.descriptionId : undefined}
-          tabIndex={0}
-          onKeyDown={(event) => state.handleKeyDown(event.key)}
-          class="relative flex w-full max-w-md flex-col items-start justify-start gap-4 rounded-xl border border-components-alert-dialog-default-color-dialog-border-default bg-components-alert-dialog-default-color-dialog-background-default p-6 shadow-lg focus:outline-none"
+          role="alertdialog" aria-modal="true" tabIndex={-1}
+          aria-labelledby={createDialogState({ id: 'alert-dialog' }).titleId}
+          aria-describedby={props.showDescription ? createDialogState({ id: 'alert-dialog' }).descriptionId : undefined}
+          onKeyDown={(event) => event.key === 'Escape' && props.onCancel && props.onCancel()}
+          class={cn('relative z-10 flex w-full max-w-lg flex-col gap-4 rounded-xl border border-border-default bg-background-default p-6 shadow-lg', props.className)}
         >
-          <div class="flex w-full flex-col items-start justify-start gap-2">
-            <div class="flex w-full flex-row items-center justify-between gap-2.5">
-              <h2
-                id={state.headingId}
-                class="text-xl font-semibold leading-6 tracking-normal text-components-alert-dialog-default-color-heading-text-default"
-              >
-                {props.heading}
-              </h2>
-              <Show when={props.showClose}>
-                <button
-                  type="button"
-                  aria-label="Close"
-                  onClick={() => state.requestClose()}
-                  class="inline-flex shrink-0 items-center justify-center rounded-md p-1 text-components-alert-dialog-default-color-icon-stroke-default transition-colors hover:bg-background-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring-default"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="1.5"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    aria-hidden="true"
-                  >
-                    <path d="M18 6L6 18" />
-                    <path d="M6 6l12 12" />
-                  </svg>
+          <div class="flex flex-col gap-2">
+            <div class="flex items-center justify-between gap-2.5">
+              <h2 id={createDialogState({ id: 'alert-dialog' }).titleId} class="flex-1 text-xl leading-6 font-semibold text-foreground-default">{props.heading}</h2>
+              <Show when={props.showCloseButton}>
+                <button type="button" aria-label="Close" class="inline-flex h-6 w-6 items-center justify-center rounded-md text-foreground-muted transition-colors hover:text-foreground-default focus:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring-primary" onClick={() => props.onCancel && props.onCancel()}>
+                  <svg class="h-3.5 w-3.5" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 3L3 11M3 3l8 8" /></svg>
                 </button>
               </Show>
             </div>
-            <Show when={state.hasDescription}>
-              <p
-                id={state.descriptionId}
-                class="text-sm font-normal leading-5 text-components-alert-dialog-default-color-description-text-default"
-              >
-                {props.description}
-              </p>
+            <Show when={props.showDescription}>
+              <p id={createDialogState({ id: 'alert-dialog' }).descriptionId} class="text-sm leading-5 text-foreground-muted">{props.description}</p>
             </Show>
           </div>
-          {props.children}
-          <div class="flex w-full flex-row items-center justify-end gap-2">
-            <button
-              type="button"
-              class={cn(state.cancelButtonClasses)}
-              onClick={() => state.handleCancel()}
-            >
-              {props.cancelLabel}
-            </button>
-            <button
-              type="button"
-              class={cn(state.continueButtonClasses)}
-              onClick={() => state.handleContinue()}
-            >
-              {props.continueLabel}
-            </button>
-          </div>
+          <Show when={props.children}>{props.children}</Show>
+          <Show when={!props.children}>
+            <div class="flex items-center justify-end gap-2">
+              <button type="button" class="inline-flex h-9 items-center justify-center rounded-lg bg-secondary-default px-4 py-2 text-sm font-medium text-secondary-foreground shadow-xs transition-colors hover:bg-secondary-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring-primary" onClick={() => props.onCancel && props.onCancel()}>
+                {props.cancelLabel}
+              </button>
+              <button
+                type="button"
+                class={cn(
+                  'inline-flex h-9 items-center justify-center rounded-lg px-4 py-2 text-sm font-medium text-primary-foreground shadow-xs transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring-primary',
+                  props.destructive
+                    ? 'bg-destructive-background hover:bg-destructive-hover active:bg-destructive-pressed'
+                    : 'bg-primary-default hover:bg-primary-hover active:bg-primary-pressed'
+                )}
+                onClick={() => props.onConfirm && props.onConfirm()}
+              >
+                {props.confirmLabel}
+              </button>
+            </div>
+          </Show>
         </div>
       </div>
     </Show>

@@ -1,6 +1,5 @@
 # Stepper
 
-Description
 A progress indicator that communicates a user’s position within a four-step process. It supports horizontal and vertical orientations. Completed steps use a check icon, the current step is highlighted, and upcoming steps remain neutral.
 
 ## When to Use
@@ -20,7 +19,7 @@ A progress indicator that communicates a user’s position within a four-step pr
 - Keep the orientation and total number of steps stable during a flow.
 - Pair the Stepper with explicit Back and Continue actions.
 
-## Interactive Preview
+## Live Preview & Usage
 
 <ComponentPreview name="Stepper" />
 
@@ -28,42 +27,9 @@ A progress indicator that communicates a user’s position within a four-step pr
 
 | Prop | Type | Default | Options |
 | :--- | :--- | :--- | :--- |
-| `type` | `'Horizontal' \| 'Vertical'` | `'Horizontal'` | Horizontal, Vertical |
-| `current` | `'1' \| '2' \| '3' \| '4'` | `'1'` | 1, 2, 3, 4 |
-| `step1Label` | `string` | `'Cart'` | - |
-| `step2Label` | `string` | `'Shipping'` | - |
-| `step3Label` | `string` | `'Payment'` | - |
-| `step4Label` | `string` | `'Review'` | - |
+| `orientation` | `'horizontal' \| 'vertical'` | `'horizontal'` | horizontal, vertical |
+| `current` | `number` | `1` | - |
+| `steps` | `string[]` | `['Cart', 'Shipping', 'Payment', 'Review']` | - |
+| `ariaLabel` | `string` | `'Progress'` | - |
 | `className` | `string` | `''` | - |
-
-## Usage
-
-::: code-group
-
-```tsx [React]
-import { Stepper } from '@supernova/design-system/react';
-
-export default function App() {
-  return <Stepper type="Horizontal" current="1" step1Label="Cart" />;
-}
-```
-
-```vue [Vue 3]
-<script setup lang="ts">
-import { Stepper } from '@supernova/design-system/vue3';
-</script>
-
-<template>
-  <Stepper type="Horizontal" current="1" step1Label="Cart" />
-</template>
-```
-
-```svelte [Svelte]
-<script lang="ts">
-  import { Stepper } from '@supernova/design-system/svelte';
-</script>
-
-<Stepper type="Horizontal" current="1" step1Label="Cart" />
-```
-
-:::
+| `children` | `ReactNode \| Slot \| ng-content` | `-` | - |

@@ -17,10 +17,10 @@ A slider allows users to select a single value from a defined range by moving a 
 - Use a meaningful step increment and keep it consistent with the displayed value format.
 - Ensure the control supports keyboard interaction and exposes an accessible name and value in implementation.
 - Provide visible hover, focus, active, and disabled states when those states are added.
-- Variant
+- ### Variants
 - Default — A single-thumb horizontal slider with a filled value bar. This is the current standalone component; it is not yet part of a component set and has no additional Figma variants.
 
-## Interactive Preview
+## Live Preview & Usage
 
 <ComponentPreview name="Slider" />
 
@@ -28,51 +28,14 @@ A slider allows users to select a single value from a defined range by moving a 
 
 | Prop | Type | Default | Options |
 | :--- | :--- | :--- | :--- |
-| `value` | `number` | `-` | - |
-| `defaultValue` | `number` | `0` | - |
+| `id` | `string` | `'slider'` | - |
+| `name` | `string` | `'slider'` | - |
+| `value` | `number` | `0` | - |
 | `min` | `number` | `0` | - |
 | `max` | `number` | `100` | - |
 | `step` | `number` | `1` | - |
 | `disabled` | `boolean` | `false` | - |
-| `id` | `string` | `-` | - |
-| `name` | `string` | `-` | - |
-| `label` | `string` | `''` | - |
-| `ariaLabel` | `string` | `''` | - |
+| `label` | `string` | `'Slider'` | - |
 | `showValue` | `boolean` | `false` | - |
-| `showRange` | `boolean` | `false` | - |
-| `formatValue` | `(value: number) => string` | `-` | - |
-| `onChange` | `(value: number) => void` | `-` | - |
-| `onInput` | `(value: number) => void` | `-` | - |
 | `className` | `string` | `''` | - |
-
-## Usage
-
-::: code-group
-
-```tsx [React]
-import { Slider } from '@supernova/design-system/react';
-
-export default function App() {
-  return <Slider defaultValue={0} min={0} max={100} />;
-}
-```
-
-```vue [Vue 3]
-<script setup lang="ts">
-import { Slider } from '@supernova/design-system/vue3';
-</script>
-
-<template>
-  <Slider :defaultValue="0" :min="0" :max="100" />
-</template>
-```
-
-```svelte [Svelte]
-<script lang="ts">
-  import { Slider } from '@supernova/design-system/svelte';
-</script>
-
-<Slider defaultValue={0} min={0} max={100} />
-```
-
-:::
+| `onValueChange` | `(value: number) => void` | `-` | - |

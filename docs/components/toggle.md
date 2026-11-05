@@ -16,7 +16,7 @@ Toggle lets users switch a single setting between off and on, with the change ta
 - Use supporting text when the outcome may not be obvious.
 - Keep disabled controls visible only when their context is useful, and explain why they are unavailable when needed.
 
-## Interactive Preview
+## Live Preview & Usage
 
 <ComponentPreview name="Toggle" />
 
@@ -24,45 +24,12 @@ Toggle lets users switch a single setting between off and on, with the change ta
 
 | Prop | Type | Default | Options |
 | :--- | :--- | :--- | :--- |
-| `state` | `'Default' \| 'Active' \| 'Disabled'` | `'Default'` | Default, Active, Disabled |
-| `size` | `'Small' \| 'Medium' \| 'Large'` | `'Small'` | Small, Medium, Large |
-| `showText` | `boolean` | `false` | - |
-| `label` | `string` | `-` | - |
-| `pressed` | `boolean` | `-` | - |
+| `pressed` | `boolean` | `false` | - |
 | `disabled` | `boolean` | `false` | - |
-| `ariaLabel` | `string` | `-` | - |
+| `size` | `'small' \| 'medium' \| 'large'` | `'medium'` | small, medium, large |
+| `showText` | `boolean` | `false` | - |
+| `label` | `string` | `'Toggle'` | - |
 | `className` | `string` | `''` | - |
-| `children` | `any` | `-` | - |
+| `children` | `ReactNode \| Slot \| ng-content` | `-` | - |
+| `ariaLabel` | `string` | `''` | - |
 | `onPressedChange` | `(pressed: boolean) => void` | `-` | - |
-
-## Usage
-
-::: code-group
-
-```tsx [React]
-import { Toggle } from '@supernova/design-system/react';
-
-export default function App() {
-  return <Toggle state="Default" size="Small" showText={false} />;
-}
-```
-
-```vue [Vue 3]
-<script setup lang="ts">
-import { Toggle } from '@supernova/design-system/vue3';
-</script>
-
-<template>
-  <Toggle state="Default" size="Small" :showText="false" />
-</template>
-```
-
-```svelte [Svelte]
-<script lang="ts">
-  import { Toggle } from '@supernova/design-system/svelte';
-</script>
-
-<Toggle state="Default" size="Small" showText={false} />
-```
-
-:::

@@ -18,7 +18,7 @@ Tooltip provides brief contextual information about a UI element without interru
 - Avoid interactive controls, links, or long-form content inside a tooltip.
 - Ensure the same information is available to keyboard and touch users.
 
-## Interactive Preview
+## Live Preview & Usage
 
 <ComponentPreview name="Tooltip" />
 
@@ -26,42 +26,8 @@ Tooltip provides brief contextual information about a UI element without interru
 
 | Prop | Type | Default | Options |
 | :--- | :--- | :--- | :--- |
-| `textContent` | `string` | `'Label'` | - |
-| `text` | `string` | `-` | - |
-| `position` | `'Top' \| 'Bottom' \| 'Left' \| 'Right'` | `'Top'` | Top, Bottom, Left, Right |
+| `text` | `string` | `'Label'` | - |
+| `position` | `'top' \| 'bottom' \| 'left' \| 'right'` | `'top'` | top, bottom, left, right |
 | `id` | `string` | `'tooltip'` | - |
-| `disabled` | `boolean` | `false` | - |
 | `className` | `string` | `''` | - |
-| `children` | `any` | `-` | - |
-
-## Usage
-
-::: code-group
-
-```tsx [React]
-import { Tooltip } from '@supernova/design-system/react';
-
-export default function App() {
-  return <Tooltip textContent="Label" position="Top" id="tooltip" />;
-}
-```
-
-```vue [Vue 3]
-<script setup lang="ts">
-import { Tooltip } from '@supernova/design-system/vue3';
-</script>
-
-<template>
-  <Tooltip textContent="Label" position="Top" id="tooltip" />
-</template>
-```
-
-```svelte [Svelte]
-<script lang="ts">
-  import { Tooltip } from '@supernova/design-system/svelte';
-</script>
-
-<Tooltip textContent="Label" position="Top" id="tooltip" />
-```
-
-:::
+| `children` | `ReactNode \| Slot \| ng-content` | `-` | - |

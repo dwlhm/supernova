@@ -14,7 +14,7 @@ A horizontal tab bar composed of Tab Item instances. It provides up to eight tab
 - Hide unused tabs instead of leaving empty labels.
 - Avoid overcrowding; use another navigation pattern if labels no longer fit clearly.
 
-## Interactive Preview
+## Live Preview & Usage
 
 <ComponentPreview name="Tabs" />
 
@@ -22,44 +22,9 @@ A horizontal tab bar composed of Tab Item instances. It provides up to eight tab
 
 | Prop | Type | Default | Options |
 | :--- | :--- | :--- | :--- |
-| `tabs` | `TabsItem[]` | `[]` | - |
-| `activeId` | `string` | `''` | - |
-| `defaultActiveId` | `string` | `''` | - |
-| `onSelect` | `(id: string) => void` | `-` | - |
+| `tabs` | `TabData[]` | `[]` | - |
+| `activeTab` | `string` | `'overview'` | - |
 | `ariaLabel` | `string` | `'Tabs'` | - |
-| `idBase` | `string` | `'tabs'` | - |
 | `className` | `string` | `''` | - |
-| `panelClassName` | `string` | `''` | - |
-| `children` | `any` | `-` | - |
-
-## Usage
-
-::: code-group
-
-```tsx [React]
-import { Tabs } from '@supernova/design-system/react';
-
-export default function App() {
-  return <Tabs ariaLabel="Tabs" idBase="tabs" />;
-}
-```
-
-```vue [Vue 3]
-<script setup lang="ts">
-import { Tabs } from '@supernova/design-system/vue3';
-</script>
-
-<template>
-  <Tabs ariaLabel="Tabs" idBase="tabs" />
-</template>
-```
-
-```svelte [Svelte]
-<script lang="ts">
-  import { Tabs } from '@supernova/design-system/svelte';
-</script>
-
-<Tabs ariaLabel="Tabs" idBase="tabs" />
-```
-
-:::
+| `children` | `ReactNode \| Slot \| ng-content` | `-` | - |
+| `onTabChange` | `(id: string) => void` | `-` | - |

@@ -1,6 +1,5 @@
 # TableCheckboxBodyCell
 
-Description
 A compact body cell containing a row-selection checkbox.
 
 ## When to Use
@@ -13,7 +12,7 @@ A compact body cell containing a row-selection checkbox.
 - Keep selection state synchronized with the header checkbox.
 - Do not use it for an editable boolean data field.
 
-## Interactive Preview
+## Live Preview & Usage
 
 <ComponentPreview name="TableCheckboxBodyCell" />
 
@@ -22,45 +21,7 @@ A compact body cell containing a row-selection checkbox.
 | Prop | Type | Default | Options |
 | :--- | :--- | :--- | :--- |
 | `checked` | `boolean` | `false` | - |
-| `indeterminate` | `boolean` | `false` | - |
-| `disabled` | `boolean` | `false` | - |
-| `leftLabel` | `string` | `-` | - |
-| `label` | `string` | `-` | - |
-| `ariaLabel` | `string` | `-` | - |
-| `rowId` | `string` | `-` | - |
-| `name` | `string` | `-` | - |
+| `rowId` | `string` | `''` | - |
+| `ariaLabel` | `string` | `'Select row'` | - |
 | `className` | `string` | `''` | - |
-| `children` | `any` | `-` | - |
-| `onChange` | `(checked: boolean) => void` | `-` | - |
-
-## Usage
-
-::: code-group
-
-```tsx [React]
-import { TableCheckboxBodyCell } from '@supernova/design-system/react';
-
-export default function App() {
-  return <TableCheckboxBodyCell checked={false} indeterminate={false} disabled={false} />;
-}
-```
-
-```vue [Vue 3]
-<script setup lang="ts">
-import { TableCheckboxBodyCell } from '@supernova/design-system/vue3';
-</script>
-
-<template>
-  <TableCheckboxBodyCell :checked="false" :indeterminate="false" :disabled="false" />
-</template>
-```
-
-```svelte [Svelte]
-<script lang="ts">
-  import { TableCheckboxBodyCell } from '@supernova/design-system/svelte';
-</script>
-
-<TableCheckboxBodyCell checked={false} indeterminate={false} disabled={false} />
-```
-
-:::
+| `onCheckedChange` | `(rowId: string, checked: boolean) => void` | `-` | - |

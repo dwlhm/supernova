@@ -19,7 +19,7 @@ Metric Card presents a key performance indicator with optional context, status, 
 - Keep optional actions secondary to the metric and limit custom slot content to compact, scannable information.
 - Keep cards in the same group visually and semantically consistent.
 
-## Interactive Preview
+## Live Preview & Usage
 
 <ComponentPreview name="MetricCard" />
 
@@ -27,65 +27,19 @@ Metric Card presents a key performance indicator with optional context, status, 
 
 | Prop | Type | Default | Options |
 | :--- | :--- | :--- | :--- |
-| `type` | `\| 'Default' \| 'Progress' \| 'Sparkline' \| 'Comparison' \| 'Radial' \| 'Mini Bar' \| 'Target' \| 'List' \| 'Multi-Metric' \| 'Leaderboard'` | `'Default'` | , Default, Progress, Sparkline, Comparison, Radial, Mini Bar, Target, List, Multi-Metric, Leaderboard |
-| `labelText` | `string` | `'Total Revenue'` | - |
-| `valueText` | `string` | `'$45,231.89'` | - |
+| `label` | `string` | `'Total Revenue'` | - |
+| `value` | `string` | `'$45,231.89'` | - |
 | `showValue` | `boolean` | `true` | - |
-| `showIcon` | `boolean` | `true` | - |
-| `iconName` | `'revenue' \| 'orders' \| 'customers' \| 'growth' \| 'chart' \| 'target'` | `'growth'` | revenue, orders, customers, growth, chart, target |
-| `showTrend` | `boolean` | `true` | - |
 | `trendText` | `string` | `'+20.1%'` | - |
+| `showTrend` | `boolean` | `true` | - |
 | `trendDirection` | `'up' \| 'down' \| 'neutral'` | `'up'` | up, down, neutral |
-| `showDescription` | `boolean` | `true` | - |
 | `descriptionText` | `string` | `'from last month'` | - |
-| `showStatus` | `boolean` | `false` | - |
-| `statusLabel` | `string` | `''` | - |
-| `showActionable` | `boolean` | `false` | - |
-| `primaryActionLabel` | `string` | `''` | - |
-| `secondaryActionLabel` | `string` | `''` | - |
-| `onPrimaryAction` | `() => void` | `-` | - |
-| `onSecondaryAction` | `() => void` | `-` | - |
+| `showDescription` | `boolean` | `true` | - |
+| `showIcon` | `boolean` | `true` | - |
+| `showStatus` | `boolean` | `true` | - |
+| `statusLabel` | `string` | `'On track'` | - |
+| `statusVariant` | `'default' \| 'success' \| 'warning' \| 'error' \| 'info'` | `'default'` | default, success, warning, error, info |
+| `showProgress` | `boolean` | `false` | - |
 | `progress` | `number` | `0` | - |
-| `targetText` | `string` | `''` | - |
-| `comparisonValueText` | `string` | `''` | - |
-| `comparisonLabelText` | `string` | `''` | - |
-| `comparisonShare` | `number` | `0` | - |
-| `sparklineData` | `number[]` | `[]` | - |
-| `barData` | `number[]` | `[]` | - |
-| `listItems` | `{ id: string; label: string; value: string }[]` | `[]` | - |
-| `metrics` | `{ id: string; label: string; value: string }[]` | `[]` | - |
-| `leaderboardEntries` | `{ id: string; label: string; value: string }[]` | `[]` | - |
 | `className` | `string` | `''` | - |
-| `children` | `any` | `-` | - |
-
-## Usage
-
-::: code-group
-
-```tsx [React]
-import { MetricCard } from '@supernova/design-system/react';
-
-export default function App() {
-  return <MetricCard type="Default" labelText="Total Revenue" valueText="$45,231.89" />;
-}
-```
-
-```vue [Vue 3]
-<script setup lang="ts">
-import { MetricCard } from '@supernova/design-system/vue3';
-</script>
-
-<template>
-  <MetricCard type="Default" labelText="Total Revenue" valueText="$45,231.89" />
-</template>
-```
-
-```svelte [Svelte]
-<script lang="ts">
-  import { MetricCard } from '@supernova/design-system/svelte';
-</script>
-
-<MetricCard type="Default" labelText="Total Revenue" valueText="$45,231.89" />
-```
-
-:::
+| `children` | `ReactNode \| Slot \| ng-content` | `-` | - |

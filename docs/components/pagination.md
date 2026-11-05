@@ -1,9 +1,9 @@
 # Pagination
 
-Description
 Pagination lets users navigate through content or data that is divided across multiple pages. This component includes Previous and Next controls, individual page numbers, and an ellipsis for skipped page ranges.
 
-Variant
+### Variants
+
 Default — Use the standard pagination layout when users need sequential navigation and direct access to nearby pages.
 
 ## When to Use
@@ -21,7 +21,7 @@ Default — Use the standard pagination layout when users need sequential naviga
 - Preserve sorting, filters, and item order when users move between pages.
 - Provide accessible labels for navigation controls and indicate the current page to assistive technologies.
 
-## Interactive Preview
+## Live Preview & Usage
 
 <ComponentPreview name="Pagination" />
 
@@ -33,38 +33,5 @@ Default — Use the standard pagination layout when users need sequential naviga
 | `totalPages` | `number` | `1` | - |
 | `previousLabel` | `string` | `'Previous'` | - |
 | `nextLabel` | `string` | `'Next'` | - |
-| `ariaLabel` | `string` | `'Pagination'` | - |
 | `className` | `string` | `''` | - |
 | `onPageChange` | `(page: number) => void` | `-` | - |
-
-## Usage
-
-::: code-group
-
-```tsx [React]
-import { Pagination } from '@supernova/design-system/react';
-
-export default function App() {
-  return <Pagination currentPage={1} totalPages={1} previousLabel="Previous" />;
-}
-```
-
-```vue [Vue 3]
-<script setup lang="ts">
-import { Pagination } from '@supernova/design-system/vue3';
-</script>
-
-<template>
-  <Pagination :currentPage="1" :totalPages="1" previousLabel="Previous" />
-</template>
-```
-
-```svelte [Svelte]
-<script lang="ts">
-  import { Pagination } from '@supernova/design-system/svelte';
-</script>
-
-<Pagination currentPage={1} totalPages={1} previousLabel="Previous" />
-```
-
-:::

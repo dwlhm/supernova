@@ -17,7 +17,7 @@ Alert dialog asks users to explicitly confirm an important, risky, or difficult-
 - Hide the description only when the heading provides sufficient context. Keep it visible for high-risk actions.
 - Use a destructive button style when the confirmed action is destructive.
 
-## Interactive Preview
+## Live Preview & Usage
 
 <ComponentPreview name="AlertDialog" />
 
@@ -26,48 +26,15 @@ Alert dialog asks users to explicitly confirm an important, risky, or difficult-
 | Prop | Type | Default | Options |
 | :--- | :--- | :--- | :--- |
 | `open` | `boolean` | `true` | - |
-| `id` | `string` | `'alert-dialog'` | - |
+| `inline` | `boolean` | `false` | - |
 | `heading` | `string` | `'Are you absolutely sure?'` | - |
 | `description` | `string` | `'This action cannot be undone. This will permanently delete your account and remove your data from our servers.'` | - |
 | `showDescription` | `boolean` | `true` | - |
-| `showClose` | `boolean` | `true` | - |
+| `showCloseButton` | `boolean` | `true` | - |
 | `cancelLabel` | `string` | `'Cancel'` | - |
-| `continueLabel` | `string` | `'Continue'` | - |
-| `continueVariant` | `'primary' \| 'destructive'` | `'primary'` | primary, destructive |
-| `onCancel` | `() => void` | `-` | - |
-| `onContinue` | `() => void` | `-` | - |
-| `onOpenChange` | `(open: boolean) => void` | `-` | - |
+| `confirmLabel` | `string` | `'Continue'` | - |
+| `destructive` | `boolean` | `false` | - |
 | `className` | `string` | `''` | - |
-| `children` | `any` | `-` | - |
-
-## Usage
-
-::: code-group
-
-```tsx [React]
-import { AlertDialog } from '@supernova/design-system/react';
-
-export default function App() {
-  return <AlertDialog open id="alert-dialog" heading="Are you absolutely sure?" />;
-}
-```
-
-```vue [Vue 3]
-<script setup lang="ts">
-import { AlertDialog } from '@supernova/design-system/vue3';
-</script>
-
-<template>
-  <AlertDialog open id="alert-dialog" heading="Are you absolutely sure?" />
-</template>
-```
-
-```svelte [Svelte]
-<script lang="ts">
-  import { AlertDialog } from '@supernova/design-system/svelte';
-</script>
-
-<AlertDialog open id="alert-dialog" heading="Are you absolutely sure?" />
-```
-
-:::
+| `children` | `ReactNode \| Slot \| ng-content` | `-` | - |
+| `onCancel` | `() => void` | `-` | - |
+| `onConfirm` | `() => void` | `-` | - |

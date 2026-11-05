@@ -16,7 +16,7 @@ Chart is a flexible data-visualization component with 12 variants for comparing 
 - Do not use charts for a single value when a KPI or statistic component is clearer.
 - Provide an accessible text summary or data table when the chart contains critical information.
 
-## Interactive Preview
+## Live Preview & Usage
 
 <ComponentPreview name="Chart" />
 
@@ -24,49 +24,14 @@ Chart is a flexible data-visualization component with 12 variants for comparing 
 
 | Prop | Type | Default | Options |
 | :--- | :--- | :--- | :--- |
-| `type` | `ChartType` | `'Bar'` | - |
+| `type` | `'bar' \| 'line' \| 'area' \| 'pie' \| 'donut'` | `'bar'` | bar, line, area, pie, donut |
+| `title` | `string` | `'Revenue Overview'` | - |
+| `description` | `string` | `'Weekly revenue breakdown by day'` | - |
 | `showTitle` | `boolean` | `true` | - |
 | `showDescription` | `boolean` | `true` | - |
-| `showLegend` | `boolean` | `true` | - |
-| `showGridLines` | `boolean` | `true` | - |
-| `showDataLabels` | `boolean` | `true` | - |
-| `titleText` | `string` | `'Revenue Overview'` | - |
-| `descriptionText` | `string` | `'Weekly revenue breakdown by day'` | - |
+| `showTooltip` | `boolean` | `true` | - |
+| `legend` | `ChartLegendEntry[]` | `[]` | - |
 | `data` | `ChartDataPoint[]` | `[]` | - |
-| `seriesNames` | `string[]` | `[]` | - |
-| `maxValue` | `number` | `-` | - |
-| `customContent` | `boolean` | `false` | - |
+| `showLegend` | `boolean` | `true` | - |
 | `className` | `string` | `''` | - |
-| `children` | `any` | `-` | - |
-
-## Usage
-
-::: code-group
-
-```tsx [React]
-import { Chart } from '@supernova/design-system/react';
-
-export default function App() {
-  return <Chart type="Bar" showTitle showDescription />;
-}
-```
-
-```vue [Vue 3]
-<script setup lang="ts">
-import { Chart } from '@supernova/design-system/vue3';
-</script>
-
-<template>
-  <Chart type="Bar" showTitle showDescription />
-</template>
-```
-
-```svelte [Svelte]
-<script lang="ts">
-  import { Chart } from '@supernova/design-system/svelte';
-</script>
-
-<Chart type="Bar" showTitle showDescription />
-```
-
-:::
+| `children` | `ReactNode \| Slot \| ng-content` | `-` | - |

@@ -20,7 +20,7 @@ An indeterminate loading indicator that communicates an ongoing process when pro
 - Add concise supporting text when the loading context is not obvious or the wait may be prolonged.
 - Do not use multiple prominent spinners in the same region.
 
-## Interactive Preview
+## Live Preview & Usage
 
 <ComponentPreview name="Spinner" />
 
@@ -28,39 +28,6 @@ An indeterminate loading indicator that communicates an ongoing process when pro
 
 | Prop | Type | Default | Options |
 | :--- | :--- | :--- | :--- |
-| `size` | `'12' \| '16' \| '24' \| '32'` | `'24'` | 12, 16, 24, 32 |
-| `tone` | `'primary' \| 'inherit' \| 'inverse'` | `'primary'` | primary, inherit, inverse |
+| `size` | `'12' \| '16' \| '24' \| '32'` | `'12'` | 12, 16, 24, 32 |
 | `label` | `string` | `'Loading'` | - |
 | `className` | `string` | `''` | - |
-
-## Usage
-
-::: code-group
-
-```tsx [React]
-import { Spinner } from '@supernova/design-system/react';
-
-export default function App() {
-  return <Spinner size="24" tone="primary" label="Loading" />;
-}
-```
-
-```vue [Vue 3]
-<script setup lang="ts">
-import { Spinner } from '@supernova/design-system/vue3';
-</script>
-
-<template>
-  <Spinner size="24" tone="primary" label="Loading" />
-</template>
-```
-
-```svelte [Svelte]
-<script lang="ts">
-  import { Spinner } from '@supernova/design-system/svelte';
-</script>
-
-<Spinner size="24" tone="primary" label="Loading" />
-```
-
-:::

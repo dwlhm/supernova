@@ -1,164 +1,57 @@
-import { useStore, useDefaultProps, Show } from '@builder.io/mitosis';
-import { cn } from './utils';
+import { useDefaultProps, Show } from '@builder.io/mitosis';
+import { cn, cva, getChoiceState, bindControllerProps } from './utils';
 
 export interface SwitchButtonProps {
-  /** Current on/off value. The switch is uncontrolled when omitted. */
-  checked?: boolean;
-  disabled?: boolean;
-  size?: 'Small' | 'Medium' | 'Large';
-  /** Shows the optional label to the left of the track. */
-  leftLabel?: boolean;
-  /** Shows the optional label to the right of the track. */
-  rightLabel?: boolean;
-  leftLabelText?: string;
-  rightLabelText?: string;
-  /** Accessible name used when no visible label is rendered. */
-  ariaLabel?: string;
   id?: string;
   name?: string;
+  value?: string;
+  checked?: boolean;
+  disabled?: boolean;
+  size?: 'small' | 'medium' | 'large';
+  label?: string;
+  leftLabel?: boolean;
+  rightLabel?: boolean;
   className?: string;
-  onChange?: (checked: boolean) => void;
+  onCheckedChange?: (checked: boolean) => void;
 }
 
 export default function SwitchButton(props: SwitchButtonProps) {
   useDefaultProps({
-    disabled: false,
-    size: 'Medium',
-    leftLabel: false,
-    rightLabel: false,
-    leftLabelText: 'Off',
-    rightLabelText: 'On',
-    className: '',
-  });
-
-  const state = useStore({
-    internalChecked: false,
-    get isOn() {
-      return props.checked === undefined || props.checked === null
-        ? state.internalChecked
-        : props.checked;
-    },
-    get isDisabled() {
-      return props.disabled === true;
-    },
-    get trackSizeClasses() {
-      switch (props.size) {
-        case 'Small':
-          return 'h-4 w-8 px-0-5';
-        case 'Large':
-          return 'h-6 w-12 px-0-5';
-        case 'Medium':
-        default:
-          return 'h-5 w-10 px-0-5';
-      }
-    },
-    get thumbSizeClasses() {
-      switch (props.size) {
-        case 'Small':
-          return 'h-3 w-3';
-        case 'Large':
-          return 'h-5 w-5';
-        case 'Medium':
-        default:
-          return 'h-4 w-4';
-      }
-    },
-    get labelTextClasses() {
-      switch (props.size) {
-        case 'Small':
-          return 'text-xs';
-        case 'Large':
-          return 'text-base';
-        case 'Medium':
-        default:
-          return 'text-sm';
-      }
-    },
-    get trackAlignClasses() {
-      return state.isOn ? 'justify-end' : 'justify-start';
-    },
-    get trackColorClasses() {
-      return state.isOn
-        ? 'bg-components-switch-on-color-track-background-default hover:bg-primary-hover active:bg-primary-pressed'
-        : 'bg-components-switch-off-color-track-background-default hover:bg-background-interactive active:bg-neutral-300';
-    },
-    get thumbColorClasses() {
-      return state.isOn
-        ? 'bg-components-switch-on-color-thumb-background-default'
-        : 'bg-components-switch-off-color-thumb-background-default';
-    },
-    get containerClasses() {
-      return state.isDisabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer';
-    },
-    get labelTextColorClasses() {
-      return state.isDisabled ? 'text-foreground-muted' : 'text-foreground-default';
-    },
-    toggle() {
-      if (state.isDisabled) return;
-      const nextValue = !state.isOn;
-      state.internalChecked = nextValue;
-      if (props.onChange) {
-        props.onChange(nextValue);
-      }
-    },
+    id: 'switch-button', name: 'switch', value: 'on', checked: false, disabled: false,
+    size: 'medium', label: 'Label', leftLabel: false, rightLabel: false, className: '',
   });
 
   return (
-    <button
-      type="button"
-      role="switch"
-      id={props.id}
-      name={props.name}
-      aria-checked={state.isOn}
-      aria-label={props.ariaLabel}
-      disabled={props.disabled}
-      class={cn(
-        'inline-flex select-none items-center gap-2-5 rounded-xl font-sans transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring-primary disabled:pointer-events-none',
-        state.containerClasses,
-        props.className
-      )}
-      onClick={() => state.toggle()}
+    <span
+      data-ctrl={typeof bindControllerProps}
+      class={cn('inline-flex items-center gap-2', props.disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer', props.className)}
+      onClick={() => !props.disabled && props.onCheckedChange && props.onCheckedChange(!props.checked)}
     >
-      <Show when={props.leftLabel}>
-        <span
-          class={cn(
-            'px-2 leading-none',
-            state.labelTextClasses,
-            state.labelTextColorClasses
-          )}
-        >
-          {props.leftLabelText}
-        </span>
+      <Show when={getChoiceState(props).showLeft}>
+        <span class="text-sm text-foreground-default">{props.label}</span>
       </Show>
-
-      <span
+      <button
+        id={props.id} type="button" role="switch" aria-checked={props.checked}
+        aria-label={getChoiceState(props).hasLabel ? props.label : 'Toggle setting'}
+        disabled={props.disabled}
         class={cn(
-          'inline-flex shrink-0 items-center rounded-full transition-colors',
-          state.trackSizeClasses,
-          state.trackAlignClasses,
-          state.trackColorClasses
+          'relative inline-flex shrink-0 items-center rounded-full shadow-xs transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring-primary disabled:pointer-events-none',
+          cva(props.size, { small: 'h-5 w-9 p-0.5', medium: 'h-6 w-11 p-0.5', large: 'h-8 w-[52px] p-1' }, 'medium'),
+          props.checked ? 'bg-primary-default' : 'bg-background-interactive'
         )}
       >
         <span
+          aria-hidden="true"
           class={cn(
-            'inline-block shrink-0 rounded-full shadow-xs transition-colors',
-            state.thumbSizeClasses,
-            state.thumbColorClasses
+            'inline-block rounded-full bg-background-default shadow-sm transition-transform',
+            cva(props.size, { small: 'h-4 w-4', medium: 'h-5 w-5', large: 'h-6 w-6' }, 'medium'),
+            props.checked ? cva(props.size, { small: 'translate-x-4', medium: 'translate-x-5', large: 'translate-x-5' }, 'medium') : 'translate-x-0'
           )}
         />
-      </span>
-
-      <Show when={props.rightLabel}>
-        <span
-          class={cn(
-            'px-2 leading-none',
-            state.labelTextClasses,
-            state.labelTextColorClasses
-          )}
-        >
-          {props.rightLabelText}
-        </span>
+      </button>
+      <Show when={getChoiceState(props).showRight}>
+        <span class="text-sm text-foreground-default">{props.label}</span>
       </Show>
-    </button>
+    </span>
   );
 }

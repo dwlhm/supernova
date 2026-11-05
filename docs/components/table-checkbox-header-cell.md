@@ -1,6 +1,5 @@
 # TableCheckboxHeaderCell
 
-Description
 A compact header cell containing the table's selection checkbox.
 
 ## When to Use
@@ -13,7 +12,7 @@ A compact header cell containing the table's selection checkbox.
 - Use an indeterminate state when only some eligible rows are selected.
 - Disable or omit it when bulk selection is unavailable.
 
-## Interactive Preview
+## Live Preview & Usage
 
 <ComponentPreview name="TableCheckboxHeaderCell" />
 
@@ -23,39 +22,6 @@ A compact header cell containing the table's selection checkbox.
 | :--- | :--- | :--- | :--- |
 | `checked` | `boolean` | `false` | - |
 | `indeterminate` | `boolean` | `false` | - |
-| `disabled` | `boolean` | `false` | - |
 | `ariaLabel` | `string` | `'Select all rows'` | - |
 | `className` | `string` | `''` | - |
 | `onCheckedChange` | `(checked: boolean) => void` | `-` | - |
-
-## Usage
-
-::: code-group
-
-```tsx [React]
-import { TableCheckboxHeaderCell } from '@supernova/design-system/react';
-
-export default function App() {
-  return <TableCheckboxHeaderCell checked={false} indeterminate={false} disabled={false} />;
-}
-```
-
-```vue [Vue 3]
-<script setup lang="ts">
-import { TableCheckboxHeaderCell } from '@supernova/design-system/vue3';
-</script>
-
-<template>
-  <TableCheckboxHeaderCell :checked="false" :indeterminate="false" :disabled="false" />
-</template>
-```
-
-```svelte [Svelte]
-<script lang="ts">
-  import { TableCheckboxHeaderCell } from '@supernova/design-system/svelte';
-</script>
-
-<TableCheckboxHeaderCell checked={false} indeterminate={false} disabled={false} />
-```
-
-:::

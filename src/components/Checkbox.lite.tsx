@@ -1,181 +1,64 @@
-import { useStore, useDefaultProps, Show } from '@builder.io/mitosis';
-import { cn } from './utils';
+import { useDefaultProps, Show } from '@builder.io/mitosis';
+import { cn, cva, getChoiceState, ICON_PATHS, bindControllerProps } from './utils';
 
 export interface CheckboxProps {
+  id?: string;
   checked?: boolean;
+  indeterminate?: boolean;
+  disabled?: boolean;
+  required?: boolean;
+  size?: 'small' | 'medium' | 'large';
   label?: string;
   leftLabel?: boolean;
   rightLabel?: boolean;
-  size?: 'Small' | 'Medium' | 'Large';
-  disabled?: boolean;
-  id?: string;
   name?: string;
   value?: string;
-  ariaLabel?: string;
   className?: string;
-  onChange?: (checked: boolean) => void;
+  onCheckedChange?: (checked: boolean) => void;
 }
 
 export default function Checkbox(props: CheckboxProps) {
   useDefaultProps({
-    checked: false,
-    label: '',
-    leftLabel: false,
-    rightLabel: false,
-    size: 'Small',
-    disabled: false,
-    id: '',
-    name: '',
-    value: '',
-    ariaLabel: '',
-    className: '',
-  });
-
-  const state = useStore({
-    get hasLeftLabel() {
-      return props.leftLabel === true && !!props.label;
-    },
-    get hasRightLabel() {
-      return props.rightLabel === true && !!props.label;
-    },
-    get resolvedAriaLabel() {
-      if (props.ariaLabel && props.ariaLabel.length > 0) {
-        return props.ariaLabel;
-      }
-      return undefined;
-    },
-    get resolvedId() {
-      if (props.id && props.id.length > 0) {
-        return props.id;
-      }
-      return undefined;
-    },
-    get gapClasses() {
-      switch (props.size) {
-        case 'Medium':
-          return 'gap-2';
-        case 'Large':
-          return 'gap-2.5';
-        case 'Small':
-        default:
-          return 'gap-1.5';
-      }
-    },
-    get boxSizeClasses() {
-      switch (props.size) {
-        case 'Medium':
-          return 'w-5 h-5';
-        case 'Large':
-          return 'w-6 h-6';
-        case 'Small':
-        default:
-          return 'w-4 h-4';
-      }
-    },
-    get boxRadiusClasses() {
-      switch (props.size) {
-        case 'Medium':
-          return 'rounded-md';
-        case 'Large':
-          return 'rounded-lg';
-        case 'Small':
-        default:
-          return 'rounded-sm';
-      }
-    },
-    get iconSizeClasses() {
-      switch (props.size) {
-        case 'Medium':
-          return 'w-3.5 h-3.5';
-        case 'Large':
-          return 'w-4 h-4';
-        case 'Small':
-        default:
-          return 'w-3 h-3';
-      }
-    },
-    get labelSizeClasses() {
-      switch (props.size) {
-        case 'Medium':
-          return 'text-sm leading-none';
-        case 'Large':
-          return 'text-base leading-none';
-        case 'Small':
-        default:
-          return 'text-xs leading-none';
-      }
-    },
-    get boxStateClasses() {
-      return props.checked
-        ? 'bg-primary-default border-primary-default text-primary-foreground'
-        : 'bg-background-default border-border-default text-transparent';
-    },
-    handleChange() {
-      if (props.disabled) {
-        return;
-      }
-      if (props.onChange) {
-        props.onChange(!props.checked);
-      }
-    },
+    id: 'checkbox', checked: false, indeterminate: false, disabled: false, required: false,
+    size: 'medium', label: 'Label', leftLabel: false, rightLabel: false, name: 'checkbox', value: '', className: '',
   });
 
   return (
     <label
-      class={cn(
-        'inline-flex items-center select-none rounded-sm',
-        state.gapClasses,
-        props.disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer',
-        props.className
-      )}
+      data-ctrl={typeof bindControllerProps}
+      class={cn('inline-flex items-center', cva(props.size, { small: 'gap-1.5', medium: 'gap-2', large: 'gap-2.5' }, 'medium'), props.disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer', props.className)}
     >
-      <Show when={state.hasLeftLabel}>
-        <span class={cn('text-foreground-default', state.labelSizeClasses)}>{props.label}</span>
+      <Show when={getChoiceState(props).showLeft}>
+        <span class="text-sm text-foreground-default">{props.label}</span>
       </Show>
-
-      <span class="relative inline-flex items-center justify-center shrink-0">
+      <span class="relative inline-flex shrink-0 items-center justify-center">
         <input
-          type="checkbox"
-          class="sr-only peer"
-          checked={props.checked}
-          disabled={props.disabled}
-          id={state.resolvedId}
-          name={props.name}
-          value={props.value}
-          aria-label={state.resolvedAriaLabel}
-          onChange={() => state.handleChange()}
+          id={props.id} type="checkbox" name={props.name} value={props.value} checked={props.checked}
+          disabled={props.disabled} required={props.required}
+          aria-checked={props.indeterminate ? 'mixed' : props.checked}
+          aria-label={!getChoiceState(props).showLeft && !getChoiceState(props).showRight ? (props.label || 'Checkbox') : undefined}
+          class="peer absolute inset-0 h-full w-full cursor-pointer appearance-none opacity-0 disabled:cursor-not-allowed"
+          onChange={() => !props.disabled && props.onCheckedChange && props.onCheckedChange(!props.checked)}
         />
         <span
           aria-hidden="true"
           class={cn(
-            'inline-flex items-center justify-center border transition-colors peer-focus-visible:outline-none peer-focus-visible:ring-2 peer-focus-visible:ring-focus-ring-primary peer-focus-visible:ring-offset-2',
-            state.boxSizeClasses,
-            state.boxRadiusClasses,
-            state.boxStateClasses
+            'inline-flex items-center justify-center rounded-sm border shadow-xs transition-colors peer-focus-visible:ring-2 peer-focus-visible:ring-focus-ring-primary',
+            cva(props.size, { small: 'h-3.5 w-3.5', medium: 'h-4 w-4', large: 'h-5 w-5' }, 'medium'),
+            props.checked || props.indeterminate
+              ? 'border-primary-default bg-primary-default text-primary-foreground'
+              : 'border-border-default bg-background-default'
           )}
         >
-          <Show when={props.checked}>
-            <svg
-              class={cn('shrink-0', state.iconSizeClasses)}
-              viewBox="0 0 16 16"
-              fill="none"
-              aria-hidden="true"
-              focusable="false"
-            >
-              <path
-                d="M3.25 8.5L6.25 11.5L12.75 4.5"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
+          <Show when={props.checked || props.indeterminate}>
+            <svg class={cn('shrink-0', cva(props.size, { small: 'h-2.5 w-2.5', medium: 'h-3 w-3', large: 'h-3.5 w-3.5' }, 'medium'))} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d={props.indeterminate ? ICON_PATHS.minus : ICON_PATHS.check} stroke-linecap="round" stroke-linejoin="round" />
             </svg>
           </Show>
         </span>
       </span>
-
-      <Show when={state.hasRightLabel}>
-        <span class={cn('text-foreground-default', state.labelSizeClasses)}>{props.label}</span>
+      <Show when={getChoiceState(props).showRight}>
+        <span class="text-sm text-foreground-default">{props.label}</span>
       </Show>
     </label>
   );

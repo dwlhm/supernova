@@ -16,7 +16,7 @@ A single-line input for collecting short-form information such as names, titles,
 - Provide actionable validation feedback and preserve the entered value.
 - Use leading or trailing icons only when they clarify meaning or provide a relevant action.
 
-## Interactive Preview
+## Live Preview & Usage
 
 <ComponentPreview name="InputText" />
 
@@ -24,58 +24,21 @@ A single-line input for collecting short-form information such as names, titles,
 
 | Prop | Type | Default | Options |
 | :--- | :--- | :--- | :--- |
-| `id` | `string` | `'input-text'` | - |
-| `name` | `string` | `'input-text'` | - |
-| `type` | `'text' \| 'email' \| 'password' \| 'search' \| 'tel' \| 'url' \| 'number'` | `'text'` | text, email, password, search, tel, url, number |
 | `value` | `string` | `''` | - |
-| `autoComplete` | `string` | `'off'` | - |
-| `labelText` | `string` | `'Username'` | - |
-| `placeholderText` | `string` | `'Max Leiter'` | - |
-| `hintErrorText` | `string` | `'Choose a unique username for your account.'` | - |
-| `characterCount` | `string` | `''` | - |
-| `maxLength` | `number` | `200` | - |
+| `name` | `string` | `'input-text'` | - |
+| `id` | `string` | `'input-text'` | - |
+| `type` | `'text' \| 'email' \| 'password' \| 'search' \| 'tel' \| 'url' \| 'number'` | `'text'` | text, email, password, search, tel, url, number |
+| `label` | `string` | `'Username'` | - |
+| `placeholder` | `string` | `'Max Leiter'` | - |
+| `hint` | `string` | `'Choose a unique username for your account.'` | - |
+| `errorMessage` | `string` | `''` | - |
+| `disabled` | `boolean` | `false` | - |
+| `required` | `boolean` | `true` | - |
 | `showLabel` | `boolean` | `true` | - |
-| `showRequired` | `boolean` | `true` | - |
 | `showHint` | `boolean` | `true` | - |
 | `showCharacterCount` | `boolean` | `false` | - |
+| `maxLength` | `number` | `200` | - |
 | `showLeftIcon` | `boolean` | `false` | - |
 | `showRightIcon` | `boolean` | `true` | - |
-| `leftIcon` | `string` | `'search'` | - |
-| `rightIcon` | `string` | `'check'` | - |
-| `visualState` | `'Default' \| 'Focus' \| 'Filled' \| 'Error' \| 'Disabled'` | `'Default'` | Default, Focus, Filled, Error, Disabled |
-| `disabled` | `boolean` | `false` | - |
-| `required` | `boolean` | `false` | - |
 | `className` | `string` | `''` | - |
 | `onValueChange` | `(value: string) => void` | `-` | - |
-
-## Usage
-
-::: code-group
-
-```tsx [React]
-import { InputText } from '@supernova/design-system/react';
-
-export default function App() {
-  return <InputText id="input-text" name="input-text" type="text" />;
-}
-```
-
-```vue [Vue 3]
-<script setup lang="ts">
-import { InputText } from '@supernova/design-system/vue3';
-</script>
-
-<template>
-  <InputText id="input-text" name="input-text" type="text" />
-</template>
-```
-
-```svelte [Svelte]
-<script lang="ts">
-  import { InputText } from '@supernova/design-system/svelte';
-</script>
-
-<InputText id="input-text" name="input-text" type="text" />
-```
-
-:::

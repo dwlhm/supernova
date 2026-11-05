@@ -18,7 +18,7 @@ A brief, non-intrusive notification that communicates the status of an action or
 - Show the timestamp only when message recency is useful.
 - Avoid stacking many toasts, duplicating inline validation, or using toasts for critical information that must remain visible.
 
-## Interactive Preview
+## Live Preview & Usage
 
 <ComponentPreview name="Toast" />
 
@@ -26,47 +26,15 @@ A brief, non-intrusive notification that communicates the status of an action or
 
 | Prop | Type | Default | Options |
 | :--- | :--- | :--- | :--- |
-| `toastText` | `string` | `'Toast Text'` | - |
-| `descriptionText` | `string` | `'Toast description text here'` | - |
-| `actionText` | `string` | `'Undo'` | - |
+| `type` | `'default' \| 'success' \| 'error' \| 'warning' \| 'info'` | `'default'` | default, success, error, warning, info |
+| `title` | `string` | `'Toast Text'` | - |
+| `description` | `string` | `'Toast description text here'` | - |
 | `showDescription` | `boolean` | `false` | - |
-| `showActionButton` | `boolean` | `false` | - |
-| `showCloseButton` | `boolean` | `false` | - |
-| `clock` | `boolean` | `true` | - |
-| `timestampText` | `string` | `-` | - |
-| `type` | `ToastType` | `'Default'` | - |
+| `actionText` | `string` | `'Undo'` | - |
+| `showAction` | `boolean` | `false` | - |
+| `showClose` | `boolean` | `false` | - |
+| `timestamp` | `string` | `'11.29.45 AM'` | - |
+| `showTimestamp` | `boolean` | `true` | - |
 | `className` | `string` | `''` | - |
 | `onAction` | `() => void` | `-` | - |
 | `onClose` | `() => void` | `-` | - |
-
-## Usage
-
-::: code-group
-
-```tsx [React]
-import { Toast } from '@supernova/design-system/react';
-
-export default function App() {
-  return <Toast toastText="Toast Text" descriptionText="Toast description text here" actionText="Undo" />;
-}
-```
-
-```vue [Vue 3]
-<script setup lang="ts">
-import { Toast } from '@supernova/design-system/vue3';
-</script>
-
-<template>
-  <Toast toastText="Toast Text" descriptionText="Toast description text here" actionText="Undo" />
-</template>
-```
-
-```svelte [Svelte]
-<script lang="ts">
-  import { Toast } from '@supernova/design-system/svelte';
-</script>
-
-<Toast toastText="Toast Text" descriptionText="Toast description text here" actionText="Undo" />
-```
-
-:::

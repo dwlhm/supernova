@@ -1,6 +1,5 @@
 # TableNoBodyCell
 
-Description
 A compact body cell that displays a row number.
 
 ## When to Use
@@ -13,7 +12,7 @@ A compact body cell that displays a row number.
 - Align values consistently in the number column.
 - Use with Table No Header Cell.
 
-## Interactive Preview
+## Live Preview & Usage
 
 <ComponentPreview name="TableNoBodyCell" />
 
@@ -21,38 +20,5 @@ A compact body cell that displays a row number.
 
 | Prop | Type | Default | Options |
 | :--- | :--- | :--- | :--- |
-| `no` | `number \| string` | `1` | - |
-| `srLabel` | `string` | `''` | - |
+| `no` | `number` | `1` | - |
 | `className` | `string` | `''` | - |
-
-## Usage
-
-::: code-group
-
-```tsx [React]
-import { TableNoBodyCell } from '@supernova/design-system/react';
-
-export default function App() {
-  return <TableNoBodyCell no={1} />;
-}
-```
-
-```vue [Vue 3]
-<script setup lang="ts">
-import { TableNoBodyCell } from '@supernova/design-system/vue3';
-</script>
-
-<template>
-  <TableNoBodyCell :no="1" />
-</template>
-```
-
-```svelte [Svelte]
-<script lang="ts">
-  import { TableNoBodyCell } from '@supernova/design-system/svelte';
-</script>
-
-<TableNoBodyCell no={1} />
-```
-
-:::

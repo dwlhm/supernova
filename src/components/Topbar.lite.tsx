@@ -1,156 +1,69 @@
-import { useStore, useDefaultProps, Show, For } from '@builder.io/mitosis';
-import { cn } from './utils';
-
-export interface TopbarBreadcrumbItem {
-  label: string;
-  href?: string;
-}
+import { useDefaultProps, Show } from '@builder.io/mitosis';
+import { cn, ICON_PATHS, bindControllerProps } from './utils';
 
 export interface TopbarProps {
-  /** Trail of page-context links rendered left of the content slot. */
-  breadcrumbItems?: TopbarBreadcrumbItem[];
-  /** Visual separator between breadcrumb entries. */
-  breadcrumbSeparator?: string;
-  /** Accessible label for the breadcrumb navigation landmark. */
-  breadcrumbLabel?: string;
-  /** Renders the sidebar-collapse control at the leading edge. */
+  showSearch?: boolean;
+  searchPlaceholder?: string;
+  searchValue?: string;
   showSidebarToggle?: boolean;
-  /** Accessible label for the sidebar-collapse control. */
   sidebarToggleLabel?: string;
-  /** Reflects the expanded state of the sidebar controlled by the toggle. */
-  sidebarToggleExpanded?: boolean;
-  /** Fired when the sidebar-collapse control is activated. */
-  onSidebarToggle?: () => void;
-  /** Keeps the bar pinned to the top of the scroll container. */
-  sticky?: boolean;
-  /** Accessible label for the banner landmark. */
-  ariaLabel?: string;
-  /** Additional utility classes applied to the header element. */
+  breadcrumbRoot?: string;
+  breadcrumbCurrent?: string;
   className?: string;
-  /** Topbar content slot: page context, search, notifications, account actions. */
   children?: any;
+  onSearchChange?: (value: string) => void;
+  onToggleSidebar?: () => void;
 }
 
 export default function Topbar(props: TopbarProps) {
   useDefaultProps({
-    breadcrumbSeparator: '/',
-    breadcrumbLabel: 'Breadcrumb',
-    sidebarToggleLabel: 'Toggle sidebar',
-    showSidebarToggle: false,
-    sidebarToggleExpanded: false,
-    sticky: false,
-    className: '',
-  });
-
-  const state = useStore({
-    get hasBreadcrumb() {
-      const trail = props.breadcrumbItems;
-      return !!trail && trail.length > 0;
-    },
-    get breadcrumbEntries() {
-      const trail = props.breadcrumbItems || [];
-      const total = trail.length;
-      return trail.map((entry, index) => ({
-        key: entry.label + '-' + index,
-        label: entry.label,
-        href: entry.href,
-        isLast: index === total - 1,
-      }));
-    },
-    get separator() {
-      return props.breadcrumbSeparator || '/';
-    },
-    get headerClasses() {
-      return cn(
-        'flex w-full flex-row items-center justify-start gap-2.5 px-4 py-3',
-        'bg-background-default border-b border-border-default',
-        props.sticky && 'sticky top-0 z-20',
-        props.className
-      );
-    },
-    get toggleClasses() {
-      return cn(
-        'inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-none',
-        'bg-background-default text-foreground-default transition-colors',
-        'hover:bg-background-muted active:bg-background-interactive',
-        'focus:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring-primary focus-visible:ring-offset-2'
-      );
-    },
-    get breadcrumbLinkClasses() {
-      return cn(
-        'inline-flex items-center rounded-sm px-0.5 text-sm text-foreground-muted transition-colors',
-        'hover:text-foreground-default',
-        'focus:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring-primary focus-visible:ring-offset-2'
-      );
-    },
-    handleSidebarToggle() {
-      if (props.onSidebarToggle) {
-        props.onSidebarToggle();
-      }
-    },
+    showSearch: false, searchPlaceholder: 'Search', searchValue: '',
+    showSidebarToggle: true, sidebarToggleLabel: 'Toggle sidebar',
+    breadcrumbRoot: 'Home', breadcrumbCurrent: 'Breadcrumb', className: '',
   });
 
   return (
-    <header class={state.headerClasses} aria-label={props.ariaLabel}>
+    <header
+      data-ctrl={typeof bindControllerProps}
+      class={cn(
+        'flex h-16 w-full items-center gap-2 border-b border-border-default bg-background-default px-6',
+        props.className
+      )}
+    >
       <Show when={props.showSidebarToggle}>
         <button
           type="button"
-          class={state.toggleClasses}
           aria-label={props.sidebarToggleLabel}
-          aria-expanded={props.sidebarToggleExpanded ? 'true' : 'false'}
-          onClick={() => state.handleSidebarToggle()}
+          class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md p-2 text-foreground-default transition-colors hover:bg-background-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring-primary"
+          onClick={() => props.onToggleSidebar && props.onToggleSidebar()}
         >
-          <svg
-            class="h-4 w-4 shrink-0"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.5"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            aria-hidden="true"
-            focusable="false"
-          >
-            <rect x="3" y="3" width="18" height="18" rx="2" />
-            <path d="M9 3v18" />
+          <svg aria-hidden="true" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <rect x="3" y="4" width="18" height="16" rx="2" />
+            <path d="M9 4v16" stroke-linecap="round" />
           </svg>
         </button>
       </Show>
-
-      <Show when={state.hasBreadcrumb}>
-        <nav class="flex flex-row items-center gap-1.5" aria-label={props.breadcrumbLabel}>
-          <For each={state.breadcrumbEntries}>
-            {(entry) => (
-              <div class="flex flex-row items-center gap-1.5" key={entry.key}>
-                <Show
-                  when={entry.isLast}
-                  else={
-                    <a href={entry.href} class={state.breadcrumbLinkClasses}>
-                      {entry.label}
-                    </a>
-                  }
-                >
-                  <span
-                    class="inline-flex items-center px-0.5 text-sm font-medium text-foreground-default"
-                    aria-current="page"
-                  >
-                    {entry.label}
-                  </span>
-                </Show>
-                <Show when={!entry.isLast}>
-                  <span class="text-sm text-foreground-muted select-none" aria-hidden="true">
-                    {state.separator}
-                  </span>
-                </Show>
-              </div>
-            )}
-          </For>
-        </nav>
+      <nav aria-label="Breadcrumb" class="flex items-center gap-1.5 text-sm">
+        <span class="text-foreground-muted">{props.breadcrumbRoot}</span>
+        <span aria-hidden="true" class="text-foreground-muted">/</span>
+        <span aria-current="page" class="font-normal text-foreground-default">{props.breadcrumbCurrent}</span>
+      </nav>
+      <Show when={props.showSearch}>
+        <div class="ml-4 flex h-8 w-full max-w-xs items-center gap-2 rounded-lg border border-border-default bg-background-default px-3 focus-within:ring-2 focus-within:ring-focus-ring-primary">
+          <svg aria-hidden="true" class="h-4 w-4 shrink-0 text-foreground-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d={ICON_PATHS.search} stroke-linecap="round" />
+          </svg>
+          <input
+            type="search"
+            value={props.searchValue}
+            placeholder={props.searchPlaceholder}
+            aria-label={props.searchPlaceholder}
+            class="w-full bg-transparent text-sm text-foreground-default outline-none placeholder:text-foreground-muted"
+            onInput={(event) => props.onSearchChange && props.onSearchChange(event.target.value)}
+          />
+        </div>
       </Show>
-
-      <div class="flex min-w-0 flex-1 flex-row items-center justify-end gap-2.5">
-        {props.children}
-      </div>
+      <div class="ml-auto flex flex-1 items-center justify-end gap-2">{props.children}</div>
     </header>
   );
 }

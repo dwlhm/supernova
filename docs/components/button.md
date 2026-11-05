@@ -20,7 +20,7 @@ A versatile interactive component for user actions and link-styled navigation. I
 - Do not use Hover, Focus, or Pressed as resting states; they communicate interaction feedback or progress.
 - Keep button hierarchy and sizing consistent within the same action group.
 
-## Interactive Preview
+## Live Preview & Usage
 
 <ComponentPreview name="Button" />
 
@@ -28,50 +28,16 @@ A versatile interactive component for user actions and link-styled navigation. I
 
 | Prop | Type | Default | Options |
 | :--- | :--- | :--- | :--- |
-| `variant` | `ButtonVariant` | `'Primary'` | - |
-| `size` | `ButtonSize` | `'Regular'` | - |
-| `roundness` | `ButtonRoundness` | `'Default'` | - |
-| `state` | `ButtonState` | `'Default'` | - |
 | `label` | `string` | `'Label'` | - |
+| `type` | `'button' \| 'submit' \| 'reset'` | `'button'` | button, submit, reset |
+| `variant` | `'primary' \| 'secondary' \| 'outline' \| 'ghost' \| 'destructive' \| 'link'` | `'primary'` | primary, secondary, outline, ghost, destructive, link |
+| `size` | `'large' \| 'regular' \| 'small' \| 'mini'` | `'regular'` | large, regular, small, mini |
+| `roundness` | `'default' \| 'round'` | `'default'` | default, round |
+| `disabled` | `boolean` | `false` | - |
 | `showLabel` | `boolean` | `true` | - |
 | `showLeftIcon` | `boolean` | `false` | - |
 | `showRightIcon` | `boolean` | `false` | - |
-| `ariaLabel` | `string` | `-` | - |
-| `href` | `string` | `-` | - |
-| `target` | `string` | `-` | - |
-| `disabled` | `boolean` | `false` | - |
+| `ariaLabel` | `string` | `''` | - |
 | `className` | `string` | `''` | - |
-| `children` | `any` | `-` | - |
+| `children` | `ReactNode \| Slot \| ng-content` | `-` | - |
 | `onClick` | `() => void` | `-` | - |
-
-## Usage
-
-::: code-group
-
-```tsx [React]
-import { Button } from '@supernova/design-system/react';
-
-export default function App() {
-  return <Button variant="Primary" size="Regular" roundness="Default" />;
-}
-```
-
-```vue [Vue 3]
-<script setup lang="ts">
-import { Button } from '@supernova/design-system/vue3';
-</script>
-
-<template>
-  <Button variant="Primary" size="Regular" roundness="Default" />
-</template>
-```
-
-```svelte [Svelte]
-<script lang="ts">
-  import { Button } from '@supernova/design-system/svelte';
-</script>
-
-<Button variant="Primary" size="Regular" roundness="Default" />
-```
-
-:::

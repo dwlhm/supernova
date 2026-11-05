@@ -1,6 +1,5 @@
 # RadioButton
 
-Description
 A radio button lets users select exactly one option from a set of mutually exclusive choices. Radio buttons should always appear in a group of two or more options with clear labels.
 
 ## When to Use
@@ -21,7 +20,7 @@ A radio button lets users select exactly one option from a set of mutually exclu
 - Never use a single radio button for an independent on/off setting.
 - Explain why an option is disabled when the reason is not obvious.
 
-## Interactive Preview
+## Live Preview & Usage
 
 <ComponentPreview name="RadioButton" />
 
@@ -29,46 +28,15 @@ A radio button lets users select exactly one option from a set of mutually exclu
 
 | Prop | Type | Default | Options |
 | :--- | :--- | :--- | :--- |
-| `label` | `string` | `''` | - |
-| `leftLabel` | `boolean` | `false` | - |
-| `rightLabel` | `boolean` | `false` | - |
+| `id` | `string` | `'radio-button'` | - |
 | `checked` | `boolean` | `false` | - |
 | `disabled` | `boolean` | `false` | - |
-| `size` | `RadioButtonSize` | `'Medium'` | - |
-| `name` | `string` | `-` | - |
-| `value` | `string` | `-` | - |
-| `id` | `string` | `-` | - |
+| `required` | `boolean` | `false` | - |
+| `size` | `'small' \| 'medium' \| 'large'` | `'medium'` | small, medium, large |
+| `label` | `string` | `'Label'` | - |
+| `leftLabel` | `boolean` | `false` | - |
+| `rightLabel` | `boolean` | `false` | - |
+| `name` | `string` | `'radio-group'` | - |
+| `value` | `string` | `''` | - |
 | `className` | `string` | `''` | - |
 | `onChange` | `(value: string) => void` | `-` | - |
-
-## Usage
-
-::: code-group
-
-```tsx [React]
-import { RadioButton } from '@supernova/design-system/react';
-
-export default function App() {
-  return <RadioButton leftLabel={false} rightLabel={false} checked={false} />;
-}
-```
-
-```vue [Vue 3]
-<script setup lang="ts">
-import { RadioButton } from '@supernova/design-system/vue3';
-</script>
-
-<template>
-  <RadioButton :leftLabel="false" :rightLabel="false" :checked="false" />
-</template>
-```
-
-```svelte [Svelte]
-<script lang="ts">
-  import { RadioButton } from '@supernova/design-system/svelte';
-</script>
-
-<RadioButton leftLabel={false} rightLabel={false} checked={false} />
-```
-
-:::

@@ -1,6 +1,5 @@
 # SwitchButton
 
-Description
 A switch lets users turn one setting on or off. It communicates a binary state and should apply the change immediately.
 
 ## When to Use
@@ -20,7 +19,7 @@ A switch lets users turn one setting on or off. It communicates a binary state a
 - Use the disabled state only when the setting is temporarily unavailable.
 - Explain why a switch is disabled when the reason is not obvious.
 
-## Interactive Preview
+## Live Preview & Usage
 
 <ComponentPreview name="SwitchButton" />
 
@@ -28,47 +27,14 @@ A switch lets users turn one setting on or off. It communicates a binary state a
 
 | Prop | Type | Default | Options |
 | :--- | :--- | :--- | :--- |
-| `checked` | `boolean` | `-` | - |
+| `id` | `string` | `'switch-button'` | - |
+| `name` | `string` | `'switch'` | - |
+| `value` | `string` | `'on'` | - |
+| `checked` | `boolean` | `false` | - |
 | `disabled` | `boolean` | `false` | - |
-| `size` | `'Small' \| 'Medium' \| 'Large'` | `'Medium'` | Small, Medium, Large |
+| `size` | `'small' \| 'medium' \| 'large'` | `'medium'` | small, medium, large |
+| `label` | `string` | `'Label'` | - |
 | `leftLabel` | `boolean` | `false` | - |
 | `rightLabel` | `boolean` | `false` | - |
-| `leftLabelText` | `string` | `'Off'` | - |
-| `rightLabelText` | `string` | `'On'` | - |
-| `ariaLabel` | `string` | `-` | - |
-| `id` | `string` | `-` | - |
-| `name` | `string` | `-` | - |
 | `className` | `string` | `''` | - |
-| `onChange` | `(checked: boolean) => void` | `-` | - |
-
-## Usage
-
-::: code-group
-
-```tsx [React]
-import { SwitchButton } from '@supernova/design-system/react';
-
-export default function App() {
-  return <SwitchButton disabled={false} size="Medium" leftLabel={false} />;
-}
-```
-
-```vue [Vue 3]
-<script setup lang="ts">
-import { SwitchButton } from '@supernova/design-system/vue3';
-</script>
-
-<template>
-  <SwitchButton :disabled="false" size="Medium" :leftLabel="false" />
-</template>
-```
-
-```svelte [Svelte]
-<script lang="ts">
-  import { SwitchButton } from '@supernova/design-system/svelte';
-</script>
-
-<SwitchButton disabled={false} size="Medium" leftLabel={false} />
-```
-
-:::
+| `onCheckedChange` | `(checked: boolean) => void` | `-` | - |

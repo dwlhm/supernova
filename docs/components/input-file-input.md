@@ -16,7 +16,7 @@ A compact file input that lets users browse for and select a single file from th
 - Validate type and size with a specific error message.
 - Keep the browse action keyboard accessible.
 
-## Interactive Preview
+## Live Preview & Usage
 
 <ComponentPreview name="InputFileInput" />
 
@@ -24,50 +24,18 @@ A compact file input that lets users browse for and select a single file from th
 
 | Prop | Type | Default | Options |
 | :--- | :--- | :--- | :--- |
-| `labelText` | `string` | `'Picture'` | - |
+| `id` | `string` | `'input-file'` | - |
+| `name` | `string` | `'file'` | - |
+| `label` | `string` | `'Picture'` | - |
 | `buttonText` | `string` | `'Choose File'` | - |
-| `fileName` | `string` | `'No file chosen'` | - |
-| `hintErrorText` | `string` | `'Supported formats: PNG, JPG, or PDF.'` | - |
-| `showRequired` | `boolean` | `false` | - |
-| `showHint` | `boolean` | `true` | - |
+| `fileName` | `string` | `''` | - |
+| `hint` | `string` | `'Supported formats: PNG, JPG, or PDF.'` | - |
+| `errorMessage` | `string` | `''` | - |
+| `accept` | `string` | `'image/png,image/jpeg,application/pdf'` | - |
+| `disabled` | `boolean` | `false` | - |
+| `required` | `boolean` | `false` | - |
 | `showLabel` | `boolean` | `true` | - |
-| `state` | `'Default' \| 'Focus' \| 'Filled' \| 'Error' \| 'Disabled'` | `'Default'` | Default, Focus, Filled, Error, Disabled |
-| `accept` | `string` | `''` | - |
-| `previewSrc` | `string` | `''` | - |
-| `fileMeta` | `string` | `''` | - |
-| `removeLabel` | `string` | `'Remove'` | - |
+| `showHint` | `boolean` | `true` | - |
 | `className` | `string` | `''` | - |
-| `onChange` | `(fileName: string) => void` | `-` | - |
-| `onRemove` | `() => void` | `-` | - |
-
-## Usage
-
-::: code-group
-
-```tsx [React]
-import { InputFileInput } from '@supernova/design-system/react';
-
-export default function App() {
-  return <InputFileInput labelText="Picture" buttonText="Choose File" fileName="No file chosen" />;
-}
-```
-
-```vue [Vue 3]
-<script setup lang="ts">
-import { InputFileInput } from '@supernova/design-system/vue3';
-</script>
-
-<template>
-  <InputFileInput labelText="Picture" buttonText="Choose File" fileName="No file chosen" />
-</template>
-```
-
-```svelte [Svelte]
-<script lang="ts">
-  import { InputFileInput } from '@supernova/design-system/svelte';
-</script>
-
-<InputFileInput labelText="Picture" buttonText="Choose File" fileName="No file chosen" />
-```
-
-:::
+| `onFileNameChange` | `(fileName: string) => void` | `-` | - |
+| `onFilesChange` | `(files: unknown[]) => void` | `-` | - |

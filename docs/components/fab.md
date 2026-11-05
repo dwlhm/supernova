@@ -20,7 +20,7 @@ A Floating Action Button represents the most important action on a screen, such 
 - Provide an accessible name and maintain a logical focus order.
 - Use interaction states as specified; do not use Disabled when the action can remain available with validation or guidance.
 
-## Interactive Preview
+## Live Preview & Usage
 
 <ComponentPreview name="FAB" />
 
@@ -28,43 +28,6 @@ A Floating Action Button represents the most important action on a screen, such 
 
 | Prop | Type | Default | Options |
 | :--- | :--- | :--- | :--- |
-| `label` | `string` | `'Label'` | - |
-| `variant` | `'primary' \| 'secondary' \| 'outline'` | `'primary'` | primary, secondary, outline |
-| `size` | `'small' \| 'regular' \| 'large' \| 'extended'` | `'small'` | small, regular, large, extended |
-| `disabled` | `boolean` | `false` | - |
-| `ariaLabel` | `string` | `''` | - |
-| `className` | `string` | `''` | - |
-| `children` | `any` | `-` | - |
-| `onClick` | `() => void` | `-` | - |
-
-## Usage
-
-::: code-group
-
-```tsx [React]
-import { FAB } from '@supernova/design-system/react';
-
-export default function App() {
-  return <FAB label="Label" variant="primary" size="small" />;
-}
-```
-
-```vue [Vue 3]
-<script setup lang="ts">
-import { FAB } from '@supernova/design-system/vue3';
-</script>
-
-<template>
-  <FAB label="Label" variant="primary" size="small" />
-</template>
-```
-
-```svelte [Svelte]
-<script lang="ts">
-  import { FAB } from '@supernova/design-system/svelte';
-</script>
-
-<FAB label="Label" variant="primary" size="small" />
-```
-
-:::
+| `label` | `text` | `Label` | - |
+| `variant` | `'Primary' | 'Secondary' | 'Outline'` | `Primary` | Primary, Secondary, Outline |
+| `size` | `'Small' | 'Regular' | 'Large' | 'Extended'` | `Small` | Small, Regular, Large, Extended |

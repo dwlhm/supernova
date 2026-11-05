@@ -14,7 +14,7 @@ A horizontal application header that provides a consistent area for page-level o
 - Maintain predictable control order across screens.
 - Avoid duplicating navigation or actions already provided by the sidebar or page header.
 
-## Interactive Preview
+## Live Preview & Usage
 
 <ComponentPreview name="Topbar" />
 
@@ -22,46 +22,14 @@ A horizontal application header that provides a consistent area for page-level o
 
 | Prop | Type | Default | Options |
 | :--- | :--- | :--- | :--- |
-| `breadcrumbItems` | `TopbarBreadcrumbItem[]` | `-` | - |
-| `breadcrumbSeparator` | `string` | `'/'` | - |
-| `breadcrumbLabel` | `string` | `'Breadcrumb'` | - |
-| `showSidebarToggle` | `boolean` | `false` | - |
+| `showSearch` | `boolean` | `false` | - |
+| `searchPlaceholder` | `string` | `'Search'` | - |
+| `searchValue` | `string` | `''` | - |
+| `showSidebarToggle` | `boolean` | `true` | - |
 | `sidebarToggleLabel` | `string` | `'Toggle sidebar'` | - |
-| `sidebarToggleExpanded` | `boolean` | `false` | - |
-| `onSidebarToggle` | `() => void` | `-` | - |
-| `sticky` | `boolean` | `false` | - |
-| `ariaLabel` | `string` | `-` | - |
+| `breadcrumbRoot` | `string` | `'Home'` | - |
+| `breadcrumbCurrent` | `string` | `'Breadcrumb'` | - |
 | `className` | `string` | `''` | - |
-| `children` | `any` | `-` | - |
-
-## Usage
-
-::: code-group
-
-```tsx [React]
-import { Topbar } from '@supernova/design-system/react';
-
-export default function App() {
-  return <Topbar breadcrumbSeparator="/" breadcrumbLabel="Breadcrumb" showSidebarToggle={false} />;
-}
-```
-
-```vue [Vue 3]
-<script setup lang="ts">
-import { Topbar } from '@supernova/design-system/vue3';
-</script>
-
-<template>
-  <Topbar breadcrumbSeparator="/" breadcrumbLabel="Breadcrumb" :showSidebarToggle="false" />
-</template>
-```
-
-```svelte [Svelte]
-<script lang="ts">
-  import { Topbar } from '@supernova/design-system/svelte';
-</script>
-
-<Topbar breadcrumbSeparator="/" breadcrumbLabel="Breadcrumb" showSidebarToggle={false} />
-```
-
-:::
+| `children` | `ReactNode \| Slot \| ng-content` | `-` | - |
+| `onSearchChange` | `(value: string) => void` | `-` | - |
+| `onToggleSidebar` | `() => void` | `-` | - |

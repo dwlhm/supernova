@@ -16,7 +16,7 @@ A horizontal progress bar that communicates how much of an ongoing process has b
 - Do not use color alone to communicate status; provide supporting text when status is important.
 - Show completion clearly at 100%, then transition to the completed state or next step.
 
-## Interactive Preview
+## Live Preview & Usage
 
 <ComponentPreview name="Progressbar" />
 
@@ -25,44 +25,6 @@ A horizontal progress bar that communicates how much of an ongoing process has b
 | Prop | Type | Default | Options |
 | :--- | :--- | :--- | :--- |
 | `value` | `number` | `0` | - |
-| `min` | `number` | `0` | - |
-| `max` | `number` | `100` | - |
-| `label` | `string` | `''` | - |
-| `showValue` | `boolean` | `false` | - |
-| `tone` | `'primary' \| 'success' \| 'warning' \| 'info' \| 'danger'` | `'primary'` | primary, success, warning, info, danger |
-| `size` | `'small' \| 'medium' \| 'large'` | `'medium'` | small, medium, large |
-| `ariaLabel` | `string` | `''` | - |
-| `description` | `string` | `''` | - |
+| `label` | `string` | `'Progress'` | - |
+| `showLabel` | `boolean` | `false` | - |
 | `className` | `string` | `''` | - |
-
-## Usage
-
-::: code-group
-
-```tsx [React]
-import { Progressbar } from '@supernova/design-system/react';
-
-export default function App() {
-  return <Progressbar value={0} min={0} max={100} />;
-}
-```
-
-```vue [Vue 3]
-<script setup lang="ts">
-import { Progressbar } from '@supernova/design-system/vue3';
-</script>
-
-<template>
-  <Progressbar :value="0" :min="0" :max="100" />
-</template>
-```
-
-```svelte [Svelte]
-<script lang="ts">
-  import { Progressbar } from '@supernova/design-system/svelte';
-</script>
-
-<Progressbar value={0} min={0} max={100} />
-```
-
-:::

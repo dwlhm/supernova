@@ -16,7 +16,7 @@ A multi-line text input for collecting longer free-form content such as messages
 - Use a character count when a limit matters.
 - Preserve entered content between states and use Disabled sparingly.
 
-## Interactive Preview
+## Live Preview & Usage
 
 <ComponentPreview name="InputTextArea" />
 
@@ -25,60 +25,20 @@ A multi-line text input for collecting longer free-form content such as messages
 | Prop | Type | Default | Options |
 | :--- | :--- | :--- | :--- |
 | `value` | `string` | `''` | - |
-| `name` | `string` | `'input-text-area'` | - |
-| `id` | `string` | `'input-text-area'` | - |
+| `name` | `string` | `'input-textarea'` | - |
+| `id` | `string` | `'input-textarea'` | - |
 | `label` | `string` | `'Your message'` | - |
-| `labelText` | `string` | `''` | - |
-| `placeholder` | `string` | `''` | - |
-| `placeholderText` | `string` | `'Type your message here.'` | - |
-| `hint` | `string` | `''` | - |
-| `hintErrorText` | `string` | `'Your message will be copied to the support team.'` | - |
+| `placeholder` | `string` | `'Type your message here.'` | - |
+| `hint` | `string` | `'Your message will be copied to the support team.'` | - |
 | `errorMessage` | `string` | `''` | - |
-| `characterCount` | `string` | `''` | - |
-| `maxLength` | `number` | `200` | - |
-| `rows` | `number` | `4` | - |
 | `disabled` | `boolean` | `false` | - |
 | `required` | `boolean` | `false` | - |
-| `showRequired` | `boolean` | `false` | - |
+| `rows` | `number` | `4` | - |
 | `showLabel` | `boolean` | `true` | - |
 | `showHint` | `boolean` | `true` | - |
 | `showCharacterCount` | `boolean` | `true` | - |
+| `maxLength` | `number` | `200` | - |
 | `showLeftIcon` | `boolean` | `false` | - |
 | `showRightIcon` | `boolean` | `false` | - |
-| `visualState` | `InputTextAreaVisualState` | `'Default'` | - |
 | `className` | `string` | `''` | - |
 | `onValueChange` | `(value: string) => void` | `-` | - |
-| `onFocus` | `() => void` | `-` | - |
-| `onBlur` | `() => void` | `-` | - |
-
-## Usage
-
-::: code-group
-
-```tsx [React]
-import { InputTextArea } from '@supernova/design-system/react';
-
-export default function App() {
-  return <InputTextArea name="input-text-area" id="input-text-area" label="Your message" />;
-}
-```
-
-```vue [Vue 3]
-<script setup lang="ts">
-import { InputTextArea } from '@supernova/design-system/vue3';
-</script>
-
-<template>
-  <InputTextArea name="input-text-area" id="input-text-area" label="Your message" />
-</template>
-```
-
-```svelte [Svelte]
-<script lang="ts">
-  import { InputTextArea } from '@supernova/design-system/svelte';
-</script>
-
-<InputTextArea name="input-text-area" id="input-text-area" label="Your message" />
-```
-
-:::

@@ -19,7 +19,7 @@ Bubble Chat displays a message inside a conversation thread. It supports incomin
 - Use Custom text for optional supporting information, not the primary message.
 - Error messages should explain the failure and, when possible, support a retry action nearby.
 
-## Interactive Preview
+## Live Preview & Usage
 
 <ComponentPreview name="BubbleChat" />
 
@@ -27,56 +27,21 @@ Bubble Chat displays a message inside a conversation thread. It supports incomin
 
 | Prop | Type | Default | Options |
 | :--- | :--- | :--- | :--- |
-| `direction` | `'Incoming' \| 'Outgoing'` | `'Incoming'` | Incoming, Outgoing |
-| `type` | `'Text' \| 'File' \| 'Image' \| 'Video'` | `'Text'` | Text, File, Image, Video |
-| `messageState` | `'Default' \| 'Error'` | `'Default'` | Default, Error |
+| `direction` | `'incoming' \| 'outgoing'` | `'incoming'` | incoming, outgoing |
+| `type` | `'text' \| 'file' \| 'image' \| 'video'` | `'text'` | text, file, image, video |
+| `messageState` | `'default' \| 'error'` | `'default'` | default, error |
+| `text` | `string` | `'Message'` | - |
+| `customText` | `string` | `'Additional information'` | - |
+| `showCustomText` | `boolean` | `false` | - |
 | `showTime` | `boolean` | `true` | - |
 | `showStatus` | `boolean` | `false` | - |
-| `showCustomText` | `boolean` | `false` | - |
-| `customText` | `string` | `'Additional information'` | - |
-| `textMessage` | `string` | `'Message'` | - |
-| `fileName` | `string` | `'document.pdf'` | - |
-| `fileMetadata` | `string` | `'2.4 MB'` | - |
-| `imageName` | `string` | `'image.jpg'` | - |
-| `imageMetadata` | `string` | `'3.4 MB'` | - |
-| `videoName` | `string` | `'video.mp4'` | - |
-| `videoMetadata` | `string` | `'24.8 MB • 01:08'` | - |
-| `incomingStatusText` | `string` | `'Received'` | - |
-| `outgoingStatusText` | `string` | `'Delivered'` | - |
+| `timeText` | `string` | `'10:24 AM'` | - |
+| `statusText` | `string` | `'Received'` | - |
 | `errorStatusText` | `string` | `'Failed to send'` | - |
-| `incomingTimeText` | `string` | `'10:24 AM'` | - |
-| `outgoingTimeText` | `string` | `'10:26 AM'` | - |
+| `fileName` | `string` | `'document.pdf'` | - |
+| `fileMeta` | `string` | `'2.4 MB'` | - |
+| `imageName` | `string` | `'image.jpg'` | - |
+| `imageMeta` | `string` | `'3.4 MB'` | - |
+| `videoName` | `string` | `'video.mp4'` | - |
+| `videoMeta` | `string` | `'24.8 MB • 01:08'` | - |
 | `className` | `string` | `''` | - |
-| `children` | `any` | `-` | - |
-
-## Usage
-
-::: code-group
-
-```tsx [React]
-import { BubbleChat } from '@supernova/design-system/react';
-
-export default function App() {
-  return <BubbleChat direction="Incoming" type="Text" messageState="Default" />;
-}
-```
-
-```vue [Vue 3]
-<script setup lang="ts">
-import { BubbleChat } from '@supernova/design-system/vue3';
-</script>
-
-<template>
-  <BubbleChat direction="Incoming" type="Text" messageState="Default" />
-</template>
-```
-
-```svelte [Svelte]
-<script lang="ts">
-  import { BubbleChat } from '@supernova/design-system/svelte';
-</script>
-
-<BubbleChat direction="Incoming" type="Text" messageState="Default" />
-```
-
-:::

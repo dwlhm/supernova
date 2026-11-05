@@ -15,7 +15,7 @@ A date-selection component for choosing a single date, a date and time, a date r
 - Keep the entered value when switching between Closed and Open states.
 - Ensure keyboard navigation, visible focus, and an accessible label are available in implementation.
 
-## Interactive Preview
+## Live Preview & Usage
 
 <ComponentPreview name="DatePicker" />
 
@@ -23,65 +23,17 @@ A date-selection component for choosing a single date, a date and time, a date r
 
 | Prop | Type | Default | Options |
 | :--- | :--- | :--- | :--- |
-| `type` | `DatePickerType` | `'Date of Birth Picker'` | - |
-| `pickerState` | `DatePickerVisibility` | `'Closed'` | - |
-| `hintText` | `boolean` | `false` | - |
 | `open` | `boolean` | `false` | - |
 | `value` | `number` | `0` | - |
-| `rangeEnd` | `number` | `0` | - |
-| `selectedYear` | `number` | `0` | - |
-| `time` | `string` | `''` | - |
 | `month` | `number` | `1` | - |
 | `year` | `number` | `2025` | - |
-| `minDay` | `number` | `0` | - |
-| `maxDay` | `number` | `0` | - |
-| `minYear` | `number` | `0` | - |
-| `maxYear` | `number` | `0` | - |
-| `firstDayOfWeek` | `number` | `0` | - |
-| `label` | `string` | `'Date'` | - |
+| `label` | `string` | `'Date of Birth'` | - |
 | `placeholder` | `string` | `'Select a date'` | - |
-| `hint` | `string` | `''` | - |
-| `timeLabel` | `string` | `'Time'` | - |
+| `hint` | `string` | `'Choose a date from the calendar.'` | - |
+| `showHint` | `boolean` | `false` | - |
 | `showLabel` | `boolean` | `true` | - |
 | `displayValue` | `string` | `''` | - |
-| `typedValue` | `string` | `''` | - |
 | `className` | `string` | `''` | - |
 | `onSelect` | `(day: number) => void` | `-` | - |
-| `onRangeEndSelect` | `(day: number) => void` | `-` | - |
-| `onYearSelect` | `(year: number) => void` | `-` | - |
-| `onTimeChange` | `(time: string) => void` | `-` | - |
-| `onTypedInput` | `(value: string) => void` | `-` | - |
 | `onOpenChange` | `(open: boolean) => void` | `-` | - |
-| `onMonthChange` | `(month: number, year: number) => void` | `-` | - |
-
-## Usage
-
-::: code-group
-
-```tsx [React]
-import { DatePicker } from '@supernova/design-system/react';
-
-export default function App() {
-  return <DatePicker type="Date of Birth Picker" pickerState="Closed" hintText={false} />;
-}
-```
-
-```vue [Vue 3]
-<script setup lang="ts">
-import { DatePicker } from '@supernova/design-system/vue3';
-</script>
-
-<template>
-  <DatePicker type="Date of Birth Picker" pickerState="Closed" :hintText="false" />
-</template>
-```
-
-```svelte [Svelte]
-<script lang="ts">
-  import { DatePicker } from '@supernova/design-system/svelte';
-</script>
-
-<DatePicker type="Date of Birth Picker" pickerState="Closed" hintText={false} />
-```
-
-:::
+| `onMonthStep` | `(delta: number) => void` | `-` | - |
