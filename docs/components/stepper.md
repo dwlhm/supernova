@@ -28,8 +28,8 @@ A progress indicator that communicates a user’s position within a four-step pr
 | Prop | Type | Default | Options |
 | :--- | :--- | :--- | :--- |
 | `orientation` | `'horizontal' \| 'vertical'` | `'horizontal'` | horizontal, vertical |
-| `current` | `number` | `1` | - |
-| `steps` | `string[]` | `['Cart', 'Shipping', 'Payment', 'Review']` | - |
+| `current` | `number` | `2` | - |
+| `steps` | `string[]` | `['Cart', 'Shipping', 'Payment', 'Review', 'Step 5', 'Step 6']` | - |
 | `ariaLabel` | `string` | `'Progress'` | - |
 | `className` | `string` | `''` | - |
 | `children` | `ReactNode \| Slot \| ng-content` | `-` | - |
