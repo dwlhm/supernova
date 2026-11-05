@@ -1,0 +1,25 @@
+{
+  "name": "@supernova/api",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "supernova-api": "dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "test": "node --test test/*.test.js",
+    "start": "node dist/cli.js"
+  },
+  "dependencies": {
+    "@supernova/contracts": "workspace:*",
+    "@supernova/mitosis-author": "workspace:*",
+    "@supernova/mitosis-compiler": "workspace:*",
+    "typescript": "^5.8.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.9"
+  }
+}
