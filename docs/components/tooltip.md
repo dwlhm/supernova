@@ -26,8 +26,5 @@ Tooltip provides brief contextual information about a UI element without interru
 
 | Prop | Type | Default | Options |
 | :--- | :--- | :--- | :--- |
-| `text` | `string` | `'Label'` | - |
-| `position` | `'top' \| 'bottom' \| 'left' \| 'right'` | `'top'` | top, bottom, left, right |
-| `id` | `string` | `'tooltip'` | - |
-| `className` | `string` | `''` | - |
-| `children` | `ReactNode \| Slot \| ng-content` | `-` | - |
+| `textContent` | `text` | `Label` | - |
+| `position` | `'Top' | 'Bottom' | 'Left' | 'Right'` | `Top` | Top, Bottom, Left, Right |
