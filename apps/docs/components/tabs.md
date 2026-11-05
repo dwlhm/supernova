@@ -17,66 +17,9 @@ Properties
 • Tab 1 and Tab 2 are always visible.
 • Configure each nested Tab Item instance to set its label, icon, numeric value, and state.
 
-## Live Preview
+## Live Preview & Usage
 
 <FrameworkPreview name="Tabs" />
-
-## Usage
-
-::: code-group
-
-```tsx [React]
-import { Tabs } from './Tabs';
-
-export default function Example() {
-  return (
-    <Tabs>
-      Tabs
-    </Tabs>
-  );
-}
-```
-
-```vue [Vue 3]
-<script setup lang="ts">
-import { Tabs } from './Tabs';
-</script>
-
-<template>
-  <Tabs>
-    Tabs
-  </Tabs>
-</template>
-```
-
-```svelte [Svelte]
-<script lang="ts">
-  import Tabs from './Tabs.svelte';
-</script>
-
-<Tabs>
-  Tabs
-</Tabs>
-```
-
-```ts [Angular]
-import { Component } from '@angular/core';
-import { TabsComponent } from './tabs.component';
-
-@Component({
-  selector: 'app-root',
-  standalone: true,
-  imports: [TabsComponent],
-  template: `
-    <app-tabs>
-      Tabs
-    </app-tabs>
-  `,
-})
-export class AppComponent {}
-```
-
-:::
 
 ## Props & Variants
 

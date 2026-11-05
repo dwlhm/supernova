@@ -24,66 +24,9 @@ Properties
 Type — Controls the hierarchy depth: 1, 2, or deep.
 Show Ellipsis — Shows or hides the collapsed-path indicator. Use primarily with Type=deep when intermediate levels are omitted.
 
-## Live Preview
+## Live Preview & Usage
 
 <FrameworkPreview name="Breadcrumb" />
-
-## Usage
-
-::: code-group
-
-```tsx [React]
-import { Breadcrumb } from './Breadcrumb';
-
-export default function Example() {
-  return (
-    <Breadcrumb show Ellipsis type="2">
-      Breadcrumb
-    </Breadcrumb>
-  );
-}
-```
-
-```vue [Vue 3]
-<script setup lang="ts">
-import { Breadcrumb } from './Breadcrumb';
-</script>
-
-<template>
-  <Breadcrumb show Ellipsis type="2">
-    Breadcrumb
-  </Breadcrumb>
-</template>
-```
-
-```svelte [Svelte]
-<script lang="ts">
-  import Breadcrumb from './Breadcrumb.svelte';
-</script>
-
-<Breadcrumb show Ellipsis type="2">
-  Breadcrumb
-</Breadcrumb>
-```
-
-```ts [Angular]
-import { Component } from '@angular/core';
-import { BreadcrumbComponent } from './breadcrumb.component';
-
-@Component({
-  selector: 'app-root',
-  standalone: true,
-  imports: [BreadcrumbComponent],
-  template: `
-    <app-breadcrumb show Ellipsis type="2">
-      Breadcrumb
-    </app-breadcrumb>
-  `,
-})
-export class AppComponent {}
-```
-
-:::
 
 ## Props & Variants
 

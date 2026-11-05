@@ -4,23 +4,25 @@ export interface TableBodyCellProps {
   value?: string;
   secondaryValue?: string;
   badgeLabel?: string;
+  buttonLabel?: string;
   statusLabel?: string;
   imageSrc?: string;
   avatarInitials?: string;
   href?: string;
   align?: "left" | "center" | "right";
   className?: string;
-  children?: any;
+  children?: React.ReactNode;
 }
 
-import { cn } from "./utils";
+import { cn, cva, bindControllerProps } from "./utils";
 import TableCellValue from "./TableCellValue";
 
 function TableBodyCell(props: TableBodyCellProps) {
   props = {
-    value: "",
+    value: "Cell Value",
     secondaryValue: "",
     badgeLabel: "",
+    buttonLabel: "",
     statusLabel: "",
     imageSrc: "",
     avatarInitials: "",
@@ -29,23 +31,22 @@ function TableBodyCell(props: TableBodyCellProps) {
     className: "",
     ...props,
   };
-  function cellClasses() {
-    switch (props.align) {
-      case "center":
-        return "text-center";
-      case "right":
-        return "text-right";
-      case "left":
-      default:
-        return "text-left";
-    }
-  }
-
+  const [__ctrlState, __setCtrlState] = React.useState<Record<string, any>>({});
+  props = bindControllerProps(props, __ctrlState, __setCtrlState);
   return (
     <td
+      data-ctrl={typeof bindControllerProps}
       className={cn(
-        "border-t border-components-table-default-color-divider-border-default px-4 py-3 align-middle",
-        cellClasses(),
+        "border-t border-border-default px-4 py-3 align-middle",
+        cva(
+          props.align,
+          {
+            left: "text-left",
+            center: "text-center",
+            right: "text-right",
+          },
+          "left"
+        ),
         props.className
       )}
     >
@@ -55,6 +56,7 @@ function TableBodyCell(props: TableBodyCellProps) {
           value={props.value}
           secondaryValue={props.secondaryValue}
           badgeLabel={props.badgeLabel}
+          buttonLabel={props.buttonLabel}
           statusLabel={props.statusLabel}
           imageSrc={props.imageSrc}
           avatarInitials={props.avatarInitials}
@@ -65,5 +67,7 @@ function TableBodyCell(props: TableBodyCellProps) {
     </td>
   );
 }
+
+Object.assign(TableBodyCell, { TableCellValue });
 
 export default TableBodyCell;

@@ -1,65 +1,151 @@
 <template>
   <iframe
     ref="frameRef"
-    class="w-full border-0 overflow-hidden transition-all duration-200"
-    :style="{ height: `${frameHeight}px` }"
+    class="isolated-preview-iframe"
+    srcdoc="<!doctype html><html><head><meta charset='utf-8'></head><body></body></html>"
+    :style="{
+      width: '100%',
+      height: `${frameHeight}px`,
+      border: '0',
+      display: 'block',
+      overflow: 'hidden',
+      backgroundColor: 'transparent',
+    }"
+    title="Isolated UI Preview"
     @load="onFrameLoad"
   />
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onBeforeUnmount, watch } from 'vue';
+import { ref, onMounted, onBeforeUnmount, watch, createApp, h } from 'vue';
+import { useRouter } from 'vitepress';
+import previewFrameCss from '../preview-frame.css?inline';
 
-const props = defineProps<{
-  framework: 'react' | 'vue3' | 'svelte';
-  component: any;
-  props: Record<string, any>;
-  isDark?: boolean;
-}>();
+const props = withDefaults(
+  defineProps<{
+    framework: 'react' | 'vue3' | 'svelte';
+    component: any;
+    props?: Record<string, any>;
+    isDark?: boolean;
+    align?: 'center' | 'stretch';
+    minHeight?: number;
+  }>(),
+  {
+    props: () => ({}),
+    isDark: false,
+    align: 'center',
+    minHeight: 96,
+  }
+);
 
+const router = useRouter();
 const frameRef = ref<HTMLIFrameElement | null>(null);
-const frameHeight = ref(120);
+const frameHeight = ref(props.minHeight);
 
 let unmountCurrent: (() => void) | null = null;
-let resizeObserver: any = null;
+let resizeObserver: ResizeObserver | null = null;
+let mutationObserver: MutationObserver | null = null;
 
 function updateHeight() {
-  if (!frameRef.value?.contentDocument?.body) return;
-  const doc = frameRef.value.contentDocument;
+  const doc = frameRef.value?.contentDocument;
+  if (!doc?.body) return;
   const el = doc.getElementById('app-root');
-  if (el) {
-    const scrollH = el.scrollHeight;
-    frameHeight.value = Math.max(80, scrollH + 32);
+  if (!el) return;
+  const rootRect = el.getBoundingClientRect();
+  let maxBottom = Math.ceil(rootRect.height);
+  const popovers = el.querySelectorAll('[role="dialog"], [role="listbox"], [role="tooltip"], .absolute');
+  const win = doc.defaultView;
+  for (let i = 0; i < popovers.length; i++) {
+    const node = popovers[i] as HTMLElement;
+    const st = win?.getComputedStyle(node);
+    if (st && (st.display === 'none' || st.visibility === 'hidden' || st.opacity === '0')) {
+      continue;
+    }
+    const r = node.getBoundingClientRect();
+    if (r.height > 0 && r.width > 0) {
+      const relBottom = Math.ceil(r.bottom - rootRect.top) + 12;
+      if (relBottom > maxBottom) maxBottom = relBottom;
+    }
+  }
+  const scrollH = el.scrollHeight;
+  const targetH = Math.max(props.minHeight, maxBottom, scrollH);
+  if (Math.abs(frameHeight.value - targetH) > 1) {
+    frameHeight.value = targetH;
   }
 }
 
-async function renderIntoFrame() {
-  if (!frameRef.value?.contentDocument || !props.component) return;
-  const doc = frameRef.value.contentDocument;
-  const win = frameRef.value.contentWindow as any;
-  if (!win) return;
+function bindNavigationBridge(doc: Document) {
+  if ((doc as any).__navBound) return;
+  (doc as any).__navBound = true;
+  doc.addEventListener('click', (e: MouseEvent) => {
+    if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) {
+      return;
+    }
+    const anchor = (e.target as HTMLElement | null)?.closest?.('a');
+    if (!anchor) return;
+    const href = anchor.getAttribute('href');
+    if (!href || href.startsWith('http://') || href.startsWith('https://') || href.startsWith('#')) {
+      return;
+    }
+    e.preventDefault();
+    router.go(href);
+  });
+}
+
+function ensureFrameDocument(): HTMLElement | null {
+  const doc = frameRef.value?.contentDocument;
+  if (!doc || !doc.head || !doc.body) return null;
+
+  if (!doc.head.querySelector('style[data-isolated-frame="true"]')) {
+    const styleEl = doc.createElement('style');
+    styleEl.setAttribute('data-isolated-frame', 'true');
+    styleEl.textContent = previewFrameCss;
+    doc.head.appendChild(styleEl);
+  }
+
+  let layoutStyle = doc.head.querySelector('style[data-isolated-layout="true"]') as HTMLStyleElement | null;
+  if (!layoutStyle) {
+    layoutStyle = doc.createElement('style');
+    layoutStyle.setAttribute('data-isolated-layout', 'true');
+    doc.head.appendChild(layoutStyle);
+  }
+  layoutStyle.textContent =
+    props.align === 'stretch'
+      ? `html, body { height: auto !important; min-height: 0 !important; overflow: hidden !important; } #app-root { width: 100%; height: auto !important; min-height: 0 !important; display: flow-root; padding: 4px 2px; }`
+      : `html, body { height: auto !important; min-height: 0 !important; overflow: hidden !important; } #app-root { padding: 24px 16px; display: flex; align-items: center; justify-content: center; min-height: ${props.minHeight}px; width: 100%; }`;
 
   let rootEl = doc.getElementById('app-root');
   if (!rootEl) {
-    setupFrame();
-    rootEl = doc.getElementById('app-root');
-    if (!rootEl) return;
+    rootEl = doc.createElement('div');
+    rootEl.id = 'app-root';
+    doc.body.appendChild(rootEl);
   }
 
-  // Sync theme
+  bindNavigationBridge(doc);
+  return rootEl;
+}
+
+async function renderIntoFrame() {
+  if (!props.component) return;
+  const rootEl = ensureFrameDocument();
+  const doc = frameRef.value?.contentDocument;
+  const win = frameRef.value?.contentWindow as any;
+  if (!rootEl || !doc || !win) return;
+
   if (props.isDark) {
     doc.documentElement.classList.add('dark');
   } else {
     doc.documentElement.classList.remove('dark');
   }
 
-  // Cleanup prior mount & observer
-  if (resizeObserver) {
-    resizeObserver.disconnect();
-    resizeObserver = null;
-  }
+  resizeObserver?.disconnect();
+  mutationObserver?.disconnect();
   if (unmountCurrent) {
-    unmountCurrent();
+    try {
+      unmountCurrent();
+    } catch {
+      // ignore unmount errors
+    }
     unmountCurrent = null;
   }
   rootEl.innerHTML = '';
@@ -76,7 +162,6 @@ async function renderIntoFrame() {
       root.render(React.createElement(Comp, props.props || {}));
       unmountCurrent = () => root.unmount();
     } else if (props.framework === 'vue3') {
-      const { createApp, h } = await import('vue');
       const app = createApp({
         render() {
           return h(Comp, props.props || {});
@@ -97,102 +182,37 @@ async function renderIntoFrame() {
 
   if (win.ResizeObserver) {
     resizeObserver = new win.ResizeObserver(() => updateHeight());
-    resizeObserver.observe(rootEl);
+    resizeObserver!.observe(rootEl);
   }
-  setTimeout(updateHeight, 50);
-}
-
-function setupFrame() {
-  if (!frameRef.value?.contentDocument) return;
-  const doc = frameRef.value.contentDocument;
-
-  // Grab styles from host document (Tailwind + tokens)
-  if (!doc.head.querySelector('style[data-isolated-frame]')) {
-    const linkEls = Array.from(
-      document.querySelectorAll<HTMLLinkElement>('link[rel*="stylesheet"], link[as="style"]')
-    );
-    const hrefs = new Set<string>();
-    for (const l of linkEls) {
-      if (l.href) hrefs.add(l.href);
-    }
-    for (const s of Array.from(document.styleSheets)) {
-      if (s.href) hrefs.add(s.href);
-    }
-
-    for (const href of hrefs) {
-      const link = doc.createElement('link');
-      link.rel = 'stylesheet';
-      link.href = href;
-      link.onload = () => sanitizeFrameStyles(doc);
-      doc.head.appendChild(link);
-    }
-
-    // Inline style tags from host document
-    for (const s of Array.from(document.querySelectorAll('style'))) {
-      if (!s.hasAttribute('data-isolated-frame')) {
-        doc.head.appendChild(s.cloneNode(true));
-      }
-    }
-
-    const baseStyle = doc.createElement('style');
-    baseStyle.setAttribute('data-isolated-frame', 'true');
-    baseStyle.textContent = `
-      html, body {
-        margin: 0;
-        padding: 0;
-        background: transparent;
-        font-family: inherit;
-      }
-      #app-root {
-        padding: 16px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        min-height: 80px;
-      }
-    `;
-    doc.head.appendChild(baseStyle);
+  if (win.MutationObserver) {
+    mutationObserver = new win.MutationObserver(() => updateHeight());
+    mutationObserver!.observe(rootEl, { childList: true, subtree: true, attributes: true });
   }
-
-  sanitizeFrameStyles(doc);
-
-  let root = doc.getElementById('app-root');
-  if (!root) {
-    root = doc.createElement('div');
-    root.id = 'app-root';
-    doc.body.appendChild(root);
-  }
-
-  renderIntoFrame();
-}
-
-function sanitizeFrameStyles(doc: Document) {
-  // Strip VitePress unlayered button reset (button { background-color: transparent })
-  // that clobbers Tailwind v4 layered utility classes
-  for (const sheet of Array.from(doc.styleSheets)) {
-    try {
-      for (let i = sheet.cssRules.length - 1; i >= 0; i--) {
-        const r = sheet.cssRules[i] as CSSStyleRule;
-        if (r.selectorText === 'button' && r.style?.backgroundColor === 'transparent') {
-          sheet.deleteRule(i);
-        }
-      }
-    } catch {
-      // In case of any cross-origin sheet
-    }
-  }
+  setTimeout(updateHeight, 20);
+  setTimeout(updateHeight, 120);
 }
 
 function onFrameLoad() {
-  setupFrame();
+  renderIntoFrame();
 }
 
 onMounted(() => {
-  setupFrame();
+  if (frameRef.value?.contentDocument?.readyState === 'complete') {
+    renderIntoFrame();
+  }
 });
 
 watch(
-  () => [props.component, props.props, props.framework, props.isDark],
+  () => props.isDark,
+  (dark) => {
+    const doc = frameRef.value?.contentDocument;
+    if (!doc) return;
+    doc.documentElement.classList.toggle('dark', Boolean(dark));
+  }
+);
+
+watch(
+  () => [props.component, props.props, props.framework, props.align],
   () => {
     renderIntoFrame();
   },
@@ -200,12 +220,14 @@ watch(
 );
 
 onBeforeUnmount(() => {
-  if (resizeObserver) {
-    resizeObserver.disconnect();
-    resizeObserver = null;
-  }
+  resizeObserver?.disconnect();
+  mutationObserver?.disconnect();
   if (unmountCurrent) {
-    unmountCurrent();
+    try {
+      unmountCurrent();
+    } catch {
+      // ignore
+    }
     unmountCurrent = null;
   }
 });

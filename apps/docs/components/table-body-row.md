@@ -18,66 +18,9 @@ Place row-level actions in the designated actions column.
 Properties
 Show Column 1–10 — Shows or hides each data column. Columns 1–5 are visible by default; columns 6–10 are optional.
 
-## Live Preview
+## Live Preview & Usage
 
 <FrameworkPreview name="TableBodyRow" />
-
-## Usage
-
-::: code-group
-
-```tsx [React]
-import { TableBodyRow } from './TableBodyRow';
-
-export default function Example() {
-  return (
-    <TableBodyRow>
-      TableBodyRow
-    </TableBodyRow>
-  );
-}
-```
-
-```vue [Vue 3]
-<script setup lang="ts">
-import { TableBodyRow } from './TableBodyRow';
-</script>
-
-<template>
-  <TableBodyRow>
-    TableBodyRow
-  </TableBodyRow>
-</template>
-```
-
-```svelte [Svelte]
-<script lang="ts">
-  import TableBodyRow from './TableBodyRow.svelte';
-</script>
-
-<TableBodyRow>
-  TableBodyRow
-</TableBodyRow>
-```
-
-```ts [Angular]
-import { Component } from '@angular/core';
-import { TableBodyRowComponent } from './table-body-row.component';
-
-@Component({
-  selector: 'app-root',
-  standalone: true,
-  imports: [TableBodyRowComponent],
-  template: `
-    <app-table-body-row>
-      TableBodyRow
-    </app-table-body-row>
-  `,
-})
-export class AppComponent {}
-```
-
-:::
 
 ## Props & Variants
 

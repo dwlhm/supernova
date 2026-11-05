@@ -3,7 +3,7 @@
     scope="col"
     :class="
       cn(
-        'w-12 whitespace-nowrap bg-components-table-default-color-header-background-default px-4 py-3 text-center text-xs font-semibold uppercase tracking-wide text-components-table-default-color-header-foreground-default',
+        'w-12 whitespace-nowrap bg-background-muted px-4 py-3 text-center text-sm font-medium text-foreground-default',
         className
       )
     "
@@ -22,6 +22,6 @@ export interface TableNoHeaderCellProps {
 
 const props = withDefaults(defineProps<TableNoHeaderCellProps>(), {
   className: "",
-  label: "No.",
+  label: "No",
 });
 </script>

@@ -23,66 +23,9 @@ Properties
 • No configurable component properties are currently exposed.
 • The current page numbers and Previous/Next labels are defined by the component’s internal layers.
 
-## Live Preview
+## Live Preview & Usage
 
 <FrameworkPreview name="Pagination" />
-
-## Usage
-
-::: code-group
-
-```tsx [React]
-import { Pagination } from './Pagination';
-
-export default function Example() {
-  return (
-    <Pagination>
-      Pagination
-    </Pagination>
-  );
-}
-```
-
-```vue [Vue 3]
-<script setup lang="ts">
-import { Pagination } from './Pagination';
-</script>
-
-<template>
-  <Pagination>
-    Pagination
-  </Pagination>
-</template>
-```
-
-```svelte [Svelte]
-<script lang="ts">
-  import Pagination from './Pagination.svelte';
-</script>
-
-<Pagination>
-  Pagination
-</Pagination>
-```
-
-```ts [Angular]
-import { Component } from '@angular/core';
-import { PaginationComponent } from './pagination.component';
-
-@Component({
-  selector: 'app-root',
-  standalone: true,
-  imports: [PaginationComponent],
-  template: `
-    <app-pagination>
-      Pagination
-    </app-pagination>
-  `,
-})
-export class AppComponent {}
-```
-
-:::
 
 ## Props & Variants
 

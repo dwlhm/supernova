@@ -8,11 +8,11 @@ export interface TabItemProps {
   showNum?: boolean;
   num?: string;
   className?: string;
-  children?: any;
+  children?: React.ReactNode;
   onClick?: () => void;
 }
 
-import { cn } from "./utils";
+import { cn, ICON_PATHS, bindControllerProps } from "./utils";
 
 function TabItem(props: TabItemProps) {
   props = {
@@ -24,32 +24,26 @@ function TabItem(props: TabItemProps) {
     className: "",
     ...props,
   };
-  function tabClasses() {
-    return props.active
-      ? "bg-components-tabs-active-color-tab-background-default border border-components-tabs-active-color-tab-border-default shadow-sm text-components-tabs-active-color-label-foreground-default"
-      : "border border-transparent text-components-tabs-inactive-color-label-foreground-default hover:bg-background-default";
-  }
-
-  function handleClick() {
-    if (props.onClick) {
-      props.onClick();
-    }
-  }
-
+  const [__ctrlState, __setCtrlState] = React.useState<Record<string, any>>({});
+  props = bindControllerProps(props, __ctrlState, __setCtrlState);
   return (
     <button
       type="button"
       role="tab"
+      data-ctrl={typeof bindControllerProps}
       aria-selected={props.active}
+      tabIndex={props.active ? 0 : -1}
       className={cn(
-        "inline-flex h-8 shrink-0 items-center gap-1 whitespace-nowrap rounded-rounded-lg px-2 py-1 text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring-primary",
-        tabClasses(),
+        "inline-flex h-7 shrink-0 items-center gap-1 whitespace-nowrap rounded-md px-2 py-1 text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring-primary",
+        props.active
+          ? "bg-background-default text-foreground-default shadow-xs"
+          : "text-foreground-muted hover:text-foreground-default",
         props.className
       )}
-      onClick={(event) => handleClick()}
+      onClick={(event) => props.onClick && props.onClick()}
     >
       {props.showIcon ? (
-        <span className="flex shrink-0 items-center text-components-tabs-all-color-icon-foreground-default">
+        <span className="flex shrink-0 items-center text-foreground-muted">
           {props.children ? <>{props.children}</> : null}
           {!props.children ? (
             <svg
@@ -58,16 +52,16 @@ function TabItem(props: TabItemProps) {
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
-              stroke-width="1.5"
+              strokeWidth="1.5"
             >
-              <path d="M4 6h16M4 12h16M4 18h16" stroke-linecap="round" />
+              <path strokeLinecap="round" d={ICON_PATHS.menu} />
             </svg>
           ) : null}
         </span>
       ) : null}
       <span className="truncate">{props.label}</span>
       {props.showNum ? (
-        <span className="inline-flex shrink-0 items-center rounded-rounded-full bg-components-tabs-all-color-num-background-default px-1 py-0.5 text-xs font-medium leading-none text-components-tabs-all-color-num-foreground-default">
+        <span className="inline-flex shrink-0 items-center rounded-full bg-background-muted px-1 py-0.5 text-xs font-medium leading-none text-foreground-muted">
           {props.num}
         </span>
       ) : null}

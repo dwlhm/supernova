@@ -7,38 +7,34 @@
 </script>
 
 <script lang="ts">
-  import { cn } from "./utils";
+  import { cn, cva, bindControllerProps } from "./utils";
 
-  export let size: SpinnerProps["size"] = "24";
   export let className: SpinnerProps["className"] = "";
+  export let size: SpinnerProps["size"] = "12";
   export let label: SpinnerProps["label"] = "Loading";
-
-  $: sizeClasses = () => {
-    switch (size) {
-      case "12":
-        return "h-3 w-3";
-      case "16":
-        return "h-4 w-4";
-      case "32":
-        return "h-8 w-8";
-      case "24":
-      default:
-        return "h-6 w-6";
-    }
-  };
 </script>
 
 <span
   role="status"
   aria-live="polite"
+  data-ctrl={typeof bindControllerProps}
   class={cn("inline-flex items-center justify-center", className)}
   ><svg
     aria-hidden="true"
     viewBox="0 0 24 24"
     fill="none"
     class={cn(
-      "animate-spin text-components-spinner-all-color-icon-stroke-default",
-      sizeClasses()
+      "animate-spin text-primary-default",
+      cva(
+        size,
+        {
+          "12": "h-3 w-3",
+          "16": "h-4 w-4",
+          "24": "h-6 w-6",
+          "32": "h-8 w-8",
+        },
+        "12"
+      )
     )}
     ><circle
       cx="12"

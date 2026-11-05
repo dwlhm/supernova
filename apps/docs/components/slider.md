@@ -33,66 +33,9 @@ Label / Value display — Optional supporting content that should be composed ou
 
 Current Figma component properties: None exposed.
 
-## Live Preview
+## Live Preview & Usage
 
 <FrameworkPreview name="Slider" />
-
-## Usage
-
-::: code-group
-
-```tsx [React]
-import { Slider } from './Slider';
-
-export default function Example() {
-  return (
-    <Slider>
-      Slider
-    </Slider>
-  );
-}
-```
-
-```vue [Vue 3]
-<script setup lang="ts">
-import { Slider } from './Slider';
-</script>
-
-<template>
-  <Slider>
-    Slider
-  </Slider>
-</template>
-```
-
-```svelte [Svelte]
-<script lang="ts">
-  import Slider from './Slider.svelte';
-</script>
-
-<Slider>
-  Slider
-</Slider>
-```
-
-```ts [Angular]
-import { Component } from '@angular/core';
-import { SliderComponent } from './slider.component';
-
-@Component({
-  selector: 'app-root',
-  standalone: true,
-  imports: [SliderComponent],
-  template: `
-    <app-slider>
-      Slider
-    </app-slider>
-  `,
-})
-export class AppComponent {}
-```
-
-:::
 
 ## Props & Variants
 

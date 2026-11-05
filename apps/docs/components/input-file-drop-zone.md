@@ -25,66 +25,9 @@ PROPERTIES
 • File name — Selected-file name.
 • File metadata — File size, type, or upload status.
 
-## Live Preview
+## Live Preview & Usage
 
 <FrameworkPreview name="InputFileDropZone" />
-
-## Usage
-
-::: code-group
-
-```tsx [React]
-import { InputFileDropZone } from './InputFileDropZone';
-
-export default function Example() {
-  return (
-    <InputFileDropZone file metadata="248 KB · Ready to upload" file name="invoice-september.pdf">
-      InputFileDropZone
-    </InputFileDropZone>
-  );
-}
-```
-
-```vue [Vue 3]
-<script setup lang="ts">
-import { InputFileDropZone } from './InputFileDropZone';
-</script>
-
-<template>
-  <InputFileDropZone file metadata="248 KB · Ready to upload" file name="invoice-september.pdf">
-    InputFileDropZone
-  </InputFileDropZone>
-</template>
-```
-
-```svelte [Svelte]
-<script lang="ts">
-  import InputFileDropZone from './InputFileDropZone.svelte';
-</script>
-
-<InputFileDropZone file metadata="248 KB · Ready to upload" file name="invoice-september.pdf">
-  InputFileDropZone
-</InputFileDropZone>
-```
-
-```ts [Angular]
-import { Component } from '@angular/core';
-import { InputFileDropZoneComponent } from './input-file-drop-zone.component';
-
-@Component({
-  selector: 'app-root',
-  standalone: true,
-  imports: [InputFileDropZoneComponent],
-  template: `
-    <app-input-file-drop-zone file metadata="248 KB · Ready to upload" file name="invoice-september.pdf">
-      InputFileDropZone
-    </app-input-file-drop-zone>
-  `,
-})
-export class AppComponent {}
-```
-
-:::
 
 ## Props & Variants
 

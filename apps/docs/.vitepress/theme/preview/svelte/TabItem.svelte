@@ -6,52 +6,46 @@
     showNum?: boolean;
     num?: string;
     className?: string;
-    children?: any;
+
     onClick?: () => void;
   }
 </script>
 
 <script lang="ts">
-  import { cn } from "./utils";
+  interface $$Slots {
+    default: Record<string, never>;
+  }
+  import { cn, ICON_PATHS, bindControllerProps } from "./utils";
 
   export let active: TabItemProps["active"] = false;
-  export let onClick: TabItemProps["onClick"];
   export let className: TabItemProps["className"] = "";
+  export let onClick: TabItemProps["onClick"];
   export let showIcon: TabItemProps["showIcon"] = false;
 
   export let label: TabItemProps["label"] = "Label";
   export let showNum: TabItemProps["showNum"] = false;
   export let num: TabItemProps["num"] = "1";
-
-  function handleClick() {
-    if (onClick) {
-      onClick();
-    }
-  }
-  $: tabClasses = () => {
-    return active
-      ? "bg-components-tabs-active-color-tab-background-default border border-components-tabs-active-color-tab-border-default shadow-sm text-components-tabs-active-color-label-foreground-default"
-      : "border border-transparent text-components-tabs-inactive-color-label-foreground-default hover:bg-background-default";
-  };
 </script>
 
 <button
   type="button"
   role="tab"
+  data-ctrl={typeof bindControllerProps}
   aria-selected={active}
+  tabIndex={active ? 0 : -1}
   class={cn(
-    "inline-flex h-8 shrink-0 items-center gap-1 whitespace-nowrap rounded-rounded-lg px-2 py-1 text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring-primary",
-    tabClasses(),
+    "inline-flex h-7 shrink-0 items-center gap-1 whitespace-nowrap rounded-md px-2 py-1 text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring-primary",
+    active
+      ? "bg-background-default text-foreground-default shadow-xs"
+      : "text-foreground-muted hover:text-foreground-default",
     className
   )}
   on:click={(event) => {
-    handleClick();
+    onClick && onClick();
   }}
 >
   {#if showIcon}
-    <span
-      class="flex shrink-0 items-center text-components-tabs-all-color-icon-foreground-default"
-    >
+    <span class="flex shrink-0 items-center text-foreground-muted">
       {#if $$slots.default}
         <slot />
       {/if}
@@ -63,14 +57,14 @@
           fill="none"
           stroke="currentColor"
           stroke-width="1.5"
-          ><path d="M4 6h16M4 12h16M4 18h16" stroke-linecap="round" /></svg
+          ><path stroke-linecap="round" d={ICON_PATHS.menu} /></svg
         >
       {/if}</span
     >
   {/if}<span class="truncate">{label}</span>
   {#if showNum}
     <span
-      class="inline-flex shrink-0 items-center rounded-rounded-full bg-components-tabs-all-color-num-background-default px-1 py-0.5 text-xs font-medium leading-none text-components-tabs-all-color-num-foreground-default"
+      class="inline-flex shrink-0 items-center rounded-full bg-background-muted px-1 py-0.5 text-xs font-medium leading-none text-foreground-muted"
       >{num}</span
     >
   {/if}</button

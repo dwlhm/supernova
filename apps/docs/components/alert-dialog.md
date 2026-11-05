@@ -25,66 +25,9 @@ Description content — Sets the supporting explanation or consequence.
 Cancel button — Controls the content and configuration of the safe action.
 Continue button — Controls the content and configuration of the primary action.
 
-## Live Preview
+## Live Preview & Usage
 
 <FrameworkPreview name="AlertDialog" />
-
-## Usage
-
-::: code-group
-
-```tsx [React]
-import { AlertDialog } from './AlertDialog';
-
-export default function Example() {
-  return (
-    <AlertDialog>
-      AlertDialog
-    </AlertDialog>
-  );
-}
-```
-
-```vue [Vue 3]
-<script setup lang="ts">
-import { AlertDialog } from './AlertDialog';
-</script>
-
-<template>
-  <AlertDialog>
-    AlertDialog
-  </AlertDialog>
-</template>
-```
-
-```svelte [Svelte]
-<script lang="ts">
-  import AlertDialog from './AlertDialog.svelte';
-</script>
-
-<AlertDialog>
-  AlertDialog
-</AlertDialog>
-```
-
-```ts [Angular]
-import { Component } from '@angular/core';
-import { AlertDialogComponent } from './alert-dialog.component';
-
-@Component({
-  selector: 'app-root',
-  standalone: true,
-  imports: [AlertDialogComponent],
-  template: `
-    <app-alert-dialog>
-      AlertDialog
-    </app-alert-dialog>
-  `,
-})
-export class AppComponent {}
-```
-
-:::
 
 ## Props & Variants
 

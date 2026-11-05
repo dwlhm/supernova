@@ -9,6 +9,7 @@ export interface ComponentMeta {
   name: string;
   group?: string;
   variants?: Record<string, string[]>;
+  booleans?: string[];
   totalVariants?: number;
 }
 
@@ -71,7 +72,13 @@ export const componentMetadata: Record<string, ComponentMeta> = {
     "name": "AlertDialog",
     "group": "components",
     "variants": {},
-    "totalVariants": 0
+    "totalVariants": 0,
+    "booleans": [
+      "open",
+      "showDescription",
+      "showCloseButton",
+      "destructive"
+    ]
   },
   "Avatar": {
     "name": "Avatar",
@@ -96,21 +103,15 @@ export const componentMetadata: Record<string, ComponentMeta> = {
         "away"
       ]
     },
-    "totalVariants": 15
+    "totalVariants": 15,
+    "booleans": [
+      "showStatus"
+    ]
   },
   "Badge": {
     "name": "Badge",
     "group": "components",
     "variants": {
-      "Variant": [
-        "destructive",
-        "info",
-        "outline",
-        "primary",
-        "secondary",
-        "success",
-        "warning"
-      ],
       "variant": [
         "primary",
         "secondary",
@@ -121,43 +122,28 @@ export const componentMetadata: Record<string, ComponentMeta> = {
         "outline"
       ]
     },
-    "totalVariants": 7
+    "totalVariants": 7,
+    "booleans": []
   },
   "Breadcrumb": {
     "name": "Breadcrumb",
     "group": "components",
     "variants": {
-      "Type": [
-        "1",
-        "2",
-        "deep"
-      ],
       "type": [
         "1",
         "2",
         "deep"
       ]
     },
-    "totalVariants": 3
+    "totalVariants": 3,
+    "booleans": [
+      "showEllipsis"
+    ]
   },
   "BubbleChat": {
     "name": "BubbleChat",
     "group": "components",
     "variants": {
-      "Direction": [
-        "Incoming",
-        "Outgoing"
-      ],
-      "State": [
-        "Default",
-        "Error"
-      ],
-      "Type": [
-        "File",
-        "Image",
-        "Text",
-        "Video"
-      ],
       "direction": [
         "incoming",
         "outgoing"
@@ -173,34 +159,21 @@ export const componentMetadata: Record<string, ComponentMeta> = {
         "error"
       ]
     },
-    "totalVariants": 16
+    "totalVariants": 16,
+    "booleans": [
+      "showCustomText",
+      "showTime",
+      "showStatus"
+    ]
   },
   "Button": {
     "name": "Button",
     "group": "components",
     "variants": {
-      "Roundness": [
-        "Default",
-        "Round"
-      ],
-      "Size": [
-        "Large",
-        "Mini",
-        "Regular",
-        "Small"
-      ],
-      "State": [
-        "Default",
-        "Disabled",
-        "Focus",
-        "Pressed"
-      ],
-      "Style": [
-        "Destructive",
-        "Link",
-        "Outline",
-        "Primary",
-        "Secondary"
+      "type": [
+        "button",
+        "submit",
+        "reset"
       ],
       "variant": [
         "primary",
@@ -221,101 +194,109 @@ export const componentMetadata: Record<string, ComponentMeta> = {
         "round"
       ]
     },
-    "totalVariants": 160
+    "totalVariants": 160,
+    "booleans": [
+      "disabled",
+      "showLabel",
+      "showLeftIcon",
+      "showRightIcon"
+    ]
   },
   "Chart": {
     "name": "Chart",
     "group": "components",
     "variants": {
-      "Type": [
-        "Area",
-        "Bar",
-        "Donut",
-        "Funnel",
-        "Gauge",
-        "Horizontal Bar",
-        "Line",
-        "Pie",
-        "Radar",
-        "Scatter",
-        "Stacked Bar",
-        "Waterfall"
+      "type": [
+        "bar",
+        "line",
+        "area",
+        "pie",
+        "donut"
       ]
     },
-    "totalVariants": 12
+    "totalVariants": 12,
+    "booleans": [
+      "showTitle",
+      "showDescription",
+      "showTooltip",
+      "showLegend"
+    ]
   },
   "ChartBar": {
     "name": "ChartBar",
     "group": "components",
     "variants": {},
-    "totalVariants": 0
+    "totalVariants": 0,
+    "booleans": [
+      "showGridLines",
+      "showDataLabels",
+      "showAxisLabels",
+      "showTooltip"
+    ]
   },
   "ChartLegend": {
     "name": "ChartLegend",
     "group": "components",
     "variants": {},
-    "totalVariants": 0
+    "totalVariants": 0,
+    "booleans": []
   },
   "ChartLine": {
     "name": "ChartLine",
     "group": "components",
     "variants": {},
-    "totalVariants": 0
+    "totalVariants": 0,
+    "booleans": [
+      "showAxisLabels"
+    ]
   },
   "ChartPie": {
     "name": "ChartPie",
     "group": "components",
     "variants": {},
-    "totalVariants": 0
+    "totalVariants": 0,
+    "booleans": [
+      "showTooltip"
+    ]
   },
   "Checkbox": {
     "name": "Checkbox",
     "group": "components",
     "variants": {
-      "Disabled": [
-        "false",
-        "true"
-      ],
-      "Size": [
-        "Large",
-        "Medium",
-        "Small"
-      ],
-      "State": [
-        "off",
-        "on"
-      ],
       "size": [
         "small",
         "medium",
         "large"
       ]
     },
-    "totalVariants": 12
+    "totalVariants": 12,
+    "booleans": [
+      "checked",
+      "indeterminate",
+      "disabled",
+      "required"
+    ]
   },
   "DatePicker": {
     "name": "DatePicker",
     "group": "components",
-    "variants": {
-      "State": [
-        "Closed",
-        "Open"
-      ],
-      "Type": [
-        "Date and Time Picker",
-        "Date of Birth Picker",
-        "Natural Language Picker",
-        "Picker with Input",
-        "Range Picker",
-        "Year Picker"
-      ]
-    },
-    "totalVariants": 12
+    "variants": {},
+    "totalVariants": 12,
+    "booleans": [
+      "open",
+      "showHint",
+      "showLabel"
+    ]
   },
   "FAB": {
     "name": "FAB",
     "group": "components",
     "variants": {
+      "type": [
+        "button",
+        "submit",
+        "reset"
+      ],
       "variant": [
         "primary",
         "secondary",
@@ -328,107 +309,141 @@ export const componentMetadata: Record<string, ComponentMeta> = {
         "extended"
       ]
     },
-    "totalVariants": 0
+    "totalVariants": 36,
+    "booleans": [
+      "disabled",
+      "showLabel"
+    ]
   },
   "IconPlaceholder": {
     "name": "IconPlaceholder",
     "group": "icons",
     "variants": {},
+    "booleans": [],
     "totalVariants": 0
   },
   "IconTruckDelivery": {
     "name": "IconTruckDelivery",
     "group": "icons",
     "variants": {},
+    "booleans": [],
     "totalVariants": 0
   },
   "InputDropdown": {
     "name": "InputDropdown",
     "group": "components",
-    "variants": {
-      "State": [
-        "Default",
-        "Disabled",
-        "Error",
-        "Filled",
-        "Focus"
-      ]
-    },
-    "totalVariants": 5
+    "variants": {},
+    "totalVariants": 5,
+    "booleans": [
+      "open",
+      "disabled",
+      "showLeftIcon"
+    ]
   },
   "InputFileDropZone": {
     "name": "InputFileDropZone",
     "group": "components",
     "variants": {
-      "State": [
-        "Default",
-        "Disabled",
-        "Error",
-        "Filled",
-        "Focus"
+      "previewState": [
+        "default",
+        "filled",
+        "focus",
+        "error",
+        "disabled"
       ]
     },
-    "totalVariants": 5
+    "totalVariants": 5,
+    "booleans": [
+      "disabled",
+      "required",
+      "showLabel",
+      "showHint"
+    ]
   },
   "InputFileInput": {
     "name": "InputFileInput",
     "group": "components",
     "variants": {
-      "State": [
-        "Default",
-        "Disabled",
-        "Error",
-        "Filled",
-        "Focus"
+      "previewState": [
+        "default",
+        "filled",
+        "focus",
+        "error",
+        "disabled"
       ]
     },
-    "totalVariants": 5
+    "totalVariants": 5,
+    "booleans": [
+      "disabled",
+      "required",
+      "showLabel",
+      "showHint"
+    ]
   },
   "InputImageUploader": {
     "name": "InputImageUploader",
     "group": "components",
     "variants": {
-      "State": [
-        "Default",
-        "Disabled",
-        "Error",
-        "Filled",
-        "Focus"
+      "previewState": [
+        "default",
+        "filled",
+        "focus",
+        "error",
+        "disabled"
       ]
     },
-    "totalVariants": 5
+    "totalVariants": 5,
+    "booleans": [
+      "disabled",
+      "required",
+      "showLabel",
+      "showHint"
+    ]
   },
   "InputMultipleFileUpload": {
     "name": "InputMultipleFileUpload",
     "group": "components",
     "variants": {
-      "State": [
-        "Default",
-        "Disabled",
-        "Error",
-        "Filled",
-        "Focus"
+      "previewState": [
+        "default",
+        "filled",
+        "focus",
+        "error",
+        "disabled"
       ]
     },
-    "totalVariants": 5
+    "totalVariants": 5,
+    "booleans": [
+      "disabled",
+      "required",
+      "showLabel",
+      "showHint"
+    ]
   },
   "InputOTP": {
     "name": "InputOTP",
     "group": "components",
-    "variants": {},
-    "totalVariants": 0
+    "variants": {
+      "previewState": [
+        "default",
+        "filled",
+        "focus",
+        "error",
+        "disabled"
+      ]
+    },
+    "totalVariants": 5,
+    "booleans": [
+      "disabled",
+      "required",
+      "showLabel",
+      "showHint"
+    ]
   },
   "InputText": {
     "name": "InputText",
     "group": "components",
     "variants": {
-      "State": [
-        "Default",
-        "Disabled",
-        "Error",
-        "Filled",
-        "Focus"
-      ],
       "type": [
         "text",
         "email",
@@ -437,66 +452,79 @@ export const componentMetadata: Record<string, ComponentMeta> = {
         "tel",
         "url",
         "number"
+      ],
+      "previewState": [
+        "default",
+        "filled",
+        "focus",
+        "error",
+        "disabled"
       ]
     },
-    "totalVariants": 5
+    "totalVariants": 5,
+    "booleans": [
+      "disabled",
+      "required",
+      "showLabel",
+      "showHint",
+      "showCharacterCount",
+      "showLeftIcon",
+      "showRightIcon"
+    ]
   },
   "InputTextArea": {
     "name": "InputTextArea",
     "group": "components",
     "variants": {
-      "State": [
-        "Default",
-        "Disabled",
-        "Error",
-        "Filled",
-        "Focus"
+      "previewState": [
+        "default",
+        "filled",
+        "focus",
+        "error",
+        "disabled"
       ]
     },
-    "totalVariants": 5
+    "totalVariants": 5,
+    "booleans": [
+      "disabled",
+      "required",
+      "showLabel",
+      "showHint",
+      "showCharacterCount",
+      "showLeftIcon",
+      "showRightIcon"
+    ]
   },
   "MainMenu": {
     "name": "MainMenu",
     "group": "components",
-    "variants": {
-      "State": [
-        "Active",
-        "Active-Hover",
-        "Default",
-        "Hover",
-        "Pressed"
-      ]
-    },
-    "totalVariants": 5
+    "variants": {},
+    "totalVariants": 5,
+    "booleans": [
+      "active",
+      "showLabel",
+      "showLeadingIcon",
+      "showTrailingIcon",
+      "showBadge"
+    ]
   },
   "MenuItem": {
     "name": "MenuItem",
     "group": "components",
-    "variants": {
-      "State": [
-        "Active",
-        "Default",
-        "Hover"
-      ]
-    },
-    "totalVariants": 3
+    "variants": {},
+    "totalVariants": 3,
+    "booleans": [
+      "active",
+      "showLabel",
+      "showLeadingIcon",
+      "showTrailingIcon",
+      "showBadge"
+    ]
   },
   "MetricCard": {
     "name": "MetricCard",
     "group": "components",
     "variants": {
-      "Type": [
-        "Comparison",
-        "Default",
-        "Leaderboard",
-        "List",
-        "Mini Bar",
-        "Multi-Metric",
-        "Progress",
-        "Radial",
-        "Sparkline",
-        "Target"
-      ],
       "trendDirection": [
         "up",
         "down",
@@ -510,72 +538,72 @@ export const componentMetadata: Record<string, ComponentMeta> = {
         "info"
       ]
     },
-    "totalVariants": 10
+    "totalVariants": 10,
+    "booleans": [
+      "showValue",
+      "showTrend",
+      "showDescription",
+      "showIcon",
+      "showStatus",
+      "showProgress"
+    ]
   },
   "Pagination": {
     "name": "Pagination",
     "group": "components",
     "variants": {},
-    "totalVariants": 0
+    "totalVariants": 0,
+    "booleans": []
   },
   "Progressbar": {
     "name": "Progressbar",
     "group": "components",
     "variants": {},
-    "totalVariants": 0
+    "totalVariants": 0,
+    "booleans": [
+      "showLabel"
+    ]
   },
   "RadioButton": {
     "name": "RadioButton",
     "group": "components",
     "variants": {
-      "Disabled": [
-        "false",
-        "true"
-      ],
-      "Size": [
-        "Large",
-        "Medium",
-        "Small"
-      ],
-      "State": [
-        "off",
-        "on"
-      ],
       "size": [
         "small",
         "medium",
         "large"
       ]
     },
-    "totalVariants": 12
+    "totalVariants": 12,
+    "booleans": [
+      "checked",
+      "disabled",
+      "required"
+    ]
   },
   "Sidebar": {
     "name": "Sidebar",
     "group": "components",
-    "variants": {
-      "Expanded": [
-        "False",
-        "True"
-      ]
-    },
-    "totalVariants": 2
+    "variants": {},
+    "totalVariants": 2,
+    "booleans": [
+      "expanded"
+    ]
   },
   "Slider": {
     "name": "Slider",
     "group": "components",
     "variants": {},
-    "totalVariants": 0
+    "totalVariants": 0,
+    "booleans": [
+      "disabled",
+      "showValue"
+    ]
   },
   "Spinner": {
     "name": "Spinner",
     "group": "components",
     "variants": {
-      "Size": [
-        "12",
-        "16",
-        "24",
-        "32"
-      ],
       "size": [
         "12",
         "16",
@@ -583,75 +611,64 @@ export const componentMetadata: Record<string, ComponentMeta> = {
         "32"
       ]
     },
-    "totalVariants": 4
+    "totalVariants": 4,
+    "booleans": []
   },
   "Stepper": {
     "name": "Stepper",
     "group": "components",
     "variants": {
-      "Current": [
-        "1",
-        "2",
-        "3",
-        "4"
-      ],
-      "Type": [
-        "Horizontal",
-        "Vertical"
-      ],
       "orientation": [
         "horizontal",
         "vertical"
       ]
     },
-    "totalVariants": 8
+    "totalVariants": 8,
+    "booleans": []
   },
   "SwitchButton": {
     "name": "SwitchButton",
     "group": "components",
     "variants": {
-      "Disabled": [
-        "False",
-        "True"
-      ],
-      "Size": [
-        "Large",
-        "Medium",
-        "Small"
-      ],
-      "State": [
-        "Off",
-        "On"
-      ],
       "size": [
         "small",
         "medium",
         "large"
       ]
     },
-    "totalVariants": 12
+    "totalVariants": 12,
+    "booleans": [
+      "checked",
+      "disabled"
+    ]
   },
   "TabItem": {
     "name": "TabItem",
     "group": "components",
-    "variants": {
-      "State": [
-        "Active",
-        "Default"
-      ]
-    },
-    "totalVariants": 2
+    "variants": {},
+    "totalVariants": 2,
+    "booleans": [
+      "active",
+      "showIcon",
+      "showNum"
+    ]
   },
   "Table": {
     "name": "Table",
     "group": "components",
     "variants": {
-      "State": [
-        "Default",
-        "Empty"
+      "state": [
+        "default",
+        "empty"
       ]
     },
-    "totalVariants": 2
+    "totalVariants": 2,
+    "booleans": [
+      "showCheckbox",
+      "showNo",
+      "showPagination",
+      "showEmptyCta"
+    ]
   },
   "TableBodyCell": {
     "name": "TableBodyCell",
@@ -663,95 +680,87 @@ export const componentMetadata: Record<string, ComponentMeta> = {
         "right"
       ]
     },
-    "totalVariants": 0
+    "totalVariants": 3,
+    "booleans": []
   },
   "TableBodyRow": {
     "name": "TableBodyRow",
     "group": "components",
     "variants": {},
-    "totalVariants": 0
+    "totalVariants": 0,
+    "booleans": [
+      "showNo",
+      "showCheckbox",
+      "checked"
+    ]
   },
   "TableCellValue": {
     "name": "TableCellValue",
     "group": "components",
     "variants": {
-      "Type": [
-        "Action",
-        "Action (Icon)",
-        "Avatar Text",
-        "Badge",
-        "Checkbox",
-        "Image",
-        "Image Text",
-        "Link",
-        "Number",
-        "Product",
-        "Slot",
-        "Stacked Text",
-        "Status",
-        "Text",
-        "Toggle"
-      ],
       "align": [
         "left",
         "center",
         "right"
       ]
     },
-    "totalVariants": 15
+    "totalVariants": 15,
+    "booleans": []
   },
   "TableCheckboxBodyCell": {
     "name": "TableCheckboxBodyCell",
     "group": "components",
     "variants": {},
-    "totalVariants": 0
+    "totalVariants": 0,
+    "booleans": [
+      "checked"
+    ]
   },
   "TableCheckboxHeaderCell": {
     "name": "TableCheckboxHeaderCell",
     "group": "components",
     "variants": {},
-    "totalVariants": 0
+    "totalVariants": 0,
+    "booleans": [
+      "checked",
+      "indeterminate"
+    ]
   },
   "TableHeaderRow": {
     "name": "TableHeaderRow",
     "group": "components",
     "variants": {},
-    "totalVariants": 0
+    "totalVariants": 0,
+    "booleans": [
+      "showCheckbox",
+      "showNo"
+    ]
   },
   "TableNoBodyCell": {
     "name": "TableNoBodyCell",
     "group": "components",
     "variants": {},
-    "totalVariants": 0
+    "totalVariants": 0,
+    "booleans": []
   },
   "TableNoHeaderCell": {
     "name": "TableNoHeaderCell",
     "group": "components",
     "variants": {},
-    "totalVariants": 0
+    "totalVariants": 0,
+    "booleans": []
   },
   "Tabs": {
     "name": "Tabs",
     "group": "components",
     "variants": {},
-    "totalVariants": 0
+    "totalVariants": 0,
+    "booleans": []
   },
   "Toast": {
     "name": "Toast",
     "group": "components",
     "variants": {
-      "State": [
-        "Default",
-        "Hover",
-        "Pressed"
-      ],
-      "Type": [
-        "Default",
-        "Error",
-        "Info",
-        "Success",
-        "Warning"
-      ],
       "type": [
         "default",
         "success",
@@ -760,57 +769,50 @@ export const componentMetadata: Record<string, ComponentMeta> = {
         "info"
       ]
     },
-    "totalVariants": 15
+    "totalVariants": 15,
+    "booleans": [
+      "showDescription",
+      "showAction",
+      "showClose",
+      "showTimestamp"
+    ]
   },
   "Toggle": {
     "name": "Toggle",
     "group": "components",
     "variants": {
-      "Size": [
-        "Large",
-        "Medium",
-        "Small"
-      ],
-      "State": [
-        "Active",
-        "Default",
-        "Disabled"
-      ],
       "size": [
         "small",
         "medium",
         "large"
       ]
     },
-    "totalVariants": 9
+    "totalVariants": 9,
+    "booleans": [
+      "pressed",
+      "disabled",
+      "showText"
+    ]
   },
   "ToggleGroup": {
     "name": "ToggleGroup",
     "group": "components",
     "variants": {
-      "Size": [
-        "Large",
-        "Medium",
-        "Small"
-      ],
       "size": [
         "small",
         "medium",
         "large"
       ]
     },
-    "totalVariants": 3
+    "totalVariants": 3,
+    "booleans": [
+      "showLabel"
+    ]
   },
   "Tooltip": {
     "name": "Tooltip",
     "group": "components",
     "variants": {
-      "Position": [
-        "Bottom",
-        "Left",
-        "Right",
-        "Top"
-      ],
       "position": [
         "top",
         "bottom",
@@ -818,12 +820,17 @@ export const componentMetadata: Record<string, ComponentMeta> = {
         "right"
       ]
     },
-    "totalVariants": 4
+    "totalVariants": 4,
+    "booleans": []
   },
   "Topbar": {
     "name": "Topbar",
     "group": "components",
     "variants": {},
-    "totalVariants": 0
+    "totalVariants": 0,
+    "booleans": [
+      "showSearch",
+      "showSidebarToggle"
+    ]
   }
 };

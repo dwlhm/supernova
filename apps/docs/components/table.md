@@ -32,66 +32,9 @@ Show Description — Shows or hides the empty-state supporting text.
 Show CTA — Shows or hides the empty-state action.
 Icon — Swaps the empty-state icon.
 
-## Live Preview
+## Live Preview & Usage
 
 <FrameworkPreview name="Table" />
-
-## Usage
-
-::: code-group
-
-```tsx [React]
-import { Table } from './Table';
-
-export default function Example() {
-  return (
-    <Table body="There's nothing here yet. Try adding some data or adjusting your filters." cTA Label="Add Data">
-      Table
-    </Table>
-  );
-}
-```
-
-```vue [Vue 3]
-<script setup lang="ts">
-import { Table } from './Table';
-</script>
-
-<template>
-  <Table body="There's nothing here yet. Try adding some data or adjusting your filters." cTA Label="Add Data">
-    Table
-  </Table>
-</template>
-```
-
-```svelte [Svelte]
-<script lang="ts">
-  import Table from './Table.svelte';
-</script>
-
-<Table body="There's nothing here yet. Try adding some data or adjusting your filters." cTA Label="Add Data">
-  Table
-</Table>
-```
-
-```ts [Angular]
-import { Component } from '@angular/core';
-import { TableComponent } from './table.component';
-
-@Component({
-  selector: 'app-root',
-  standalone: true,
-  imports: [TableComponent],
-  template: `
-    <app-table body="There's nothing here yet. Try adding some data or adjusting your filters." cTA Label="Add Data">
-      Table
-    </app-table>
-  `,
-})
-export class AppComponent {}
-```
-
-:::
 
 ## Props & Variants
 

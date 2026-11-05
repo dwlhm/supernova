@@ -1,88 +1,73 @@
 <template>
-  <div :class="cn('flex w-full flex-col gap-3', className)">
+  <div
+    :data-ctrl="typeof bindControllerProps"
+    :class="cn('flex w-full flex-col gap-3', className)"
+  >
     <template v-if="showLabel && label !== ''">
-      <span
-        class="flex items-center gap-1 text-sm font-medium text-components-input-file-drop-zone-color-label-foreground-default"
+      <label
+        class="flex items-center gap-1 text-sm font-medium text-foreground-default"
+        :for="id"
         >{{ label }}
         <template v-if="required">
-          <span
-            aria-hidden="true"
-            class="text-components-input-file-drop-zone-color-required-indicator-foreground-default"
-          >
-            *
-          </span>
+          <span aria-hidden="true" class="text-destructive-default">*</span>
         </template>
-      </span>
+      </label>
     </template>
 
     <label
+      :for="id"
       :class="
         cn(
-          'flex flex-col items-center justify-center gap-4 rounded-rounded-lg border bg-components-input-file-drop-zone-color-container-background-default px-6 py-6 text-center transition-colors',
-          containerClasses,
+          'flex flex-col items-center justify-center gap-3 rounded-lg border bg-background-default px-6 py-6 text-center shadow-sm transition-colors',
+          getFileState(props).hasError
+            ? 'border-destructive-default focus-within:ring-2 focus-within:ring-focus-ring-error'
+            : 'border-border-default border-dashed focus-within:border-primary-border-emphasis focus-within:ring-2 focus-within:ring-focus-ring-primary',
           disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'
         )
       "
-      @dragenter="async (event) => setDragging(true)"
       @dragover="async (event) => event.preventDefault()"
-      @dragleave="async (event) => setDragging(false)"
       @drop="
-        async (event) => {
-          event.preventDefault();
-          setDragging(false);
-          setName(
-            event.dataTransfer &&
-              event.dataTransfer.files &&
-              event.dataTransfer.files.length > 0
-              ? event.dataTransfer.files[0].name
-              : ''
-          );
-        }
+        async (event) =>
+          !disabled &&
+          handleFileSelectEvent(event, onFileNameChange, onFilesChange)
       "
       ><svg
         aria-hidden="true"
-        class="h-6 w-6 shrink-0 text-components-input-file-drop-zone-color-vector-stroke-default"
+        class="h-6 w-6 shrink-0 text-foreground-default"
         viewBox="0 0 24 24"
         fill="none"
         stroke="currentColor"
         stroke-width="1.5"
       >
         <path
-          d="M12 16V4m0 0L8 8m4-4 4 4"
           stroke-linecap="round"
           stroke-linejoin="round"
-        ></path>
-        <path
-          d="M4 16v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"
-          stroke-linecap="round"
+          :d="ICON_PATHS.upload"
         ></path>
       </svg>
-      <template v-if="!hasFile">
+      <template v-if="!getFileState(props).hasFile">
         <span class="flex flex-col items-center gap-1"
           ><span
-            class="text-sm text-components-input-file-drop-zone-color-primary-text-foreground-default"
-            >{{ primaryText
-            }}<span class="font-medium underline underline-offset-2">{{
-              browseText
-            }}</span></span
-          ><span
-            class="text-xs text-components-input-file-drop-zone-color-supporting-text-foreground-default"
-            >{{ supportingText }}</span
-          ></span
+            class="inline-flex flex-wrap items-center justify-center gap-1.5 text-base text-foreground-default"
+            ><span
+              class="inline-flex items-center rounded-lg bg-secondary-default px-2 py-0.5 text-sm font-medium text-secondary-foreground"
+              >{{ browseText }}</span
+            ><span>{{ primaryText }}</span></span
+          ><span class="text-sm text-foreground-muted">{{
+            supportingText
+          }}</span></span
         >
       </template>
 
-      <template v-if="hasFile">
+      <template v-if="getFileState(props).hasFile">
         <span class="flex flex-col items-center gap-1"
-          ><span
-            class="text-sm font-medium text-components-input-file-drop-zone-color-file-name-foreground-filled"
-            >{{ fileName }}</span
-          >
+          ><span class="text-sm font-medium text-foreground-default">{{
+            fileName
+          }}</span>
           <template v-if="fileMetadata !== ''">
-            <span
-              class="text-xs text-components-input-file-drop-zone-color-file-metadata-foreground-filled"
-              >{{ fileMetadata }}</span
-            >
+            <span class="text-xs text-foreground-muted">{{
+              fileMetadata
+            }}</span>
           </template>
         </span>
       </template>
@@ -91,34 +76,47 @@
         type="file"
         class="sr-only"
         :id="id"
+        :name="name"
         :accept="accept"
         :disabled="disabled"
         :required="required"
-        :aria-invalid="hasError"
+        :aria-invalid="getFileState(props).hasError"
+        :aria-describedby="showHint ? id + '-hint' : undefined"
         @change="
           async (event) =>
-            setName(
-              event.target.files && event.target.files.length > 0
-                ? event.target.files[0].name
-                : ''
-            )
+            !disabled &&
+            handleFileSelectEvent(event, onFileNameChange, onFilesChange)
         "
     /></label>
     <template v-if="showHint">
-      <span :class="cn('text-xs', supportingClasses)">{{
-        supportingText
-      }}</span>
+      <span
+        :id="id + '-hint'"
+        :class="
+          cn(
+            'text-sm',
+            getFileState(props).hasError
+              ? 'text-destructive-default'
+              : 'text-foreground-muted'
+          )
+        "
+        >{{ getFileState(props).helpText }}</span
+      >
     </template>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from "vue";
-
-import { cn } from "./utils";
+import {
+  cn,
+  getFileState,
+  handleFileSelectEvent,
+  ICON_PATHS,
+  bindControllerProps,
+} from "./utils";
 
 export interface InputFileDropZoneProps {
   id?: string;
+  name?: string;
   label?: string;
   primaryText?: string;
   supportingText?: string;
@@ -134,58 +132,27 @@ export interface InputFileDropZoneProps {
   showHint?: boolean;
   className?: string;
   onFileNameChange?: (fileName: string) => void;
+  onFilesChange?: (files: unknown[]) => void;
 }
 
 const props = withDefaults(defineProps<InputFileDropZoneProps>(), {
-  errorMessage: "",
-  fileName: "",
-  hint: "You can upload one file.",
-  onFileNameChange: undefined,
   className: "",
   showLabel: true,
   label: "Documents",
+  id: "file-drop-zone",
   required: false,
   disabled: false,
-  primaryText: "Drag and drop files here, or",
-  browseText: "browse",
+  onFileNameChange: undefined,
+  onFilesChange: undefined,
+  browseText: "Browse",
+  primaryText: "or drag and drop files here",
   supportingText: "PNG, JPG, or PDF up to 10 MB",
+  fileName: "",
   fileMetadata: "",
-  id: "file-drop-zone",
+  name: "drop-file",
   accept: "image/png,image/jpeg,application/pdf",
   showHint: true,
+  hint: 'You can upload one file.',
+  errorMessage: '',
 });
-const isDragging = ref(false);
-
-const hasError = computed(() => {
-  return props.errorMessage !== "";
-});
-const hasFile = computed(() => {
-  return props.fileName !== "";
-});
-const containerClasses = computed(() => {
-  if (hasError) {
-    return "border-components-input-file-drop-zone-color-container-border-error";
-  }
-  if (isDragging.value) {
-    return "border-components-input-file-drop-zone-color-container-border-focus bg-background-subtle";
-  }
-  return "border-components-input-file-drop-zone-color-container-border-default border-dashed";
-});
-const supportingText = computed(() => {
-  return hasError ? props.errorMessage : props.hint;
-});
-const supportingClasses = computed(() => {
-  return hasError
-    ? "text-components-input-file-drop-zone-color-supporting-text-foreground-error"
-    : "text-components-input-file-drop-zone-color-supporting-text-foreground-default";
-});
-
-function setDragging(value: boolean) {
-  isDragging.value = value;
-}
-function setName(fileName: string) {
-  if (props.onFileNameChange) {
-    props.onFileNameChange(fileName);
-  }
-}
 </script>

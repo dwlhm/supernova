@@ -8,12 +8,12 @@ export interface TableNoHeaderCellProps {
 import { cn } from "./utils";
 
 function TableNoHeaderCell(props: TableNoHeaderCellProps) {
-  props = { label: "No.", className: "", ...props };
+  props = { label: "No", className: "", ...props };
   return (
     <th
       scope="col"
       className={cn(
-        "w-12 whitespace-nowrap bg-components-table-default-color-header-background-default px-4 py-3 text-center text-xs font-semibold uppercase tracking-wide text-components-table-default-color-header-foreground-default",
+        "w-12 whitespace-nowrap bg-background-muted px-4 py-3 text-center text-sm font-medium text-foreground-default",
         props.className
       )}
     >

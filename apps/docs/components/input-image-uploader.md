@@ -25,66 +25,9 @@ PROPERTIES
 • File name — Selected-image name.
 • File metadata — Dimensions, size, or upload status.
 
-## Live Preview
+## Live Preview & Usage
 
 <FrameworkPreview name="InputImageUploader" />
-
-## Usage
-
-::: code-group
-
-```tsx [React]
-import { InputImageUploader } from './InputImageUploader';
-
-export default function Example() {
-  return (
-    <InputImageUploader file metadata="1200 × 1200 · 1.8 MB" file name="profile-photo.jpg">
-      InputImageUploader
-    </InputImageUploader>
-  );
-}
-```
-
-```vue [Vue 3]
-<script setup lang="ts">
-import { InputImageUploader } from './InputImageUploader';
-</script>
-
-<template>
-  <InputImageUploader file metadata="1200 × 1200 · 1.8 MB" file name="profile-photo.jpg">
-    InputImageUploader
-  </InputImageUploader>
-</template>
-```
-
-```svelte [Svelte]
-<script lang="ts">
-  import InputImageUploader from './InputImageUploader.svelte';
-</script>
-
-<InputImageUploader file metadata="1200 × 1200 · 1.8 MB" file name="profile-photo.jpg">
-  InputImageUploader
-</InputImageUploader>
-```
-
-```ts [Angular]
-import { Component } from '@angular/core';
-import { InputImageUploaderComponent } from './input-image-uploader.component';
-
-@Component({
-  selector: 'app-root',
-  standalone: true,
-  imports: [InputImageUploaderComponent],
-  template: `
-    <app-input-image-uploader file metadata="1200 × 1200 · 1.8 MB" file name="profile-photo.jpg">
-      InputImageUploader
-    </app-input-image-uploader>
-  `,
-})
-export class AppComponent {}
-```
-
-:::
 
 ## Props & Variants
 

@@ -3,6 +3,7 @@ import * as React from "react";
 
 export interface InputFileInputProps {
   id?: string;
+  name?: string;
   label?: string;
   buttonText?: string;
   fileName?: string;
@@ -15,13 +16,22 @@ export interface InputFileInputProps {
   showHint?: boolean;
   className?: string;
   onFileNameChange?: (fileName: string) => void;
+  onFilesChange?: (files: unknown[]) => void;
 }
 
-import { cn } from "./utils";
+import {
+  cn,
+  getFileState,
+  handleFileSelectEvent,
+  clearFileInputEvent,
+  ICON_PATHS,
+  bindControllerProps,
+} from "./utils";
 
 function InputFileInput(props: InputFileInputProps) {
   props = {
     id: "input-file",
+    name: "file",
     label: "Picture",
     buttonText: "Choose File",
     fileName: "",
@@ -35,102 +45,89 @@ function InputFileInput(props: InputFileInputProps) {
     className: "",
     ...props,
   };
-  function hasError() {
-    return props.errorMessage !== "";
-  }
-
-  function hasFile() {
-    return props.fileName !== "";
-  }
-
-  function containerClasses() {
-    if (hasError()) {
-      return "border-components-input-file-input-color-container-border-error";
-    }
-    return "border-components-input-file-input-color-container-border-default focus-within:border-components-input-file-input-color-container-border-focus";
-  }
-
-  function supportingText() {
-    return hasError() ? props.errorMessage : props.hint;
-  }
-
-  function supportingClasses() {
-    return hasError()
-      ? "text-components-input-file-input-color-supporting-text-foreground-error"
-      : "text-components-input-file-input-color-supporting-text-foreground-default";
-  }
-
-  function displayName() {
-    return hasFile() ? props.fileName : "No file chosen";
-  }
-
-  function setName(fileName: string) {
-    if (props.onFileNameChange) {
-      props.onFileNameChange(fileName);
-    }
-  }
-
-  function clear() {
-    setName("");
-  }
-
+  const [__ctrlState, __setCtrlState] = React.useState<Record<string, any>>({});
+  props = bindControllerProps(props, __ctrlState, __setCtrlState);
   return (
-    <div className={cn("flex w-full flex-col gap-3", props.className)}>
+    <div
+      data-ctrl={typeof bindControllerProps}
+      className={cn("flex w-full flex-col gap-3", props.className)}
+    >
       {props.showLabel && props.label !== "" ? (
-        <span className="flex items-center gap-1 text-sm font-medium text-components-input-file-input-color-label-foreground-default">
+        <label
+          className="flex items-center gap-1 text-sm font-medium text-foreground-default"
+          htmlFor={props.id}
+        >
           {props.label}
           {props.required ? (
-            <span
-              aria-hidden="true"
-              className="text-components-input-file-input-color-required-indicator-foreground-default"
-            >
+            <span aria-hidden="true" className="text-destructive-default">
               *
             </span>
           ) : null}
-        </span>
+        </label>
       ) : null}
-      <label
+      <div
         className={cn(
-          "flex items-center gap-2.5 rounded-rounded-lg border bg-components-input-file-input-color-container-background-default px-3 py-1 transition-colors",
-          containerClasses(),
-          props.disabled ? "cursor-not-allowed opacity-50" : "cursor-pointer"
+          "flex items-center gap-3 rounded-lg border bg-background-default px-3 py-1 shadow-xs transition-colors",
+          getFileState(props).hasError
+            ? "border-destructive-border focus-within:ring-2 focus-within:ring-focus-ring-error"
+            : "border-border-default focus-within:border-primary-border-emphasis focus-within:ring-2 focus-within:ring-focus-ring-primary",
+          props.disabled && "cursor-not-allowed opacity-50"
         )}
       >
-        <span className="inline-flex h-7 shrink-0 items-center rounded-rounded-sm bg-components-button-secondary-color-container-background-default px-3 text-xs font-medium text-components-input-file-input-color-button-label-foreground-default">
-          {props.buttonText}
-        </span>
-        <span
+        <label
+          htmlFor={props.id}
           className={cn(
-            "truncate py-1 text-sm",
-            hasFile()
-              ? "text-components-input-file-input-color-file-name-foreground-filled"
-              : "text-components-input-file-input-color-file-name-foreground-default"
+            "flex min-w-0 flex-1 items-center gap-3",
+            props.disabled ? "cursor-not-allowed" : "cursor-pointer"
           )}
         >
-          {displayName()}
-        </span>
-        <input
-          type="file"
-          className="sr-only"
-          id={props.id}
-          accept={props.accept}
-          disabled={props.disabled}
-          required={props.required}
-          aria-invalid={hasError()}
-          onChange={(event) =>
-            setName(
-              event.target.files && event.target.files.length > 0
-                ? event.target.files[0].name
-                : ""
-            )
-          }
-        />
-        {hasFile() ? (
+          <span className="inline-flex h-7 shrink-0 items-center rounded-sm bg-secondary-default px-3 text-sm font-medium text-secondary-foreground">
+            {props.buttonText}
+          </span>
+          <span
+            className={cn(
+              "truncate py-1 text-sm",
+              getFileState(props).hasFile
+                ? "text-foreground-default"
+                : "text-foreground-subtle"
+            )}
+          >
+            {getFileState(props).displayName}
+          </span>
+          <input
+            type="file"
+            className="sr-only"
+            id={props.id}
+            name={props.name}
+            accept={props.accept}
+            disabled={props.disabled}
+            required={props.required}
+            aria-invalid={getFileState(props).hasError}
+            aria-describedby={props.showHint ? props.id + "-hint" : undefined}
+            onChange={(event) =>
+              !props.disabled &&
+              handleFileSelectEvent(
+                event,
+                props.onFileNameChange,
+                props.onFilesChange
+              )
+            }
+          />
+        </label>
+        {getFileState(props).hasFile ? (
           <button
             type="button"
             aria-label="Remove file"
-            className="ml-auto inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-rounded-full text-components-input-file-input-color-file-name-foreground-filled hover:bg-background-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring-primary"
-            onClick={(event) => clear()}
+            className="ml-auto inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-foreground-default hover:bg-background-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring-primary disabled:pointer-events-none"
+            disabled={props.disabled}
+            onClick={(event) =>
+              !props.disabled &&
+              clearFileInputEvent(
+                event,
+                props.onFileNameChange,
+                props.onFilesChange
+              )
+            }
           >
             <svg
               aria-hidden="true"
@@ -138,16 +135,24 @@ function InputFileInput(props: InputFileInputProps) {
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
-              stroke-width="2"
+              strokeWidth="2"
             >
-              <path d="M6 6l12 12M18 6 6 18" stroke-linecap="round" />
+              <path strokeLinecap="round" d={ICON_PATHS.close} />
             </svg>
           </button>
         ) : null}
-      </label>
+      </div>
       {props.showHint ? (
-        <span className={cn("text-xs", supportingClasses())}>
-          {supportingText()}
+        <span
+          id={props.id + "-hint"}
+          className={cn(
+            "text-sm",
+            getFileState(props).hasError
+              ? "text-destructive-foreground"
+              : "text-foreground-muted"
+          )}
+        >
+          {getFileState(props).helpText}
         </span>
       ) : null}
     </div>

@@ -8,7 +8,7 @@
 </script>
 
 <script lang="ts">
-  import { cn } from "./utils";
+  import { cn, bindControllerProps } from "./utils";
 
   export let ariaLabel: IconTruckDeliveryProps["ariaLabel"] = "Truck delivery";
   export let size: IconTruckDeliveryProps["size"] = 24;
@@ -23,13 +23,11 @@
   stroke="currentColor"
   stroke-linecap="round"
   stroke-linejoin="round"
+  data-ctrl={typeof bindControllerProps}
   aria-label={ariaLabel}
   width={size}
   height={size}
-  class={cn(
-    "inline-block shrink-0 text-components-icon-truck-delivery-color-root-fill-default",
-    className
-  )}
+  class={cn("inline-block shrink-0 text-foreground-default", className)}
   stroke-width={strokeWidth}
   ><path d="M5 18m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /><path
     d="M15 18m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"

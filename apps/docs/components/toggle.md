@@ -19,66 +19,9 @@ Properties
 • Size — Small: compact layouts; Medium: standard interfaces; Large: prominent or touch-focused layouts.
 • Show Text — Shows or hides the accompanying text label.
 
-## Live Preview
+## Live Preview & Usage
 
 <FrameworkPreview name="Toggle" />
-
-## Usage
-
-::: code-group
-
-```tsx [React]
-import { Toggle } from './Toggle';
-
-export default function Example() {
-  return (
-    <Toggle show Text={false} size="Small">
-      Toggle
-    </Toggle>
-  );
-}
-```
-
-```vue [Vue 3]
-<script setup lang="ts">
-import { Toggle } from './Toggle';
-</script>
-
-<template>
-  <Toggle show Text={false} size="Small">
-    Toggle
-  </Toggle>
-</template>
-```
-
-```svelte [Svelte]
-<script lang="ts">
-  import Toggle from './Toggle.svelte';
-</script>
-
-<Toggle show Text={false} size="Small">
-  Toggle
-</Toggle>
-```
-
-```ts [Angular]
-import { Component } from '@angular/core';
-import { ToggleComponent } from './toggle.component';
-
-@Component({
-  selector: 'app-root',
-  standalone: true,
-  imports: [ToggleComponent],
-  template: `
-    <app-toggle show Text={false} size="Small">
-      Toggle
-    </app-toggle>
-  `,
-})
-export class AppComponent {}
-```
-
-:::
 
 ## Props & Variants
 

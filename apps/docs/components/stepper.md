@@ -26,66 +26,9 @@ Properties
 • Step 3 label: Sets the third step label. Default: Payment.
 • Step 4 label: Sets the fourth step label. Default: Review.
 
-## Live Preview
+## Live Preview & Usage
 
 <FrameworkPreview name="Stepper" />
-
-## Usage
-
-::: code-group
-
-```tsx [React]
-import { Stepper } from './Stepper';
-
-export default function Example() {
-  return (
-    <Stepper current="1" step 1 label="Cart">
-      Stepper
-    </Stepper>
-  );
-}
-```
-
-```vue [Vue 3]
-<script setup lang="ts">
-import { Stepper } from './Stepper';
-</script>
-
-<template>
-  <Stepper current="1" step 1 label="Cart">
-    Stepper
-  </Stepper>
-</template>
-```
-
-```svelte [Svelte]
-<script lang="ts">
-  import Stepper from './Stepper.svelte';
-</script>
-
-<Stepper current="1" step 1 label="Cart">
-  Stepper
-</Stepper>
-```
-
-```ts [Angular]
-import { Component } from '@angular/core';
-import { StepperComponent } from './stepper.component';
-
-@Component({
-  selector: 'app-root',
-  standalone: true,
-  imports: [StepperComponent],
-  template: `
-    <app-stepper current="1" step 1 label="Cart">
-      Stepper
-    </app-stepper>
-  `,
-})
-export class AppComponent {}
-```
-
-:::
 
 ## Props & Variants
 

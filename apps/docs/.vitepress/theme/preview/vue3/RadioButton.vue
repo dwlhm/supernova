@@ -1,38 +1,60 @@
 <template>
   <label
+    :data-ctrl="typeof bindControllerProps"
     :class="
       cn(
-        'inline-flex items-center gap-2',
+        'inline-flex items-center',
+        cva(
+          size,
+          {
+            small: 'gap-1.5',
+            medium: 'gap-2',
+            large: 'gap-2.5',
+          },
+          'medium'
+        ),
         disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer',
         className
       )
     "
   >
-    <template v-if="leftLabel && hasLabel">
-      <span
-        class="text-sm text-components-radio-button-all-color-label-foreground-default"
-        >{{ label }}</span
-      >
+    <template v-if="getChoiceState(props).showLeft">
+      <span class="text-sm text-foreground-default">{{ label }}</span>
     </template>
 
     <span class="relative inline-flex shrink-0 items-center justify-center"
       ><input
         type="radio"
-        class="peer absolute inset-0 h-full w-full cursor-pointer appearance-none rounded-rounded-full opacity-0 disabled:cursor-not-allowed"
+        class="peer absolute inset-0 h-full w-full cursor-pointer appearance-none rounded-full opacity-0 disabled:cursor-not-allowed"
+        :id="id"
         :name="name"
         :value="value"
         :checked="checked"
         :disabled="disabled"
-        :aria-label="hasLabel ? label : 'Option'"
-        @change="async (event) => handleChange()" /><span
+        :required="required"
+        :aria-label="
+          !getChoiceState(props).showLeft && !getChoiceState(props).showRight
+            ? label || 'Option'
+            : undefined
+        "
+        @change="
+          async (event) =>
+            !disabled && onChange && onChange(value || label || '')
+        " /><span
         aria-hidden="true"
         :class="
           cn(
-            'inline-flex items-center justify-center rounded-rounded-full border bg-components-radio-button-all-color-circle-background-default shadow-sm peer-focus-visible:ring-2 peer-focus-visible:ring-focus-ring-primary',
-            circleClasses,
-            checked
-              ? 'border-components-radio-button-on-color-indicator-fill-default'
-              : 'border-components-radio-button-all-color-circle-border-default'
+            'inline-flex items-center justify-center rounded-full border bg-background-default shadow-xs peer-focus-visible:ring-2 peer-focus-visible:ring-focus-ring-primary',
+            cva(
+              size,
+              {
+                small: 'h-3 w-3',
+                medium: 'h-3.5 w-3.5',
+                large: 'h-4 w-4',
+              },
+              'medium'
+            ),
+            checked ? 'border-primary-default' : 'border-border-default'
           )
         "
       >
@@ -40,30 +62,35 @@
           <span
             :class="
               cn(
-                'rounded-rounded-full bg-components-radio-button-on-color-indicator-fill-default',
-                dotClasses
+                'rounded-full bg-primary-default',
+                cva(
+                  size,
+                  {
+                    small: 'h-1.5 w-1.5',
+                    medium: 'h-2 w-2',
+                    large: 'h-2.5 w-2.5',
+                  },
+                  'medium'
+                )
               )
             "
           ></span>
         </template> </span
     ></span>
-    <template v-if="rightLabel && hasLabel">
-      <span
-        class="text-sm text-components-radio-button-all-color-label-foreground-default"
-        >{{ label }}</span
-      >
+    <template v-if="getChoiceState(props).showRight">
+      <span class="text-sm text-foreground-default">{{ label }}</span>
     </template>
   </label>
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
-
-import { cn } from "./utils";
+import { cn, cva, getChoiceState, bindControllerProps } from "./utils";
 
 export interface RadioButtonProps {
+  id?: string;
   checked?: boolean;
   disabled?: boolean;
+  required?: boolean;
   size?: "small" | "medium" | "large";
   label?: string;
   leftLabel?: boolean;
@@ -76,49 +103,16 @@ export interface RadioButtonProps {
 
 const props = withDefaults(defineProps<RadioButtonProps>(), {
   size: "medium",
-  label: "Label",
   disabled: false,
-  onChange: undefined,
-  value: "",
   className: "",
-  leftLabel: false,
+  label: "Label",
+  id: "radio-button",
   name: "radio-group",
+  value: "",
   checked: false,
-  rightLabel: true,
+  required: false,
+  onChange: undefined,
+  leftLabel: false,
+  rightLabel: false,
 });
-
-const circleClasses = computed(() => {
-  switch (props.size) {
-    case "small":
-      return "h-4 w-4";
-    case "large":
-      return "h-6 w-6";
-    case "medium":
-    default:
-      return "h-5 w-5";
-  }
-});
-const dotClasses = computed(() => {
-  switch (props.size) {
-    case "small":
-      return "h-1.5 w-1.5";
-    case "large":
-      return "h-2.5 w-2.5";
-    case "medium":
-    default:
-      return "h-2 w-2";
-  }
-});
-const hasLabel = computed(() => {
-  return props.label !== "";
-});
-
-function handleChange() {
-  if (props.disabled) {
-    return;
-  }
-  if (props.onChange) {
-    props.onChange(props.value);
-  }
-}
 </script>

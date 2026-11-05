@@ -16,66 +16,9 @@ Use consistently with the table's Show No option.
 Properties
 No exposed properties.
 
-## Live Preview
+## Live Preview & Usage
 
 <FrameworkPreview name="TableNoHeaderCell" />
-
-## Usage
-
-::: code-group
-
-```tsx [React]
-import { TableNoHeaderCell } from './TableNoHeaderCell';
-
-export default function Example() {
-  return (
-    <TableNoHeaderCell>
-      TableNoHeaderCell
-    </TableNoHeaderCell>
-  );
-}
-```
-
-```vue [Vue 3]
-<script setup lang="ts">
-import { TableNoHeaderCell } from './TableNoHeaderCell';
-</script>
-
-<template>
-  <TableNoHeaderCell>
-    TableNoHeaderCell
-  </TableNoHeaderCell>
-</template>
-```
-
-```svelte [Svelte]
-<script lang="ts">
-  import TableNoHeaderCell from './TableNoHeaderCell.svelte';
-</script>
-
-<TableNoHeaderCell>
-  TableNoHeaderCell
-</TableNoHeaderCell>
-```
-
-```ts [Angular]
-import { Component } from '@angular/core';
-import { TableNoHeaderCellComponent } from './table-no-header-cell.component';
-
-@Component({
-  selector: 'app-root',
-  standalone: true,
-  imports: [TableNoHeaderCellComponent],
-  template: `
-    <app-table-no-header-cell>
-      TableNoHeaderCell
-    </app-table-no-header-cell>
-  `,
-})
-export class AppComponent {}
-```
-
-:::
 
 ## Props & Variants
 

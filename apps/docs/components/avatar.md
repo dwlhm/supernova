@@ -28,66 +28,9 @@ Properties
 | showStatus | Boolean | true | Shows or hides the presence indicator. Enable only when live status is relevant. |
 | initialsText | Text | AB | Sets the initials shown by the initials variant. Use one or two uppercase characters. |
 
-## Live Preview
+## Live Preview & Usage
 
 <FrameworkPreview name="Avatar" />
-
-## Usage
-
-::: code-group
-
-```tsx [React]
-import { Avatar } from './Avatar';
-
-export default function Example() {
-  return (
-    <Avatar initialsText="AB" showStatus>
-      Avatar
-    </Avatar>
-  );
-}
-```
-
-```vue [Vue 3]
-<script setup lang="ts">
-import { Avatar } from './Avatar';
-</script>
-
-<template>
-  <Avatar initialsText="AB" showStatus>
-    Avatar
-  </Avatar>
-</template>
-```
-
-```svelte [Svelte]
-<script lang="ts">
-  import Avatar from './Avatar.svelte';
-</script>
-
-<Avatar initialsText="AB" showStatus>
-  Avatar
-</Avatar>
-```
-
-```ts [Angular]
-import { Component } from '@angular/core';
-import { AvatarComponent } from './avatar.component';
-
-@Component({
-  selector: 'app-root',
-  standalone: true,
-  imports: [AvatarComponent],
-  template: `
-    <app-avatar initialsText="AB" showStatus>
-      Avatar
-    </app-avatar>
-  `,
-})
-export class AppComponent {}
-```
-
-:::
 
 ## Props & Variants
 

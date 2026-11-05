@@ -1,11 +1,34 @@
 <template>
   <div
+    :data-ctrl="typeof bindControllerProps"
     :class="
-      cn('flex w-full', isOutgoing ? 'justify-end' : 'justify-start', className)
+      cn(
+        'flex w-full',
+        direction === 'outgoing' ? 'justify-end' : 'justify-start',
+        className
+      )
     "
   >
-    <div :class="cn('flex max-w-xs flex-col gap-1', isOutgoing && 'items-end')">
-      <div :class="cn('rounded-rounded-2xl px-4 py-3', bubbleClasses)">
+    <div
+      :class="
+        cn(
+          'flex max-w-xs flex-col gap-1',
+          direction === 'outgoing' && 'items-end'
+        )
+      "
+    >
+      <div
+        :class="
+          cn(
+            'rounded-2xl p-4',
+            messageState === 'error'
+              ? 'border border-destructive-border bg-destructive-subtle text-destructive-foreground'
+              : direction === 'outgoing'
+              ? 'border border-border-default bg-background-default text-foreground-default'
+              : 'bg-background-muted text-foreground-default'
+          )
+        "
+      >
         <template v-if="type === 'text'">
           <p class="whitespace-pre-wrap text-sm leading-relaxed">{{ text }}</p>
         </template>
@@ -21,20 +44,23 @@
               stroke-width="1.5"
             >
               <path
-                d="M14 3v5h5"
                 stroke-linecap="round"
                 stroke-linejoin="round"
-              ></path>
-              <path
-                d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9l5 5v11a2 2 0 0 1-2 2Z"
-                stroke-linecap="round"
-                stroke-linejoin="round"
+                :d="ICON_PATHS.file"
               ></path></svg
             ><span class="flex flex-col"
               ><span class="truncate text-sm font-medium">{{ fileName }}</span
-              ><span :class="cn('text-xs', previewMetaClasses)">{{
-                fileMeta
-              }}</span></span
+              ><span
+                :class="
+                  cn(
+                    'text-xs',
+                    messageState === 'error'
+                      ? 'text-destructive-foreground'
+                      : 'text-foreground-muted'
+                  )
+                "
+                >{{ fileMeta }}</span
+              ></span
             >
           </div>
         </template>
@@ -44,8 +70,10 @@
             <div
               :class="
                 cn(
-                  'flex h-32 w-60 items-center justify-center rounded-rounded-xl bg-background-muted',
-                  previewMetaClasses
+                  'flex h-32 w-60 items-center justify-center rounded-xl bg-background-subtle',
+                  messageState === 'error'
+                    ? 'text-destructive-foreground'
+                    : 'text-foreground-muted'
                 )
               "
             >
@@ -57,16 +85,11 @@
                 stroke="currentColor"
                 stroke-width="1.5"
               >
-                <template v-if="type === 'image'">
-                  <rect x="3" y="3" width="18" height="18" rx="2"></rect>
-                </template>
-
                 <path
-                  d="m21 15-5-5L5 21"
                   stroke-linecap="round"
                   stroke-linejoin="round"
+                  :d="type === 'image' ? ICON_PATHS.image : ICON_PATHS.video"
                 ></path>
-                <circle cx="8.5" cy="8.5" r="1.5"></circle>
               </svg>
             </div>
             <span class="flex flex-col"
@@ -78,7 +101,16 @@
                 <template v-else>
                   {{ videoName }}
                 </template> </span
-              ><span :class="cn('text-xs', previewMetaClasses)">
+              ><span
+                :class="
+                  cn(
+                    'text-xs',
+                    messageState === 'error'
+                      ? 'text-destructive-foreground'
+                      : 'text-foreground-muted'
+                  )
+                "
+              >
                 <template v-if="type === 'image'">
                   {{ imageMeta }}
                 </template>
@@ -92,28 +124,54 @@
         </template>
 
         <template v-if="showCustomText">
-          <p :class="cn('mt-2 text-xs', previewMetaClasses)">
+          <p
+            :class="
+              cn(
+                'mt-2 text-xs',
+                messageState === 'error'
+                  ? 'text-destructive-foreground'
+                  : 'text-foreground-muted'
+              )
+            "
+          >
             {{ customText }}
           </p>
         </template>
       </div>
-      <div class="flex items-center gap-1">
+      <div class="flex w-full items-center justify-between gap-2">
         <template v-if="showTime">
-          <span :class="cn('text-xs', metaClasses)">{{ timeText }}</span>
-        </template>
-
-        <template v-if="showStatus || isError">
           <span
             :class="
               cn(
                 'text-xs',
-                isError
-                  ? 'text-components-bubble-chat-error-color-status-foreground-default'
-                  : metaClasses
+                messageState === 'error'
+                  ? 'text-destructive-foreground'
+                  : 'text-foreground-muted'
               )
             "
-            >{{ displayStatus }}</span
+            >{{ timeText }}</span
           >
+        </template>
+
+        <template v-if="showStatus || messageState === 'error'">
+          <span
+            :class="
+              cn(
+                'text-xs',
+                messageState === 'error'
+                  ? 'text-destructive-foreground'
+                  : 'text-foreground-muted'
+              )
+            "
+          >
+            <template v-if="messageState === 'error'">
+              {{ errorStatusText }}
+            </template>
+
+            <template v-else>
+              {{ statusText }}
+            </template>
+          </span>
         </template>
       </div>
     </div>
@@ -121,9 +179,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
-
-import { cn } from "./utils";
+import { cn, ICON_PATHS, bindControllerProps } from "./utils";
 
 export interface BubbleChatProps {
   direction?: "incoming" | "outgoing";
@@ -148,56 +204,22 @@ export interface BubbleChatProps {
 
 const props = withDefaults(defineProps<BubbleChatProps>(), {
   direction: "incoming",
-  messageState: "default",
-  errorStatusText: "Failed to send",
-  statusText: "Received",
   className: "",
+  messageState: "default",
   type: "text",
   text: "Message",
   fileName: "document.pdf",
   fileMeta: "2.4 MB",
   videoName: "video.mp4",
   imageName: "image.jpg",
-  videoMeta: "24.8 MB",
+  videoMeta: "24.8 MB • 01:08",
   imageMeta: "3.4 MB",
   showCustomText: false,
   customText: "Additional information",
   showTime: true,
   timeText: "10:24 AM",
   showStatus: false,
-});
-
-const isOutgoing = computed(() => {
-  return props.direction === "outgoing";
-});
-const isError = computed(() => {
-  return props.messageState === "error";
-});
-const bubbleClasses = computed(() => {
-  if (isError) {
-    return "bg-components-bubble-chat-error-color-container-background-default border border-components-bubble-chat-error-color-container-border-default text-components-bubble-chat-error-color-message-foreground-default";
-  }
-  if (isOutgoing) {
-    return "bg-components-bubble-chat-outgoing-color-container-background-default text-components-bubble-chat-outgoing-color-message-foreground-default";
-  }
-  return "bg-components-bubble-chat-incoming-color-container-background-default text-components-bubble-chat-incoming-color-message-foreground-default";
-});
-const metaClasses = computed(() => {
-  if (isError) {
-    return "text-components-bubble-chat-error-color-metadata-foreground-default";
-  }
-  if (isOutgoing) {
-    return "text-components-bubble-chat-outgoing-color-timestamp-foreground-default";
-  }
-  return "text-components-bubble-chat-incoming-color-timestamp-foreground-default";
-});
-const previewMetaClasses = computed(() => {
-  if (isError) {
-    return "text-components-bubble-chat-error-color-metadata-foreground-default";
-  }
-  return "text-foreground-muted";
-});
-const displayStatus = computed(() => {
-  return isError ? props.errorStatusText : props.statusText;
+  statusText: "Received",
+  errorStatusText: "Failed to send",
 });
 </script>

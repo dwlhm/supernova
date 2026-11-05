@@ -1,17 +1,15 @@
 <template>
-  <div :class="cn('flex w-full flex-col gap-3', className)">
+  <div
+    :data-ctrl="typeof bindControllerProps"
+    :class="cn('flex w-full flex-col gap-3', className)"
+  >
     <template v-if="showLabel && label !== ''">
       <label
-        class="flex items-center gap-1 text-sm font-medium text-components-input-text-color-label-foreground-default"
+        class="flex items-center gap-1 text-sm font-medium text-foreground-default"
         :for="id"
         >{{ label }}
         <template v-if="required">
-          <span
-            aria-hidden="true"
-            class="text-components-input-text-color-required-indicator-foreground-default"
-          >
-            *
-          </span>
+          <span aria-hidden="true" class="text-destructive-default">*</span>
         </template>
       </label>
     </template>
@@ -19,9 +17,12 @@
     <div
       :class="
         cn(
-          'flex items-center gap-2.5 rounded-rounded-lg border bg-components-input-text-color-container-background-default px-3 transition-colors',
-          containerClasses,
-          disabled && 'opacity-50'
+          'flex items-center gap-3 rounded-lg border px-3 shadow-xs transition-colors',
+          disabled
+            ? 'border-border-default bg-background-muted cursor-not-allowed opacity-50'
+            : getInputState(props).hasError
+            ? 'border-destructive-border bg-background-default focus-within:ring-2 focus-within:ring-focus-ring-error'
+            : 'border-border-default bg-background-default focus-within:border-primary-border-emphasis focus-within:ring-2 focus-within:ring-focus-ring-primary'
         )
       "
     >
@@ -32,15 +33,21 @@
           fill="none"
           stroke="currentColor"
           stroke-width="1.5"
-          :class="cn('h-4 w-4 shrink-0', iconClasses)"
+          :class="
+            cn(
+              'h-4 w-4 shrink-0',
+              getInputState(props).hasError
+                ? 'text-destructive-foreground'
+                : 'text-foreground-muted'
+            )
+          "
         >
-          <circle cx="11" cy="11" r="7"></circle>
-          <path d="m20 20-3.5-3.5" stroke-linecap="round"></path>
+          <path stroke-linecap="round" :d="ICON_PATHS.search"></path>
         </svg>
       </template>
 
       <input
-        class="h-9 w-full bg-transparent text-sm text-foreground-default outline-none placeholder:text-components-input-text-color-placeholder-foreground-default disabled:cursor-not-allowed"
+        class="h-9 w-full bg-transparent text-base text-foreground-default outline-none placeholder:text-foreground-subtle disabled:cursor-not-allowed"
         :id="id"
         :name="name"
         :type="type"
@@ -49,9 +56,12 @@
         :maxLength="maxLength"
         :disabled="disabled"
         :required="required"
-        :aria-invalid="hasError"
+        :aria-invalid="getInputState(props).hasError"
         :aria-describedby="showHint ? id + '-hint' : undefined"
-        @input="async (event) => handleInput(event.target.value)"
+        @input="
+          async (event) =>
+            !disabled && onValueChange && onValueChange(event.target.value)
+        "
       />
       <template v-if="showRightIcon">
         <svg
@@ -60,13 +70,19 @@
           fill="none"
           stroke="currentColor"
           stroke-width="1.5"
-          :class="cn('h-4 w-4 shrink-0', iconClasses)"
+          :class="
+            cn(
+              'h-4 w-4 shrink-0',
+              getInputState(props).hasError
+                ? 'text-destructive-foreground'
+                : 'text-foreground-muted'
+            )
+          "
         >
-          <circle cx="12" cy="12" r="9"></circle>
           <path
-            d="m8.5 12 2.5 2.5 4.5-5"
             stroke-linecap="round"
             stroke-linejoin="round"
+            :d="ICON_PATHS.checkCircle"
           ></path>
         </svg>
       </template>
@@ -74,15 +90,32 @@
     <template v-if="showHint || showCharacterCount">
       <div class="flex items-start justify-between gap-2.5">
         <template v-if="showHint">
-          <span :id="id + '-hint'" :class="cn('text-xs', supportingClasses)">{{
-            supportingText
-          }}</span>
+          <span
+            :id="id + '-hint'"
+            :class="
+              cn(
+                'text-sm',
+                getInputState(props).hasError
+                  ? 'text-destructive-foreground'
+                  : 'text-foreground-muted'
+              )
+            "
+            >{{ getInputState(props).helpText }}</span
+          >
         </template>
 
         <template v-if="showCharacterCount">
-          <span :class="cn('ml-auto shrink-0 text-xs', countClasses)">{{
-            countText
-          }}</span>
+          <span
+            :class="
+              cn(
+                'ml-auto shrink-0 text-sm',
+                getInputState(props).hasError
+                  ? 'text-destructive-foreground'
+                  : 'text-foreground-muted'
+              )
+            "
+            >{{ getInputState(props).countText }}</span
+          >
         </template>
       </div>
     </template>
@@ -90,9 +123,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
-
-import { cn } from "./utils";
+import { cn, getInputState, ICON_PATHS, bindControllerProps } from "./utils";
 
 export interface InputTextProps {
   value?: string;
@@ -116,64 +147,23 @@ export interface InputTextProps {
 }
 
 const props = withDefaults(defineProps<InputTextProps>(), {
-  errorMessage: "",
-  hint: "Choose a unique username for your account.",
-  value: "",
-  maxLength: 200,
-  disabled: false,
-  onValueChange: undefined,
   className: "",
   showLabel: true,
   label: "Username",
   id: "input-text",
-  required: false,
+  required: true,
+  disabled: false,
   showLeftIcon: false,
   name: "input-text",
   type: "text",
+  value: "",
   placeholder: "Max Leiter",
+  maxLength: 200,
   showHint: true,
-  showRightIcon: false,
+  onValueChange: undefined,
+  showRightIcon: true,
   showCharacterCount: false,
+  hint: 'Choose a unique username for your account.',
+  errorMessage: '',
 });
-
-const hasError = computed(() => {
-  return props.errorMessage !== "";
-});
-const containerClasses = computed(() => {
-  if (hasError) {
-    return "border-components-input-text-color-container-border-error focus-within:ring-2 focus-within:ring-focus-ring-error";
-  }
-  return "border-components-input-text-color-container-border-default focus-within:border-components-input-text-color-container-border-focus focus-within:ring-2 focus-within:ring-focus-ring-primary";
-});
-const iconClasses = computed(() => {
-  if (hasError) {
-    return "text-components-input-text-color-left-icon-foreground-error";
-  }
-  return "text-components-input-text-color-left-icon-foreground-default";
-});
-const supportingText = computed(() => {
-  return hasError ? props.errorMessage : props.hint;
-});
-const supportingClasses = computed(() => {
-  return hasError
-    ? "text-components-input-text-color-supporting-text-foreground-error"
-    : "text-components-input-text-color-supporting-text-foreground-default";
-});
-const countClasses = computed(() => {
-  return hasError
-    ? "text-components-input-text-color-character-count-foreground-error"
-    : "text-components-input-text-color-character-count-foreground-default";
-});
-const countText = computed(() => {
-  return props.value.length + " / " + props.maxLength;
-});
-
-function handleInput(rawValue: string) {
-  if (props.disabled) {
-    return;
-  }
-  if (props.onValueChange) {
-    props.onValueChange(rawValue);
-  }
-}
 </script>

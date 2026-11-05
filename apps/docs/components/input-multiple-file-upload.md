@@ -26,66 +26,9 @@ PROPERTIES
 • File 1 name / File 2 name — Example file names.
 • File 1 status / File 2 status — Example upload statuses.
 
-## Live Preview
+## Live Preview & Usage
 
 <FrameworkPreview name="InputMultipleFileUpload" />
-
-## Usage
-
-::: code-group
-
-```tsx [React]
-import { InputMultipleFileUpload } from './InputMultipleFileUpload';
-
-export default function Example() {
-  return (
-    <InputMultipleFileUpload file 1 name="brand-guidelines.pdf" file 1 status="Uploaded">
-      InputMultipleFileUpload
-    </InputMultipleFileUpload>
-  );
-}
-```
-
-```vue [Vue 3]
-<script setup lang="ts">
-import { InputMultipleFileUpload } from './InputMultipleFileUpload';
-</script>
-
-<template>
-  <InputMultipleFileUpload file 1 name="brand-guidelines.pdf" file 1 status="Uploaded">
-    InputMultipleFileUpload
-  </InputMultipleFileUpload>
-</template>
-```
-
-```svelte [Svelte]
-<script lang="ts">
-  import InputMultipleFileUpload from './InputMultipleFileUpload.svelte';
-</script>
-
-<InputMultipleFileUpload file 1 name="brand-guidelines.pdf" file 1 status="Uploaded">
-  InputMultipleFileUpload
-</InputMultipleFileUpload>
-```
-
-```ts [Angular]
-import { Component } from '@angular/core';
-import { InputMultipleFileUploadComponent } from './input-multiple-file-upload.component';
-
-@Component({
-  selector: 'app-root',
-  standalone: true,
-  imports: [InputMultipleFileUploadComponent],
-  template: `
-    <app-input-multiple-file-upload file 1 name="brand-guidelines.pdf" file 1 status="Uploaded">
-      InputMultipleFileUpload
-    </app-input-multiple-file-upload>
-  `,
-})
-export class AppComponent {}
-```
-
-:::
 
 ## Props & Variants
 

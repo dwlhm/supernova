@@ -24,66 +24,9 @@ Properties
 • State: indeterminate
 • Content: icon only
 
-## Live Preview
+## Live Preview & Usage
 
 <FrameworkPreview name="Spinner" />
-
-## Usage
-
-::: code-group
-
-```tsx [React]
-import { Spinner } from './Spinner';
-
-export default function Example() {
-  return (
-    <Spinner size="12">
-      Spinner
-    </Spinner>
-  );
-}
-```
-
-```vue [Vue 3]
-<script setup lang="ts">
-import { Spinner } from './Spinner';
-</script>
-
-<template>
-  <Spinner size="12">
-    Spinner
-  </Spinner>
-</template>
-```
-
-```svelte [Svelte]
-<script lang="ts">
-  import Spinner from './Spinner.svelte';
-</script>
-
-<Spinner size="12">
-  Spinner
-</Spinner>
-```
-
-```ts [Angular]
-import { Component } from '@angular/core';
-import { SpinnerComponent } from './spinner.component';
-
-@Component({
-  selector: 'app-root',
-  standalone: true,
-  imports: [SpinnerComponent],
-  template: `
-    <app-spinner size="12">
-      Spinner
-    </app-spinner>
-  `,
-})
-export class AppComponent {}
-```
-
-:::
 
 ## Props & Variants
 

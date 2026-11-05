@@ -23,66 +23,9 @@ PROPERTIES
 • Show required — Toggles the required indicator.
 • Show hint — Toggles supporting or error text.
 
-## Live Preview
+## Live Preview & Usage
 
 <FrameworkPreview name="InputFileInput" />
-
-## Usage
-
-::: code-group
-
-```tsx [React]
-import { InputFileInput } from './InputFileInput';
-
-export default function Example() {
-  return (
-    <InputFileInput button text="Choose File" file name="No file chosen">
-      InputFileInput
-    </InputFileInput>
-  );
-}
-```
-
-```vue [Vue 3]
-<script setup lang="ts">
-import { InputFileInput } from './InputFileInput';
-</script>
-
-<template>
-  <InputFileInput button text="Choose File" file name="No file chosen">
-    InputFileInput
-  </InputFileInput>
-</template>
-```
-
-```svelte [Svelte]
-<script lang="ts">
-  import InputFileInput from './InputFileInput.svelte';
-</script>
-
-<InputFileInput button text="Choose File" file name="No file chosen">
-  InputFileInput
-</InputFileInput>
-```
-
-```ts [Angular]
-import { Component } from '@angular/core';
-import { InputFileInputComponent } from './input-file-input.component';
-
-@Component({
-  selector: 'app-root',
-  standalone: true,
-  imports: [InputFileInputComponent],
-  template: `
-    <app-input-file-input button text="Choose File" file name="No file chosen">
-      InputFileInput
-    </app-input-file-input>
-  `,
-})
-export class AppComponent {}
-```
-
-:::
 
 ## Props & Variants
 

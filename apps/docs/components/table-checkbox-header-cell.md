@@ -17,66 +17,9 @@ Disable or omit it when bulk selection is unavailable.
 Properties
 Checkbox state — Configure the nested checkbox instance.
 
-## Live Preview
+## Live Preview & Usage
 
 <FrameworkPreview name="TableCheckboxHeaderCell" />
-
-## Usage
-
-::: code-group
-
-```tsx [React]
-import { TableCheckboxHeaderCell } from './TableCheckboxHeaderCell';
-
-export default function Example() {
-  return (
-    <TableCheckboxHeaderCell>
-      TableCheckboxHeaderCell
-    </TableCheckboxHeaderCell>
-  );
-}
-```
-
-```vue [Vue 3]
-<script setup lang="ts">
-import { TableCheckboxHeaderCell } from './TableCheckboxHeaderCell';
-</script>
-
-<template>
-  <TableCheckboxHeaderCell>
-    TableCheckboxHeaderCell
-  </TableCheckboxHeaderCell>
-</template>
-```
-
-```svelte [Svelte]
-<script lang="ts">
-  import TableCheckboxHeaderCell from './TableCheckboxHeaderCell.svelte';
-</script>
-
-<TableCheckboxHeaderCell>
-  TableCheckboxHeaderCell
-</TableCheckboxHeaderCell>
-```
-
-```ts [Angular]
-import { Component } from '@angular/core';
-import { TableCheckboxHeaderCellComponent } from './table-checkbox-header-cell.component';
-
-@Component({
-  selector: 'app-root',
-  standalone: true,
-  imports: [TableCheckboxHeaderCellComponent],
-  template: `
-    <app-table-checkbox-header-cell>
-      TableCheckboxHeaderCell
-    </app-table-checkbox-header-cell>
-  `,
-})
-export class AppComponent {}
-```
-
-:::
 
 ## Props & Variants
 

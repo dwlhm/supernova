@@ -25,66 +25,9 @@ PROPERTIES
 • Description Text: Overrides the default supporting description.
 • Content: Accepts optional custom content for the selected chart variant.
 
-## Live Preview
+## Live Preview & Usage
 
 <FrameworkPreview name="Chart" />
-
-## Usage
-
-::: code-group
-
-```tsx [React]
-import { Chart } from './Chart';
-
-export default function Example() {
-  return (
-    <Chart content="default" content10="default">
-      Chart
-    </Chart>
-  );
-}
-```
-
-```vue [Vue 3]
-<script setup lang="ts">
-import { Chart } from './Chart';
-</script>
-
-<template>
-  <Chart content="default" content10="default">
-    Chart
-  </Chart>
-</template>
-```
-
-```svelte [Svelte]
-<script lang="ts">
-  import Chart from './Chart.svelte';
-</script>
-
-<Chart content="default" content10="default">
-  Chart
-</Chart>
-```
-
-```ts [Angular]
-import { Component } from '@angular/core';
-import { ChartComponent } from './chart.component';
-
-@Component({
-  selector: 'app-root',
-  standalone: true,
-  imports: [ChartComponent],
-  template: `
-    <app-chart content="default" content10="default">
-      Chart
-    </app-chart>
-  `,
-})
-export class AppComponent {}
-```
-
-:::
 
 ## Props & Variants
 

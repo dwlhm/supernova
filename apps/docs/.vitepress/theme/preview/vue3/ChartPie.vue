@@ -1,110 +1,79 @@
 <template>
-  <div :class="cn('flex w-full items-center justify-center', className)">
-    <svg
-      class="h-44 w-44 shrink-0 -rotate-90"
-      viewBox="0 0 100 100"
-      role="img"
-      :aria-label="ariaLabel"
-    >
-      <template :key="slice.key" v-for="(slice, index) in slices">
-        <circle
-          cx="50"
-          cy="50"
-          fill="none"
-          :r="ringRadius"
-          :class="slice.colorClass"
-          :stroke-width="ringWidth"
-          :stroke-dasharray="slice.dashArray"
-          :stroke-dashoffset="slice.dashOffset"
-        ></circle>
+  <div
+    :data-ctrl="typeof bindControllerProps"
+    :class="cn('relative flex w-full items-center justify-center', className)"
+  >
+    <div class="relative flex items-center justify-center">
+      <svg
+        class="h-44 w-44 shrink-0 -rotate-90"
+        viewBox="0 0 100 100"
+        role="img"
+        :aria-label="ariaLabel"
+      >
+        <template
+          :key="slice.key"
+          v-for="(slice, index) in getChartPieState(data, innerRadius).slices"
+        >
+          <circle
+            cx="50"
+            cy="50"
+            fill="none"
+            :r="getChartPieState(data, innerRadius).ringRadius"
+            :class="
+              cva(
+                String(slice.seriesIndex),
+                {
+                  '0': 'stroke-chart-series-1',
+                  '1': 'stroke-chart-series-2',
+                  '2': 'stroke-chart-series-3',
+                  '3': 'stroke-chart-series-4',
+                  '4': 'stroke-chart-series-5',
+                },
+                '0'
+              )
+            "
+            :stroke-width="getChartPieState(data, innerRadius).ringWidth"
+            :stroke-dasharray="slice.dashArray"
+            :stroke-dashoffset="slice.dashOffset"
+          ></circle>
+        </template>
+      </svg>
+      <template v-if="innerRadius > 0 && showTooltip">
+        <div
+          class="pointer-events-none absolute inset-0 flex flex-col items-center justify-center text-center p-2"
+        >
+          <span class="w-16 truncate text-xs font-medium text-foreground-muted"
+            >Total</span
+          ><span
+            class="w-16 truncate text-sm font-bold text-foreground-default"
+            >{{ getChartPieState(data, innerRadius).total }}</span
+          >
+        </div>
       </template>
-    </svg>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
-
-import { cn } from "./utils";
+import { cn, cva, getChartPieState, bindControllerProps } from "./utils";
 
 export interface ChartPoint {
   label: string;
   value: number;
 }
-export interface PieSlice {
-  key: string;
-  label: string;
-  value: number;
-  dashArray: string;
-  dashOffset: string;
-  colorClass: string;
-}
 export interface ChartPieProps {
   data?: ChartPoint[];
   innerRadius?: number;
+  showTooltip?: boolean;
   ariaLabel?: string;
   className?: string;
 }
 
 const props = withDefaults(defineProps<ChartPieProps>(), {
-  innerRadius: 0,
-  data: [],
   className: "",
   ariaLabel: "Pie chart",
-});
-
-const ringRadius = computed(() => {
-  const inner = props.innerRadius;
-  if (inner > 0 && inner < 50) {
-    return (50 + inner) / 2;
-  }
-  return 25;
-});
-const ringWidth = computed(() => {
-  const inner = props.innerRadius;
-  if (inner > 0 && inner < 50) {
-    return 50 - inner;
-  }
-  return 50;
-});
-const slices = computed(() => {
-  const rows: ChartPoint[] = props.data || [];
-  const inner = props.innerRadius;
-  let radius = 25;
-  if (inner > 0 && inner < 50) {
-    radius = (50 + inner) / 2;
-  }
-  const circumference = 2 * Math.PI * radius;
-  let total = 0;
-  for (let i = 0; i < rows.length; i++) {
-    total = total + rows[i].value;
-  }
-  const output: PieSlice[] = [];
-  let running = 0;
-  for (let i = 0; i < rows.length; i++) {
-    const fraction = total > 0 ? rows[i].value / total : 0;
-    const length = fraction * circumference;
-    let colorClass = "stroke-chart-series-1";
-    const mod = i % 5;
-    if (mod === 1) {
-      colorClass = "stroke-chart-series-2";
-    } else if (mod === 2) {
-      colorClass = "stroke-chart-series-3";
-    } else if (mod === 3) {
-      colorClass = "stroke-chart-series-4";
-    } else if (mod === 4) {
-      colorClass = "stroke-chart-series-5";
-    }
-    output.push({
-      key: "slice-" + i,
-      label: rows[i].label,
-      value: rows[i].value,
-      dashArray: length + " " + (circumference - length),
-      dashOffset: String(-running * circumference),
-      colorClass: colorClass,
-    });
-    running = running + fraction;
-  }
-  return output;
+  data: () => [],
+  innerRadius: 0,
+  showTooltip: true,
 });
 </script>

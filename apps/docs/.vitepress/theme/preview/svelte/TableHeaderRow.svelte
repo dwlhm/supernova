@@ -12,45 +12,33 @@
     allSelected?: boolean;
     checkboxAriaLabel?: string;
     className?: string;
+
     onSelectAll?: (checked: boolean) => void;
   }
 </script>
 
 <script lang="ts">
-  import { cn } from "./utils";
+  interface $$Slots {
+    default: Record<string, never>;
+  }
+  import { cn, cva, bindControllerProps } from "./utils";
   import TableNoHeaderCell from "./TableNoHeaderCell.svelte";
   import TableCheckboxHeaderCell from "./TableCheckboxHeaderCell.svelte";
 
-  export let onSelectAll: TableHeaderRowProps["onSelectAll"];
   export let className: TableHeaderRowProps["className"] = "";
   export let showNo: TableHeaderRowProps["showNo"] = false;
   export let showCheckbox: TableHeaderRowProps["showCheckbox"] = false;
   export let allSelected: TableHeaderRowProps["allSelected"] = false;
   export let checkboxAriaLabel: TableHeaderRowProps["checkboxAriaLabel"] =
     "Select all rows";
-  export let columns: TableHeaderRowProps["columns"] = [];
+  export let onSelectAll: TableHeaderRowProps["onSelectAll"];
 
-  function alignmentClasses(align: string) {
-    if (align === "center") {
-      return "text-center";
-    }
-    if (align === "right") {
-      return "text-right";
-    }
-    return "text-left";
-  }
-  function handleSelectAll(checked: boolean) {
-    if (onSelectAll) {
-      onSelectAll(checked);
-    }
-  }
+  export let columns: TableHeaderRowProps["columns"] = [];
 </script>
 
 <tr
-  class={cn(
-    "border-b border-components-table-default-color-divider-border-default",
-    className
-  )}
+  data-ctrl={typeof bindControllerProps}
+  class={cn("border-b border-border-default bg-background-muted", className)}
 >
   {#if showNo}
     <TableNoHeaderCell />
@@ -59,16 +47,29 @@
     <TableCheckboxHeaderCell
       checked={allSelected}
       ariaLabel={checkboxAriaLabel}
-      onCheckedChange={(checked) => handleSelectAll(checked)}
+      onCheckedChange={(checked) => onSelectAll && onSelectAll(checked)}
     />
   {/if}
-  {#each columns as column (column.id)}
-    <th
-      scope="col"
-      class={cn(
-        "whitespace-nowrap bg-components-table-default-color-header-background-default px-4 py-3 text-xs font-semibold uppercase tracking-wide text-components-table-default-color-header-foreground-default",
-        alignmentClasses(column.align)
-      )}>{column.label}</th
-    >
-  {/each}
-</tr>
+  {#if $$slots.default}
+    <slot />
+  {/if}
+  {#if !$$slots.default}
+    {#each columns as column (column.id)}
+      <th
+        scope="col"
+        class={cn(
+          "whitespace-nowrap bg-background-muted px-4 py-3 text-sm font-medium text-foreground-default",
+          cva(
+            column.align,
+            {
+              left: "text-left",
+              center: "text-center",
+              right: "text-right",
+            },
+            "left"
+          )
+        )}>{column.label}</th
+      >
+    {/each}
+  {/if}</tr
+>

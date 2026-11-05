@@ -18,66 +18,9 @@ Avoid wrapping header labels when a shorter label is available.
 Properties
 Show Column 1–10 — Shows or hides each header column. Columns 1–5 are visible by default; columns 6–10 are optional.
 
-## Live Preview
+## Live Preview & Usage
 
 <FrameworkPreview name="TableHeaderRow" />
-
-## Usage
-
-::: code-group
-
-```tsx [React]
-import { TableHeaderRow } from './TableHeaderRow';
-
-export default function Example() {
-  return (
-    <TableHeaderRow>
-      TableHeaderRow
-    </TableHeaderRow>
-  );
-}
-```
-
-```vue [Vue 3]
-<script setup lang="ts">
-import { TableHeaderRow } from './TableHeaderRow';
-</script>
-
-<template>
-  <TableHeaderRow>
-    TableHeaderRow
-  </TableHeaderRow>
-</template>
-```
-
-```svelte [Svelte]
-<script lang="ts">
-  import TableHeaderRow from './TableHeaderRow.svelte';
-</script>
-
-<TableHeaderRow>
-  TableHeaderRow
-</TableHeaderRow>
-```
-
-```ts [Angular]
-import { Component } from '@angular/core';
-import { TableHeaderRowComponent } from './table-header-row.component';
-
-@Component({
-  selector: 'app-root',
-  standalone: true,
-  imports: [TableHeaderRowComponent],
-  template: `
-    <app-table-header-row>
-      TableHeaderRow
-    </app-table-header-row>
-  `,
-})
-export class AppComponent {}
-```
-
-:::
 
 ## Props & Variants
 

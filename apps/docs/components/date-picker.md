@@ -21,66 +21,9 @@ Type: Date of Birth Picker, Picker with Input, Date and Time Picker, Natural Lan
 State: Closed hides the selection surface; Open displays or activates it.
 Hint Text: Shows or hides supporting guidance beneath the field.
 
-## Live Preview
+## Live Preview & Usage
 
 <FrameworkPreview name="DatePicker" />
-
-## Usage
-
-::: code-group
-
-```tsx [React]
-import { DatePicker } from './DatePicker';
-
-export default function Example() {
-  return (
-    <DatePicker hint Text={false} state="Closed">
-      DatePicker
-    </DatePicker>
-  );
-}
-```
-
-```vue [Vue 3]
-<script setup lang="ts">
-import { DatePicker } from './DatePicker';
-</script>
-
-<template>
-  <DatePicker hint Text={false} state="Closed">
-    DatePicker
-  </DatePicker>
-</template>
-```
-
-```svelte [Svelte]
-<script lang="ts">
-  import DatePicker from './DatePicker.svelte';
-</script>
-
-<DatePicker hint Text={false} state="Closed">
-  DatePicker
-</DatePicker>
-```
-
-```ts [Angular]
-import { Component } from '@angular/core';
-import { DatePickerComponent } from './date-picker.component';
-
-@Component({
-  selector: 'app-root',
-  standalone: true,
-  imports: [DatePickerComponent],
-  template: `
-    <app-date-picker hint Text={false} state="Closed">
-      DatePicker
-    </app-date-picker>
-  `,
-})
-export class AppComponent {}
-```
-
-:::
 
 ## Props & Variants
 

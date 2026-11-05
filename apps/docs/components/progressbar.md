@@ -27,66 +27,9 @@ Component properties: No exposed component properties are currently configured.
 Variants
 No predefined variants are currently configured for this component.
 
-## Live Preview
+## Live Preview & Usage
 
 <FrameworkPreview name="Progressbar" />
-
-## Usage
-
-::: code-group
-
-```tsx [React]
-import { Progressbar } from './Progressbar';
-
-export default function Example() {
-  return (
-    <Progressbar>
-      Progressbar
-    </Progressbar>
-  );
-}
-```
-
-```vue [Vue 3]
-<script setup lang="ts">
-import { Progressbar } from './Progressbar';
-</script>
-
-<template>
-  <Progressbar>
-    Progressbar
-  </Progressbar>
-</template>
-```
-
-```svelte [Svelte]
-<script lang="ts">
-  import Progressbar from './Progressbar.svelte';
-</script>
-
-<Progressbar>
-  Progressbar
-</Progressbar>
-```
-
-```ts [Angular]
-import { Component } from '@angular/core';
-import { ProgressbarComponent } from './progressbar.component';
-
-@Component({
-  selector: 'app-root',
-  standalone: true,
-  imports: [ProgressbarComponent],
-  template: `
-    <app-progressbar>
-      Progressbar
-    </app-progressbar>
-  `,
-})
-export class AppComponent {}
-```
-
-:::
 
 ## Props & Variants
 

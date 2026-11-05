@@ -26,66 +26,9 @@ PROPERTIES
 • Show hint — Toggles supporting or error text.
 • Show left icon / Show right icon — Toggles leading and trailing icons.
 
-## Live Preview
+## Live Preview & Usage
 
 <FrameworkPreview name="InputText" />
-
-## Usage
-
-::: code-group
-
-```tsx [React]
-import { InputText } from './InputText';
-
-export default function Example() {
-  return (
-    <InputText character Count="0 / 200" hint/Error text="Choose a unique username for your account.">
-      InputText
-    </InputText>
-  );
-}
-```
-
-```vue [Vue 3]
-<script setup lang="ts">
-import { InputText } from './InputText';
-</script>
-
-<template>
-  <InputText character Count="0 / 200" hint/Error text="Choose a unique username for your account.">
-    InputText
-  </InputText>
-</template>
-```
-
-```svelte [Svelte]
-<script lang="ts">
-  import InputText from './InputText.svelte';
-</script>
-
-<InputText character Count="0 / 200" hint/Error text="Choose a unique username for your account.">
-  InputText
-</InputText>
-```
-
-```ts [Angular]
-import { Component } from '@angular/core';
-import { InputTextComponent } from './input-text.component';
-
-@Component({
-  selector: 'app-root',
-  standalone: true,
-  imports: [InputTextComponent],
-  template: `
-    <app-input-text character Count="0 / 200" hint/Error text="Choose a unique username for your account.">
-      InputText
-    </app-input-text>
-  `,
-})
-export class AppComponent {}
-```
-
-:::
 
 ## Props & Variants
 

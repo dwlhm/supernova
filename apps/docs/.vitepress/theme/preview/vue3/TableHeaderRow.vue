@@ -1,11 +1,7 @@
 <template>
   <tr
-    :class="
-      cn(
-        'border-b border-components-table-default-color-divider-border-default',
-        className
-      )
-    "
+    :data-ctrl="typeof bindControllerProps"
+    :class="cn('border-b border-border-default bg-background-muted', className)"
   >
     <template v-if="showNo">
       <TableNoHeaderCell></TableNoHeaderCell>
@@ -15,28 +11,42 @@
       <TableCheckboxHeaderCell
         :checked="allSelected"
         :ariaLabel="checkboxAriaLabel"
-        :onCheckedChange="(checked) => handleSelectAll(checked)"
+        :onCheckedChange="(checked) => onSelectAll && onSelectAll(checked)"
       ></TableCheckboxHeaderCell>
     </template>
 
-    <template :key="column.id" v-for="(column, index) in columns">
-      <th
-        scope="col"
-        :class="
-          cn(
-            'whitespace-nowrap bg-components-table-default-color-header-background-default px-4 py-3 text-xs font-semibold uppercase tracking-wide text-components-table-default-color-header-foreground-default',
-            alignmentClasses(column.align)
-          )
-        "
-      >
-        {{ column.label }}
-      </th>
+    <template v-if="$slots.default">
+      <slot />
+    </template>
+
+    <template v-if="!$slots.default">
+      <template :key="column.id" v-for="(column, index) in columns">
+        <th
+          scope="col"
+          :class="
+            cn(
+              'whitespace-nowrap bg-background-muted px-4 py-3 text-sm font-medium text-foreground-default',
+              cva(
+                column.align,
+                {
+                  left: 'text-left',
+                  center: 'text-center',
+                  right: 'text-right',
+                },
+                'left'
+              )
+            )
+          "
+        >
+          {{ column.label }}
+        </th>
+      </template>
     </template>
   </tr>
 </template>
 
 <script setup lang="ts">
-import { cn } from "./utils";
+import { cn, cva, bindControllerProps } from "./utils";
 import TableNoHeaderCell from "./TableNoHeaderCell.vue";
 import TableCheckboxHeaderCell from "./TableCheckboxHeaderCell.vue";
 
@@ -52,31 +62,19 @@ export interface TableHeaderRowProps {
   allSelected?: boolean;
   checkboxAriaLabel?: string;
   className?: string;
+
   onSelectAll?: (checked: boolean) => void;
 }
 
 const props = withDefaults(defineProps<TableHeaderRowProps>(), {
-  onSelectAll: undefined,
   className: "",
   showNo: false,
   showCheckbox: false,
   allSelected: false,
   checkboxAriaLabel: "Select all rows",
-  columns: [],
-});
+  onSelectAll: undefined,
 
-function alignmentClasses(align: string) {
-  if (align === "center") {
-    return "text-center";
-  }
-  if (align === "right") {
-    return "text-right";
-  }
-  return "text-left";
-}
-function handleSelectAll(checked: boolean) {
-  if (props.onSelectAll) {
-    props.onSelectAll(checked);
-  }
-}
+  columns: () => [],
+});
+defineSlots<{ default?: () => any }>();
 </script>

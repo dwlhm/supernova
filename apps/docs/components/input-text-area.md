@@ -26,66 +26,9 @@ PROPERTIES
 • Show hint — Toggles supporting or error text.
 • Show left icon / Show right icon — Toggles leading and trailing icons.
 
-## Live Preview
+## Live Preview & Usage
 
 <FrameworkPreview name="InputTextArea" />
-
-## Usage
-
-::: code-group
-
-```tsx [React]
-import { InputTextArea } from './InputTextArea';
-
-export default function Example() {
-  return (
-    <InputTextArea character Count="0 / 200" hint/Error text="Your message will be copied to the support team.">
-      InputTextArea
-    </InputTextArea>
-  );
-}
-```
-
-```vue [Vue 3]
-<script setup lang="ts">
-import { InputTextArea } from './InputTextArea';
-</script>
-
-<template>
-  <InputTextArea character Count="0 / 200" hint/Error text="Your message will be copied to the support team.">
-    InputTextArea
-  </InputTextArea>
-</template>
-```
-
-```svelte [Svelte]
-<script lang="ts">
-  import InputTextArea from './InputTextArea.svelte';
-</script>
-
-<InputTextArea character Count="0 / 200" hint/Error text="Your message will be copied to the support team.">
-  InputTextArea
-</InputTextArea>
-```
-
-```ts [Angular]
-import { Component } from '@angular/core';
-import { InputTextAreaComponent } from './input-text-area.component';
-
-@Component({
-  selector: 'app-root',
-  standalone: true,
-  imports: [InputTextAreaComponent],
-  template: `
-    <app-input-text-area character Count="0 / 200" hint/Error text="Your message will be copied to the support team.">
-      InputTextArea
-    </app-input-text-area>
-  `,
-})
-export class AppComponent {}
-```
-
-:::
 
 ## Props & Variants
 

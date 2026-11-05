@@ -1,10 +1,11 @@
 <template>
   <aside
+    :data-ctrl="typeof bindControllerProps"
     :aria-label="brand"
     :class="
       cn(
-        'flex h-full shrink-0 flex-col justify-between border-r border-components-sidebar-expanded-rebind-color-container-border-default bg-components-sidebar-expanded-rebind-color-container-background-default pb-2',
-        widthClasses,
+        'flex h-full shrink-0 flex-col justify-between border-r border-border-default bg-background-default pb-2',
+        expanded ? 'w-60' : 'w-16',
         className
       )
     "
@@ -19,43 +20,42 @@
         "
       >
         <span
-          class="flex h-8 w-8 shrink-0 items-center justify-center rounded-rounded-md bg-components-sidebar-expanded-rebind-color-container-background-default-2 text-sm font-semibold text-components-sidebar-expanded-rebind-color-label-foreground-default-2"
+          class="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-primary-default text-sm font-semibold text-primary-foreground"
           aria-hidden="true"
           >{{ brandInitials }}</span
         >
         <template v-if="expanded">
           <span
-            class="truncate text-sm font-semibold text-components-sidebar-expanded-rebind-color-label-foreground-default"
+            class="truncate text-sm font-semibold text-foreground-default"
             >{{ brand }}</span
           >
         </template>
       </div>
       <nav aria-label="Main" class="flex flex-col gap-2 px-2"><slot /></nav>
     </div>
-    <template v-if="hasAccount">
+    <template v-if="accountLabel !== '' || accountMeta !== ''">
       <div :class="cn('px-2', expanded ? '' : 'flex justify-center')">
         <div
           :class="
             cn(
-              'flex items-center gap-2 rounded-rounded-xl bg-background-subtle px-2 py-2',
+              'flex items-center gap-2 rounded-xl bg-background-muted px-2 py-2',
               expanded ? '' : 'justify-center'
             )
           "
         >
           <span
-            class="flex h-8 w-8 shrink-0 items-center justify-center rounded-rounded-full bg-background-muted text-xs font-medium text-components-sidebar-expanded-rebind-color-section-label-foreground-default"
+            class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-background-subtle text-xs font-medium text-foreground-muted"
             aria-hidden="true"
             >{{ accountInitials }}</span
           >
           <template v-if="expanded">
             <span class="flex min-w-0 flex-col"
               ><span
-                class="truncate text-sm font-medium text-components-sidebar-expanded-rebind-color-label-foreground-default"
+                class="truncate text-sm font-medium text-foreground-default"
                 >{{ accountLabel }}</span
-              ><span
-                class="truncate text-xs text-components-sidebar-expanded-rebind-color-section-label-foreground-default"
-                >{{ accountMeta }}</span
-              ></span
+              ><span class="truncate text-xs text-foreground-muted">{{
+                accountMeta
+              }}</span></span
             >
           </template>
         </div>
@@ -65,9 +65,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
-
-import { cn } from "./utils";
+import { cn, bindControllerProps } from "./utils";
 
 export interface SidebarProps {
   expanded?: boolean;
@@ -77,24 +75,17 @@ export interface SidebarProps {
   accountInitials?: string;
   brandInitials?: string;
   className?: string;
-  children?: any;
 }
 
 const props = withDefaults(defineProps<SidebarProps>(), {
-  expanded: true,
-  accountLabel: "Account",
-  accountMeta: "account@example.com",
   brand: "Komerce",
+  expanded: false,
   className: "",
   brandInitials: "K",
-  children: undefined,
-  accountInitials: "AB",
-});
 
-const widthClasses = computed(() => {
-  return props.expanded ? "w-60" : "w-16";
+  accountLabel: "Lionel Messi",
+  accountMeta: "messi@gmail.com",
+  accountInitials: "LM",
 });
-const hasAccount = computed(() => {
-  return props.accountLabel !== "" || props.accountMeta !== "";
-});
+defineSlots<{ default?: () => any }>();
 </script>

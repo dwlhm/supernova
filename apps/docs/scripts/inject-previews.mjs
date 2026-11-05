@@ -9,7 +9,7 @@ const generatedComponentsDir = path.resolve(__dirname, '../../../generated/compo
 
 function toPascal(fileName) {
   const base = path.basename(fileName, '.md');
-  if (base === 'tabler-truck-delivery') return 'IconTruckDelivery';
+  if (base === 'icon-truck-delivery' || base === 'tabler-truck-delivery') return 'IconTruckDelivery';
   if (base.toLowerCase() === 'fab') return 'FAB';
   return base
     .split('-')
@@ -31,30 +31,31 @@ async function processDir(dir) {
       let content = await fs.readFile(fullPath, 'utf8');
 
       const compName = toPascal(file);
-      const previewBlock = `## Live Preview\n\n<FrameworkPreview name="${compName}" />\n\n`;
+      const previewBlock = `## Live Preview & Usage\n\n<FrameworkPreview name="${compName}" />\n\n`;
 
-      if (content.includes('<FrameworkPreview')) {
-        // Already injected, skip or ensure name is correct
-        continue;
-      }
+      content = content
+        .replace(/^## (?:Live|Interactive) Preview(?: & Usage)?\s*\n+(?=<(?:Framework|Component)Preview)/gm, '## Live Preview & Usage\n\n')
+        .replace(/\n## Usage\n+::: code-group[\s\S]*?:::\n*/g, '\n');
 
-      if (content.includes('## Usage')) {
-        content = content.replace('## Usage', `${previewBlock}## Usage`);
-      } else {
-        // Fallback: append after first paragraph
-        const lines = content.split('\n');
-        let insertIdx = 2;
-        while (insertIdx < lines.length && lines[insertIdx].trim() !== '') {
-          insertIdx++;
+      if (!content.includes('<FrameworkPreview') && !content.includes('<ComponentPreview')) {
+        if (content.includes('## Props & Variants')) {
+          content = content.replace('## Props & Variants', `${previewBlock}## Props & Variants`);
+        } else {
+          const lines = content.split('\n');
+          let insertIdx = 2;
+          while (insertIdx < lines.length && lines[insertIdx].trim() !== '') {
+            insertIdx++;
+          }
+          lines.splice(insertIdx + 1, 0, `\n${previewBlock}`);
+          content = lines.join('\n');
         }
-        lines.splice(insertIdx + 1, 0, `\n${previewBlock}`);
-        content = lines.join('\n');
       }
 
       await fs.writeFile(fullPath, content, 'utf8');
       console.log(`[inject-previews] Injected preview for ${compName} in ${file}`);
     }
   } catch (err) {
+    if (err && err.code === 'ENOENT') return;
     console.error(`[inject-previews] Error processing ${dir}:`, err);
   }
 }

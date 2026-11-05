@@ -1,32 +1,33 @@
 <template>
-  <div :class="cn('flex w-full flex-col gap-3', className)">
+  <div
+    :data-ctrl="typeof bindControllerProps"
+    :class="cn('flex w-full flex-col gap-3', className)"
+  >
     <template v-if="showLabel && label !== ''">
-      <span
-        class="flex items-center gap-1 text-sm font-medium text-components-input-image-uploader-color-label-foreground-default"
+      <label
+        class="flex items-center gap-1 text-sm font-medium text-foreground-default"
+        :for="id"
         >{{ label }}
         <template v-if="required">
-          <span
-            aria-hidden="true"
-            class="text-components-input-image-uploader-color-required-indicator-foreground-default"
-          >
-            *
-          </span>
+          <span aria-hidden="true" class="text-destructive-default">*</span>
         </template>
-      </span>
+      </label>
     </template>
 
     <div
       :class="
         cn(
-          'flex items-center gap-4 rounded-rounded-lg border bg-components-input-image-uploader-color-container-background-default p-3 transition-colors',
-          containerClasses,
-          disabled && 'opacity-50'
+          'flex items-center gap-4 rounded-lg border bg-background-default p-3 shadow-xs transition-colors',
+          getFileState(props).hasError
+            ? 'border-destructive-border focus-within:ring-2 focus-within:ring-focus-ring-error'
+            : 'border-border-default focus-within:border-primary-border-emphasis focus-within:ring-2 focus-within:ring-focus-ring-primary',
+          disabled && 'cursor-not-allowed opacity-50'
         )
       "
     >
       <span
-        class="flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-rounded-lg bg-components-input-image-uploader-color-preview-background-default"
         aria-hidden="true"
+        class="flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-background-muted"
       >
         <template v-if="imageSrc !== ''">
           <img alt="" class="h-full w-full object-cover" :src="imageSrc" />
@@ -34,36 +35,30 @@
 
         <template v-if="imageSrc === ''">
           <svg
-            class="h-8 w-8 text-components-input-image-uploader-color-icon-fill-default"
+            class="h-8 w-8 text-foreground-subtle"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
             stroke-width="1.5"
           >
-            <rect x="3" y="3" width="18" height="18" rx="2"></rect>
             <path
-              d="m21 15-5-5L5 21"
               stroke-linecap="round"
               stroke-linejoin="round"
+              :d="ICON_PATHS.image"
             ></path>
-            <circle cx="8.5" cy="8.5" r="1.5"></circle>
           </svg>
         </template> </span
       ><span class="flex min-w-0 flex-1 flex-col gap-2"
-        ><span
-          class="truncate text-sm font-medium text-components-input-image-uploader-color-primary-text-foreground-default"
-        >
-          <template v-if="hasFile">
+        ><span class="truncate text-sm font-medium text-foreground-default">
+          <template v-if="getFileState(props).hasFile">
             {{ fileName }}
           </template>
 
           <template v-else>
             {{ primaryText }}
           </template> </span
-        ><span
-          class="truncate text-xs text-components-input-image-uploader-color-supporting-text-foreground-default"
-        >
-          <template v-if="hasFile && fileMetadata !== ''">
+        ><span class="truncate text-sm text-foreground-muted">
+          <template v-if="getFileState(props).hasFile && fileMetadata !== ''">
             {{ fileMetadata }}
           </template>
 
@@ -72,33 +67,49 @@
           </template> </span
         ><span class="flex items-center gap-2"
           ><label
-            class="inline-flex cursor-pointer items-center rounded-rounded-sm border border-components-input-image-uploader-color-container-border-default bg-components-input-image-uploader-color-container-background-default px-3 py-1 text-xs font-medium text-components-input-image-uploader-color-primary-text-foreground-default focus-within:ring-2 focus-within:ring-focus-ring-primary"
+            :for="id"
+            :class="
+              cn(
+                'inline-flex items-center rounded-lg bg-secondary-default px-2 py-0.5 text-sm font-medium text-secondary-foreground hover:bg-secondary-hover focus-within:ring-2 focus-within:ring-focus-ring-primary',
+                disabled
+                  ? 'pointer-events-none cursor-not-allowed'
+                  : 'cursor-pointer'
+              )
+            "
           >
-            <template v-if="hasFile"> Replace </template>
+            <template v-if="getFileState(props).hasFile"> Replace </template>
 
-            <template v-else> Browse </template>
+            <template v-else> Choose image </template>
             <input
               type="file"
               class="sr-only"
               :id="id"
+              :name="name"
               :accept="accept"
               :disabled="disabled"
               :required="required"
-              :aria-invalid="hasError"
+              :aria-invalid="getFileState(props).hasError"
               @change="
                 async (event) =>
-                  setName(
-                    event.target.files && event.target.files.length > 0
-                      ? event.target.files[0].name
-                      : ''
+                  !disabled &&
+                  handleFileSelectEvent(
+                    event,
+                    onFileNameChange,
+                    onFilesChange,
+                    onPreviewChange
                   )
               "
           /></label>
-          <template v-if="hasFile">
+          <template v-if="getFileState(props).hasFile">
             <button
               type="button"
-              class="inline-flex items-center rounded-rounded-sm px-2 py-1 text-xs font-medium text-components-input-image-uploader-color-primary-text-foreground-default hover:bg-background-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring-primary"
-              @click="async (event) => clear()"
+              class="inline-flex items-center rounded-lg px-2 py-0.5 text-sm font-medium text-foreground-default hover:bg-background-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring-primary"
+              :disabled="disabled"
+              @click="
+                async (event) =>
+                  !disabled &&
+                  clearFileInputEvent(event, onFileNameChange, onFilesChange)
+              "
             >
               Remove
             </button>
@@ -107,20 +118,35 @@
       >
     </div>
     <template v-if="showHint">
-      <span :class="cn('text-xs', supportingClasses)">{{
-        supportingText
-      }}</span>
+      <span
+        :id="id + '-hint'"
+        :class="
+          cn(
+            'text-sm',
+            getFileState(props).hasError
+              ? 'text-destructive-foreground'
+              : 'text-foreground-muted'
+          )
+        "
+        >{{ getFileState(props).helpText }}</span
+      >
     </template>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
-
-import { cn } from "./utils";
+import {
+  cn,
+  getFileState,
+  handleFileSelectEvent,
+  clearFileInputEvent,
+  ICON_PATHS,
+  bindControllerProps,
+} from "./utils";
 
 export interface InputImageUploaderProps {
   id?: string;
+  name?: string;
   label?: string;
   primaryText?: string;
   supportingText?: string;
@@ -136,54 +162,29 @@ export interface InputImageUploaderProps {
   showHint?: boolean;
   className?: string;
   onFileNameChange?: (fileName: string) => void;
+  onFilesChange?: (files: unknown[]) => void;
+  onPreviewChange?: (url: string) => void;
 }
 
 const props = withDefaults(defineProps<InputImageUploaderProps>(), {
-  errorMessage: "",
-  fileName: "",
-  hint: "For best results, use a 1:1 image.",
-  onFileNameChange: undefined,
   className: "",
   showLabel: true,
   label: "Profile image",
+  id: "image-uploader",
   required: true,
   disabled: false,
   imageSrc: "",
   primaryText: "Upload an image",
+  fileName: "",
   fileMetadata: "",
   supportingText: "Square JPG or PNG, up to 5 MB",
-  id: "image-uploader",
+  name: "image-file",
   accept: "image/png,image/jpeg",
+  onFileNameChange: undefined,
+  onFilesChange: undefined,
+  onPreviewChange: undefined,
   showHint: true,
+  hint: 'For best results, use a 1:1 image.',
+  errorMessage: '',
 });
-
-const hasError = computed(() => {
-  return props.errorMessage !== "";
-});
-const hasFile = computed(() => {
-  return props.fileName !== "";
-});
-const containerClasses = computed(() => {
-  if (hasError) {
-    return "border-components-input-image-uploader-color-container-border-error";
-  }
-  return "border-components-input-image-uploader-color-container-border-default focus-within:border-components-input-image-uploader-color-container-border-focus";
-});
-const supportingText = computed(() => {
-  return hasError ? props.errorMessage : props.hint;
-});
-const supportingClasses = computed(() => {
-  return hasError
-    ? "text-components-input-image-uploader-color-helper-text-foreground-error"
-    : "text-components-input-image-uploader-color-helper-text-foreground-default";
-});
-
-function setName(fileName: string) {
-  if (props.onFileNameChange) {
-    props.onFileNameChange(fileName);
-  }
-}
-function clear() {
-  setName("");
-}
 </script>

@@ -2,6 +2,7 @@
 import * as React from "react";
 
 export interface FABProps {
+  type?: "button" | "submit" | "reset";
   variant?: "primary" | "secondary" | "outline";
   size?: "small" | "regular" | "large" | "extended";
   disabled?: boolean;
@@ -9,16 +10,17 @@ export interface FABProps {
   showLabel?: boolean;
   ariaLabel?: string;
   className?: string;
-  children?: any;
+  children?: React.ReactNode;
   onClick?: () => void;
 }
 
-import { cn } from "./utils";
+import { cn, cva, ICON_PATHS } from "./utils";
 
 function FAB(props: FABProps) {
   props = {
+    type: "button",
     variant: "primary",
-    size: "regular",
+    size: "small",
     disabled: false,
     label: "Label",
     showLabel: true,
@@ -26,67 +28,38 @@ function FAB(props: FABProps) {
     className: "",
     ...props,
   };
-  function variantClasses() {
-    switch (props.variant) {
-      case "secondary":
-        return "bg-components-fab-secondary-color-container-background-default text-components-fab-secondary-color-label-foreground-default hover:bg-components-fab-secondary-color-container-background-hover";
-      case "outline":
-        return "bg-components-fab-surface-color-container-background-default text-components-fab-surface-color-label-foreground-default border border-border-default hover:bg-components-fab-surface-color-container-background-hover";
-      case "primary":
-      default:
-        return "bg-components-fab-primary-color-container-background-default text-components-fab-primary-color-label-foreground-default hover:bg-components-fab-primary-color-container-background-hover";
-    }
-  }
-
-  function sizeClasses() {
-    switch (props.size) {
-      case "small":
-        return "h-10 w-10";
-      case "large":
-        return "h-24 w-24";
-      case "extended":
-        return "h-14 w-auto gap-3 px-4";
-      case "regular":
-      default:
-        return "h-14 w-14";
-    }
-  }
-
-  function iconClasses() {
-    switch (props.size) {
-      case "small":
-        return "h-4 w-4";
-      case "large":
-        return "h-7 w-7";
-      case "regular":
-      case "extended":
-      default:
-        return "h-5 w-5";
-    }
-  }
-
-  function accessibleName() {
-    return props.ariaLabel !== "" ? props.ariaLabel : props.label;
-  }
-
-  function handleClick() {
-    if (!props.disabled && props.onClick) {
-      props.onClick();
-    }
-  }
-
   return (
     <button
-      type="button"
-      aria-label={accessibleName()}
+      type={props.type || "button"}
+      aria-label={props.ariaLabel || props.label || "Action"}
       disabled={props.disabled}
       className={cn(
-        "inline-flex shrink-0 items-center justify-center rounded-rounded-full shadow-lg transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring-primary disabled:pointer-events-none disabled:opacity-50",
-        variantClasses(),
-        sizeClasses(),
+        "inline-flex shrink-0 items-center justify-center rounded-full shadow-md transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring-primary disabled:pointer-events-none disabled:opacity-50",
+        cva(
+          props.variant,
+          {
+            primary:
+              "bg-primary-default text-primary-foreground hover:bg-primary-hover active:bg-primary-pressed",
+            secondary:
+              "bg-secondary-default text-secondary-foreground hover:bg-secondary-hover active:bg-background-interactive",
+            outline:
+              "border border-border-default bg-background-default text-foreground-default hover:bg-background-muted active:bg-background-interactive",
+          },
+          "primary"
+        ),
+        cva(
+          props.size,
+          {
+            small: "h-10 w-10",
+            regular: "h-14 w-14",
+            large: "h-24 w-24",
+            extended: "h-14 w-auto gap-3 px-4",
+          },
+          "small"
+        ),
         props.className
       )}
-      onClick={(event) => handleClick()}
+      onClick={(event) => !props.disabled && props.onClick && props.onClick()}
     >
       {props.children ? <>{props.children}</> : null}
       {!props.children ? (
@@ -95,10 +68,22 @@ function FAB(props: FABProps) {
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
-          stroke-width="1.5"
-          className={cn("shrink-0", iconClasses())}
+          strokeWidth="1.5"
+          className={cn(
+            "shrink-0",
+            cva(
+              props.size,
+              {
+                small: "h-4 w-4",
+                regular: "h-5 w-5",
+                large: "h-7 w-7",
+                extended: "h-5 w-5",
+              },
+              "small"
+            )
+          )}
         >
-          <path d="M12 5v14M5 12h14" stroke-linecap="round" />
+          <path strokeLinecap="round" d={ICON_PATHS.plus} />
         </svg>
       ) : null}
       {props.size === "extended" && props.showLabel ? (

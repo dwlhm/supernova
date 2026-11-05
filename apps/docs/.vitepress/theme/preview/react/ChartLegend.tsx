@@ -9,25 +9,24 @@ export interface ChartLegendProps {
   className?: string;
 }
 
-import { cn } from "./utils";
+import { cn, bindControllerProps } from "./utils";
 
 function ChartLegend(props: ChartLegendProps) {
   props = { items: [], className: "", ...props };
-  function dotClasses() {
-    return "h-2 w-2 shrink-0 rounded-rounded-full";
-  }
-
+  const [__ctrlState, __setCtrlState] = React.useState<Record<string, any>>({});
+  props = bindControllerProps(props, __ctrlState, __setCtrlState);
   return (
-    <ul className={cn("flex flex-wrap items-center gap-4", props.className)}>
+    <ul
+      data-ctrl={typeof bindControllerProps}
+      className={cn("flex flex-wrap items-center gap-4", props.className)}
+    >
       {props.items?.map((item) => (
         <li className="flex items-center gap-2" key={item.label}>
           <span
             aria-hidden="true"
-            className={cn(dotClasses(), item.colorClass)}
+            className={cn("h-2 w-2 shrink-0 rounded-full", item.colorClass)}
           />
-          <span className="text-xs text-components-chart-all-color-legend-label-text-default">
-            {item.label}
-          </span>
+          <span className="text-xs text-foreground-muted">{item.label}</span>
         </li>
       ))}
     </ul>

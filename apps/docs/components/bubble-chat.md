@@ -26,66 +26,9 @@ PROPERTIES
 • Show custom text: Shows or hides supplementary copy.
 • Editable text properties: Custom text, Text message, File name, File metadata, Image name, Image metadata, Video name, Video metadata, Incoming status text, Outgoing status text, Error status text, Incoming time text, Outgoing time text.
 
-## Live Preview
+## Live Preview & Usage
 
 <FrameworkPreview name="BubbleChat" />
-
-## Usage
-
-::: code-group
-
-```tsx [React]
-import { BubbleChat } from './BubbleChat';
-
-export default function Example() {
-  return (
-    <BubbleChat custom text="Additional information" direction="Incoming">
-      BubbleChat
-    </BubbleChat>
-  );
-}
-```
-
-```vue [Vue 3]
-<script setup lang="ts">
-import { BubbleChat } from './BubbleChat';
-</script>
-
-<template>
-  <BubbleChat custom text="Additional information" direction="Incoming">
-    BubbleChat
-  </BubbleChat>
-</template>
-```
-
-```svelte [Svelte]
-<script lang="ts">
-  import BubbleChat from './BubbleChat.svelte';
-</script>
-
-<BubbleChat custom text="Additional information" direction="Incoming">
-  BubbleChat
-</BubbleChat>
-```
-
-```ts [Angular]
-import { Component } from '@angular/core';
-import { BubbleChatComponent } from './bubble-chat.component';
-
-@Component({
-  selector: 'app-root',
-  standalone: true,
-  imports: [BubbleChatComponent],
-  template: `
-    <app-bubble-chat custom text="Additional information" direction="Incoming">
-      BubbleChat
-    </app-bubble-chat>
-  `,
-})
-export class AppComponent {}
-```
-
-:::
 
 ## Props & Variants
 

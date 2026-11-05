@@ -1,6 +1,7 @@
 <script context="module" lang="ts">
   export interface InputFileInputProps {
     id?: string;
+    name?: string;
     label?: string;
     buttonText?: string;
     fileName?: string;
@@ -13,114 +14,103 @@
     showHint?: boolean;
     className?: string;
     onFileNameChange?: (fileName: string) => void;
+    onFilesChange?: (files: unknown[]) => void;
   }
 </script>
 
 <script lang="ts">
-  import { cn } from "./utils";
+  import {
+    cn,
+    getFileState,
+    handleFileSelectEvent,
+    clearFileInputEvent,
+    ICON_PATHS,
+    bindControllerProps,
+  } from "./utils";
 
-  export let errorMessage: InputFileInputProps["errorMessage"] = "";
-  export let fileName: InputFileInputProps["fileName"] = "";
-  export let hint: InputFileInputProps["hint"] =
-    "Supported formats: PNG, JPG, or PDF.";
-  export let onFileNameChange: InputFileInputProps["onFileNameChange"];
   export let className: InputFileInputProps["className"] = "";
   export let showLabel: InputFileInputProps["showLabel"] = true;
   export let label: InputFileInputProps["label"] = "Picture";
+  export let id: InputFileInputProps["id"] = "input-file";
   export let required: InputFileInputProps["required"] = false;
   export let disabled: InputFileInputProps["disabled"] = false;
   export let buttonText: InputFileInputProps["buttonText"] = "Choose File";
-  export let id: InputFileInputProps["id"] = "input-file";
+  export let name: InputFileInputProps["name"] = "file";
   export let accept: InputFileInputProps["accept"] =
     "image/png,image/jpeg,application/pdf";
   export let showHint: InputFileInputProps["showHint"] = true;
-
-  function setName(fileName: string) {
-    if (onFileNameChange) {
-      onFileNameChange(fileName);
-    }
-  }
-  function clear() {
-    setName("");
-  }
-  $: hasError = () => {
-    return errorMessage !== "";
-  };
-  $: hasFile = () => {
-    return fileName !== "";
-  };
-  $: containerClasses = () => {
-    if (hasError()) {
-      return "border-components-input-file-input-color-container-border-error";
-    }
-    return "border-components-input-file-input-color-container-border-default focus-within:border-components-input-file-input-color-container-border-focus";
-  };
-  $: supportingText = () => {
-    return hasError() ? errorMessage : hint;
-  };
-  $: supportingClasses = () => {
-    return hasError()
-      ? "text-components-input-file-input-color-supporting-text-foreground-error"
-      : "text-components-input-file-input-color-supporting-text-foreground-default";
-  };
-  $: displayName = () => {
-    return hasFile() ? fileName : "No file chosen";
-  };
+  export let onFileNameChange: InputFileInputProps["onFileNameChange"];
+  export let onFilesChange: InputFileInputProps["onFilesChange"];
+  export let fileName: InputFileInputProps["fileName"] = '';
+  export let hint: InputFileInputProps["hint"] = 'Supported formats: PNG, JPG, or PDF.';
+  export let errorMessage: InputFileInputProps["errorMessage"] = '';
+  $: props = { className, showLabel, label, id, required, disabled, buttonText, name, accept, showHint, onFileNameChange, onFilesChange, fileName, hint, errorMessage };
 </script>
 
-<div class={cn("flex w-full flex-col gap-3", className)}>
+<div
+  data-ctrl={typeof bindControllerProps}
+  class={cn("flex w-full flex-col gap-3", className)}
+>
   {#if showLabel && label !== ""}
-    <span
-      class="flex items-center gap-1 text-sm font-medium text-components-input-file-input-color-label-foreground-default"
+    <label
+      class="flex items-center gap-1 text-sm font-medium text-foreground-default"
+      for={id}
       >{label}
       {#if required}
-        <span
-          aria-hidden="true"
-          class="text-components-input-file-input-color-required-indicator-foreground-default"
-        >
-          *
-        </span>
-      {/if}</span
+        <span aria-hidden="true" class="text-destructive-default">*</span>
+      {/if}</label
     >
-  {/if}<label
+  {/if}
+  <div
     class={cn(
-      "flex items-center gap-2.5 rounded-rounded-lg border bg-components-input-file-input-color-container-background-default px-3 py-1 transition-colors",
-      containerClasses(),
-      disabled ? "cursor-not-allowed opacity-50" : "cursor-pointer"
+      "flex items-center gap-3 rounded-lg border bg-background-default px-3 py-1 shadow-xs transition-colors",
+      getFileState(props).hasError
+        ? "border-destructive-border focus-within:ring-2 focus-within:ring-focus-ring-error"
+        : "border-border-default focus-within:border-primary-border-emphasis focus-within:ring-2 focus-within:ring-focus-ring-primary",
+      disabled && "cursor-not-allowed opacity-50"
     )}
-    ><span
-      class="inline-flex h-7 shrink-0 items-center rounded-rounded-sm bg-components-button-secondary-color-container-background-default px-3 text-xs font-medium text-components-input-file-input-color-button-label-foreground-default"
-      >{buttonText}</span
-    ><span
+  >
+    <label
+      for={id}
       class={cn(
-        "truncate py-1 text-sm",
-        hasFile()
-          ? "text-components-input-file-input-color-file-name-foreground-filled"
-          : "text-components-input-file-input-color-file-name-foreground-default"
-      )}>{displayName()}</span
-    ><input
-      type="file"
-      class="sr-only"
-      {id}
-      {accept}
-      {disabled}
-      {required}
-      aria-invalid={hasError()}
-      on:change={(event) => {
-        setName(
-          event.target.files && event.target.files.length > 0
-            ? event.target.files[0].name
-            : ""
-        );
-      }}
-    />
-    {#if hasFile()}
+        "flex min-w-0 flex-1 items-center gap-3",
+        disabled ? "cursor-not-allowed" : "cursor-pointer"
+      )}
+      ><span
+        class="inline-flex h-7 shrink-0 items-center rounded-sm bg-secondary-default px-3 text-sm font-medium text-secondary-foreground"
+        >{buttonText}</span
+      ><span
+        class={cn(
+          "truncate py-1 text-sm",
+          getFileState(props).hasFile
+            ? "text-foreground-default"
+            : "text-foreground-subtle"
+        )}>{getFileState(props).displayName}</span
+      ><input
+        type="file"
+        class="sr-only"
+        {id}
+        {name}
+        {accept}
+        {disabled}
+        {required}
+        aria-invalid={getFileState(props).hasError}
+        aria-describedby={showHint ? id + "-hint" : undefined}
+        on:change={(event) => {
+          !disabled &&
+            handleFileSelectEvent(event, onFileNameChange, onFilesChange);
+        }}
+      /></label
+    >
+    {#if getFileState(props).hasFile}
       <button
         type="button"
         aria-label="Remove file"
-        class="ml-auto inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-rounded-full text-components-input-file-input-color-file-name-foreground-filled hover:bg-background-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring-primary"
+        class="ml-auto inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-foreground-default hover:bg-background-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring-primary disabled:pointer-events-none"
+        {disabled}
         on:click={(event) => {
-          clear();
+          !disabled &&
+            clearFileInputEvent(event, onFileNameChange, onFilesChange);
         }}
         ><svg
           aria-hidden="true"
@@ -129,12 +119,20 @@
           fill="none"
           stroke="currentColor"
           stroke-width="2"
-          ><path d="M6 6l12 12M18 6 6 18" stroke-linecap="round" /></svg
+          ><path stroke-linecap="round" d={ICON_PATHS.close} /></svg
         ></button
       >
-    {/if}</label
-  >
+    {/if}
+  </div>
   {#if showHint}
-    <span class={cn("text-xs", supportingClasses())}>{supportingText()}</span>
+    <span
+      id={id + "-hint"}
+      class={cn(
+        "text-sm",
+        getFileState(props).hasError
+          ? "text-destructive-foreground"
+          : "text-foreground-muted"
+      )}>{getFileState(props).helpText}</span
+    >
   {/if}
 </div>

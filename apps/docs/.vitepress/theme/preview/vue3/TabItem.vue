@@ -2,20 +2,22 @@
   <button
     type="button"
     role="tab"
+    :data-ctrl="typeof bindControllerProps"
     :aria-selected="active"
+    :tabIndex="active ? 0 : -1"
     :class="
       cn(
-        'inline-flex h-8 shrink-0 items-center gap-1 whitespace-nowrap rounded-rounded-lg px-2 py-1 text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring-primary',
-        tabClasses,
+        'inline-flex h-7 shrink-0 items-center gap-1 whitespace-nowrap rounded-md px-2 py-1 text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring-primary',
+        active
+          ? 'bg-background-default text-foreground-default shadow-xs'
+          : 'text-foreground-muted hover:text-foreground-default',
         className
       )
     "
-    @click="async (event) => handleClick()"
+    @click="async (event) => onClick && onClick()"
   >
     <template v-if="showIcon">
-      <span
-        class="flex shrink-0 items-center text-components-tabs-all-color-icon-foreground-default"
-      >
+      <span class="flex shrink-0 items-center text-foreground-muted">
         <template v-if="$slots.default">
           <slot />
         </template>
@@ -29,7 +31,7 @@
             stroke="currentColor"
             stroke-width="1.5"
           >
-            <path d="M4 6h16M4 12h16M4 18h16" stroke-linecap="round"></path>
+            <path stroke-linecap="round" :d="ICON_PATHS.menu"></path>
           </svg>
         </template>
       </span>
@@ -38,7 +40,7 @@
     <span class="truncate">{{ label }}</span>
     <template v-if="showNum">
       <span
-        class="inline-flex shrink-0 items-center rounded-rounded-full bg-components-tabs-all-color-num-background-default px-1 py-0.5 text-xs font-medium leading-none text-components-tabs-all-color-num-foreground-default"
+        class="inline-flex shrink-0 items-center rounded-full bg-background-muted px-1 py-0.5 text-xs font-medium leading-none text-foreground-muted"
         >{{ num }}</span
       >
     </template>
@@ -46,9 +48,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
-
-import { cn } from "./utils";
+import { cn, ICON_PATHS, bindControllerProps } from "./utils";
 
 export interface TabItemProps {
   label?: string;
@@ -57,30 +57,19 @@ export interface TabItemProps {
   showNum?: boolean;
   num?: string;
   className?: string;
-  children?: any;
+
   onClick?: () => void;
 }
 
 const props = withDefaults(defineProps<TabItemProps>(), {
   active: false,
-  onClick: undefined,
   className: "",
+  onClick: undefined,
   showIcon: false,
-  children: undefined,
+
   label: "Label",
   showNum: false,
   num: "1",
 });
-
-const tabClasses = computed(() => {
-  return props.active
-    ? "bg-components-tabs-active-color-tab-background-default border border-components-tabs-active-color-tab-border-default shadow-sm text-components-tabs-active-color-label-foreground-default"
-    : "border border-transparent text-components-tabs-inactive-color-label-foreground-default hover:bg-background-default";
-});
-
-function handleClick() {
-  if (props.onClick) {
-    props.onClick();
-  }
-}
+defineSlots<{ default?: () => any }>();
 </script>

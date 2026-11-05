@@ -23,66 +23,9 @@ Show Affiliate, Show Komlabs, Show Raja Ongkir, Show Komads, Show Komcards, Show
 Show Edit, Show Delete, Show More — Controls visible actions in Action (Icon).
 Slot — Replaces the custom content in the Slot variant.
 
-## Live Preview
+## Live Preview & Usage
 
 <FrameworkPreview name="TableCellValue" />
-
-## Usage
-
-::: code-group
-
-```tsx [React]
-import { TableCellValue } from './TableCellValue';
-
-export default function Example() {
-  return (
-    <TableCellValue show Affiliate show Delete>
-      TableCellValue
-    </TableCellValue>
-  );
-}
-```
-
-```vue [Vue 3]
-<script setup lang="ts">
-import { TableCellValue } from './TableCellValue';
-</script>
-
-<template>
-  <TableCellValue show Affiliate show Delete>
-    TableCellValue
-  </TableCellValue>
-</template>
-```
-
-```svelte [Svelte]
-<script lang="ts">
-  import TableCellValue from './TableCellValue.svelte';
-</script>
-
-<TableCellValue show Affiliate show Delete>
-  TableCellValue
-</TableCellValue>
-```
-
-```ts [Angular]
-import { Component } from '@angular/core';
-import { TableCellValueComponent } from './table-cell-value.component';
-
-@Component({
-  selector: 'app-root',
-  standalone: true,
-  imports: [TableCellValueComponent],
-  template: `
-    <app-table-cell-value show Affiliate show Delete>
-      TableCellValue
-    </app-table-cell-value>
-  `,
-})
-export class AppComponent {}
-```
-
-:::
 
 ## Props & Variants
 

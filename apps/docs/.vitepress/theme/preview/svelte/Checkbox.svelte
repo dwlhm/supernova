@@ -1,7 +1,10 @@
 <script context="module" lang="ts">
   export interface CheckboxProps {
+    id?: string;
     checked?: boolean;
+    indeterminate?: boolean;
     disabled?: boolean;
+    required?: boolean;
     size?: "small" | "medium" | "large";
     label?: string;
     leftLabel?: boolean;
@@ -14,120 +17,113 @@
 </script>
 
 <script lang="ts">
-  import { cn } from "./utils";
+  import {
+    cn,
+    cva,
+    getChoiceState,
+    ICON_PATHS,
+    bindControllerProps,
+  } from "./utils";
 
   export let size: CheckboxProps["size"] = "medium";
-  export let label: CheckboxProps["label"] = "Label";
   export let disabled: CheckboxProps["disabled"] = false;
-  export let onCheckedChange: CheckboxProps["onCheckedChange"];
-  export let checked: CheckboxProps["checked"] = false;
   export let className: CheckboxProps["className"] = "";
-  export let leftLabel: CheckboxProps["leftLabel"] = false;
+  export let label: CheckboxProps["label"] = "Label";
+  export let id: CheckboxProps["id"] = "checkbox";
   export let name: CheckboxProps["name"] = "checkbox";
   export let value: CheckboxProps["value"] = "";
-  export let rightLabel: CheckboxProps["rightLabel"] = true;
-
-  function handleChange() {
-    if (disabled) {
-      return;
-    }
-    if (onCheckedChange) {
-      onCheckedChange(!checked);
-    }
-  }
-  $: boxClasses = () => {
-    switch (size) {
-      case "small":
-        return "h-4 w-4 rounded-rounded-sm";
-      case "large":
-        return "h-6 w-6 rounded-rounded-lg";
-      case "medium":
-      default:
-        return "h-5 w-5 rounded-rounded-md";
-    }
-  };
-  $: iconClasses = () => {
-    switch (size) {
-      case "small":
-        return "h-3 w-3";
-      case "large":
-        return "h-4 w-4";
-      case "medium":
-      default:
-        return "h-3.5 w-3.5";
-    }
-  };
-  $: gapClasses = () => {
-    switch (size) {
-      case "small":
-        return "gap-1.5";
-      case "large":
-        return "gap-2.5";
-      case "medium":
-      default:
-        return "gap-2";
-    }
-  };
-  $: hasLabel = () => {
-    return label !== "";
-  };
+  export let checked: CheckboxProps["checked"] = false;
+  export let required: CheckboxProps["required"] = false;
+  export let indeterminate: CheckboxProps["indeterminate"] = false;
+  export let onCheckedChange: CheckboxProps["onCheckedChange"];
+  export let leftLabel: CheckboxProps["leftLabel"] = false;
+  export let rightLabel: CheckboxProps["rightLabel"] = false;
+  $: props = { size, disabled, className, label, id, name, value, checked, required, indeterminate, onCheckedChange, leftLabel, rightLabel };
 </script>
 
 <label
+  data-ctrl={typeof bindControllerProps}
   class={cn(
     "inline-flex items-center",
-    gapClasses(),
+    cva(
+      size,
+      {
+        small: "gap-1.5",
+        medium: "gap-2",
+        large: "gap-2.5",
+      },
+      "medium"
+    ),
     disabled ? "cursor-not-allowed opacity-50" : "cursor-pointer",
     className
   )}
 >
-  {#if leftLabel && hasLabel()}
-    <span
-      class="text-sm text-components-checkbox-all-color-label-foreground-default"
-      >{label}</span
-    >
+  {#if getChoiceState(props).showLeft}
+    <span class="text-sm text-foreground-default">{label}</span>
   {/if}<span class="relative inline-flex shrink-0 items-center justify-center"
     ><input
       type="checkbox"
       class="peer absolute inset-0 h-full w-full cursor-pointer appearance-none opacity-0 disabled:cursor-not-allowed"
+      {id}
       {name}
       {value}
       {checked}
       {disabled}
-      aria-label={hasLabel() ? label : "Checkbox"}
+      {required}
+      aria-checked={indeterminate ? "mixed" : checked}
+      aria-label={!getChoiceState(props).showLeft &&
+      !getChoiceState(props).showRight
+        ? label || "Checkbox"
+        : undefined}
       on:change={(event) => {
-        handleChange();
+        !disabled && onCheckedChange && onCheckedChange(!checked);
       }}
     /><span
       aria-hidden="true"
       class={cn(
-        "inline-flex items-center justify-center border transition-colors peer-focus-visible:ring-2 peer-focus-visible:ring-focus-ring-primary",
-        boxClasses(),
-        checked
-          ? "border-components-checkbox-on-color-container-background-default bg-components-checkbox-on-color-container-background-default text-components-checkbox-on-color-icon-foreground-default"
-          : "border-components-checkbox-off-color-container-border-default bg-components-checkbox-off-color-container-background-default"
+        "inline-flex items-center justify-center rounded-sm border shadow-xs transition-colors peer-focus-visible:ring-2 peer-focus-visible:ring-focus-ring-primary",
+        cva(
+          size,
+          {
+            small: "h-3.5 w-3.5",
+            medium: "h-4 w-4",
+            large: "h-5 w-5",
+          },
+          "medium"
+        ),
+        checked || indeterminate
+          ? "border-primary-default bg-primary-default text-primary-foreground"
+          : "border-border-default bg-background-default"
       )}
     >
-      {#if checked}
+      {#if checked || indeterminate}
         <svg
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
           stroke-width="2.5"
-          class={cn("shrink-0", iconClasses())}
+          class={cn(
+            "shrink-0",
+            cva(
+              size,
+              {
+                small: "h-2.5 w-2.5",
+                medium: "h-3 w-3",
+                large: "h-3.5 w-3.5",
+              },
+              "medium"
+            )
+          )}
           ><path
-            d="M5 13l4 4L19 7"
             stroke-linecap="round"
             stroke-linejoin="round"
+            d={indeterminate ? ICON_PATHS.minus : ICON_PATHS.check}
           /></svg
         >
       {/if}</span
     ></span
   >
-  {#if rightLabel && hasLabel()}
-    <span
-      class="text-sm text-components-checkbox-all-color-label-foreground-default"
-      >{label}</span
-    >
+  {#if getChoiceState(props).showRight}
+    <span class="text-sm text-foreground-default">{label}</span>
   {/if}</label
 >

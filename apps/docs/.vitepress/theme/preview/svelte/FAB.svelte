@@ -1,5 +1,6 @@
 <script context="module" lang="ts">
   export interface FABProps {
+    type?: "button" | "submit" | "reset";
     variant?: "primary" | "secondary" | "outline";
     size?: "small" | "regular" | "large" | "extended";
     disabled?: boolean;
@@ -7,82 +8,61 @@
     showLabel?: boolean;
     ariaLabel?: string;
     className?: string;
-    children?: any;
+
     onClick?: () => void;
   }
 </script>
 
 <script lang="ts">
-  import { cn } from "./utils";
+  interface $$Slots {
+    default: Record<string, never>;
+  }
+  import { cn, cva, ICON_PATHS } from "./utils";
 
-  export let variant: FABProps["variant"] = "primary";
-  export let size: FABProps["size"] = "regular";
+  export let type: FABProps["type"] = "button";
   export let ariaLabel: FABProps["ariaLabel"] = "";
   export let label: FABProps["label"] = "Label";
   export let disabled: FABProps["disabled"] = false;
-  export let onClick: FABProps["onClick"];
+  export let variant: FABProps["variant"] = "primary";
+  export let size: FABProps["size"] = "small";
   export let className: FABProps["className"] = "";
+  export let onClick: FABProps["onClick"];
 
   export let showLabel: FABProps["showLabel"] = true;
-
-  function handleClick() {
-    if (!disabled && onClick) {
-      onClick();
-    }
-  }
-  $: variantClasses = () => {
-    switch (variant) {
-      case "secondary":
-        return "bg-components-fab-secondary-color-container-background-default text-components-fab-secondary-color-label-foreground-default hover:bg-components-fab-secondary-color-container-background-hover";
-      case "outline":
-        return "bg-components-fab-surface-color-container-background-default text-components-fab-surface-color-label-foreground-default border border-border-default hover:bg-components-fab-surface-color-container-background-hover";
-      case "primary":
-      default:
-        return "bg-components-fab-primary-color-container-background-default text-components-fab-primary-color-label-foreground-default hover:bg-components-fab-primary-color-container-background-hover";
-    }
-  };
-  $: sizeClasses = () => {
-    switch (size) {
-      case "small":
-        return "h-10 w-10";
-      case "large":
-        return "h-24 w-24";
-      case "extended":
-        return "h-14 w-auto gap-3 px-4";
-      case "regular":
-      default:
-        return "h-14 w-14";
-    }
-  };
-  $: iconClasses = () => {
-    switch (size) {
-      case "small":
-        return "h-4 w-4";
-      case "large":
-        return "h-7 w-7";
-      case "regular":
-      case "extended":
-      default:
-        return "h-5 w-5";
-    }
-  };
-  $: accessibleName = () => {
-    return ariaLabel !== "" ? ariaLabel : label;
-  };
 </script>
 
 <button
-  type="button"
-  aria-label={accessibleName()}
+  type={type || "button"}
+  aria-label={ariaLabel || label || "Action"}
   {disabled}
   class={cn(
-    "inline-flex shrink-0 items-center justify-center rounded-rounded-full shadow-lg transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring-primary disabled:pointer-events-none disabled:opacity-50",
-    variantClasses(),
-    sizeClasses(),
+    "inline-flex shrink-0 items-center justify-center rounded-full shadow-md transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring-primary disabled:pointer-events-none disabled:opacity-50",
+    cva(
+      variant,
+      {
+        primary:
+          "bg-primary-default text-primary-foreground hover:bg-primary-hover active:bg-primary-pressed",
+        secondary:
+          "bg-secondary-default text-secondary-foreground hover:bg-secondary-hover active:bg-background-interactive",
+        outline:
+          "border border-border-default bg-background-default text-foreground-default hover:bg-background-muted active:bg-background-interactive",
+      },
+      "primary"
+    ),
+    cva(
+      size,
+      {
+        small: "h-10 w-10",
+        regular: "h-14 w-14",
+        large: "h-24 w-24",
+        extended: "h-14 w-auto gap-3 px-4",
+      },
+      "small"
+    ),
     className
   )}
   on:click={(event) => {
-    handleClick();
+    !disabled && onClick && onClick();
   }}
 >
   {#if $$slots.default}
@@ -95,8 +75,19 @@
       fill="none"
       stroke="currentColor"
       stroke-width="1.5"
-      class={cn("shrink-0", iconClasses())}
-      ><path d="M12 5v14M5 12h14" stroke-linecap="round" /></svg
+      class={cn(
+        "shrink-0",
+        cva(
+          size,
+          {
+            small: "h-4 w-4",
+            regular: "h-5 w-5",
+            large: "h-7 w-7",
+            extended: "h-5 w-5",
+          },
+          "small"
+        )
+      )}><path stroke-linecap="round" d={ICON_PATHS.plus} /></svg
     >
   {/if}
   {#if size === "extended" && showLabel}

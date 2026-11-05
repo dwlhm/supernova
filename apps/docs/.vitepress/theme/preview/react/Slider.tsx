@@ -2,6 +2,8 @@
 import * as React from "react";
 
 export interface SliderProps {
+  id?: string;
+  name?: string;
   value?: number;
   min?: number;
   max?: number;
@@ -13,10 +15,12 @@ export interface SliderProps {
   onValueChange?: (value: number) => void;
 }
 
-import { cn } from "./utils";
+import { cn, getSliderState, bindControllerProps } from "./utils";
 
 function Slider(props: SliderProps) {
   props = {
+    id: "slider",
+    name: "slider",
     value: 0,
     min: 0,
     max: 100,
@@ -27,45 +31,13 @@ function Slider(props: SliderProps) {
     className: "",
     ...props,
   };
-  function percentage() {
-    const range = props.max - props.min;
-    if (range <= 0) {
-      return 0;
-    }
-    const raw = ((props.value - props.min) / range) * 100;
-    if (raw < 0) {
-      return 0;
-    }
-    if (raw > 100) {
-      return 100;
-    }
-    return raw;
-  }
-
-  function barStyle() {
-    return {
-      width: percentage() + "%",
-    };
-  }
-
-  function thumbStyle() {
-    return {
-      left: percentage() + "%",
-    };
-  }
-
-  function handleInput(rawValue: string) {
-    if (props.disabled) {
-      return;
-    }
-    const next = Number(rawValue);
-    if (props.onValueChange && !isNaN(next)) {
-      props.onValueChange(next);
-    }
-  }
-
+  const [__ctrlState, __setCtrlState] = React.useState<Record<string, any>>({});
+  props = bindControllerProps(props, __ctrlState, __setCtrlState);
   return (
-    <div className={cn("flex w-full flex-col gap-2", props.className)}>
+    <div
+      data-ctrl={typeof bindControllerProps}
+      className={cn("flex w-full flex-col gap-2", props.className)}
+    >
       {props.showValue ? (
         <div className="flex items-center justify-between text-xs text-foreground-muted">
           <span>{props.label}</span>
@@ -78,29 +50,32 @@ function Slider(props: SliderProps) {
           props.disabled && "opacity-50"
         )}
       >
-        <div className="absolute inset-x-0 h-1.5 rounded-rounded-full bg-components-slider-default-color-track-background-default" />
+        <div className="absolute inset-x-0 h-1.5 rounded-full bg-background-muted" />
         <div
-          className="absolute left-0 h-1.5 rounded-rounded-full bg-components-slider-default-color-bar-background-default"
-          style={barStyle()}
-        />
-        <div
-          className="absolute top-1/2 h-5 w-5 -translate-x-1/2 -translate-y-1/2 rounded-rounded-full border border-components-slider-default-color-thumb-border-default bg-components-slider-default-color-thumb-background-default shadow-sm"
-          aria-hidden="true"
-          style={thumbStyle()}
+          className="absolute left-0 h-1.5 rounded-full bg-primary-default"
+          style={getSliderState(props).barStyle}
         />
         <input
           type="range"
-          className="absolute inset-0 h-5 w-full cursor-pointer opacity-0 disabled:cursor-not-allowed"
+          className="peer absolute inset-0 z-10 h-5 w-full cursor-pointer opacity-0 disabled:cursor-not-allowed"
+          id={props.id}
+          name={props.name}
           min={props.min}
           max={props.max}
           step={props.step}
           value={props.value}
           disabled={props.disabled}
           aria-label={props.label}
-          aria-valuemin={props.min}
-          aria-valuemax={props.max}
-          aria-valuenow={props.value}
-          onInput={(event) => handleInput(event.target.value)}
+          onChange={(event) =>
+            !props.disabled &&
+            props.onValueChange &&
+            props.onValueChange(Number(event.target.value))
+          }
+        />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute top-1/2 h-5 w-5 -translate-x-1/2 -translate-y-1/2 rounded-full border border-primary-default bg-background-default shadow-sm peer-focus-visible:ring-2 peer-focus-visible:ring-focus-ring-primary"
+          style={getSliderState(props).thumbStyle}
         />
       </div>
     </div>

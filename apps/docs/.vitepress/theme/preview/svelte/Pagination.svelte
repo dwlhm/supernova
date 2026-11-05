@@ -18,131 +18,35 @@
 </script>
 
 <script lang="ts">
-  import { cn } from "./utils";
+  import {
+    cn,
+    getPaginationState,
+    ICON_PATHS,
+    bindControllerProps,
+  } from "./utils";
 
-  export let totalPages: PaginationProps["totalPages"] = 1;
-  export let currentPage: PaginationProps["currentPage"] = 1;
-  export let onPageChange: PaginationProps["onPageChange"];
   export let className: PaginationProps["className"] = "";
+  export let currentPage: PaginationProps["currentPage"] = 1;
+  export let totalPages: PaginationProps["totalPages"] = 1;
   export let previousLabel: PaginationProps["previousLabel"] = "Previous";
+  export let onPageChange: PaginationProps["onPageChange"];
   export let nextLabel: PaginationProps["nextLabel"] = "Next";
-
-  function goTo(page: number) {
-    const total = totalPages > 0 ? totalPages : 1;
-    let current = currentPage;
-    if (current < 1) {
-      current = 1;
-    }
-    if (current > total) {
-      current = total;
-    }
-    if (page < 1 || page > total || page === current) {
-      return;
-    }
-    if (onPageChange) {
-      onPageChange(page);
-    }
-  }
-  $: currentPageSafe = () => {
-    const total = totalPages > 0 ? totalPages : 1;
-    const current = currentPage;
-    if (current < 1) {
-      return 1;
-    }
-    if (current > total) {
-      return total;
-    }
-    return current;
-  };
-  $: canGoPrevious = () => {
-    const total = totalPages > 0 ? totalPages : 1;
-    let current = currentPage;
-    if (current < 1) {
-      current = 1;
-    }
-    if (current > total) {
-      current = total;
-    }
-    return current > 1;
-  };
-  $: canGoNext = () => {
-    const total = totalPages > 0 ? totalPages : 1;
-    let current = currentPage;
-    if (current < 1) {
-      current = 1;
-    }
-    if (current > total) {
-      current = total;
-    }
-    return current < total;
-  };
-  $: entries = () => {
-    const total = totalPages > 0 ? totalPages : 1;
-    let current = currentPage;
-    if (current < 1) {
-      current = 1;
-    }
-    if (current > total) {
-      current = total;
-    }
-    const rows: PaginationEntry[] = [];
-    const start = Math.max(2, current - 1);
-    const end = Math.min(total - 1, current + 1);
-    rows.push({
-      key: "page-1",
-      label: "1",
-      page: 1,
-      isCurrent: current === 1,
-      isEllipsis: false,
-    });
-    if (start > 2) {
-      rows.push({
-        key: "ellipsis-start",
-        label: "...",
-        page: 0,
-        isCurrent: false,
-        isEllipsis: true,
-      });
-    }
-    for (let i = start; i <= end; i++) {
-      rows.push({
-        key: "page-" + i,
-        label: String(i),
-        page: i,
-        isCurrent: i === current,
-        isEllipsis: false,
-      });
-    }
-    if (end < total - 1) {
-      rows.push({
-        key: "ellipsis-end",
-        label: "...",
-        page: 0,
-        isCurrent: false,
-        isEllipsis: true,
-      });
-    }
-    if (total > 1) {
-      rows.push({
-        key: "page-" + total,
-        label: String(total),
-        page: total,
-        isCurrent: current === total,
-        isEllipsis: false,
-      });
-    }
-    return rows;
-  };
 </script>
 
-<nav aria-label="Pagination" class={cn("flex items-center gap-1", className)}>
+<nav
+  aria-label="Pagination"
+  data-ctrl={typeof bindControllerProps}
+  class={cn("flex items-center gap-1", className)}
+>
   <button
     type="button"
-    class="inline-flex h-9 items-center gap-1 rounded-rounded-lg border border-components-pagination-active-color-page-item-border-default bg-components-pagination-active-color-page-item-background-default px-3 text-sm font-medium text-components-pagination-default-color-label-foreground-default transition-colors hover:bg-background-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring-primary disabled:cursor-not-allowed disabled:opacity-50"
-    disabled={!canGoPrevious()}
+    class="inline-flex h-9 items-center gap-1 rounded-lg border border-transparent bg-transparent px-3 text-sm font-medium text-foreground-default transition-colors hover:bg-background-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring-primary disabled:cursor-not-allowed disabled:opacity-50"
+    disabled={!getPaginationState(currentPage, totalPages).canPrev}
     aria-label={previousLabel}
     on:click={(event) => {
-      goTo(currentPageSafe() - 1);
+      getPaginationState(currentPage, totalPages).canPrev &&
+        onPageChange &&
+        onPageChange(getPaginationState(currentPage, totalPages).current - 1);
     }}
     ><svg
       aria-hidden="true"
@@ -150,20 +54,20 @@
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
-      stroke-width="1"
+      stroke-width="1.5"
       ><path
-        d="m14 6-6 6 6 6"
         stroke-linecap="round"
         stroke-linejoin="round"
+        d={ICON_PATHS.chevronLeft}
       /></svg
     ><span class="hidden sm:inline">{previousLabel}</span></button
   >
   <ol class="flex items-center gap-1">
-    {#each entries() as entry (entry.key)}
+    {#each getPaginationState(currentPage, totalPages).entries as entry (entry.key)}
       <li>
         {#if entry.isEllipsis}
           <span
-            class="inline-flex h-9 w-9 items-center justify-center text-sm text-components-pagination-default-color-label-foreground-default"
+            class="inline-flex h-9 w-9 items-center justify-center text-sm text-foreground-default"
             aria-hidden="true">{entry.label}</span
           >
         {/if}
@@ -173,13 +77,13 @@
             aria-current={entry.isCurrent ? "page" : undefined}
             aria-label={"Page " + entry.label}
             class={cn(
-              "inline-flex h-9 w-9 items-center justify-center rounded-rounded-lg border text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring-primary",
+              "inline-flex h-9 w-9 items-center justify-center rounded-lg border text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring-primary",
               entry.isCurrent
-                ? "border-components-pagination-active-color-page-item-border-default bg-components-pagination-active-color-page-item-background-default text-components-pagination-default-color-label-foreground-default"
-                : "border-transparent bg-transparent text-components-pagination-default-color-label-foreground-default hover:bg-background-muted"
+                ? "border-border-default bg-background-default text-foreground-default shadow-xs"
+                : "border-transparent bg-transparent text-foreground-default hover:bg-background-muted"
             )}
             on:click={(event) => {
-              goTo(entry.page);
+              !entry.isCurrent && onPageChange && onPageChange(entry.page);
             }}>{entry.label}</button
           >
         {/if}
@@ -188,11 +92,13 @@
   </ol>
   <button
     type="button"
-    class="inline-flex h-9 items-center gap-1 rounded-rounded-lg border border-components-pagination-active-color-page-item-border-default bg-components-pagination-active-color-page-item-background-default px-3 text-sm font-medium text-components-pagination-default-color-label-foreground-default transition-colors hover:bg-background-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring-primary disabled:cursor-not-allowed disabled:opacity-50"
-    disabled={!canGoNext()}
+    class="inline-flex h-9 items-center gap-1 rounded-lg border border-transparent bg-transparent px-3 text-sm font-medium text-foreground-default transition-colors hover:bg-background-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring-primary disabled:cursor-not-allowed disabled:opacity-50"
+    disabled={!getPaginationState(currentPage, totalPages).canNext}
     aria-label={nextLabel}
     on:click={(event) => {
-      goTo(currentPageSafe() + 1);
+      getPaginationState(currentPage, totalPages).canNext &&
+        onPageChange &&
+        onPageChange(getPaginationState(currentPage, totalPages).current + 1);
     }}
     ><span class="hidden sm:inline">{nextLabel}</span><svg
       aria-hidden="true"
@@ -200,11 +106,11 @@
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
-      stroke-width="1"
+      stroke-width="1.5"
       ><path
-        d="m10 6 6 6-6 6"
         stroke-linecap="round"
         stroke-linejoin="round"
+        d={ICON_PATHS.chevronRight}
       /></svg
     ></button
   >

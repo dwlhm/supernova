@@ -22,66 +22,9 @@ Brand content — Slot for product or workspace identity.
 Navigation content — Slot for the main navigation menu.
 Account content — Slot for user and account controls.
 
-## Live Preview
+## Live Preview & Usage
 
 <FrameworkPreview name="Sidebar" />
-
-## Usage
-
-::: code-group
-
-```tsx [React]
-import { Sidebar } from './Sidebar';
-
-export default function Example() {
-  return (
-    <Sidebar account content="default" brand content="default">
-      Sidebar
-    </Sidebar>
-  );
-}
-```
-
-```vue [Vue 3]
-<script setup lang="ts">
-import { Sidebar } from './Sidebar';
-</script>
-
-<template>
-  <Sidebar account content="default" brand content="default">
-    Sidebar
-  </Sidebar>
-</template>
-```
-
-```svelte [Svelte]
-<script lang="ts">
-  import Sidebar from './Sidebar.svelte';
-</script>
-
-<Sidebar account content="default" brand content="default">
-  Sidebar
-</Sidebar>
-```
-
-```ts [Angular]
-import { Component } from '@angular/core';
-import { SidebarComponent } from './sidebar.component';
-
-@Component({
-  selector: 'app-root',
-  standalone: true,
-  imports: [SidebarComponent],
-  template: `
-    <app-sidebar account content="default" brand content="default">
-      Sidebar
-    </app-sidebar>
-  `,
-})
-export class AppComponent {}
-```
-
-:::
 
 ## Props & Variants
 

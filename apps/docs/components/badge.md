@@ -18,66 +18,9 @@ Do not use a Badge for interactive actions.
 PropertiesVariant: primary, secondary, destructive, success, warning, info, or outline.
 Label: Editable text displayed inside the badge.
 
-## Live Preview
+## Live Preview & Usage
 
 <FrameworkPreview name="Badge" />
-
-## Usage
-
-::: code-group
-
-```tsx [React]
-import { Badge } from './Badge';
-
-export default function Example() {
-  return (
-    <Badge label="Badge" variant="primary">
-      Badge
-    </Badge>
-  );
-}
-```
-
-```vue [Vue 3]
-<script setup lang="ts">
-import { Badge } from './Badge';
-</script>
-
-<template>
-  <Badge label="Badge" variant="primary">
-    Badge
-  </Badge>
-</template>
-```
-
-```svelte [Svelte]
-<script lang="ts">
-  import Badge from './Badge.svelte';
-</script>
-
-<Badge label="Badge" variant="primary">
-  Badge
-</Badge>
-```
-
-```ts [Angular]
-import { Component } from '@angular/core';
-import { BadgeComponent } from './badge.component';
-
-@Component({
-  selector: 'app-root',
-  standalone: true,
-  imports: [BadgeComponent],
-  template: `
-    <app-badge label="Badge" variant="primary">
-      Badge
-    </app-badge>
-  `,
-})
-export class AppComponent {}
-```
-
-:::
 
 ## Props & Variants
 

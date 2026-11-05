@@ -18,66 +18,9 @@ Maintain consistent alignment for cells in the same column.
 Properties
 Cell Value — Swaps the nested Table Cell Value component used by the cell.
 
-## Live Preview
+## Live Preview & Usage
 
 <FrameworkPreview name="TableBodyCell" />
-
-## Usage
-
-::: code-group
-
-```tsx [React]
-import { TableBodyCell } from './TableBodyCell';
-
-export default function Example() {
-  return (
-    <TableBodyCell>
-      TableBodyCell
-    </TableBodyCell>
-  );
-}
-```
-
-```vue [Vue 3]
-<script setup lang="ts">
-import { TableBodyCell } from './TableBodyCell';
-</script>
-
-<template>
-  <TableBodyCell>
-    TableBodyCell
-  </TableBodyCell>
-</template>
-```
-
-```svelte [Svelte]
-<script lang="ts">
-  import TableBodyCell from './TableBodyCell.svelte';
-</script>
-
-<TableBodyCell>
-  TableBodyCell
-</TableBodyCell>
-```
-
-```ts [Angular]
-import { Component } from '@angular/core';
-import { TableBodyCellComponent } from './table-body-cell.component';
-
-@Component({
-  selector: 'app-root',
-  standalone: true,
-  imports: [TableBodyCellComponent],
-  template: `
-    <app-table-body-cell>
-      TableBodyCell
-    </app-table-body-cell>
-  `,
-})
-export class AppComponent {}
-```
-
-:::
 
 ## Props & Variants
 

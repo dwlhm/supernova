@@ -28,66 +28,9 @@ PROPERTIES
 • Show left icon / Show right icon — Toggles the leading or trailing icon.
 • Left icon / Right icon — Swaps the icon shown in the corresponding position.
 
-## Live Preview
+## Live Preview & Usage
 
 <FrameworkPreview name="Button" />
-
-## Usage
-
-::: code-group
-
-```tsx [React]
-import { Button } from './Button';
-
-export default function Example() {
-  return (
-    <Button label="Label" roundness="Default">
-      Button
-    </Button>
-  );
-}
-```
-
-```vue [Vue 3]
-<script setup lang="ts">
-import { Button } from './Button';
-</script>
-
-<template>
-  <Button label="Label" roundness="Default">
-    Button
-  </Button>
-</template>
-```
-
-```svelte [Svelte]
-<script lang="ts">
-  import Button from './Button.svelte';
-</script>
-
-<Button label="Label" roundness="Default">
-  Button
-</Button>
-```
-
-```ts [Angular]
-import { Component } from '@angular/core';
-import { ButtonComponent } from './button.component';
-
-@Component({
-  selector: 'app-root',
-  standalone: true,
-  imports: [ButtonComponent],
-  template: `
-    <app-button label="Label" roundness="Default">
-      Button
-    </app-button>
-  `,
-})
-export class AppComponent {}
-```
-
-:::
 
 ## Props & Variants
 

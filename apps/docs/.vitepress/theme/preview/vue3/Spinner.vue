@@ -2,6 +2,7 @@
   <span
     role="status"
     aria-live="polite"
+    :data-ctrl="typeof bindControllerProps"
     :class="cn('inline-flex items-center justify-center', className)"
     ><svg
       aria-hidden="true"
@@ -9,8 +10,17 @@
       fill="none"
       :class="
         cn(
-          'animate-spin text-components-spinner-all-color-icon-stroke-default',
-          sizeClasses
+          'animate-spin text-primary-default',
+          cva(
+            size,
+            {
+              '12': 'h-3 w-3',
+              '16': 'h-4 w-4',
+              '24': 'h-6 w-6',
+              '32': 'h-8 w-8',
+            },
+            '12'
+          )
         )
       "
     >
@@ -33,9 +43,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
-
-import { cn } from "./utils";
+import { cn, cva, bindControllerProps } from "./utils";
 
 export interface SpinnerProps {
   size?: "12" | "16" | "24" | "32";
@@ -44,22 +52,8 @@ export interface SpinnerProps {
 }
 
 const props = withDefaults(defineProps<SpinnerProps>(), {
-  size: "24",
   className: "",
+  size: "12",
   label: "Loading",
-});
-
-const sizeClasses = computed(() => {
-  switch (props.size) {
-    case "12":
-      return "h-3 w-3";
-    case "16":
-      return "h-4 w-4";
-    case "32":
-      return "h-8 w-8";
-    case "24":
-    default:
-      return "h-6 w-6";
-  }
 });
 </script>

@@ -1,67 +1,10 @@
-# TablerTruckDelivery
+# IconTruckDelivery
 
 Tabler Icons — truck-delivery
 
-## Live Preview
+## Live Preview & Usage
 
 <FrameworkPreview name="IconTruckDelivery" />
-
-## Usage
-
-::: code-group
-
-```tsx [React]
-import { TablerTruckDelivery } from './TablerTruckDelivery';
-
-export default function Example() {
-  return (
-    <TablerTruckDelivery>
-      TablerTruckDelivery
-    </TablerTruckDelivery>
-  );
-}
-```
-
-```vue [Vue 3]
-<script setup lang="ts">
-import { TablerTruckDelivery } from './TablerTruckDelivery';
-</script>
-
-<template>
-  <TablerTruckDelivery>
-    TablerTruckDelivery
-  </TablerTruckDelivery>
-</template>
-```
-
-```svelte [Svelte]
-<script lang="ts">
-  import TablerTruckDelivery from './TablerTruckDelivery.svelte';
-</script>
-
-<TablerTruckDelivery>
-  TablerTruckDelivery
-</TablerTruckDelivery>
-```
-
-```ts [Angular]
-import { Component } from '@angular/core';
-import { TablerTruckDeliveryComponent } from './tabler-truck-delivery.component';
-
-@Component({
-  selector: 'app-root',
-  standalone: true,
-  imports: [TablerTruckDeliveryComponent],
-  template: `
-    <app-tabler-truck-delivery>
-      TablerTruckDelivery
-    </app-tabler-truck-delivery>
-  `,
-})
-export class AppComponent {}
-```
-
-:::
 
 ## Props & Variants
 

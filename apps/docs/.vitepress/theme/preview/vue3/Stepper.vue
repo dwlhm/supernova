@@ -1,6 +1,14 @@
 <template>
-  <nav :aria-label="ariaLabel" :class="cn('w-full', className)">
-    <template v-if="orientation === 'vertical'">
+  <nav
+    :data-ctrl="typeof bindControllerProps"
+    :aria-label="ariaLabel"
+    :class="cn('w-full bg-background-default', className)"
+  >
+    <template v-if="$slots.default">
+      <slot />
+    </template>
+
+    <template v-if="!$slots.default && orientation === 'vertical'">
       <ol class="flex flex-col">
         <template :key="index" v-for="(step, index) in steps">
           <li class="flex gap-2">
@@ -8,13 +16,33 @@
               <span
                 :class="
                   cn(
-                    'flex h-8 w-8 shrink-0 items-center justify-center rounded-rounded-full text-sm',
-                    indicatorClasses(index)
+                    'flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-medium',
+                    cva(
+                      getStepperStepState(index, current, (steps || []).length)
+                        .stepKey,
+                      {
+                        completed: 'bg-primary-default text-primary-foreground',
+                        active:
+                          'border-2 border-primary-default bg-background-default text-primary-default',
+                        upcoming: 'bg-background-muted text-foreground-muted',
+                      },
+                      'upcoming'
+                    )
                   )
                 "
-                :aria-current="index + 1 === current ? 'step' : undefined"
+                :aria-current="
+                  getStepperStepState(index, current, (steps || []).length)
+                    .isCurrent
+                    ? 'step'
+                    : undefined
+                "
               >
-                <template v-if="index + 1 < current">
+                <template
+                  v-if="
+                    getStepperStepState(index, current, (steps || []).length)
+                      .isCompleted
+                  "
+                >
                   <svg
                     aria-hidden="true"
                     class="h-4 w-4"
@@ -24,33 +52,66 @@
                     stroke-width="2"
                   >
                     <path
-                      d="M5 13l4 4L19 7"
                       stroke-linecap="round"
                       stroke-linejoin="round"
+                      :d="ICON_PATHS.check"
                     ></path>
                   </svg>
                 </template>
 
-                <template v-if="index + 1 >= current">
+                <template
+                  v-if="
+                    !getStepperStepState(index, current, (steps || []).length)
+                      .isCompleted
+                  "
+                >
                   {{ index + 1 }}
                 </template>
               </span>
-              <template v-if="!isLast(index)">
+              <template
+                v-if="
+                  !getStepperStepState(index, current, (steps || []).length)
+                    .isLast
+                "
+              >
                 <span
                   aria-hidden="true"
-                  :class="cn('w-0.5 flex-1', connectorClasses(index))"
+                  :class="
+                    cn(
+                      'w-0.5 flex-1',
+                      getStepperStepState(index, current, (steps || []).length)
+                        .isCompleted
+                        ? 'bg-primary-default'
+                        : 'bg-border-default'
+                    )
+                  "
                 ></span>
               </template>
             </div>
-            <span :class="cn('pb-6 pt-1.5 text-sm', labelClasses(index))">{{
-              step
-            }}</span>
+            <span
+              :class="
+                cn(
+                  'pb-6 pt-1.5 text-sm',
+                  cva(
+                    getStepperStepState(index, current, (steps || []).length)
+                      .stepKey,
+                    {
+                      completed: 'text-foreground-default font-medium',
+                      active: 'text-foreground-default font-semibold',
+                      upcoming: 'text-foreground-muted',
+                    },
+                    'upcoming'
+                  )
+                )
+              "
+              >{{ step }}</span
+            >
           </li>
         </template>
       </ol>
     </template>
 
-    <template v-if="orientation === 'horizontal'">
+    <template v-if="!$slots.default && orientation === 'horizontal'">
       <ol class="flex w-full items-start">
         <template :key="index" v-for="(step, index) in steps">
           <li class="flex flex-1 flex-col items-center gap-2">
@@ -60,20 +121,48 @@
                 :class="
                   cn(
                     'h-0.5 flex-1',
-                    index === 0 ? 'bg-transparent' : connectorClasses(index - 1)
+                    index === 0
+                      ? 'bg-transparent'
+                      : getStepperStepState(
+                          index,
+                          current,
+                          (steps || []).length
+                        ).prevCompleted
+                      ? 'bg-primary-default'
+                      : 'bg-border-default'
                   )
                 "
               ></span
               ><span
                 :class="
                   cn(
-                    'flex h-8 w-8 shrink-0 items-center justify-center rounded-rounded-full text-sm',
-                    indicatorClasses(index)
+                    'flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-medium',
+                    cva(
+                      getStepperStepState(index, current, (steps || []).length)
+                        .stepKey,
+                      {
+                        completed: 'bg-primary-default text-primary-foreground',
+                        active:
+                          'border-2 border-primary-default bg-background-default text-primary-default',
+                        upcoming: 'bg-background-muted text-foreground-muted',
+                      },
+                      'upcoming'
+                    )
                   )
                 "
-                :aria-current="index + 1 === current ? 'step' : undefined"
+                :aria-current="
+                  getStepperStepState(index, current, (steps || []).length)
+                    .isCurrent
+                    ? 'step'
+                    : undefined
+                "
               >
-                <template v-if="index + 1 < current">
+                <template
+                  v-if="
+                    getStepperStepState(index, current, (steps || []).length)
+                      .isCompleted
+                  "
+                >
                   <svg
                     aria-hidden="true"
                     class="h-4 w-4"
@@ -83,14 +172,19 @@
                     stroke-width="2"
                   >
                     <path
-                      d="M5 13l4 4L19 7"
                       stroke-linecap="round"
                       stroke-linejoin="round"
+                      :d="ICON_PATHS.check"
                     ></path>
                   </svg>
                 </template>
 
-                <template v-if="index + 1 >= current">
+                <template
+                  v-if="
+                    !getStepperStepState(index, current, (steps || []).length)
+                      .isCompleted
+                  "
+                >
                   {{ index + 1 }}
                 </template> </span
               ><span
@@ -98,14 +192,38 @@
                 :class="
                   cn(
                     'h-0.5 flex-1',
-                    isLast(index) ? 'bg-transparent' : connectorClasses(index)
+                    getStepperStepState(index, current, (steps || []).length)
+                      .isLast
+                      ? 'bg-transparent'
+                      : getStepperStepState(
+                          index,
+                          current,
+                          (steps || []).length
+                        ).isCompleted
+                      ? 'bg-primary-default'
+                      : 'bg-border-default'
                   )
                 "
               ></span>
             </div>
-            <span :class="cn('text-center text-sm', labelClasses(index))">{{
-              step
-            }}</span>
+            <span
+              :class="
+                cn(
+                  'text-center text-sm',
+                  cva(
+                    getStepperStepState(index, current, (steps || []).length)
+                      .stepKey,
+                    {
+                      completed: 'text-foreground-default font-medium',
+                      active: 'text-foreground-default font-semibold',
+                      upcoming: 'text-foreground-muted',
+                    },
+                    'upcoming'
+                  )
+                )
+              "
+              >{{ step }}</span
+            >
           </li>
         </template>
       </ol>
@@ -114,7 +232,13 @@
 </template>
 
 <script setup lang="ts">
-import { cn } from "./utils";
+import {
+  cn,
+  cva,
+  getStepperStepState,
+  ICON_PATHS,
+  bindControllerProps,
+} from "./utils";
 
 export interface StepperProps {
   orientation?: "horizontal" | "vertical";
@@ -125,44 +249,12 @@ export interface StepperProps {
 }
 
 const props = withDefaults(defineProps<StepperProps>(), {
-  current: 1,
-  steps: ["Cart", "Shipping", "Payment", "Review"],
   ariaLabel: "Progress",
   className: "",
-  orientation: "horizontal",
-});
 
-function indicatorClasses(index: number) {
-  const position = index + 1;
-  const activeStep = props.current;
-  if (position < activeStep) {
-    return "bg-success-subtle text-success-foreground border border-success-default";
-  }
-  if (position === activeStep) {
-    return "bg-components-stepper-default-color-indicator-background-active text-components-stepper-default-color-indicator-content-active";
-  }
-  return "bg-components-stepper-default-color-indicator-background-upcoming text-components-stepper-default-color-indicator-content-upcoming";
-}
-function labelClasses(index: number) {
-  const position = index + 1;
-  const activeStep = props.current;
-  if (position < activeStep) {
-    return "text-components-stepper-default-color-label-text-completed font-medium";
-  }
-  if (position === activeStep) {
-    return "text-components-stepper-default-color-label-text-active font-semibold";
-  }
-  return "text-components-stepper-default-color-label-text-upcoming";
-}
-function connectorClasses(index: number) {
-  const position = index + 1;
-  const activeStep = props.current;
-  if (position < activeStep) {
-    return "bg-components-stepper-default-color-connector-background-completed";
-  }
-  return "bg-components-stepper-default-color-connector-background-upcoming";
-}
-function isLast(index: number) {
-  return index === props.steps.length - 1;
-}
+  orientation: "horizontal",
+  steps: () => ["Cart", "Shipping", "Payment", "Review"],
+  current: 1,
+});
+defineSlots<{ default?: () => any }>();
 </script>

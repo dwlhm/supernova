@@ -19,66 +19,9 @@ Properties
 • Num — Sets the displayed numeric value.
 • State — Selects Default or Active.
 
-## Live Preview
+## Live Preview & Usage
 
 <FrameworkPreview name="TabItem" />
-
-## Usage
-
-::: code-group
-
-```tsx [React]
-import { TabItem } from './TabItem';
-
-export default function Example() {
-  return (
-    <TabItem icon="3760:33" label="Label">
-      TabItem
-    </TabItem>
-  );
-}
-```
-
-```vue [Vue 3]
-<script setup lang="ts">
-import { TabItem } from './TabItem';
-</script>
-
-<template>
-  <TabItem icon="3760:33" label="Label">
-    TabItem
-  </TabItem>
-</template>
-```
-
-```svelte [Svelte]
-<script lang="ts">
-  import TabItem from './TabItem.svelte';
-</script>
-
-<TabItem icon="3760:33" label="Label">
-  TabItem
-</TabItem>
-```
-
-```ts [Angular]
-import { Component } from '@angular/core';
-import { TabItemComponent } from './tab-item.component';
-
-@Component({
-  selector: 'app-root',
-  standalone: true,
-  imports: [TabItemComponent],
-  template: `
-    <app-tab-item icon="3760:33" label="Label">
-      TabItem
-    </app-tab-item>
-  `,
-})
-export class AppComponent {}
-```
-
-:::
 
 ## Props & Variants
 

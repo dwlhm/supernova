@@ -7,7 +7,7 @@ export interface IconTruckDeliveryProps {
   className?: string;
 }
 
-import { cn } from "./utils";
+import { cn, bindControllerProps } from "./utils";
 
 function IconTruckDelivery(props: IconTruckDeliveryProps) {
   props = {
@@ -17,22 +17,25 @@ function IconTruckDelivery(props: IconTruckDeliveryProps) {
     className: "",
     ...props,
   };
+  const [__ctrlState, __setCtrlState] = React.useState<Record<string, any>>({});
+  props = bindControllerProps(props, __ctrlState, __setCtrlState);
   return (
     <svg
       role="img"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
-      stroke-linecap="round"
-      stroke-linejoin="round"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      data-ctrl={typeof bindControllerProps}
       aria-label={props.ariaLabel}
       width={props.size}
       height={props.size}
       className={cn(
-        "inline-block shrink-0 text-components-icon-truck-delivery-color-root-fill-default",
+        "inline-block shrink-0 text-foreground-default",
         props.className
       )}
-      stroke-width={props.strokeWidth}
+      strokeWidth={props.strokeWidth}
     >
       <path d="M5 18m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
       <path d="M15 18m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />

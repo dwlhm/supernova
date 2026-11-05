@@ -6,10 +6,12 @@
   }
 
   export interface InputDropdownProps {
+    open?: boolean;
     value?: string;
     options?: SelectOption[];
     searchQuery?: string;
     id?: string;
+    name?: string;
     label?: string;
     placeholder?: string;
     hint?: string;
@@ -20,227 +22,173 @@
     showHint?: boolean;
     showSearch?: boolean;
     showLeftIcon?: boolean;
+    showRightIcon?: boolean;
     className?: string;
     onSelect?: (value: string) => void;
     onSearchChange?: (value: string) => void;
+    onOpenChange?: (open: boolean) => void;
   }
 </script>
 
 <script lang="ts">
-  import { cn } from "./utils";
+  import {
+    cn,
+    getDropdownState,
+    ICON_PATHS,
+    bindControllerProps,
+  } from "./utils";
 
-  export let errorMessage: InputDropdownProps["errorMessage"] = "";
-  export let searchQuery: InputDropdownProps["searchQuery"] = "";
-  export let options: InputDropdownProps["options"] = [];
-  export let value: InputDropdownProps["value"] = "";
-  export let hint: InputDropdownProps["hint"] =
-    "Select your department or area of work.";
-  export let disabled: InputDropdownProps["disabled"] = false;
-  export let onSearchChange: InputDropdownProps["onSearchChange"];
-  export let onSelect: InputDropdownProps["onSelect"];
+  export let id: InputDropdownProps["id"] = "input-dropdown";
   export let className: InputDropdownProps["className"] = "";
   export let showLabel: InputDropdownProps["showLabel"] = true;
   export let label: InputDropdownProps["label"] = "Department";
   export let required: InputDropdownProps["required"] = false;
+  export let disabled: InputDropdownProps["disabled"] = false;
+  export let onOpenChange: InputDropdownProps["onOpenChange"];
+  export let open: InputDropdownProps["open"] = false;
   export let showLeftIcon: InputDropdownProps["showLeftIcon"] = false;
   export let placeholder: InputDropdownProps["placeholder"] =
     "Choose department";
+  export let showRightIcon: InputDropdownProps["showRightIcon"] = true;
   export let showSearch: InputDropdownProps["showSearch"] = true;
+  export let searchQuery: InputDropdownProps["searchQuery"] = "";
+  export let onSearchChange: InputDropdownProps["onSearchChange"];
+  export let value: InputDropdownProps["value"] = "";
+  export let onSelect: InputDropdownProps["onSelect"];
   export let showHint: InputDropdownProps["showHint"] = false;
-
-  function toggle() {
-    if (disabled) {
-      return;
-    }
-    isOpen = !isOpen;
-  }
-  function handleSearch(rawValue: string) {
-    if (onSearchChange) {
-      onSearchChange(rawValue);
-    }
-  }
-  function handleSelect(selected: string) {
-    isOpen = false;
-    if (onSelect) {
-      onSelect(selected);
-    }
-  }
-  $: hasError = () => {
-    return errorMessage !== "";
-  };
-  $: normalizedQuery = () => {
-    return searchQuery.trim().toLowerCase();
-  };
-  $: selectedLabel = () => {
-    const matched = (options || []).filter((option) => option.value === value);
-    return matched.length > 0 ? matched[0].label : "";
-  };
-  $: panelClasses = () => {
-    return isOpen ? "block" : "hidden";
-  };
-  $: triggerClasses = () => {
-    if (hasError()) {
-      return "border-components-select-all-color-trigger-border-error";
-    }
-    if (isOpen) {
-      return "border-components-select-all-color-trigger-border-focus";
-    }
-    return "border-components-select-all-color-trigger-border-default";
-  };
-  $: supportingText = () => {
-    return hasError() ? errorMessage : hint;
-  };
-  $: supportingClasses = () => {
-    return hasError()
-      ? "text-components-select-all-color-supporting-text-foreground-error"
-      : "text-components-select-all-color-supporting-text-foreground-default";
-  };
-
-  let isOpen = false;
+  export let options: InputDropdownProps["options"] = [];
+  export let name: InputDropdownProps["name"] = 'dropdown';
+  export let hint: InputDropdownProps["hint"] = 'Select your department or area of work.';
+  export let errorMessage: InputDropdownProps["errorMessage"] = '';
+  $: props = { id, className, showLabel, label, required, disabled, onOpenChange, open, showLeftIcon, placeholder, showRightIcon, showSearch, searchQuery, onSearchChange, value, onSelect, showHint, options, name, hint, errorMessage };
 </script>
 
-<div class={cn("relative flex w-full flex-col gap-3", className)}>
+<div
+  {id}
+  data-ctrl={typeof bindControllerProps}
+  class={cn("relative flex w-full flex-col gap-3", className)}
+>
   {#if showLabel && label !== ""}
     <span
-      class="flex items-center gap-1 text-sm font-medium text-components-select-all-color-label-foreground-default"
+      class="flex items-center gap-1 text-sm font-medium text-foreground-default"
       >{label}
       {#if required}
-        <span
-          aria-hidden="true"
-          class="text-components-select-all-color-required-indicator-foreground-default"
-        >
-          *
-        </span>
+        <span aria-hidden="true" class="text-destructive-default">*</span>
       {/if}</span
     >
   {/if}<button
     type="button"
     aria-haspopup="listbox"
-    aria-expanded={isOpen}
+    aria-expanded={getDropdownState(props).isOpen}
+    aria-invalid={getDropdownState(props).hasError}
     {disabled}
     class={cn(
-      "flex h-9 w-full items-center justify-between gap-2.5 rounded-rounded-lg border bg-components-select-all-color-trigger-background-default px-3 text-left transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring-primary disabled:cursor-not-allowed disabled:opacity-50",
-      triggerClasses()
+      "flex h-9 w-full items-center justify-between gap-1.5 rounded-lg border bg-background-default px-3 text-left shadow-xs transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring-primary disabled:cursor-not-allowed disabled:opacity-50",
+      getDropdownState(props).hasError
+        ? "border-destructive-border focus:ring-2 focus:ring-focus-ring-error"
+        : getDropdownState(props).isOpen
+        ? "border-primary-border-emphasis ring-2 ring-focus-ring-primary"
+        : "border-border-default focus:border-primary-border-emphasis focus:ring-2 focus:ring-focus-ring-primary"
     )}
     on:click={(event) => {
-      toggle();
+      !disabled && onOpenChange && onOpenChange(!open);
     }}
-    ><span class="flex items-center gap-2.5 truncate">
+    ><span class="flex items-center gap-1.5 truncate">
       {#if showLeftIcon}
         <svg
           aria-hidden="true"
-          class="h-4 w-4 shrink-0 text-components-select-all-color-trigger-icon-default"
+          class="h-4 w-4 shrink-0 text-foreground-muted"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
           stroke-width="1.5"
-          ><path d="M4 6h16M4 12h16M4 18h10" stroke-linecap="round" /></svg
+          ><path stroke-linecap="round" d={ICON_PATHS.menu} /></svg
         >
-      {/if}
-      {#if selectedLabel() !== ""}
-        <span
-          class="truncate text-sm text-components-select-all-color-trigger-foreground-default"
-          >{selectedLabel()}</span
-        >
-      {/if}
-      {#if selectedLabel() === ""}
-        <span
-          class="truncate text-sm text-components-select-all-color-placeholder-foreground-default"
-          >{placeholder}</span
-        >
-      {/if}</span
-    ><svg
-      aria-hidden="true"
-      class="h-4 w-4 shrink-0 text-components-select-all-color-vector-stroke-default"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      stroke-width="1.5"
-      ><path
-        d="m6 9 6 6 6-6"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      /></svg
-    ></button
+      {/if}<span
+        class={cn(
+          "truncate text-sm",
+          getDropdownState(props).selectedLabel !== ""
+            ? "text-foreground-default"
+            : "text-foreground-subtle"
+        )}
+      >
+        {#if getDropdownState(props).selectedLabel !== ""}
+          {getDropdownState(props).selectedLabel}
+        {:else}
+          {placeholder}
+        {/if}</span
+      ></span
+    >
+    {#if showRightIcon}
+      <svg
+        aria-hidden="true"
+        class="h-4 w-4 shrink-0 text-foreground-muted"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.5"
+        ><path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d={ICON_PATHS.chevronDown}
+        /></svg
+      >
+    {/if}</button
   >
   <div
-    role="listbox"
     class={cn(
-      "absolute top-full z-50 mt-2 w-full overflow-hidden rounded-rounded-md border border-components-select-all-color-dropdown-menu-border-focus bg-components-select-all-color-dropdown-menu-background-focus shadow-lg",
-      panelClasses()
+      "absolute top-full z-50 mt-2 w-full overflow-hidden rounded-md border border-border-default bg-background-default shadow-lg",
+      getDropdownState(props).isOpen ? "block" : "hidden"
     )}
   >
     {#if showSearch}
       <div
-        class="flex items-center gap-2 border-b border-components-select-all-color-search-input-border-focus px-3 py-2"
+        class="flex items-center gap-2 border-b border-border-default px-3 py-2"
       >
-        <svg
-          aria-hidden="true"
-          class="h-4 w-4 shrink-0 text-components-select-all-color-vector-stroke-default"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="1.5"
-          ><circle cx="11" cy="11" r="7" /><path
-            d="m20 20-3.5-3.5"
-            stroke-linecap="round"
-          /></svg
-        ><input
+        <input
           type="search"
           placeholder="Search"
           aria-label="Search options"
-          class="w-full bg-transparent text-sm text-components-select-all-color-trigger-foreground-default outline-none placeholder:text-components-select-all-color-placeholder-foreground-default"
+          class="w-full bg-transparent text-sm text-foreground-default outline-none placeholder:text-foreground-subtle"
           value={searchQuery}
           on:input={(event) => {
-            handleSearch(event.target.value);
+            onSearchChange && onSearchChange(event.target.value);
           }}
         />
       </div>
     {/if}
-    <ul class="flex max-h-60 flex-col overflow-y-auto p-1">
-      {#each options as option (option.value)}
-        <li
-          class={normalizedQuery() !== "" &&
-          option.label.toLowerCase().indexOf(normalizedQuery()) === -1
-            ? "hidden"
-            : "block"}
+    <div
+      role="listbox"
+      class="flex max-h-60 flex-col overflow-y-auto p-1"
+      aria-label={label}
+    >
+      {#each getDropdownState(props).filtered as option (option.value)}
+        <button
+          type="button"
+          role="option"
+          aria-selected={option.value === value}
+          disabled={option.disabled}
+          class={cn(
+            "flex w-full items-center justify-between rounded-sm px-2 py-2 text-left text-sm transition-colors focus:outline-none disabled:cursor-not-allowed disabled:opacity-50",
+            option.value === value
+              ? "bg-background-muted text-foreground-default"
+              : "text-foreground-default hover:bg-background-muted"
+          )}
+          on:click={(event) => {
+            onSelect && onSelect(option.value);
+          }}><span class="truncate">{option.label}</span></button
         >
-          <button
-            type="button"
-            role="option"
-            aria-selected={option.value === value}
-            disabled={option.disabled}
-            class={cn(
-              "flex w-full items-center justify-between rounded-rounded-sm px-2 py-2 text-left text-sm transition-colors focus:outline-none disabled:cursor-not-allowed disabled:opacity-50",
-              option.value === value
-                ? "bg-components-select-all-color-wrapper-background-focus text-components-select-all-color-trigger-foreground-default"
-                : "text-components-select-all-color-trigger-foreground-default hover:bg-background-muted"
-            )}
-            on:click={(event) => {
-              handleSelect(option.value);
-            }}
-            ><span class="truncate">{option.label}</span>
-            {#if option.value === value}
-              <svg
-                aria-hidden="true"
-                class="h-4 w-4 shrink-0"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                ><path
-                  d="m5 13 4 4L19 7"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                /></svg
-              >
-            {/if}</button
-          >
-        </li>
       {/each}
-    </ul>
+    </div>
   </div>
   {#if showHint}
-    <span class={cn("text-xs", supportingClasses())}>{supportingText()}</span>
+    <span
+      class={cn(
+        "text-sm",
+        getDropdownState(props).hasError
+          ? "text-destructive-foreground"
+          : "text-foreground-muted"
+      )}>{getDropdownState(props).helpText}</span
+    >
   {/if}
 </div>

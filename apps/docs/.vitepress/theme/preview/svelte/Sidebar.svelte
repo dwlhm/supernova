@@ -7,35 +7,31 @@
     accountInitials?: string;
     brandInitials?: string;
     className?: string;
-    children?: any;
-  }
+}
 </script>
 
 <script lang="ts">
-  import { cn } from "./utils";
+  interface $$Slots {
+    default: Record<string, never>;
+  }
+  import { cn, bindControllerProps } from "./utils";
 
-  export let expanded: SidebarProps["expanded"] = true;
-  export let accountLabel: SidebarProps["accountLabel"] = "Account";
-  export let accountMeta: SidebarProps["accountMeta"] = "account@example.com";
   export let brand: SidebarProps["brand"] = "Komerce";
+  export let expanded: SidebarProps["expanded"] = false;
   export let className: SidebarProps["className"] = "";
   export let brandInitials: SidebarProps["brandInitials"] = "K";
 
-  export let accountInitials: SidebarProps["accountInitials"] = "AB";
-
-  $: widthClasses = () => {
-    return expanded ? "w-60" : "w-16";
-  };
-  $: hasAccount = () => {
-    return accountLabel !== "" || accountMeta !== "";
-  };
+  export let accountLabel: SidebarProps["accountLabel"] = "Lionel Messi";
+  export let accountMeta: SidebarProps["accountMeta"] = "messi@gmail.com";
+  export let accountInitials: SidebarProps["accountInitials"] = "LM";
 </script>
 
 <aside
+  data-ctrl={typeof bindControllerProps}
   aria-label={brand}
   class={cn(
-    "flex h-full shrink-0 flex-col justify-between border-r border-components-sidebar-expanded-rebind-color-container-border-default bg-components-sidebar-expanded-rebind-color-container-background-default pb-2",
-    widthClasses(),
+    "flex h-full shrink-0 flex-col justify-between border-r border-border-default bg-background-default pb-2",
+    expanded ? "w-60" : "w-16",
     className
   )}
 >
@@ -47,37 +43,34 @@
       )}
     >
       <span
-        class="flex h-8 w-8 shrink-0 items-center justify-center rounded-rounded-md bg-components-sidebar-expanded-rebind-color-container-background-default-2 text-sm font-semibold text-components-sidebar-expanded-rebind-color-label-foreground-default-2"
+        class="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-primary-default text-sm font-semibold text-primary-foreground"
         aria-hidden="true">{brandInitials}</span
       >
       {#if expanded}
-        <span
-          class="truncate text-sm font-semibold text-components-sidebar-expanded-rebind-color-label-foreground-default"
+        <span class="truncate text-sm font-semibold text-foreground-default"
           >{brand}</span
         >
       {/if}
     </div>
     <nav aria-label="Main" class="flex flex-col gap-2 px-2"><slot /></nav>
   </div>
-  {#if hasAccount()}
+  {#if accountLabel !== "" || accountMeta !== ""}
     <div class={cn("px-2", expanded ? "" : "flex justify-center")}>
       <div
         class={cn(
-          "flex items-center gap-2 rounded-rounded-xl bg-background-subtle px-2 py-2",
+          "flex items-center gap-2 rounded-xl bg-background-muted px-2 py-2",
           expanded ? "" : "justify-center"
         )}
       >
         <span
-          class="flex h-8 w-8 shrink-0 items-center justify-center rounded-rounded-full bg-background-muted text-xs font-medium text-components-sidebar-expanded-rebind-color-section-label-foreground-default"
+          class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-background-subtle text-xs font-medium text-foreground-muted"
           aria-hidden="true">{accountInitials}</span
         >
         {#if expanded}
           <span class="flex min-w-0 flex-col"
-            ><span
-              class="truncate text-sm font-medium text-components-sidebar-expanded-rebind-color-label-foreground-default"
+            ><span class="truncate text-sm font-medium text-foreground-default"
               >{accountLabel}</span
-            ><span
-              class="truncate text-xs text-components-sidebar-expanded-rebind-color-section-label-foreground-default"
+            ><span class="truncate text-xs text-foreground-muted"
               >{accountMeta}</span
             ></span
           >

@@ -13,58 +13,9 @@ Usage guidelines
 Properties
 This component has no exposed properties.
 
-## Live Preview
+## Live Preview & Usage
 
 <FrameworkPreview name="IconPlaceholder" />
-
-## Usage
-
-::: code-group
-
-```tsx [React]
-import { IconPlaceholder } from './IconPlaceholder';
-
-export default function Example() {
-  return (
-    <IconPlaceholder />
-  );
-}
-```
-
-```vue [Vue 3]
-<script setup lang="ts">
-import { IconPlaceholder } from './IconPlaceholder';
-</script>
-
-<template>
-  <IconPlaceholder />
-</template>
-```
-
-```svelte [Svelte]
-<script lang="ts">
-  import IconPlaceholder from './IconPlaceholder.svelte';
-</script>
-
-<IconPlaceholder />
-```
-
-```ts [Angular]
-import { Component } from '@angular/core';
-import { IconPlaceholderComponent } from './icon-placeholder.component';
-
-@Component({
-  selector: 'app-root',
-  standalone: true,
-  imports: [IconPlaceholderComponent],
-  template: `
-    <app-icon-placeholder></app-icon-placeholder>
-  `,
-})
-export class AppComponent {}
-```
-
-:::
 
 ## Props & Variants
 

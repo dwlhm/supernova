@@ -17,66 +17,9 @@ Use with Table No Header Cell.
 Properties
 No — Sets the displayed row number.
 
-## Live Preview
+## Live Preview & Usage
 
 <FrameworkPreview name="TableNoBodyCell" />
-
-## Usage
-
-::: code-group
-
-```tsx [React]
-import { TableNoBodyCell } from './TableNoBodyCell';
-
-export default function Example() {
-  return (
-    <TableNoBodyCell>
-      TableNoBodyCell
-    </TableNoBodyCell>
-  );
-}
-```
-
-```vue [Vue 3]
-<script setup lang="ts">
-import { TableNoBodyCell } from './TableNoBodyCell';
-</script>
-
-<template>
-  <TableNoBodyCell>
-    TableNoBodyCell
-  </TableNoBodyCell>
-</template>
-```
-
-```svelte [Svelte]
-<script lang="ts">
-  import TableNoBodyCell from './TableNoBodyCell.svelte';
-</script>
-
-<TableNoBodyCell>
-  TableNoBodyCell
-</TableNoBodyCell>
-```
-
-```ts [Angular]
-import { Component } from '@angular/core';
-import { TableNoBodyCellComponent } from './table-no-body-cell.component';
-
-@Component({
-  selector: 'app-root',
-  standalone: true,
-  imports: [TableNoBodyCellComponent],
-  template: `
-    <app-table-no-body-cell>
-      TableNoBodyCell
-    </app-table-no-body-cell>
-  `,
-})
-export class AppComponent {}
-```
-
-:::
 
 ## Props & Variants
 

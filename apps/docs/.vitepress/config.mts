@@ -42,13 +42,7 @@ function utilsResolverPlugin() {
     name: 'vitepress-utils-resolver',
     resolveId(id: string, importer?: string) {
       if (id === './utils' || id === './utils.js' || id === './utils.ts') {
-        if (
-          importer &&
-          (importer.includes('/preview/') ||
-            importer.includes('\\preview\\') ||
-            importer.includes('/src/components/') ||
-            importer.includes('\\src\\components\\'))
-        ) {
+        if (importer && (importer.includes('/preview/') || importer.includes('\\preview\\'))) {
           return path.resolve(__dirname, 'theme/preview/utils.ts');
         }
       }
@@ -87,7 +81,7 @@ export default defineConfig({
         text: 'Pipeline Guide',
         items: [
           { text: 'Overview', link: '/guide/overview' },
-          { text: 'Architecture (Hexagonal)', link: '/guide/architecture' },
+          { text: 'Architecture (Full-TS)', link: '/guide/architecture' },
           { text: 'Figma Plugin', link: '/guide/figma-plugin' },
           { text: 'Backend API Reference', link: '/guide/api-reference' },
         ],
@@ -103,23 +97,13 @@ export default defineConfig({
         ],
       },
       {
-        text: 'Getting Started',
-        collapsed: false,
-        items: [
-          { text: 'Pipeline Overview', link: '/guide/overview' },
-          { text: 'Architecture (Hexagonal)', link: '/guide/architecture' },
-          { text: 'Figma Plugin Extractor', link: '/guide/figma-plugin' },
-          { text: 'Backend API Reference', link: '/guide/api-reference' },
-        ],
-      },
-      {
         text: 'General & Actions',
         collapsed: false,
         items: [
           { text: 'Button', link: '/components/button' },
           { text: 'FAB (Floating Action)', link: '/components/fab' },
           { text: 'Icon Placeholder', link: '/components/icon-placeholder' },
-          { text: 'Truck Delivery Icon', link: '/components/tabler-truck-delivery' },
+          { text: 'Icon Truck Delivery', link: '/components/icon-truck-delivery' },
         ],
       },
       {
@@ -148,19 +132,35 @@ export default defineConfig({
         collapsed: false,
         items: [
           { text: 'Table', link: '/components/table' },
-          { text: 'Table Header Row', link: '/components/table-header-row' },
-          { text: 'Table Body Row', link: '/components/table-body-row' },
-          { text: 'Table Body Cell', link: '/components/table-body-cell' },
-          { text: 'Table Cell Value', link: '/components/table-cell-value' },
-          { text: 'Table Checkbox Header', link: '/components/table-checkbox-header-cell' },
-          { text: 'Table Checkbox Body', link: '/components/table-checkbox-body-cell' },
-          { text: 'Table No Header Cell', link: '/components/table-no-header-cell' },
-          { text: 'Table No Body Cell', link: '/components/table-no-body-cell' },
           { text: 'Metric Card', link: '/components/metric-card' },
           { text: 'Chart', link: '/components/chart' },
           { text: 'Badge', link: '/components/badge' },
           { text: 'Avatar', link: '/components/avatar' },
           { text: 'Progressbar', link: '/components/progressbar' },
+          {
+            text: 'Chart Primitives',
+            collapsed: true,
+            items: [
+              { text: 'Chart Bar', link: '/components/chart-bar' },
+              { text: 'Chart Line', link: '/components/chart-line' },
+              { text: 'Chart Pie', link: '/components/chart-pie' },
+              { text: 'Chart Legend', link: '/components/chart-legend' },
+            ],
+          },
+          {
+            text: 'Table Primitives',
+            collapsed: true,
+            items: [
+              { text: 'Table Header Row', link: '/components/table-header-row' },
+              { text: 'Table Body Row', link: '/components/table-body-row' },
+              { text: 'Table Body Cell', link: '/components/table-body-cell' },
+              { text: 'Table Cell Value', link: '/components/table-cell-value' },
+              { text: 'Table Checkbox Header', link: '/components/table-checkbox-header-cell' },
+              { text: 'Table Checkbox Body', link: '/components/table-checkbox-body-cell' },
+              { text: 'Table No Header Cell', link: '/components/table-no-header-cell' },
+              { text: 'Table No Body Cell', link: '/components/table-no-body-cell' },
+            ],
+          },
         ],
       },
       {
@@ -187,6 +187,16 @@ export default defineConfig({
           { text: 'Tooltip', link: '/components/tooltip' },
           { text: 'Spinner', link: '/components/spinner' },
           { text: 'Bubble Chat', link: '/components/bubble-chat' },
+        ],
+      },
+      {
+        text: 'Pipeline Architecture',
+        collapsed: true,
+        items: [
+          { text: 'Pipeline Overview', link: '/guide/overview' },
+          { text: 'Architecture (Full-TS)', link: '/guide/architecture' },
+          { text: 'Figma Plugin Extractor', link: '/guide/figma-plugin' },
+          { text: 'Backend API Reference', link: '/guide/api-reference' },
         ],
       },
     ],

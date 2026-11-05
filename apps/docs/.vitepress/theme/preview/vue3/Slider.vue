@@ -1,5 +1,8 @@
 <template>
-  <div :class="cn('flex w-full flex-col gap-2', className)">
+  <div
+    :data-ctrl="typeof bindControllerProps"
+    :class="cn('flex w-full flex-col gap-2', className)"
+  >
     <template v-if="showValue">
       <div
         class="flex items-center justify-between text-xs text-foreground-muted"
@@ -15,41 +18,45 @@
       "
     >
       <div
-        class="absolute inset-x-0 h-1.5 rounded-rounded-full bg-components-slider-default-color-track-background-default"
+        class="absolute inset-x-0 h-1.5 rounded-full bg-background-muted"
       ></div>
       <div
-        class="absolute left-0 h-1.5 rounded-rounded-full bg-components-slider-default-color-bar-background-default"
-        :style="barStyle"
-      ></div>
-      <div
-        class="absolute top-1/2 h-5 w-5 -translate-x-1/2 -translate-y-1/2 rounded-rounded-full border border-components-slider-default-color-thumb-border-default bg-components-slider-default-color-thumb-background-default shadow-sm"
-        aria-hidden="true"
-        :style="thumbStyle"
+        class="absolute left-0 h-1.5 rounded-full bg-primary-default"
+        :style="getSliderState(props).barStyle"
       ></div>
       <input
         type="range"
-        class="absolute inset-0 h-5 w-full cursor-pointer opacity-0 disabled:cursor-not-allowed"
+        class="peer absolute inset-0 z-10 h-5 w-full cursor-pointer opacity-0 disabled:cursor-not-allowed"
+        :id="id"
+        :name="name"
         :min="min"
         :max="max"
         :step="step"
         :value="value"
         :disabled="disabled"
         :aria-label="label"
-        :aria-valuemin="min"
-        :aria-valuemax="max"
-        :aria-valuenow="value"
-        @input="async (event) => handleInput(event.target.value)"
+        @input="
+          async (event) =>
+            !disabled &&
+            onValueChange &&
+            onValueChange(Number(event.target.value))
+        "
       />
+      <div
+        aria-hidden="true"
+        class="pointer-events-none absolute top-1/2 h-5 w-5 -translate-x-1/2 -translate-y-1/2 rounded-full border border-primary-default bg-background-default shadow-sm peer-focus-visible:ring-2 peer-focus-visible:ring-focus-ring-primary"
+        :style="getSliderState(props).thumbStyle"
+      ></div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
-
-import { cn } from "./utils";
+import { cn, getSliderState, bindControllerProps } from "./utils";
 
 export interface SliderProps {
+  id?: string;
+  name?: string;
   value?: number;
   min?: number;
   max?: number;
@@ -62,49 +69,16 @@ export interface SliderProps {
 }
 
 const props = withDefaults(defineProps<SliderProps>(), {
-  max: 100,
-  min: 0,
-  value: 0,
-  disabled: false,
-  onValueChange: undefined,
   className: "",
   showValue: false,
   label: "Slider",
+  value: 0,
+  disabled: false,
+  id: "slider",
+  name: "slider",
+  min: 0,
+  max: 100,
   step: 1,
+  onValueChange: undefined,
 });
-
-const percentage = computed(() => {
-  const range = props.max - props.min;
-  if (range <= 0) {
-    return 0;
-  }
-  const raw = ((props.value - props.min) / range) * 100;
-  if (raw < 0) {
-    return 0;
-  }
-  if (raw > 100) {
-    return 100;
-  }
-  return raw;
-});
-const barStyle = computed(() => {
-  return {
-    width: percentage + "%",
-  };
-});
-const thumbStyle = computed(() => {
-  return {
-    left: percentage + "%",
-  };
-});
-
-function handleInput(rawValue: string) {
-  if (props.disabled) {
-    return;
-  }
-  const next = Number(rawValue);
-  if (props.onValueChange && !isNaN(next)) {
-    props.onValueChange(next);
-  }
-}
 </script>

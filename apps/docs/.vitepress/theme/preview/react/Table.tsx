@@ -8,217 +8,208 @@ export interface TableColumn {
 }
 export interface TableRowData {
   id: string;
-  cells: string[];
+  cells: TableCellInput[];
   selected?: boolean;
 }
 export interface TableProps {
+  state?: "default" | "empty";
   columns?: TableColumn[];
   rows?: TableRowData[];
   caption?: string;
   showCheckbox?: boolean;
   showNo?: boolean;
+  showPagination?: boolean;
+  currentPage?: number;
+  totalPages?: number;
+  pageSize?: number;
+  rowsPerPageLabel?: string;
   emptyTitle?: string;
   emptyBody?: string;
   emptyCtaLabel?: string;
   showEmptyCta?: boolean;
   showEmptyIcon?: boolean;
   showEmptyTitle?: boolean;
+  showEmptyDescription?: boolean;
   className?: string;
+  children?: React.ReactNode;
   onRowSelect?: (rowId: string, checked: boolean) => void;
   onSelectAll?: (checked: boolean) => void;
+  onPageChange?: (page: number) => void;
+  onPageSizeChange?: (pageSize: number) => void;
   onEmptyCtaClick?: () => void;
 }
 
-import { cn } from "./utils";
+import {
+  cn,
+  getTableState,
+  ICON_PATHS,
+  bindControllerProps,
+  TableCellInput,
+} from "./utils";
+import TableHeaderRow from "./TableHeaderRow";
+import TableBodyRow from "./TableBodyRow";
+import Pagination from "./Pagination";
 
 function Table(props: TableProps) {
   props = {
+    state: "default",
     columns: [],
     rows: [],
     caption: "Data table",
     showCheckbox: false,
     showNo: false,
-    emptyTitle: "No data available",
+    showPagination: true,
+    currentPage: 2,
+    totalPages: 10,
+    pageSize: 10,
+    rowsPerPageLabel: "Rows per page",
+    emptyTitle: "No Data Available",
     emptyBody:
       "There's nothing here yet. Try adding some data or adjusting your filters.",
-    emptyCtaLabel: "Add data",
+    emptyCtaLabel: "Add Data",
     showEmptyCta: true,
     showEmptyIcon: true,
     showEmptyTitle: true,
+    showEmptyDescription: true,
     className: "",
     ...props,
   };
-  function columnSpan() {
-    let span = props.columns.length;
-    if (props.showNo) {
-      span = span + 1;
-    }
-    if (props.showCheckbox) {
-      span = span + 1;
-    }
-    return span > 0 ? span : 1;
-  }
-
-  function isEmpty() {
-    return props.rows.length === 0;
-  }
-
-  function alignmentClasses(align: string) {
-    if (align === "center") {
-      return "text-center";
-    }
-    if (align === "right") {
-      return "text-right";
-    }
-    return "text-left";
-  }
-
-  function handleRowSelect(rowId: string, checked: boolean) {
-    if (props.onRowSelect) {
-      props.onRowSelect(rowId, checked);
-    }
-  }
-
-  function handleSelectAll(checked: boolean) {
-    if (props.onSelectAll) {
-      props.onSelectAll(checked);
-    }
-  }
-
-  function handleEmptyCta() {
-    if (props.onEmptyCtaClick) {
-      props.onEmptyCtaClick();
-    }
-  }
-
+  const [__ctrlState, __setCtrlState] = React.useState<Record<string, any>>({});
+  props = bindControllerProps(props, __ctrlState, __setCtrlState);
   return (
     <div
+      data-ctrl={typeof bindControllerProps}
       className={cn(
-        "w-full overflow-x-auto rounded-rounded-lg border border-components-table-default-color-container-border-default bg-components-table-default-color-container-background-default",
+        "w-full overflow-x-auto rounded-lg bg-background-default",
+        getTableState(props).isEmpty && !props.children
+          ? ""
+          : "border border-border-default",
         props.className
       )}
     >
-      <table className="w-full border-collapse">
-        <caption className="sr-only">{props.caption}</caption>
-        <thead>
-          <tr className="border-b border-components-table-default-color-divider-border-default">
-            {props.showNo ? (
-              <th
-                scope="col"
-                className="w-12 whitespace-nowrap bg-components-table-default-color-header-background-default px-4 py-3 text-center text-xs font-semibold uppercase tracking-wide text-components-table-default-color-header-foreground-default"
-              >
-                No.
-              </th>
-            ) : null}
-            {props.showCheckbox ? (
-              <th
-                scope="col"
-                className="w-12 whitespace-nowrap bg-components-table-default-color-header-background-default px-4 py-3 text-center"
-              >
-                <input
-                  type="checkbox"
-                  aria-label="Select all rows"
-                  className="h-4 w-4 cursor-pointer appearance-none rounded-rounded-sm border border-components-checkbox-off-color-container-border-default bg-components-checkbox-off-color-container-background-default align-middle checked:border-components-checkbox-on-color-container-background-default checked:bg-components-checkbox-on-color-container-background-default focus-visible:ring-2 focus-visible:ring-focus-ring-primary"
-                  onChange={(event) => handleSelectAll(true)}
-                />
-              </th>
-            ) : null}
-            {props.columns?.map((column) => (
-              <th
-                scope="col"
-                key={column.id}
-                className={cn(
-                  "whitespace-nowrap bg-components-table-default-color-header-background-default px-4 py-3 text-xs font-semibold uppercase tracking-wide text-components-table-default-color-header-foreground-default",
-                  alignmentClasses(column.align)
-                )}
-              >
-                {column.label}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {isEmpty() ? (
-            <tr>
-              <td className="px-8 py-10" colspan={columnSpan()}>
-                <div className="flex flex-col items-center gap-4 text-center">
-                  {props.showEmptyIcon ? (
-                    <span
-                      className="flex h-16 w-16 items-center justify-center rounded-rounded-full bg-components-table-empty-color-icon-container-background-default"
-                      aria-hidden="true"
-                    >
-                      <svg
-                        className="h-7 w-7 text-components-table-empty-color-icon-stroke-default"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="1.5"
-                      >
-                        <path
-                          d="M4 7h16M4 12h16M4 17h10"
-                          stroke-linecap="round"
-                        />
-                      </svg>
-                    </span>
-                  ) : null}
-                  <div className="flex flex-col items-center gap-2">
-                    {props.showEmptyTitle ? (
-                      <span className="text-base font-semibold text-components-table-empty-color-title-foreground-default">
-                        {props.emptyTitle}
-                      </span>
-                    ) : null}
-                    <span className="max-w-sm text-sm text-components-table-empty-color-body-foreground-default">
-                      {props.emptyBody}
-                    </span>
-                  </div>
-                  {props.showEmptyCta ? (
-                    <button
-                      type="button"
-                      className="inline-flex h-9 items-center justify-center rounded-rounded-lg bg-components-button-primary-color-container-background-default px-4 text-sm font-medium text-components-button-primary-color-label-foreground-default transition-colors hover:bg-components-button-primary-color-container-background-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring-primary"
-                      onClick={(event) => handleEmptyCta()}
-                    >
-                      {props.emptyCtaLabel}
-                    </button>
-                  ) : null}
-                </div>
-              </td>
-            </tr>
-          ) : null}
-          {props.rows?.map((row, index) => (
-            <tr
-              className="bg-components-table-default-color-row-background-default transition-colors hover:bg-background-subtle"
-              key={row.id}
+      {getTableState(props).isEmpty && !props.children ? (
+        <div className="flex flex-col items-center justify-center gap-4 px-8 py-10 text-center">
+          {props.showEmptyIcon ? (
+            <span
+              className="flex h-16 w-16 items-center justify-center rounded-full bg-background-muted"
+              aria-hidden="true"
             >
-              {props.showNo ? (
-                <td className="w-12 whitespace-nowrap border-t border-components-table-default-color-divider-border-default px-4 py-3 text-center text-sm text-components-table-default-color-cell-foreground-muted">
-                  {index + 1}
-                </td>
-              ) : null}
-              {props.showCheckbox ? (
-                <td className="w-12 whitespace-nowrap border-t border-components-table-default-color-divider-border-default px-4 py-3 text-center">
-                  <input
-                    type="checkbox"
-                    className="h-4 w-4 cursor-pointer appearance-none rounded-rounded-sm border border-components-checkbox-off-color-container-border-default bg-components-checkbox-off-color-container-background-default align-middle checked:border-components-checkbox-on-color-container-background-default checked:bg-components-checkbox-on-color-container-background-default focus-visible:ring-2 focus-visible:ring-focus-ring-primary"
-                    checked={row.selected}
-                    aria-label={"Select row " + (index + 1)}
-                    onChange={(event) => handleRowSelect(row.id, !row.selected)}
+              <svg
+                className="h-7 w-7 text-foreground-muted"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d={ICON_PATHS.search}
+                />
+              </svg>
+            </span>
+          ) : null}
+          <div className="flex flex-col items-center gap-2">
+            {props.showEmptyTitle ? (
+              <span className="text-base font-semibold text-foreground-default">
+                {props.emptyTitle}
+              </span>
+            ) : null}
+            {props.showEmptyDescription ? (
+              <span className="max-w-sm text-sm text-foreground-muted">
+                {props.emptyBody}
+              </span>
+            ) : null}
+          </div>
+          {props.showEmptyCta ? (
+            <button
+              type="button"
+              className="inline-flex h-9 items-center justify-center rounded-lg bg-secondary-default px-4 text-sm font-medium text-secondary-foreground transition-colors hover:bg-secondary-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring-primary"
+              onClick={(event) =>
+                props.onEmptyCtaClick && props.onEmptyCtaClick()
+              }
+            >
+              {props.emptyCtaLabel}
+            </button>
+          ) : null}
+        </div>
+      ) : null}
+      {!getTableState(props).isEmpty || Boolean(props.children) ? (
+        <>
+          <table className="w-full border-collapse">
+            <caption className="sr-only">{props.caption}</caption>
+            {props.children ? <>{props.children}</> : null}
+            {!props.children ? (
+              <>
+                <thead>
+                  <TableHeaderRow
+                    columns={getTableState(props).columns}
+                    showCheckbox={props.showCheckbox}
+                    showNo={props.showNo}
+                    allSelected={getTableState(props).allSelected}
+                    onSelectAll={(checked) =>
+                      props.onSelectAll && props.onSelectAll(checked)
+                    }
                   />
-                </td>
-              ) : null}
-              {row.cells?.map((cell, cellIndex) => (
-                <td
-                  className="border-t border-components-table-default-color-divider-border-default px-4 py-3 align-middle text-sm text-components-table-default-color-cell-foreground-default"
-                  key={cellIndex}
+                </thead>
+                <tbody>
+                  {getTableState(props).rows?.map((row, index) => (
+                    <TableBodyRow
+                      key={row.id}
+                      rowId={row.id}
+                      cells={row.cells}
+                      columns={getTableState(props).columns}
+                      no={index + 1}
+                      showNo={props.showNo}
+                      showCheckbox={props.showCheckbox}
+                      checked={row.selected}
+                      checkboxAriaLabel={"Select row " + (index + 1)}
+                      onSelect={(rowId, checked) =>
+                        props.onRowSelect && props.onRowSelect(rowId, checked)
+                      }
+                    />
+                  ))}
+                </tbody>
+              </>
+            ) : null}
+          </table>
+          {props.showPagination ? (
+            <div className="flex flex-wrap items-center justify-between gap-4 px-6 py-3">
+              <div className="flex items-center gap-2">
+                <span className="pr-2 text-sm text-foreground-default">
+                  {props.rowsPerPageLabel}
+                </span>
+                <select
+                  className="h-9 rounded-lg border border-border-default bg-background-default px-3 text-sm font-medium text-foreground-default shadow-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring-primary"
+                  aria-label={props.rowsPerPageLabel}
+                  value={String(props.pageSize)}
+                  onChange={(event) =>
+                    props.onPageSizeChange &&
+                    props.onPageSizeChange(Number(event.target.value))
+                  }
                 >
-                  {cell}
-                </td>
-              ))}
-            </tr>
-          ))}
-        </tbody>
-      </table>
+                  {getTableState(props).pageSizeOptions?.map((opt) => (
+                    <option key={opt} value={String(opt)}>
+                      {opt}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <Pagination
+                currentPage={props.currentPage}
+                totalPages={props.totalPages}
+                onPageChange={(page) =>
+                  props.onPageChange && props.onPageChange(page)
+                }
+              />
+            </div>
+          ) : null}
+        </>
+      ) : null}
     </div>
   );
 }
+
+Object.assign(Table, { HeaderRow: TableHeaderRow, TableHeaderRow, BodyRow: TableBodyRow, TableBodyRow, Pagination });
 
 export default Table;

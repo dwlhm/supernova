@@ -21,66 +21,9 @@ PROPERTIES
 • Show required — Toggles the required indicator.
 • Show hint — Toggles supporting or error text.
 
-## Live Preview
+## Live Preview & Usage
 
 <FrameworkPreview name="InputOTP" />
-
-## Usage
-
-::: code-group
-
-```tsx [React]
-import { InputOTP } from './InputOTP';
-
-export default function Example() {
-  return (
-    <InputOTP hint/Error text="Please enter the one-time password sent to your phone." label text="Label">
-      InputOTP
-    </InputOTP>
-  );
-}
-```
-
-```vue [Vue 3]
-<script setup lang="ts">
-import { InputOTP } from './InputOTP';
-</script>
-
-<template>
-  <InputOTP hint/Error text="Please enter the one-time password sent to your phone." label text="Label">
-    InputOTP
-  </InputOTP>
-</template>
-```
-
-```svelte [Svelte]
-<script lang="ts">
-  import InputOTP from './InputOTP.svelte';
-</script>
-
-<InputOTP hint/Error text="Please enter the one-time password sent to your phone." label text="Label">
-  InputOTP
-</InputOTP>
-```
-
-```ts [Angular]
-import { Component } from '@angular/core';
-import { InputOTPComponent } from './input-otp.component';
-
-@Component({
-  selector: 'app-root',
-  standalone: true,
-  imports: [InputOTPComponent],
-  template: `
-    <app-input-otp hint/Error text="Please enter the one-time password sent to your phone." label text="Label">
-      InputOtp
-    </app-input-otp>
-  `,
-})
-export class AppComponent {}
-```
-
-:::
 
 ## Props & Variants
 

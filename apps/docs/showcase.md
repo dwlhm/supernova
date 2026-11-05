@@ -1,6 +1,7 @@
 ---
 title: Multi-Framework Showcase
 description: Live interactive showcase of components generated from Figma across React, Vue 3, and Svelte.
+aside: false
 ---
 
 # Multi-Framework Showcase

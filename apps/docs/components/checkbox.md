@@ -27,66 +27,9 @@ Disabled: false for interactive use or true when the control is unavailable.
 leftLabel: Shows or hides the label on the left side.
 rightLabel: Shows or hides the label on the right side.
 
-## Live Preview
+## Live Preview & Usage
 
 <FrameworkPreview name="Checkbox" />
-
-## Usage
-
-::: code-group
-
-```tsx [React]
-import { Checkbox } from './Checkbox';
-
-export default function Example() {
-  return (
-    <Checkbox disabled="false" size="Small">
-      Checkbox
-    </Checkbox>
-  );
-}
-```
-
-```vue [Vue 3]
-<script setup lang="ts">
-import { Checkbox } from './Checkbox';
-</script>
-
-<template>
-  <Checkbox disabled="false" size="Small">
-    Checkbox
-  </Checkbox>
-</template>
-```
-
-```svelte [Svelte]
-<script lang="ts">
-  import Checkbox from './Checkbox.svelte';
-</script>
-
-<Checkbox disabled="false" size="Small">
-  Checkbox
-</Checkbox>
-```
-
-```ts [Angular]
-import { Component } from '@angular/core';
-import { CheckboxComponent } from './checkbox.component';
-
-@Component({
-  selector: 'app-root',
-  standalone: true,
-  imports: [CheckboxComponent],
-  template: `
-    <app-checkbox disabled="false" size="Small">
-      Checkbox
-    </app-checkbox>
-  `,
-})
-export class AppComponent {}
-```
-
-:::
 
 ## Props & Variants
 

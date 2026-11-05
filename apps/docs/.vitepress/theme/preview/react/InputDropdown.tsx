@@ -1,6 +1,5 @@
 "use client";
 import * as React from "react";
-import { useState } from "react";
 
 export interface SelectOption {
   value: string;
@@ -8,10 +7,12 @@ export interface SelectOption {
   disabled?: boolean;
 }
 export interface InputDropdownProps {
+  open?: boolean;
   value?: string;
   options?: SelectOption[];
   searchQuery?: string;
   id?: string;
+  name?: string;
   label?: string;
   placeholder?: string;
   hint?: string;
@@ -22,19 +23,23 @@ export interface InputDropdownProps {
   showHint?: boolean;
   showSearch?: boolean;
   showLeftIcon?: boolean;
+  showRightIcon?: boolean;
   className?: string;
   onSelect?: (value: string) => void;
   onSearchChange?: (value: string) => void;
+  onOpenChange?: (open: boolean) => void;
 }
 
-import { cn } from "./utils";
+import { cn, getDropdownState, ICON_PATHS, bindControllerProps } from "./utils";
 
 function InputDropdown(props: InputDropdownProps) {
   props = {
+    open: false,
     value: "",
     options: [],
     searchQuery: "",
     id: "input-dropdown",
+    name: "dropdown",
     label: "Department",
     placeholder: "Choose department",
     hint: "Select your department or area of work.",
@@ -45,80 +50,23 @@ function InputDropdown(props: InputDropdownProps) {
     showHint: false,
     showSearch: true,
     showLeftIcon: false,
+    showRightIcon: true,
     className: "",
     ...props,
   };
-  const [isOpen, setIsOpen] = useState(() => false);
-
-  function hasError() {
-    return props.errorMessage !== "";
-  }
-
-  function normalizedQuery() {
-    return props.searchQuery.trim().toLowerCase();
-  }
-
-  function selectedLabel() {
-    const matched = (props.options || []).filter(
-      (option) => option.value === props.value
-    );
-    return matched.length > 0 ? matched[0].label : "";
-  }
-
-  function panelClasses() {
-    return isOpen ? "block" : "hidden";
-  }
-
-  function triggerClasses() {
-    if (hasError()) {
-      return "border-components-select-all-color-trigger-border-error";
-    }
-    if (isOpen) {
-      return "border-components-select-all-color-trigger-border-focus";
-    }
-    return "border-components-select-all-color-trigger-border-default";
-  }
-
-  function supportingText() {
-    return hasError() ? props.errorMessage : props.hint;
-  }
-
-  function supportingClasses() {
-    return hasError()
-      ? "text-components-select-all-color-supporting-text-foreground-error"
-      : "text-components-select-all-color-supporting-text-foreground-default";
-  }
-
-  function toggle() {
-    if (props.disabled) {
-      return;
-    }
-    setIsOpen(!isOpen);
-  }
-
-  function handleSearch(rawValue: string) {
-    if (props.onSearchChange) {
-      props.onSearchChange(rawValue);
-    }
-  }
-
-  function handleSelect(selected: string) {
-    setIsOpen(false);
-    if (props.onSelect) {
-      props.onSelect(selected);
-    }
-  }
-
+  const [__ctrlState, __setCtrlState] = React.useState<Record<string, any>>({});
+  props = bindControllerProps(props, __ctrlState, __setCtrlState);
   return (
-    <div className={cn("relative flex w-full flex-col gap-3", props.className)}>
+    <div
+      id={props.id}
+      data-ctrl={typeof bindControllerProps}
+      className={cn("relative flex w-full flex-col gap-3", props.className)}
+    >
       {props.showLabel && props.label !== "" ? (
-        <span className="flex items-center gap-1 text-sm font-medium text-components-select-all-color-label-foreground-default">
+        <span className="flex items-center gap-1 text-sm font-medium text-foreground-default">
           {props.label}
           {props.required ? (
-            <span
-              aria-hidden="true"
-              className="text-components-select-all-color-required-indicator-foreground-default"
-            >
+            <span aria-hidden="true" className="text-destructive-default">
               *
             </span>
           ) : null}
@@ -127,132 +75,125 @@ function InputDropdown(props: InputDropdownProps) {
       <button
         type="button"
         aria-haspopup="listbox"
-        aria-expanded={isOpen}
+        aria-expanded={getDropdownState(props).isOpen}
+        aria-invalid={getDropdownState(props).hasError}
         disabled={props.disabled}
         className={cn(
-          "flex h-9 w-full items-center justify-between gap-2.5 rounded-rounded-lg border bg-components-select-all-color-trigger-background-default px-3 text-left transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring-primary disabled:cursor-not-allowed disabled:opacity-50",
-          triggerClasses()
+          "flex h-9 w-full items-center justify-between gap-1.5 rounded-lg border bg-background-default px-3 text-left shadow-xs transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring-primary disabled:cursor-not-allowed disabled:opacity-50",
+          getDropdownState(props).hasError
+            ? "border-destructive-border focus:ring-2 focus:ring-focus-ring-error"
+            : getDropdownState(props).isOpen
+            ? "border-primary-border-emphasis ring-2 ring-focus-ring-primary"
+            : "border-border-default focus:border-primary-border-emphasis focus:ring-2 focus:ring-focus-ring-primary"
         )}
-        onClick={(event) => toggle()}
+        onClick={(event) =>
+          !props.disabled &&
+          props.onOpenChange &&
+          props.onOpenChange(!props.open)
+        }
       >
-        <span className="flex items-center gap-2.5 truncate">
+        <span className="flex items-center gap-1.5 truncate">
           {props.showLeftIcon ? (
             <svg
               aria-hidden="true"
-              className="h-4 w-4 shrink-0 text-components-select-all-color-trigger-icon-default"
+              className="h-4 w-4 shrink-0 text-foreground-muted"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
-              stroke-width="1.5"
+              strokeWidth="1.5"
             >
-              <path d="M4 6h16M4 12h16M4 18h10" stroke-linecap="round" />
+              <path strokeLinecap="round" d={ICON_PATHS.menu} />
             </svg>
           ) : null}
-          {selectedLabel() !== "" ? (
-            <span className="truncate text-sm text-components-select-all-color-trigger-foreground-default">
-              {selectedLabel()}
-            </span>
-          ) : null}
-          {selectedLabel() === "" ? (
-            <span className="truncate text-sm text-components-select-all-color-placeholder-foreground-default">
-              {props.placeholder}
-            </span>
-          ) : null}
+          <span
+            className={cn(
+              "truncate text-sm",
+              getDropdownState(props).selectedLabel !== ""
+                ? "text-foreground-default"
+                : "text-foreground-subtle"
+            )}
+          >
+            {getDropdownState(props).selectedLabel !== "" ? (
+              <>{getDropdownState(props).selectedLabel}</>
+            ) : (
+              <>{props.placeholder}</>
+            )}
+          </span>
         </span>
-        <svg
-          aria-hidden="true"
-          className="h-4 w-4 shrink-0 text-components-select-all-color-vector-stroke-default"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="1.5"
-        >
-          <path
-            d="m6 9 6 6 6-6"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          />
-        </svg>
+        {props.showRightIcon ? (
+          <svg
+            aria-hidden="true"
+            className="h-4 w-4 shrink-0 text-foreground-muted"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.5"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d={ICON_PATHS.chevronDown}
+            />
+          </svg>
+        ) : null}
       </button>
       <div
-        role="listbox"
         className={cn(
-          "absolute top-full z-50 mt-2 w-full overflow-hidden rounded-rounded-md border border-components-select-all-color-dropdown-menu-border-focus bg-components-select-all-color-dropdown-menu-background-focus shadow-lg",
-          panelClasses()
+          "absolute top-full z-50 mt-2 w-full overflow-hidden rounded-md border border-border-default bg-background-default shadow-lg",
+          getDropdownState(props).isOpen ? "block" : "hidden"
         )}
       >
         {props.showSearch ? (
-          <div className="flex items-center gap-2 border-b border-components-select-all-color-search-input-border-focus px-3 py-2">
-            <svg
-              aria-hidden="true"
-              className="h-4 w-4 shrink-0 text-components-select-all-color-vector-stroke-default"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.5"
-            >
-              <circle cx="11" cy="11" r="7" />
-              <path d="m20 20-3.5-3.5" stroke-linecap="round" />
-            </svg>
+          <div className="flex items-center gap-2 border-b border-border-default px-3 py-2">
             <input
               type="search"
               placeholder="Search"
               aria-label="Search options"
-              className="w-full bg-transparent text-sm text-components-select-all-color-trigger-foreground-default outline-none placeholder:text-components-select-all-color-placeholder-foreground-default"
+              className="w-full bg-transparent text-sm text-foreground-default outline-none placeholder:text-foreground-subtle"
               value={props.searchQuery}
-              onInput={(event) => handleSearch(event.target.value)}
+              onChange={(event) =>
+                props.onSearchChange && props.onSearchChange(event.target.value)
+              }
             />
           </div>
         ) : null}
-        <ul className="flex max-h-60 flex-col overflow-y-auto p-1">
-          {props.options?.map((option) => (
-            <li
+        <div
+          role="listbox"
+          className="flex max-h-60 flex-col overflow-y-auto p-1"
+          aria-label={props.label}
+        >
+          {getDropdownState(props).filtered?.map((option) => (
+            <button
+              type="button"
+              role="option"
               key={option.value}
-              className={
-                normalizedQuery() !== "" &&
-                option.label.toLowerCase().indexOf(normalizedQuery()) === -1
-                  ? "hidden"
-                  : "block"
+              aria-selected={option.value === props.value}
+              disabled={option.disabled}
+              className={cn(
+                "flex w-full items-center justify-between rounded-sm px-2 py-2 text-left text-sm transition-colors focus:outline-none disabled:cursor-not-allowed disabled:opacity-50",
+                option.value === props.value
+                  ? "bg-background-muted text-foreground-default"
+                  : "text-foreground-default hover:bg-background-muted"
+              )}
+              onClick={(event) =>
+                props.onSelect && props.onSelect(option.value)
               }
             >
-              <button
-                type="button"
-                role="option"
-                aria-selected={option.value === props.value}
-                disabled={option.disabled}
-                className={cn(
-                  "flex w-full items-center justify-between rounded-rounded-sm px-2 py-2 text-left text-sm transition-colors focus:outline-none disabled:cursor-not-allowed disabled:opacity-50",
-                  option.value === props.value
-                    ? "bg-components-select-all-color-wrapper-background-focus text-components-select-all-color-trigger-foreground-default"
-                    : "text-components-select-all-color-trigger-foreground-default hover:bg-background-muted"
-                )}
-                onClick={(event) => handleSelect(option.value)}
-              >
-                <span className="truncate">{option.label}</span>
-                {option.value === props.value ? (
-                  <svg
-                    aria-hidden="true"
-                    className="h-4 w-4 shrink-0"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                  >
-                    <path
-                      d="m5 13 4 4L19 7"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    />
-                  </svg>
-                ) : null}
-              </button>
-            </li>
+              <span className="truncate">{option.label}</span>
+            </button>
           ))}
-        </ul>
+        </div>
       </div>
       {props.showHint ? (
-        <span className={cn("text-xs", supportingClasses())}>
-          {supportingText()}
+        <span
+          className={cn(
+            "text-sm",
+            getDropdownState(props).hasError
+              ? "text-destructive-foreground"
+              : "text-foreground-muted"
+          )}
+        >
+          {getDropdownState(props).helpText}
         </span>
       ) : null}
     </div>

@@ -1,5 +1,5 @@
 <template>
-  <div ref="containerRef" class="svelte-host-container"></div>
+  <component :is="tag || 'div'" ref="containerRef" class="svelte-host-container contents" />
 </template>
 
 <script setup lang="ts">
@@ -8,6 +8,7 @@ import { ref, onMounted, onBeforeUnmount, watch } from 'vue';
 const props = defineProps<{
   component: any;
   props?: any;
+  tag?: string;
 }>();
 
 const containerRef = ref<HTMLDivElement | null>(null);
@@ -39,9 +40,20 @@ onMounted(() => {
 });
 
 watch(
-  () => [props.component, props.props],
+  () => props.component,
   () => {
     mountSvelte();
+  }
+);
+
+watch(
+  () => props.props,
+  (nextProps) => {
+    if (instance && typeof instance.$set === 'function') {
+      instance.$set(nextProps || {});
+    } else {
+      mountSvelte();
+    }
   },
   { deep: true }
 );

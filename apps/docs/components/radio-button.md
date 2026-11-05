@@ -26,66 +26,9 @@ Size: Small, Medium, or Large. Use one size consistently within a group.
 leftLabel: Shows or hides the optional label on the left.
 rightLabel: Shows or hides the optional label on the right. Prefer one label position at a time.
 
-## Live Preview
+## Live Preview & Usage
 
 <FrameworkPreview name="RadioButton" />
-
-## Usage
-
-::: code-group
-
-```tsx [React]
-import { RadioButton } from './RadioButton';
-
-export default function Example() {
-  return (
-    <RadioButton disabled="false" size="Small">
-      RadioButton
-    </RadioButton>
-  );
-}
-```
-
-```vue [Vue 3]
-<script setup lang="ts">
-import { RadioButton } from './RadioButton';
-</script>
-
-<template>
-  <RadioButton disabled="false" size="Small">
-    RadioButton
-  </RadioButton>
-</template>
-```
-
-```svelte [Svelte]
-<script lang="ts">
-  import RadioButton from './RadioButton.svelte';
-</script>
-
-<RadioButton disabled="false" size="Small">
-  RadioButton
-</RadioButton>
-```
-
-```ts [Angular]
-import { Component } from '@angular/core';
-import { RadioButtonComponent } from './radio-button.component';
-
-@Component({
-  selector: 'app-root',
-  standalone: true,
-  imports: [RadioButtonComponent],
-  template: `
-    <app-radio-button disabled="false" size="Small">
-      RadioButton
-    </app-radio-button>
-  `,
-})
-export class AppComponent {}
-```
-
-:::
 
 ## Props & Variants
 

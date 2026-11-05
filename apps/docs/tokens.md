@@ -206,9 +206,11 @@ Design tokens extracted from the Figma document.
 | <span style="display:inline-block;width:1.25rem;height:1.25rem;background-color:rgb(245, 245, 245);border-radius:0.25rem;border:1px solid rgba(128,128,128,0.2);vertical-align:middle;"></span> | `🧩 Components/bubble-chat/incoming/color/container/background/default` | `rgb(245, 245, 245)` | Component token grammar — component: bubble-chat; variant: incoming; category: color; element: container; property: background; state: default. Mapping: Default → 🌱 Semantic `colors/background/muted`. |
 | <span style="display:inline-block;width:1.25rem;height:1.25rem;background-color:rgb(10, 10, 10);border-radius:0.25rem;border:1px solid rgba(128,128,128,0.2);vertical-align:middle;"></span> | `🧩 Components/bubble-chat/incoming/color/message/foreground/default` | `rgb(10, 10, 10)` | Component token grammar — component: bubble-chat; variant: incoming; category: color; element: message; property: foreground; state: default. Mapping: Default → 🌱 Semantic `colors/foreground/default`. |
 | <span style="display:inline-block;width:1.25rem;height:1.25rem;background-color:rgb(115, 115, 115);border-radius:0.25rem;border:1px solid rgba(128,128,128,0.2);vertical-align:middle;"></span> | `🧩 Components/bubble-chat/incoming/color/timestamp/foreground/default` | `rgb(115, 115, 115)` | Component token grammar — component: bubble-chat; variant: incoming; category: color; element: timestamp; property: foreground; state: default. Mapping: Default → 🌱 Semantic `colors/foreground/muted`. |
-| <span style="display:inline-block;width:1.25rem;height:1.25rem;background-color:rgb(229, 85, 20);border-radius:0.25rem;border:1px solid rgba(128,128,128,0.2);vertical-align:middle;"></span> | `🧩 Components/bubble-chat/outgoing/color/container/background/default` | `rgb(229, 85, 20)` | Component token grammar — component: bubble-chat; variant: outgoing; category: color; element: container; property: background; state: default. Mapping: Default → 🌱 Semantic `colors/primary/default`. |
-| <span style="display:inline-block;width:1.25rem;height:1.25rem;background-color:rgb(255, 255, 255);border-radius:0.25rem;border:1px solid rgba(128,128,128,0.2);vertical-align:middle;"></span> | `🧩 Components/bubble-chat/outgoing/color/message/foreground/default` | `rgb(255, 255, 255)` | Component token grammar — component: bubble-chat; variant: outgoing; category: color; element: message; property: foreground; state: default. Mapping: Default → 🌱 Semantic `colors/foreground/static-white`. |
-| <span style="display:inline-block;width:1.25rem;height:1.25rem;background-color:rgb(255, 255, 255);border-radius:0.25rem;border:1px solid rgba(128,128,128,0.2);vertical-align:middle;"></span> | `🧩 Components/bubble-chat/outgoing/color/timestamp/foreground/default` | `rgb(255, 255, 255)` | Component token grammar — component: bubble-chat; variant: outgoing; category: color; element: timestamp; property: foreground; state: default. Mapping: Default → 🌱 Semantic `colors/foreground/static-white`. |
+| <span style="display:inline-block;width:1.25rem;height:1.25rem;background-color:rgb(255, 255, 255);border-radius:0.25rem;border:1px solid rgba(128,128,128,0.2);vertical-align:middle;"></span> | `🧩 Components/bubble-chat/outgoing` | `rgb(255, 255, 255)` | - |
+| <span style="display:inline-block;width:1.25rem;height:1.25rem;background-color:rgb(229, 229, 229);border-radius:0.25rem;border:1px solid rgba(128,128,128,0.2);vertical-align:middle;"></span> | `🧩 Components/bubble-chat/outgoing/color/color/border/default` | `rgb(229, 229, 229)` | - |
+| <span style="display:inline-block;width:1.25rem;height:1.25rem;background-color:rgb(255, 255, 255);border-radius:0.25rem;border:1px solid rgba(128,128,128,0.2);vertical-align:middle;"></span> | `🧩 Components/bubble-chat/outgoing/color/container/background/default` | `rgb(255, 255, 255)` | Component token grammar — component: bubble-chat; variant: outgoing; category: color; element: container; property: background; state: default. Mapping: Default → 🌱 Semantic `colors/primary/default`. |
+| <span style="display:inline-block;width:1.25rem;height:1.25rem;background-color:rgb(15, 14, 15);border-radius:0.25rem;border:1px solid rgba(128,128,128,0.2);vertical-align:middle;"></span> | `🧩 Components/bubble-chat/outgoing/color/message/foreground/default` | `rgb(15, 14, 15)` | Component token grammar — component: bubble-chat; variant: outgoing; category: color; element: message; property: foreground; state: default. Mapping: Default → 🌱 Semantic `colors/foreground/static-white`. |
+| <span style="display:inline-block;width:1.25rem;height:1.25rem;background-color:rgb(115, 115, 115);border-radius:0.25rem;border:1px solid rgba(128,128,128,0.2);vertical-align:middle;"></span> | `🧩 Components/bubble-chat/outgoing/color/timestamp/foreground/default` | `rgb(115, 115, 115)` | Component token grammar — component: bubble-chat; variant: outgoing; category: color; element: timestamp; property: foreground; state: default. Mapping: Default → 🌱 Semantic `colors/foreground/static-white`. |
 | <span style="display:inline-block;width:1.25rem;height:1.25rem;background-color:rgb(220, 38, 38);border-radius:0.25rem;border:1px solid rgba(128,128,128,0.2);vertical-align:middle;"></span> | `🧩 Components/button/destructive/color/container/background/default` | `rgb(220, 38, 38)` | Component token grammar — component: button; variant: destructive; category: color; element: container; property: background; state: default. Mapping: Default → 🌱 Semantic `colors/destructive/background`. |
 | <span style="display:inline-block;width:1.25rem;height:1.25rem;background-color:rgb(190, 18, 60);border-radius:0.25rem;border:1px solid rgba(128,128,128,0.2);vertical-align:middle;"></span> | `🧩 Components/button/destructive/color/container/background/hover` | `rgb(190, 18, 60)` | Component token grammar — component: button; variant: destructive; category: color; element: container; property: background; state: hover. Mapping: Default → 🌱 Semantic `colors/destructive/hover`. |
 | <span style="display:inline-block;width:1.25rem;height:1.25rem;background-color:rgb(159, 18, 57);border-radius:0.25rem;border:1px solid rgba(128,128,128,0.2);vertical-align:middle;"></span> | `🧩 Components/button/destructive/color/container/background/pressed` | `rgb(159, 18, 57)` | Component token grammar — component: button; variant: destructive; category: color; element: container; property: background; state: pressed. Mapping: Default → 🌱 Semantic `colors/destructive/pressed`. |
@@ -1140,16 +1142,16 @@ Design tokens extracted from the Figma document.
 
 | Token Name | Value | Description |
 | :--- | :--- | :--- |
-| `effect/Focus Ring/Default` | `[map[color:rgb(212, 212, 212) offset:map[x:0 y:0] radius:0 spread:3 type:DROP_SHADOW visible:true]]` | Gray focus ring (3 px spread) — used as the default/neutral focus indicator. |
-| `effect/Focus Ring/Error` | `[map[color:rgb(253, 164, 175) offset:map[x:0 y:0] radius:0 spread:3 type:DROP_SHADOW visible:true]]` | Pink focus ring (3 px spread) — applied to focused elements in an error state. |
-| `effect/Focus Ring/Primary` | `[map[color:rgb(255, 176, 136) offset:map[x:0 y:0] radius:0 spread:3 type:DROP_SHADOW visible:true]]` | Orange focus ring (3 px spread) — applied to elements in an active focus state. |
-| `effect/Shadow/2xl` | `[map[color:rgba(0, 0, 0, 0.25) offset:map[x:0 y:25] radius:50 spread:12 type:DROP_SHADOW visible:true]]` | Largest drop shadow — y:25, blur:50, spread:12, 25% opacity. Use for elements with the highest elevation. |
-| `effect/Shadow/2xs` | `[map[color:rgba(0, 0, 0, 0.05) offset:map[x:0 y:1] radius:0 spread:0 type:DROP_SHADOW visible:true]]` | Lightest drop shadow — y:1, blur:0, 5% opacity. Use for subtle dividers between elements. |
-| `effect/Shadow/lg` | `[map[color:rgba(0, 0, 0, 0.1) offset:map[x:0 y:10] radius:15 spread:-3 type:DROP_SHADOW visible:true] map[color:rgba(0, 0, 0, 0.1) offset:map[x:0 y:4] radius:6 spread:-4 type:DROP_SHADOW visible:true]]` | Large drop shadow — two layers (y:10 blur:15 + y:4 blur:6), 10% opacity. Use for modals and dialogs. |
-| `effect/Shadow/md` | `[map[color:rgba(0, 0, 0, 0.1) offset:map[x:0 y:4] radius:6 spread:-1 type:DROP_SHADOW visible:true] map[color:rgba(0, 0, 0, 0.1) offset:map[x:0 y:2] radius:4 spread:-2 type:DROP_SHADOW visible:true]]` | Medium drop shadow — two layers (y:4 blur:6 + y:2 blur:4), 10% opacity. Use for dropdowns and popovers. |
-| `effect/Shadow/sm` | `[map[color:rgba(0, 0, 0, 0.1) offset:map[x:0 y:1] radius:3 spread:0 type:DROP_SHADOW visible:true] map[color:rgba(0, 0, 0, 0.1) offset:map[x:0 y:1] radius:2 spread:-1 type:DROP_SHADOW visible:true]]` | Small drop shadow — two layers (y:1 blur:3 + y:1 blur:2), 10% opacity. Use for cards and interactive elements. |
-| `effect/Shadow/xl` | `[map[color:rgba(0, 0, 0, 0.1) offset:map[x:0 y:20] radius:25 spread:-5 type:DROP_SHADOW visible:true] map[color:rgba(0, 0, 0, 0.1) offset:map[x:0 y:8] radius:10 spread:-6 type:DROP_SHADOW visible:true]]` | Extra-large drop shadow — two layers (y:20 blur:25 + y:8 blur:10), 10% opacity. Use for primary floating elements. |
-| `effect/Shadow/xs` | `[map[color:rgba(0, 0, 0, 0.05) offset:map[x:0 y:1] radius:2 spread:0 type:DROP_SHADOW visible:true]]` | Extra-small drop shadow — y:1, blur:2, 5% opacity. Use for minimal elevation on cards or buttons. |
+| `effect/Focus Ring/Default` | `[map[boundVariables:map[color:map[id:VariableID:3786:27 type:VARIABLE_ALIAS] offsetX:map[id:VariableID:3831:27201 type:VARIABLE_ALIAS] offsetY:map[id:VariableID:3831:27202 type:VARIABLE_ALIAS] radius:map[id:VariableID:3831:27203 type:VARIABLE_ALIAS] spread:map[id:VariableID:3822:1743 type:VARIABLE_ALIAS]] color:rgb(212, 212, 212) offset:map[x:0 y:0] radius:0 spread:3 type:DROP_SHADOW visible:true]]` | Gray focus ring (3 px spread) — used as the default/neutral focus indicator. |
+| `effect/Focus Ring/Error` | `[map[boundVariables:map[color:map[id:VariableID:2021:437 type:VARIABLE_ALIAS] spread:map[id:VariableID:3822:1743 type:VARIABLE_ALIAS]] color:rgb(253, 164, 175) offset:map[x:0 y:0] radius:0 spread:3 type:DROP_SHADOW visible:true]]` | Pink focus ring (3 px spread) — applied to focused elements in an error state. |
+| `effect/Focus Ring/Primary` | `[map[boundVariables:map[color:map[id:VariableID:2042:348 type:VARIABLE_ALIAS] offsetX:map[id:VariableID:3831:27200 type:VARIABLE_ALIAS] offsetY:map[id:VariableID:3831:27198 type:VARIABLE_ALIAS] radius:map[id:VariableID:3831:27199 type:VARIABLE_ALIAS] spread:map[id:VariableID:3822:1743 type:VARIABLE_ALIAS]] color:rgb(255, 176, 136) offset:map[x:0 y:0] radius:0 spread:3 type:DROP_SHADOW visible:true]]` | Orange focus ring (3 px spread) — applied to elements in an active focus state. |
+| `effect/Shadow/2xl` | `[map[boundVariables:map[color:map[id:VariableID:3786:22 type:VARIABLE_ALIAS] offsetX:map[id:VariableID:3786:23 type:VARIABLE_ALIAS] offsetY:map[id:VariableID:3786:24 type:VARIABLE_ALIAS] radius:map[id:VariableID:3786:25 type:VARIABLE_ALIAS] spread:map[id:VariableID:3786:26 type:VARIABLE_ALIAS]] color:rgba(0, 0, 0, 0.25) offset:map[x:0 y:25] radius:50 spread:12 type:DROP_SHADOW visible:true]]` | Largest drop shadow — y:25, blur:50, spread:12, 25% opacity. Use for elements with the highest elevation. |
+| `effect/Shadow/2xs` | `[map[boundVariables:map[color:map[id:VariableID:3786:9 type:VARIABLE_ALIAS] offsetX:map[id:VariableID:3786:10 type:VARIABLE_ALIAS] offsetY:map[id:VariableID:3786:11 type:VARIABLE_ALIAS] radius:map[id:VariableID:3786:12 type:VARIABLE_ALIAS] spread:map[id:VariableID:3786:13 type:VARIABLE_ALIAS]] color:rgba(0, 0, 0, 0.05) offset:map[x:0 y:1] radius:0 spread:0 type:DROP_SHADOW visible:true]]` | Lightest drop shadow — y:1, blur:0, 5% opacity. Use for subtle dividers between elements. |
+| `effect/Shadow/lg` | `[map[boundVariables:map[color:map[id:VariableID:2025:84 type:VARIABLE_ALIAS] offsetX:map[id:VariableID:2025:111 type:VARIABLE_ALIAS] offsetY:map[id:VariableID:2025:112 type:VARIABLE_ALIAS] radius:map[id:VariableID:2025:113 type:VARIABLE_ALIAS] spread:map[id:VariableID:2025:114 type:VARIABLE_ALIAS]] color:rgba(0, 0, 0, 0.1) offset:map[x:0 y:10] radius:15 spread:-3 type:DROP_SHADOW visible:true] map[boundVariables:map[color:map[id:VariableID:2025:84 type:VARIABLE_ALIAS] offsetX:map[id:VariableID:2025:115 type:VARIABLE_ALIAS] offsetY:map[id:VariableID:2025:116 type:VARIABLE_ALIAS] radius:map[id:VariableID:2025:117 type:VARIABLE_ALIAS] spread:map[id:VariableID:2025:118 type:VARIABLE_ALIAS]] color:rgba(0, 0, 0, 0.1) offset:map[x:0 y:4] radius:6 spread:-4 type:DROP_SHADOW visible:true]]` | Large drop shadow — two layers (y:10 blur:15 + y:4 blur:6), 10% opacity. Use for modals and dialogs. |
+| `effect/Shadow/md` | `[map[boundVariables:map[color:map[id:VariableID:2025:83 type:VARIABLE_ALIAS] offsetX:map[id:VariableID:2025:103 type:VARIABLE_ALIAS] offsetY:map[id:VariableID:2025:104 type:VARIABLE_ALIAS] radius:map[id:VariableID:2025:105 type:VARIABLE_ALIAS] spread:map[id:VariableID:2025:106 type:VARIABLE_ALIAS]] color:rgba(0, 0, 0, 0.1) offset:map[x:0 y:4] radius:6 spread:-1 type:DROP_SHADOW visible:true] map[boundVariables:map[color:map[id:VariableID:2025:83 type:VARIABLE_ALIAS] offsetX:map[id:VariableID:2025:107 type:VARIABLE_ALIAS] offsetY:map[id:VariableID:2025:108 type:VARIABLE_ALIAS] radius:map[id:VariableID:2025:109 type:VARIABLE_ALIAS] spread:map[id:VariableID:2025:110 type:VARIABLE_ALIAS]] color:rgba(0, 0, 0, 0.1) offset:map[x:0 y:2] radius:4 spread:-2 type:DROP_SHADOW visible:true]]` | Medium drop shadow — two layers (y:4 blur:6 + y:2 blur:4), 10% opacity. Use for dropdowns and popovers. |
+| `effect/Shadow/sm` | `[map[boundVariables:map[color:map[id:VariableID:2025:82 type:VARIABLE_ALIAS] offsetX:map[id:VariableID:2025:95 type:VARIABLE_ALIAS] offsetY:map[id:VariableID:2025:96 type:VARIABLE_ALIAS] radius:map[id:VariableID:2025:97 type:VARIABLE_ALIAS] spread:map[id:VariableID:2025:98 type:VARIABLE_ALIAS]] color:rgba(0, 0, 0, 0.1) offset:map[x:0 y:1] radius:3 spread:0 type:DROP_SHADOW visible:true] map[boundVariables:map[color:map[id:VariableID:2025:82 type:VARIABLE_ALIAS] offsetX:map[id:VariableID:2025:99 type:VARIABLE_ALIAS] offsetY:map[id:VariableID:2025:100 type:VARIABLE_ALIAS] radius:map[id:VariableID:2025:101 type:VARIABLE_ALIAS] spread:map[id:VariableID:2025:102 type:VARIABLE_ALIAS]] color:rgba(0, 0, 0, 0.1) offset:map[x:0 y:1] radius:2 spread:-1 type:DROP_SHADOW visible:true]]` | Small drop shadow — two layers (y:1 blur:3 + y:1 blur:2), 10% opacity. Use for cards and interactive elements. |
+| `effect/Shadow/xl` | `[map[boundVariables:map[color:map[id:VariableID:3786:14 type:VARIABLE_ALIAS] offsetX:map[id:VariableID:3786:15 type:VARIABLE_ALIAS] offsetY:map[id:VariableID:3786:16 type:VARIABLE_ALIAS] radius:map[id:VariableID:3786:17 type:VARIABLE_ALIAS] spread:map[id:VariableID:3786:18 type:VARIABLE_ALIAS]] color:rgba(0, 0, 0, 0.1) offset:map[x:0 y:20] radius:25 spread:-5 type:DROP_SHADOW visible:true] map[boundVariables:map[color:map[id:VariableID:3786:14 type:VARIABLE_ALIAS] offsetX:map[id:VariableID:3786:19 type:VARIABLE_ALIAS] offsetY:map[id:VariableID:2025:124 type:VARIABLE_ALIAS] radius:map[id:VariableID:3786:20 type:VARIABLE_ALIAS] spread:map[id:VariableID:3786:21 type:VARIABLE_ALIAS]] color:rgba(0, 0, 0, 0.1) offset:map[x:0 y:8] radius:10 spread:-6 type:DROP_SHADOW visible:true]]` | Extra-large drop shadow — two layers (y:20 blur:25 + y:8 blur:10), 10% opacity. Use for primary floating elements. |
+| `effect/Shadow/xs` | `[map[boundVariables:map[color:map[id:VariableID:2025:81 type:VARIABLE_ALIAS] offsetX:map[id:VariableID:2025:91 type:VARIABLE_ALIAS] offsetY:map[id:VariableID:2025:92 type:VARIABLE_ALIAS] radius:map[id:VariableID:2025:93 type:VARIABLE_ALIAS] spread:map[id:VariableID:2025:94 type:VARIABLE_ALIAS]] color:rgba(0, 0, 0, 0.05) offset:map[x:0 y:1] radius:2 spread:0 type:DROP_SHADOW visible:true]]` | Extra-small drop shadow — y:1, blur:2, 5% opacity. Use for minimal elevation on cards or buttons. |
 | `shadows/sm/color` | `rgba(0, 0, 0, 0.1)` | - |
 | `shadows/sm/shadow 1/blur` | `3` | - |
 | `shadows/sm/shadow 1/spread` | `0` | - |
@@ -1357,7 +1359,7 @@ Design tokens extracted from the Figma document.
 | `🧩 Components/bubble-chat/incoming/space/container/padding/default/y` | `12` | Component token grammar — component: bubble-chat; variant: incoming; category: space; element: container; property: padding; state: default; detail: y. Mapping: Default → 🌱 Semantic `spacing/sm`. |
 | `🧩 Components/bubble-chat/outgoing/space/container/gap/default` | `4` | Component token grammar — component: bubble-chat; variant: outgoing; category: space; element: container; property: gap; state: default. Mapping: Default → 🌱 Semantic `spacing/2xs`. |
 | `🧩 Components/bubble-chat/outgoing/space/container/padding/default/x` | `16` | Component token grammar — component: bubble-chat; variant: outgoing; category: space; element: container; property: padding; state: default; detail: x. Mapping: Default → 🌱 Semantic `spacing/md`. |
-| `🧩 Components/bubble-chat/outgoing/space/container/padding/default/y` | `12` | Component token grammar — component: bubble-chat; variant: outgoing; category: space; element: container; property: padding; state: default; detail: y. Mapping: Default → 🌱 Semantic `spacing/sm`. |
+| `🧩 Components/bubble-chat/outgoing/space/container/padding/default/y` | `16` | Component token grammar — component: bubble-chat; variant: outgoing; category: space; element: container; property: padding; state: default; detail: y. Mapping: Default → 🌱 Semantic `spacing/sm`. |
 | `🧩 Components/bubble-chat/video/size/preview/width/default` | `240` | Component token grammar — component: bubble-chat; variant: video; category: size; element: preview; property: width; state: default. Mapping: Default → 🌱 Semantic `sizing/240`. |
 | `🧩 Components/bubble-chat/video/space/preview/padding/default/x` | `16` | Component token grammar — component: bubble-chat; variant: video; category: space; element: preview; property: padding; state: default; detail: x. Mapping: Default → 🌱 Semantic `spacing/md`. |
 | `🧩 Components/bubble-chat/video/space/preview/padding/default/y` | `48` | Component token grammar — component: bubble-chat; variant: video; category: space; element: preview; property: padding; state: default; detail: y. Mapping: Default → 🌱 Semantic `spacing/4xl`. |
@@ -2703,9 +2705,11 @@ Design tokens extracted from the Figma document.
   --color-components-bubble-chat-incoming-color-container-background-default: rgb(245, 245, 245);
   --color-components-bubble-chat-incoming-color-message-foreground-default: rgb(10, 10, 10);
   --color-components-bubble-chat-incoming-color-timestamp-foreground-default: rgb(115, 115, 115);
-  --color-components-bubble-chat-outgoing-color-container-background-default: rgb(229, 85, 20);
-  --color-components-bubble-chat-outgoing-color-message-foreground-default: rgb(255, 255, 255);
-  --color-components-bubble-chat-outgoing-color-timestamp-foreground-default: rgb(255, 255, 255);
+  --color-components-bubble-chat-outgoing: rgb(255, 255, 255);
+  --color-components-bubble-chat-outgoing-color-color-border-default: rgb(229, 229, 229);
+  --color-components-bubble-chat-outgoing-color-container-background-default: rgb(255, 255, 255);
+  --color-components-bubble-chat-outgoing-color-message-foreground-default: rgb(15, 14, 15);
+  --color-components-bubble-chat-outgoing-color-timestamp-foreground-default: rgb(115, 115, 115);
   --color-components-button-destructive-color-container-background-default: rgb(220, 38, 38);
   --color-components-button-destructive-color-container-background-hover: rgb(190, 18, 60);
   --color-components-button-destructive-color-container-background-pressed: rgb(159, 18, 57);
@@ -3491,7 +3495,7 @@ Design tokens extracted from the Figma document.
   --custom-components-bubble-chat-incoming-space-container-padding-default-y: 12;
   --custom-components-bubble-chat-outgoing-space-container-gap-default: 4;
   --custom-components-bubble-chat-outgoing-space-container-padding-default-x: 16;
-  --custom-components-bubble-chat-outgoing-space-container-padding-default-y: 12;
+  --custom-components-bubble-chat-outgoing-space-container-padding-default-y: 16;
   --custom-components-bubble-chat-video-size-preview-width-default: 240;
   --custom-components-bubble-chat-video-space-preview-padding-default-x: 16;
   --custom-components-bubble-chat-video-space-preview-padding-default-y: 48;
@@ -5039,13 +5043,13 @@ Design tokens extracted from the Figma document.
   --radius-rounded-sm: 4px;
   --radius-rounded-xl: 12px;
   --radius-rounded-xs: 2px;
-  --shadow-2xl: [map[color:rgba(0, 0, 0, 0.25) offset:map[x:0 y:25] radius:50 spread:12 type:DROP_SHADOW visible:true]];
+  --shadow-2xl: [map[boundVariables:map[color:map[id:VariableID:3786:22 type:VARIABLE_ALIAS] offsetX:map[id:VariableID:3786:23 type:VARIABLE_ALIAS] offsetY:map[id:VariableID:3786:24 type:VARIABLE_ALIAS] radius:map[id:VariableID:3786:25 type:VARIABLE_ALIAS] spread:map[id:VariableID:3786:26 type:VARIABLE_ALIAS]] color:rgba(0, 0, 0, 0.25) offset:map[x:0 y:25] radius:50 spread:12 type:DROP_SHADOW visible:true]];
   --shadow-2xl-color: rgba(0, 0, 0, 0.25);
   --shadow-2xl-shadow-1-blur: 50;
   --shadow-2xl-shadow-1-spread: 12;
   --shadow-2xl-shadow-1-x: 0;
   --shadow-2xl-shadow-1-y: 25;
-  --shadow-2xs: [map[color:rgba(0, 0, 0, 0.05) offset:map[x:0 y:1] radius:0 spread:0 type:DROP_SHADOW visible:true]];
+  --shadow-2xs: [map[boundVariables:map[color:map[id:VariableID:3786:9 type:VARIABLE_ALIAS] offsetX:map[id:VariableID:3786:10 type:VARIABLE_ALIAS] offsetY:map[id:VariableID:3786:11 type:VARIABLE_ALIAS] radius:map[id:VariableID:3786:12 type:VARIABLE_ALIAS] spread:map[id:VariableID:3786:13 type:VARIABLE_ALIAS]] color:rgba(0, 0, 0, 0.05) offset:map[x:0 y:1] radius:0 spread:0 type:DROP_SHADOW visible:true]];
   --shadow-2xs-color: rgba(0, 0, 0, 0.05);
   --shadow-2xs-shadow-1-blur: 0;
   --shadow-2xs-shadow-1-spread: 0;
@@ -5056,10 +5060,10 @@ Design tokens extracted from the Figma document.
   --shadow-components-radio-button-all-shadow-circle-spread-default: 0;
   --shadow-components-radio-button-all-shadow-circle-x-default: 0;
   --shadow-components-radio-button-all-shadow-circle-y-default: 1;
-  --shadow-focus-ring-default: [map[color:rgb(212, 212, 212) offset:map[x:0 y:0] radius:0 spread:3 type:DROP_SHADOW visible:true]];
-  --shadow-focus-ring-error: [map[color:rgb(253, 164, 175) offset:map[x:0 y:0] radius:0 spread:3 type:DROP_SHADOW visible:true]];
-  --shadow-focus-ring-primary: [map[color:rgb(255, 176, 136) offset:map[x:0 y:0] radius:0 spread:3 type:DROP_SHADOW visible:true]];
-  --shadow-lg: [map[color:rgba(0, 0, 0, 0.1) offset:map[x:0 y:10] radius:15 spread:-3 type:DROP_SHADOW visible:true] map[color:rgba(0, 0, 0, 0.1) offset:map[x:0 y:4] radius:6 spread:-4 type:DROP_SHADOW visible:true]];
+  --shadow-focus-ring-default: [map[boundVariables:map[color:map[id:VariableID:3786:27 type:VARIABLE_ALIAS] offsetX:map[id:VariableID:3831:27201 type:VARIABLE_ALIAS] offsetY:map[id:VariableID:3831:27202 type:VARIABLE_ALIAS] radius:map[id:VariableID:3831:27203 type:VARIABLE_ALIAS] spread:map[id:VariableID:3822:1743 type:VARIABLE_ALIAS]] color:rgb(212, 212, 212) offset:map[x:0 y:0] radius:0 spread:3 type:DROP_SHADOW visible:true]];
+  --shadow-focus-ring-error: [map[boundVariables:map[color:map[id:VariableID:2021:437 type:VARIABLE_ALIAS] spread:map[id:VariableID:3822:1743 type:VARIABLE_ALIAS]] color:rgb(253, 164, 175) offset:map[x:0 y:0] radius:0 spread:3 type:DROP_SHADOW visible:true]];
+  --shadow-focus-ring-primary: [map[boundVariables:map[color:map[id:VariableID:2042:348 type:VARIABLE_ALIAS] offsetX:map[id:VariableID:3831:27200 type:VARIABLE_ALIAS] offsetY:map[id:VariableID:3831:27198 type:VARIABLE_ALIAS] radius:map[id:VariableID:3831:27199 type:VARIABLE_ALIAS] spread:map[id:VariableID:3822:1743 type:VARIABLE_ALIAS]] color:rgb(255, 176, 136) offset:map[x:0 y:0] radius:0 spread:3 type:DROP_SHADOW visible:true]];
+  --shadow-lg: [map[boundVariables:map[color:map[id:VariableID:2025:84 type:VARIABLE_ALIAS] offsetX:map[id:VariableID:2025:111 type:VARIABLE_ALIAS] offsetY:map[id:VariableID:2025:112 type:VARIABLE_ALIAS] radius:map[id:VariableID:2025:113 type:VARIABLE_ALIAS] spread:map[id:VariableID:2025:114 type:VARIABLE_ALIAS]] color:rgba(0, 0, 0, 0.1) offset:map[x:0 y:10] radius:15 spread:-3 type:DROP_SHADOW visible:true] map[boundVariables:map[color:map[id:VariableID:2025:84 type:VARIABLE_ALIAS] offsetX:map[id:VariableID:2025:115 type:VARIABLE_ALIAS] offsetY:map[id:VariableID:2025:116 type:VARIABLE_ALIAS] radius:map[id:VariableID:2025:117 type:VARIABLE_ALIAS] spread:map[id:VariableID:2025:118 type:VARIABLE_ALIAS]] color:rgba(0, 0, 0, 0.1) offset:map[x:0 y:4] radius:6 spread:-4 type:DROP_SHADOW visible:true]];
   --shadow-lg-color: rgba(0, 0, 0, 0.1);
   --shadow-lg-shadow-1-blur: 15;
   --shadow-lg-shadow-1-spread: -3;
@@ -5069,7 +5073,7 @@ Design tokens extracted from the Figma document.
   --shadow-lg-shadow-2-spread: -4;
   --shadow-lg-shadow-2-x: 0;
   --shadow-lg-shadow-2-y: 4;
-  --shadow-md: [map[color:rgba(0, 0, 0, 0.1) offset:map[x:0 y:4] radius:6 spread:-1 type:DROP_SHADOW visible:true] map[color:rgba(0, 0, 0, 0.1) offset:map[x:0 y:2] radius:4 spread:-2 type:DROP_SHADOW visible:true]];
+  --shadow-md: [map[boundVariables:map[color:map[id:VariableID:2025:83 type:VARIABLE_ALIAS] offsetX:map[id:VariableID:2025:103 type:VARIABLE_ALIAS] offsetY:map[id:VariableID:2025:104 type:VARIABLE_ALIAS] radius:map[id:VariableID:2025:105 type:VARIABLE_ALIAS] spread:map[id:VariableID:2025:106 type:VARIABLE_ALIAS]] color:rgba(0, 0, 0, 0.1) offset:map[x:0 y:4] radius:6 spread:-1 type:DROP_SHADOW visible:true] map[boundVariables:map[color:map[id:VariableID:2025:83 type:VARIABLE_ALIAS] offsetX:map[id:VariableID:2025:107 type:VARIABLE_ALIAS] offsetY:map[id:VariableID:2025:108 type:VARIABLE_ALIAS] radius:map[id:VariableID:2025:109 type:VARIABLE_ALIAS] spread:map[id:VariableID:2025:110 type:VARIABLE_ALIAS]] color:rgba(0, 0, 0, 0.1) offset:map[x:0 y:2] radius:4 spread:-2 type:DROP_SHADOW visible:true]];
   --shadow-md-color: rgba(0, 0, 0, 0.1);
   --shadow-md-shadow-1-blur: 6;
   --shadow-md-shadow-1-spread: -1;
@@ -5079,7 +5083,7 @@ Design tokens extracted from the Figma document.
   --shadow-md-shadow-2-spread: -2;
   --shadow-md-shadow-2-x: 0;
   --shadow-md-shadow-2-y: 2;
-  --shadow-sm: [map[color:rgba(0, 0, 0, 0.1) offset:map[x:0 y:1] radius:3 spread:0 type:DROP_SHADOW visible:true] map[color:rgba(0, 0, 0, 0.1) offset:map[x:0 y:1] radius:2 spread:-1 type:DROP_SHADOW visible:true]];
+  --shadow-sm: [map[boundVariables:map[color:map[id:VariableID:2025:82 type:VARIABLE_ALIAS] offsetX:map[id:VariableID:2025:95 type:VARIABLE_ALIAS] offsetY:map[id:VariableID:2025:96 type:VARIABLE_ALIAS] radius:map[id:VariableID:2025:97 type:VARIABLE_ALIAS] spread:map[id:VariableID:2025:98 type:VARIABLE_ALIAS]] color:rgba(0, 0, 0, 0.1) offset:map[x:0 y:1] radius:3 spread:0 type:DROP_SHADOW visible:true] map[boundVariables:map[color:map[id:VariableID:2025:82 type:VARIABLE_ALIAS] offsetX:map[id:VariableID:2025:99 type:VARIABLE_ALIAS] offsetY:map[id:VariableID:2025:100 type:VARIABLE_ALIAS] radius:map[id:VariableID:2025:101 type:VARIABLE_ALIAS] spread:map[id:VariableID:2025:102 type:VARIABLE_ALIAS]] color:rgba(0, 0, 0, 0.1) offset:map[x:0 y:1] radius:2 spread:-1 type:DROP_SHADOW visible:true]];
   --shadow-sm-color: rgba(0, 0, 0, 0.1);
   --shadow-sm-shadow-1-blur: 3;
   --shadow-sm-shadow-1-spread: 0;
@@ -5089,7 +5093,7 @@ Design tokens extracted from the Figma document.
   --shadow-sm-shadow-2-spread: -1;
   --shadow-sm-shadow-2-x: 0;
   --shadow-sm-shadow-2-y: 1;
-  --shadow-xl: [map[color:rgba(0, 0, 0, 0.1) offset:map[x:0 y:20] radius:25 spread:-5 type:DROP_SHADOW visible:true] map[color:rgba(0, 0, 0, 0.1) offset:map[x:0 y:8] radius:10 spread:-6 type:DROP_SHADOW visible:true]];
+  --shadow-xl: [map[boundVariables:map[color:map[id:VariableID:3786:14 type:VARIABLE_ALIAS] offsetX:map[id:VariableID:3786:15 type:VARIABLE_ALIAS] offsetY:map[id:VariableID:3786:16 type:VARIABLE_ALIAS] radius:map[id:VariableID:3786:17 type:VARIABLE_ALIAS] spread:map[id:VariableID:3786:18 type:VARIABLE_ALIAS]] color:rgba(0, 0, 0, 0.1) offset:map[x:0 y:20] radius:25 spread:-5 type:DROP_SHADOW visible:true] map[boundVariables:map[color:map[id:VariableID:3786:14 type:VARIABLE_ALIAS] offsetX:map[id:VariableID:3786:19 type:VARIABLE_ALIAS] offsetY:map[id:VariableID:2025:124 type:VARIABLE_ALIAS] radius:map[id:VariableID:3786:20 type:VARIABLE_ALIAS] spread:map[id:VariableID:3786:21 type:VARIABLE_ALIAS]] color:rgba(0, 0, 0, 0.1) offset:map[x:0 y:8] radius:10 spread:-6 type:DROP_SHADOW visible:true]];
   --shadow-xl-color: rgba(0, 0, 0, 0.1);
   --shadow-xl-shadow-1-blur: 25;
   --shadow-xl-shadow-1-spread: -5;
@@ -5099,7 +5103,7 @@ Design tokens extracted from the Figma document.
   --shadow-xl-shadow-2-spread: -6;
   --shadow-xl-shadow-2-x: 0;
   --shadow-xl-shadow-2-y: 8;
-  --shadow-xs: [map[color:rgba(0, 0, 0, 0.05) offset:map[x:0 y:1] radius:2 spread:0 type:DROP_SHADOW visible:true]];
+  --shadow-xs: [map[boundVariables:map[color:map[id:VariableID:2025:81 type:VARIABLE_ALIAS] offsetX:map[id:VariableID:2025:91 type:VARIABLE_ALIAS] offsetY:map[id:VariableID:2025:92 type:VARIABLE_ALIAS] radius:map[id:VariableID:2025:93 type:VARIABLE_ALIAS] spread:map[id:VariableID:2025:94 type:VARIABLE_ALIAS]] color:rgba(0, 0, 0, 0.05) offset:map[x:0 y:1] radius:2 spread:0 type:DROP_SHADOW visible:true]];
   --shadow-xs-blur: 2;
   --shadow-xs-color: rgba(0, 0, 0, 0.05);
   --shadow-xs-spread: 0;
@@ -5177,5 +5181,10 @@ Design tokens extracted from the Figma document.
   --spacing-xl: 24px;
   --spacing-xs: 8px;
   --spacing-xs-plus: 10px;
+}
+
+.dark {
+  --color-background-default: rgb(15, 14, 15);
+  --custom-mode-stroke-width: 1;
 }
 ```

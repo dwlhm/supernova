@@ -21,7 +21,7 @@ export interface BubbleChatProps {
   className?: string;
 }
 
-import { cn } from "./utils";
+import { cn, ICON_PATHS, bindControllerProps } from "./utils";
 
 function BubbleChat(props: BubbleChatProps) {
   props = {
@@ -41,64 +41,37 @@ function BubbleChat(props: BubbleChatProps) {
     imageName: "image.jpg",
     imageMeta: "3.4 MB",
     videoName: "video.mp4",
-    videoMeta: "24.8 MB",
+    videoMeta: "24.8 MB • 01:08",
     className: "",
     ...props,
   };
-  function isOutgoing() {
-    return props.direction === "outgoing";
-  }
-
-  function isError() {
-    return props.messageState === "error";
-  }
-
-  function bubbleClasses() {
-    if (isError()) {
-      return "bg-components-bubble-chat-error-color-container-background-default border border-components-bubble-chat-error-color-container-border-default text-components-bubble-chat-error-color-message-foreground-default";
-    }
-    if (isOutgoing()) {
-      return "bg-components-bubble-chat-outgoing-color-container-background-default text-components-bubble-chat-outgoing-color-message-foreground-default";
-    }
-    return "bg-components-bubble-chat-incoming-color-container-background-default text-components-bubble-chat-incoming-color-message-foreground-default";
-  }
-
-  function metaClasses() {
-    if (isError()) {
-      return "text-components-bubble-chat-error-color-metadata-foreground-default";
-    }
-    if (isOutgoing()) {
-      return "text-components-bubble-chat-outgoing-color-timestamp-foreground-default";
-    }
-    return "text-components-bubble-chat-incoming-color-timestamp-foreground-default";
-  }
-
-  function previewMetaClasses() {
-    if (isError()) {
-      return "text-components-bubble-chat-error-color-metadata-foreground-default";
-    }
-    return "text-foreground-muted";
-  }
-
-  function displayStatus() {
-    return isError() ? props.errorStatusText : props.statusText;
-  }
-
+  const [__ctrlState, __setCtrlState] = React.useState<Record<string, any>>({});
+  props = bindControllerProps(props, __ctrlState, __setCtrlState);
   return (
     <div
+      data-ctrl={typeof bindControllerProps}
       className={cn(
         "flex w-full",
-        isOutgoing() ? "justify-end" : "justify-start",
+        props.direction === "outgoing" ? "justify-end" : "justify-start",
         props.className
       )}
     >
       <div
         className={cn(
           "flex max-w-xs flex-col gap-1",
-          isOutgoing() && "items-end"
+          props.direction === "outgoing" && "items-end"
         )}
       >
-        <div className={cn("rounded-rounded-2xl px-4 py-3", bubbleClasses())}>
+        <div
+          className={cn(
+            "rounded-2xl p-4",
+            props.messageState === "error"
+              ? "border border-destructive-border bg-destructive-subtle text-destructive-foreground"
+              : props.direction === "outgoing"
+              ? "border border-border-default bg-background-default text-foreground-default"
+              : "bg-background-muted text-foreground-default"
+          )}
+        >
           {props.type === "text" ? (
             <p className="whitespace-pre-wrap text-sm leading-relaxed">
               {props.text}
@@ -112,24 +85,26 @@ function BubbleChat(props: BubbleChatProps) {
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
-                stroke-width="1.5"
+                strokeWidth="1.5"
               >
                 <path
-                  d="M14 3v5h5"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-                <path
-                  d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9l5 5v11a2 2 0 0 1-2 2Z"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d={ICON_PATHS.file}
                 />
               </svg>
               <span className="flex flex-col">
                 <span className="truncate text-sm font-medium">
                   {props.fileName}
                 </span>
-                <span className={cn("text-xs", previewMetaClasses())}>
+                <span
+                  className={cn(
+                    "text-xs",
+                    props.messageState === "error"
+                      ? "text-destructive-foreground"
+                      : "text-foreground-muted"
+                  )}
+                >
                   {props.fileMeta}
                 </span>
               </span>
@@ -139,8 +114,10 @@ function BubbleChat(props: BubbleChatProps) {
             <div className="flex flex-col gap-2">
               <div
                 className={cn(
-                  "flex h-32 w-60 items-center justify-center rounded-rounded-xl bg-background-muted",
-                  previewMetaClasses()
+                  "flex h-32 w-60 items-center justify-center rounded-xl bg-background-subtle",
+                  props.messageState === "error"
+                    ? "text-destructive-foreground"
+                    : "text-foreground-muted"
                 )}
               >
                 <svg
@@ -149,17 +126,17 @@ function BubbleChat(props: BubbleChatProps) {
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
-                  stroke-width="1.5"
+                  strokeWidth="1.5"
                 >
-                  {props.type === "image" ? (
-                    <rect x="3" y="3" width="18" height="18" rx="2" />
-                  ) : null}
                   <path
-                    d="m21 15-5-5L5 21"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d={
+                      props.type === "image"
+                        ? ICON_PATHS.image
+                        : ICON_PATHS.video
+                    }
                   />
-                  <circle cx="8.5" cy="8.5" r="1.5" />
                 </svg>
               </div>
               <span className="flex flex-col">
@@ -170,7 +147,14 @@ function BubbleChat(props: BubbleChatProps) {
                     <>{props.videoName}</>
                   )}
                 </span>
-                <span className={cn("text-xs", previewMetaClasses())}>
+                <span
+                  className={cn(
+                    "text-xs",
+                    props.messageState === "error"
+                      ? "text-destructive-foreground"
+                      : "text-foreground-muted"
+                  )}
+                >
                   {props.type === "image" ? (
                     <>{props.imageMeta}</>
                   ) : (
@@ -181,27 +165,45 @@ function BubbleChat(props: BubbleChatProps) {
             </div>
           ) : null}
           {props.showCustomText ? (
-            <p className={cn("mt-2 text-xs", previewMetaClasses())}>
+            <p
+              className={cn(
+                "mt-2 text-xs",
+                props.messageState === "error"
+                  ? "text-destructive-foreground"
+                  : "text-foreground-muted"
+              )}
+            >
               {props.customText}
             </p>
           ) : null}
         </div>
-        <div className="flex items-center gap-1">
+        <div className="flex w-full items-center justify-between gap-2">
           {props.showTime ? (
-            <span className={cn("text-xs", metaClasses())}>
-              {props.timeText}
-            </span>
-          ) : null}
-          {props.showStatus || isError() ? (
             <span
               className={cn(
                 "text-xs",
-                isError()
-                  ? "text-components-bubble-chat-error-color-status-foreground-default"
-                  : metaClasses()
+                props.messageState === "error"
+                  ? "text-destructive-foreground"
+                  : "text-foreground-muted"
               )}
             >
-              {displayStatus()}
+              {props.timeText}
+            </span>
+          ) : null}
+          {props.showStatus || props.messageState === "error" ? (
+            <span
+              className={cn(
+                "text-xs",
+                props.messageState === "error"
+                  ? "text-destructive-foreground"
+                  : "text-foreground-muted"
+              )}
+            >
+              {props.messageState === "error" ? (
+                <>{props.errorStatusText}</>
+              ) : (
+                <>{props.statusText}</>
+              )}
             </span>
           ) : null}
         </div>

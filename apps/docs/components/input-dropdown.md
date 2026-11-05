@@ -26,66 +26,9 @@ PROPERTIES
 • List Value — Slot for dropdown options.
 • Show Search Input — Toggles search within the option list.
 
-## Live Preview
+## Live Preview & Usage
 
 <FrameworkPreview name="InputDropdown" />
-
-## Usage
-
-::: code-group
-
-```tsx [React]
-import { InputDropdown } from './InputDropdown';
-
-export default function Example() {
-  return (
-    <InputDropdown hint/Error text="Select your department or area of work." icon="2487:55330">
-      InputDropdown
-    </InputDropdown>
-  );
-}
-```
-
-```vue [Vue 3]
-<script setup lang="ts">
-import { InputDropdown } from './InputDropdown';
-</script>
-
-<template>
-  <InputDropdown hint/Error text="Select your department or area of work." icon="2487:55330">
-    InputDropdown
-  </InputDropdown>
-</template>
-```
-
-```svelte [Svelte]
-<script lang="ts">
-  import InputDropdown from './InputDropdown.svelte';
-</script>
-
-<InputDropdown hint/Error text="Select your department or area of work." icon="2487:55330">
-  InputDropdown
-</InputDropdown>
-```
-
-```ts [Angular]
-import { Component } from '@angular/core';
-import { InputDropdownComponent } from './input-dropdown.component';
-
-@Component({
-  selector: 'app-root',
-  standalone: true,
-  imports: [InputDropdownComponent],
-  template: `
-    <app-input-dropdown hint/Error text="Select your department or area of work." icon="2487:55330">
-      InputDropdown
-    </app-input-dropdown>
-  `,
-})
-export class AppComponent {}
-```
-
-:::
 
 ## Props & Variants
 

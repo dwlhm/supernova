@@ -6,28 +6,17 @@ export interface SpinnerProps {
   className?: string;
 }
 
-import { cn } from "./utils";
+import { cn, cva, bindControllerProps } from "./utils";
 
 function Spinner(props: SpinnerProps) {
-  props = { size: "24", label: "Loading", className: "", ...props };
-  function sizeClasses() {
-    switch (props.size) {
-      case "12":
-        return "h-3 w-3";
-      case "16":
-        return "h-4 w-4";
-      case "32":
-        return "h-8 w-8";
-      case "24":
-      default:
-        return "h-6 w-6";
-    }
-  }
-
+  props = { size: "12", label: "Loading", className: "", ...props };
+  const [__ctrlState, __setCtrlState] = React.useState<Record<string, any>>({});
+  props = bindControllerProps(props, __ctrlState, __setCtrlState);
   return (
     <span
       role="status"
       aria-live="polite"
+      data-ctrl={typeof bindControllerProps}
       className={cn("inline-flex items-center justify-center", props.className)}
     >
       <svg
@@ -35,8 +24,17 @@ function Spinner(props: SpinnerProps) {
         viewBox="0 0 24 24"
         fill="none"
         className={cn(
-          "animate-spin text-components-spinner-all-color-icon-stroke-default",
-          sizeClasses()
+          "animate-spin text-primary-default",
+          cva(
+            props.size,
+            {
+              "12": "h-3 w-3",
+              "16": "h-4 w-4",
+              "24": "h-6 w-6",
+              "32": "h-8 w-8",
+            },
+            "12"
+          )
         )}
       >
         <circle
@@ -44,14 +42,14 @@ function Spinner(props: SpinnerProps) {
           cy="12"
           r="10"
           stroke="currentColor"
-          stroke-width="2"
           className="opacity-25"
+          strokeWidth="2"
         />
         <path
           d="M22 12a10 10 0 0 0-10-10"
           stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
+          strokeWidth="2"
+          strokeLinecap="round"
         />
       </svg>
       <span className="sr-only">{props.label}</span>

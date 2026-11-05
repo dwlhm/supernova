@@ -1,17 +1,37 @@
 <template>
   <button
-    type="button"
-    :aria-label="accessibleName"
+    :type="type || 'button'"
+    :aria-label="ariaLabel || label || 'Action'"
     :disabled="disabled"
     :class="
       cn(
-        'inline-flex shrink-0 items-center justify-center rounded-rounded-full shadow-lg transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring-primary disabled:pointer-events-none disabled:opacity-50',
-        variantClasses,
-        sizeClasses,
+        'inline-flex shrink-0 items-center justify-center rounded-full shadow-md transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring-primary disabled:pointer-events-none disabled:opacity-50',
+        cva(
+          variant,
+          {
+            primary:
+              'bg-primary-default text-primary-foreground hover:bg-primary-hover active:bg-primary-pressed',
+            secondary:
+              'bg-secondary-default text-secondary-foreground hover:bg-secondary-hover active:bg-background-interactive',
+            outline:
+              'border border-border-default bg-background-default text-foreground-default hover:bg-background-muted active:bg-background-interactive',
+          },
+          'primary'
+        ),
+        cva(
+          size,
+          {
+            small: 'h-10 w-10',
+            regular: 'h-14 w-14',
+            large: 'h-24 w-24',
+            extended: 'h-14 w-auto gap-3 px-4',
+          },
+          'small'
+        ),
         className
       )
     "
-    @click="async (event) => handleClick()"
+    @click="async (event) => !disabled && onClick && onClick()"
   >
     <template v-if="$slots.default">
       <slot />
@@ -24,9 +44,23 @@
         fill="none"
         stroke="currentColor"
         stroke-width="1.5"
-        :class="cn('shrink-0', iconClasses)"
+        :class="
+          cn(
+            'shrink-0',
+            cva(
+              size,
+              {
+                small: 'h-4 w-4',
+                regular: 'h-5 w-5',
+                large: 'h-7 w-7',
+                extended: 'h-5 w-5',
+              },
+              'small'
+            )
+          )
+        "
       >
-        <path d="M12 5v14M5 12h14" stroke-linecap="round"></path>
+        <path stroke-linecap="round" :d="ICON_PATHS.plus"></path>
       </svg>
     </template>
 
@@ -37,11 +71,10 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
-
-import { cn } from "./utils";
+import { cn, cva, ICON_PATHS } from "./utils";
 
 export interface FABProps {
+  type?: "button" | "submit" | "reset";
   variant?: "primary" | "secondary" | "outline";
   size?: "small" | "regular" | "large" | "extended";
   disabled?: boolean;
@@ -49,65 +82,21 @@ export interface FABProps {
   showLabel?: boolean;
   ariaLabel?: string;
   className?: string;
-  children?: any;
+
   onClick?: () => void;
 }
 
 const props = withDefaults(defineProps<FABProps>(), {
-  variant: "primary",
-  size: "regular",
+  type: "button",
   ariaLabel: "",
   label: "Label",
   disabled: false,
-  onClick: undefined,
+  variant: "primary",
+  size: "small",
   className: "",
-  children: undefined,
+  onClick: undefined,
+
   showLabel: true,
 });
-
-const variantClasses = computed(() => {
-  switch (props.variant) {
-    case "secondary":
-      return "bg-components-fab-secondary-color-container-background-default text-components-fab-secondary-color-label-foreground-default hover:bg-components-fab-secondary-color-container-background-hover";
-    case "outline":
-      return "bg-components-fab-surface-color-container-background-default text-components-fab-surface-color-label-foreground-default border border-border-default hover:bg-components-fab-surface-color-container-background-hover";
-    case "primary":
-    default:
-      return "bg-components-fab-primary-color-container-background-default text-components-fab-primary-color-label-foreground-default hover:bg-components-fab-primary-color-container-background-hover";
-  }
-});
-const sizeClasses = computed(() => {
-  switch (props.size) {
-    case "small":
-      return "h-10 w-10";
-    case "large":
-      return "h-24 w-24";
-    case "extended":
-      return "h-14 w-auto gap-3 px-4";
-    case "regular":
-    default:
-      return "h-14 w-14";
-  }
-});
-const iconClasses = computed(() => {
-  switch (props.size) {
-    case "small":
-      return "h-4 w-4";
-    case "large":
-      return "h-7 w-7";
-    case "regular":
-    case "extended":
-    default:
-      return "h-5 w-5";
-  }
-});
-const accessibleName = computed(() => {
-  return props.ariaLabel !== "" ? props.ariaLabel : props.label;
-});
-
-function handleClick() {
-  if (!props.disabled && props.onClick) {
-    props.onClick();
-  }
-}
+defineSlots<{ default?: () => any }>();
 </script>

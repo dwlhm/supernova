@@ -18,66 +18,9 @@ Avoid duplicating navigation or actions already provided by the sidebar or page 
 Properties
 Topbar Content — Slot for contextual or global header content.
 
-## Live Preview
+## Live Preview & Usage
 
 <FrameworkPreview name="Topbar" />
-
-## Usage
-
-::: code-group
-
-```tsx [React]
-import { Topbar } from './Topbar';
-
-export default function Example() {
-  return (
-    <Topbar>
-      Topbar
-    </Topbar>
-  );
-}
-```
-
-```vue [Vue 3]
-<script setup lang="ts">
-import { Topbar } from './Topbar';
-</script>
-
-<template>
-  <Topbar>
-    Topbar
-  </Topbar>
-</template>
-```
-
-```svelte [Svelte]
-<script lang="ts">
-  import Topbar from './Topbar.svelte';
-</script>
-
-<Topbar>
-  Topbar
-</Topbar>
-```
-
-```ts [Angular]
-import { Component } from '@angular/core';
-import { TopbarComponent } from './topbar.component';
-
-@Component({
-  selector: 'app-root',
-  standalone: true,
-  imports: [TopbarComponent],
-  template: `
-    <app-topbar>
-      Topbar
-    </app-topbar>
-  `,
-})
-export class AppComponent {}
-```
-
-:::
 
 ## Props & Variants
 

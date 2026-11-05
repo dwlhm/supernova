@@ -1,18 +1,39 @@
 <template>
   <button
     type="button"
+    :data-ctrl="typeof bindControllerProps"
     :aria-pressed="pressed"
     :aria-label="ariaLabel !== '' ? ariaLabel : label"
     :disabled="disabled"
     :class="
       cn(
-        'inline-flex items-center justify-center rounded-rounded-lg text-components-toggle-all-color-label-foreground-default transition-colors hover:bg-background-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring-primary disabled:pointer-events-none disabled:opacity-50',
-        sizeClasses,
-        pressedClasses,
+        'inline-flex items-center justify-center rounded-lg text-foreground-default transition-colors hover:bg-background-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring-primary disabled:pointer-events-none disabled:opacity-50',
+        showText
+          ? cva(
+              size,
+              {
+                small: 'px-2 py-1 gap-1.5 text-xs',
+                medium: 'px-3 py-1.5 gap-2 text-sm',
+                large: 'px-4 py-2 gap-2.5 text-base',
+              },
+              'medium'
+            )
+          : cva(
+              size,
+              {
+                small: 'h-4 w-4 p-0.5',
+                medium: 'h-6 w-6 p-1',
+                large: 'h-9 w-9 p-2',
+              },
+              'medium'
+            ),
+        pressed ? 'bg-background-muted shadow-xs' : 'bg-transparent',
         className
       )
     "
-    @click="async (event) => handleToggle()"
+    @click="
+      async (event) => !disabled && onPressedChange && onPressedChange(!pressed)
+    "
   >
     <template v-if="$slots.default">
       <slot />
@@ -25,22 +46,33 @@
         fill="none"
         stroke="currentColor"
         stroke-width="1.5"
-        :class="cn('shrink-0', iconClasses)"
+        :class="
+          cn(
+            'shrink-0',
+            cva(
+              size,
+              {
+                small: 'h-3 w-3',
+                medium: 'h-4 w-4',
+                large: 'h-5 w-5',
+              },
+              'medium'
+            )
+          )
+        "
       >
-        <path d="M12 3v18M3 12h18" stroke-linecap="round"></path>
+        <path stroke-linecap="round" :d="ICON_PATHS.plus"></path>
       </svg>
     </template>
 
     <template v-if="showText">
-      <span class="truncate">{{ label }}</span>
+      <span class="truncate font-medium">{{ label }}</span>
     </template>
   </button>
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
-
-import { cn } from "./utils";
+import { cn, cva, ICON_PATHS, bindControllerProps } from "./utils";
 
 export interface ToggleProps {
   pressed?: boolean;
@@ -49,57 +81,20 @@ export interface ToggleProps {
   showText?: boolean;
   label?: string;
   className?: string;
-  children?: any;
+
   ariaLabel?: string;
   onPressedChange?: (pressed: boolean) => void;
 }
 
 const props = withDefaults(defineProps<ToggleProps>(), {
-  size: "medium",
   pressed: false,
-  disabled: false,
-  onPressedChange: undefined,
   ariaLabel: "",
   label: "Toggle",
-  className: "",
-  children: undefined,
+  disabled: false,
   showText: false,
+  size: "medium",
+  className: "",
+  onPressedChange: undefined,
 });
-
-const sizeClasses = computed(() => {
-  switch (props.size) {
-    case "small":
-      return "p-0.5 gap-0.5 text-xs";
-    case "large":
-      return "p-2 gap-1 text-base";
-    case "medium":
-    default:
-      return "p-1 gap-1 text-sm";
-  }
-});
-const iconClasses = computed(() => {
-  switch (props.size) {
-    case "small":
-      return "h-3 w-3";
-    case "large":
-      return "h-5 w-5";
-    case "medium":
-    default:
-      return "h-4 w-4";
-  }
-});
-const pressedClasses = computed(() => {
-  return props.pressed
-    ? "bg-components-toggle-active-color-container-background-default"
-    : "bg-transparent";
-});
-
-function handleToggle() {
-  if (props.disabled) {
-    return;
-  }
-  if (props.onPressedChange) {
-    props.onPressedChange(!props.pressed);
-  }
-}
+defineSlots<{ default?: () => any }>();
 </script>

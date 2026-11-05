@@ -12,6 +12,7 @@ export default {
   extends: DefaultTheme,
   enhanceApp({ app }) {
     app.component('FrameworkPreview', FrameworkPreview);
+    app.component('ComponentPreview', FrameworkPreview);
     app.component('ReactHost', ReactHost);
     app.component('SvelteHost', SvelteHost);
     app.component('ShowcaseDashboard', ShowcaseDashboard);

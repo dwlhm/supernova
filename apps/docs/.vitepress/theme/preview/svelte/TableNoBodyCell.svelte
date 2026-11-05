@@ -14,7 +14,7 @@
 
 <td
   class={cn(
-    "w-12 whitespace-nowrap border-t border-components-table-default-color-divider-border-default px-4 py-3 text-center text-sm text-components-table-default-color-cell-foreground-muted",
+    "w-12 whitespace-nowrap border-t border-border-default px-4 py-3 text-center text-sm text-foreground-muted",
     className
   )}>{no}</td
 >

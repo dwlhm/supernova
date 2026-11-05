@@ -16,10 +16,10 @@ export interface MetricCardProps {
   showProgress?: boolean;
   progress?: number;
   className?: string;
-  children?: any;
+  children?: React.ReactNode;
 }
 
-import { cn } from "./utils";
+import { cn, cva, getProgressState, bindControllerProps } from "./utils";
 
 function MetricCard(props: MetricCardProps) {
   props = {
@@ -40,109 +40,87 @@ function MetricCard(props: MetricCardProps) {
     className: "",
     ...props,
   };
-  function trendClasses() {
-    if (props.trendDirection === "down") {
-      return "bg-destructive-subtle text-destructive-foreground";
-    }
-    if (props.trendDirection === "neutral") {
-      return "bg-background-muted text-foreground-muted";
-    }
-    return "bg-components-metric-card-all-color-trend-background-default text-components-metric-card-all-color-trend-foreground-default";
-  }
-
-  function statusClasses() {
-    switch (props.statusVariant) {
-      case "success":
-        return "bg-success-subtle text-success-foreground";
-      case "warning":
-        return "bg-warning-subtle text-warning-foreground";
-      case "error":
-        return "bg-destructive-subtle text-destructive-foreground";
-      case "info":
-        return "bg-info-subtle text-info-foreground";
-      case "default":
-      default:
-        return "bg-background-muted text-foreground-muted";
-    }
-  }
-
-  function progressPercentage() {
-    const raw = props.progress;
-    if (raw < 0) {
-      return 0;
-    }
-    if (raw > 100) {
-      return 100;
-    }
-    return raw;
-  }
-
-  function progressStyle() {
-    return {
-      width: progressPercentage() + "%",
-    };
-  }
-
+  const [__ctrlState, __setCtrlState] = React.useState<Record<string, any>>({});
+  props = bindControllerProps(props, __ctrlState, __setCtrlState);
   return (
     <article
+      data-ctrl={typeof bindControllerProps}
       className={cn(
-        "flex w-full flex-col gap-2 rounded-rounded-lg border border-components-metric-card-all-color-container-border-default bg-components-metric-card-all-color-container-background-default p-4",
+        "flex w-full flex-col gap-2 rounded-lg border border-border-default bg-background-default p-4 shadow-sm",
         props.className
       )}
     >
-      <div className="flex items-center gap-2">
-        {props.showIcon ? (
-          <span
-            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-rounded-md bg-components-metric-card-all-color-icon-background-default"
-            aria-hidden="true"
-          >
-            <svg
-              className="h-4 w-4 text-components-metric-card-all-color-label-foreground-default"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.5"
-            >
-              <path
-                d="M4 20V10M10 20V4M16 20v-7M22 20H2"
-                stroke-linecap="round"
-              />
-            </svg>
-          </span>
-        ) : null}
-        <span className="truncate text-xs font-medium text-components-metric-card-all-color-label-foreground-default">
+      <div className="flex items-center justify-between gap-2">
+        <span className="flex-1 truncate text-xs font-medium text-foreground-muted">
           {props.label}
         </span>
         {props.showStatus ? (
           <span
             className={cn(
-              "ml-auto inline-flex shrink-0 items-center rounded-rounded-full px-2 py-0.5 text-xs font-medium leading-none",
-              statusClasses()
+              "inline-flex shrink-0 items-center rounded-full px-2 py-0.5 text-xs font-medium leading-4",
+              cva(
+                props.statusVariant,
+                {
+                  success: "bg-success-subtle text-success-foreground",
+                  warning: "bg-warning-subtle text-warning-foreground",
+                  error: "bg-destructive-subtle text-destructive-foreground",
+                  info: "bg-info-subtle text-info-foreground",
+                  default: "bg-background-muted text-foreground-muted",
+                },
+                "default"
+              )
             )}
           >
             {props.statusLabel}
           </span>
         ) : null}
+        {props.showIcon ? (
+          <span
+            className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-background-muted p-1 text-foreground-default"
+            aria-hidden="true"
+          >
+            <svg
+              className="h-4 w-4"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.5"
+            >
+              <path
+                d="M4 20V10M10 20V4M16 20v-7M22 20H2"
+                strokeLinecap="round"
+              />
+            </svg>
+          </span>
+        ) : null}
       </div>
       {props.showValue ? (
-        <p className="truncate text-2xl font-semibold text-components-metric-card-all-color-value-foreground-default">
+        <p className="truncate text-xl leading-6 font-semibold text-foreground-default">
           {props.value}
         </p>
       ) : null}
       {props.showTrend || props.showDescription ? (
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-center gap-1">
           {props.showTrend ? (
             <span
               className={cn(
-                "inline-flex shrink-0 items-center gap-0.5 rounded-rounded-full px-2 py-0.5 text-xs font-medium leading-none",
-                trendClasses()
+                "inline-flex shrink-0 items-center gap-0.5 rounded-full px-2 py-0.5 text-xs font-semibold leading-4",
+                cva(
+                  props.trendDirection,
+                  {
+                    down: "bg-destructive-subtle text-destructive-foreground",
+                    neutral: "bg-background-muted text-foreground-muted",
+                    up: "bg-success-subtle text-success-foreground",
+                  },
+                  "up"
+                )
               )}
             >
               {props.trendText}
             </span>
           ) : null}
           {props.showDescription ? (
-            <span className="truncate text-xs text-components-metric-card-all-color-description-foreground-default">
+            <span className="truncate text-xs text-foreground-muted">
               {props.descriptionText}
             </span>
           ) : null}
@@ -150,16 +128,16 @@ function MetricCard(props: MetricCardProps) {
       ) : null}
       {props.showProgress ? (
         <div
-          className="h-2 w-full overflow-hidden rounded-rounded-full bg-background-muted"
+          className="h-2 w-full overflow-hidden rounded-full bg-background-muted"
           role="progressbar"
-          aria-valuenow={progressPercentage()}
+          aria-valuenow={getProgressState(props.progress).percentage}
           aria-valuemin={0}
           aria-valuemax={100}
           aria-label={props.label}
         >
           <div
-            className="h-2 rounded-rounded-full bg-chart-series-1"
-            style={progressStyle()}
+            className="h-2 rounded-full bg-chart-series-1"
+            style={getProgressState(props.progress).barStyle}
           />
         </div>
       ) : null}

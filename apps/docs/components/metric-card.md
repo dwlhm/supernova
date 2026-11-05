@@ -32,66 +32,9 @@ Properties
 • List: Supplies list content for the List variant.
 • Leaderboard: Supplies ranked content for the Leaderboard variant.
 
-## Live Preview
+## Live Preview & Usage
 
 <FrameworkPreview name="MetricCard" />
-
-## Usage
-
-::: code-group
-
-```tsx [React]
-import { MetricCard } from './MetricCard';
-
-export default function Example() {
-  return (
-    <MetricCard actionable="default" content Slot="default">
-      MetricCard
-    </MetricCard>
-  );
-}
-```
-
-```vue [Vue 3]
-<script setup lang="ts">
-import { MetricCard } from './MetricCard';
-</script>
-
-<template>
-  <MetricCard actionable="default" content Slot="default">
-    MetricCard
-  </MetricCard>
-</template>
-```
-
-```svelte [Svelte]
-<script lang="ts">
-  import MetricCard from './MetricCard.svelte';
-</script>
-
-<MetricCard actionable="default" content Slot="default">
-  MetricCard
-</MetricCard>
-```
-
-```ts [Angular]
-import { Component } from '@angular/core';
-import { MetricCardComponent } from './metric-card.component';
-
-@Component({
-  selector: 'app-root',
-  standalone: true,
-  imports: [MetricCardComponent],
-  template: `
-    <app-metric-card actionable="default" content Slot="default">
-      MetricCard
-    </app-metric-card>
-  `,
-})
-export class AppComponent {}
-```
-
-:::
 
 ## Props & Variants
 

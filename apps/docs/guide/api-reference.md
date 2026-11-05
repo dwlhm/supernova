@@ -1,6 +1,6 @@
 # Backend API Reference
 
-The Go backend (`apps/api`) exposes OpenAPI 3.0.3 endpoints under `/v1/`.
+The TypeScript backend (`apps/api` — `@supernova/api`) exposes OpenAPI 3.0.3 endpoints under `/v1/`.
 
 ## Endpoints
 
@@ -93,6 +93,8 @@ Polls the progress of an extraction job.
   "updatedAt": "2026-10-07T12:00:15Z"
 }
 ```
+
+`status` is one of `queued`, `authoring`, `compiling`, `publishing`, `succeeded`, `partially_succeeded` (published, but some components failed — listed in `error.message`), or `failed`. Jobs interrupted by a server restart are marked `failed` with `error.stage = "recovery"`.
 
 ---
 

@@ -10,11 +10,11 @@ export interface MainMenuProps {
   showBadge?: boolean;
   badgeLabel?: string;
   className?: string;
-  children?: any;
+  children?: React.ReactNode;
   onClick?: () => void;
 }
 
-import { cn } from "./utils";
+import { cn, ICON_PATHS, bindControllerProps } from "./utils";
 
 function MainMenu(props: MainMenuProps) {
   props = {
@@ -28,49 +28,31 @@ function MainMenu(props: MainMenuProps) {
     className: "",
     ...props,
   };
-  function containerClasses() {
-    return props.active
-      ? "bg-components-main-menu-active-color-container-background-active-rebind"
-      : "hover:bg-components-main-menu-all-color-container-background-hover";
-  }
-
-  function labelClasses() {
-    return props.active
-      ? "text-components-main-menu-active-color-label-foreground-active-rebind"
-      : "text-components-main-menu-default-color-label-foreground-default-rebind";
-  }
-
-  function iconClasses() {
-    return props.active
-      ? "text-components-main-menu-active-color-icon-foreground-active-rebind"
-      : "text-components-main-menu-default-color-icon-foreground-default-rebind";
-  }
-
-  function badgeClasses() {
-    return props.active
-      ? "bg-components-main-menu-active-color-badge-background-active-rebind text-components-main-menu-active-color-badge-label-foreground-active-rebind"
-      : "bg-components-main-menu-default-color-badge-background-default-rebind text-components-main-menu-default-color-badge-label-foreground-default-rebind";
-  }
-
-  function handleClick() {
-    if (props.onClick) {
-      props.onClick();
-    }
-  }
-
+  const [__ctrlState, __setCtrlState] = React.useState<Record<string, any>>({});
+  props = bindControllerProps(props, __ctrlState, __setCtrlState);
   return (
     <button
       type="button"
+      data-ctrl={typeof bindControllerProps}
       aria-current={props.active ? "page" : undefined}
       className={cn(
-        "flex w-full items-center gap-2 rounded-rounded-md px-2 py-3 text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring-primary",
-        containerClasses(),
+        "flex w-full items-center gap-2 rounded-md px-2 py-3 text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring-primary",
+        props.active
+          ? "bg-primary-subtle"
+          : "hover:bg-background-muted active:bg-background-interactive",
         props.className
       )}
-      onClick={(event) => handleClick()}
+      onClick={(event) => props.onClick && props.onClick()}
     >
       {props.showLeadingIcon ? (
-        <span className={cn("flex shrink-0 items-center", iconClasses())}>
+        <span
+          className={cn(
+            "flex shrink-0 items-center",
+            props.active
+              ? "text-primary-subtle-foreground"
+              : "text-foreground-default"
+          )}
+        >
           {props.children ? <>{props.children}</> : null}
           {!props.children ? (
             <svg
@@ -79,7 +61,7 @@ function MainMenu(props: MainMenuProps) {
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
-              stroke-width="1.5"
+              strokeWidth="1.5"
             >
               <rect x="3" y="3" width="7" height="7" rx="1.5" />
               <rect x="14" y="3" width="7" height="7" rx="1.5" />
@@ -90,15 +72,24 @@ function MainMenu(props: MainMenuProps) {
         </span>
       ) : null}
       {props.showLabel ? (
-        <span className={cn("flex-1 truncate text-left", labelClasses())}>
+        <span
+          className={cn(
+            "flex-1 truncate text-left",
+            props.active
+              ? "text-primary-subtle-foreground"
+              : "text-foreground-default"
+          )}
+        >
           {props.label}
         </span>
       ) : null}
       {props.showBadge ? (
         <span
           className={cn(
-            "inline-flex shrink-0 items-center rounded-rounded-xl px-2 py-0.5 text-xs font-medium leading-none",
-            badgeClasses()
+            "inline-flex shrink-0 items-center rounded-xl px-2 py-0.5 text-xs font-medium leading-none",
+            props.active
+              ? "bg-primary-default text-primary-foreground"
+              : "bg-primary-subtle text-primary-subtle-foreground"
           )}
         >
           {props.badgeLabel}
@@ -110,13 +101,18 @@ function MainMenu(props: MainMenuProps) {
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
-          stroke-width="1.5"
-          className={cn("h-4 w-4 shrink-0", iconClasses())}
+          strokeWidth="1.5"
+          className={cn(
+            "h-4 w-4 shrink-0",
+            props.active
+              ? "text-primary-subtle-foreground"
+              : "text-foreground-muted"
+          )}
         >
           <path
-            d="m9 6 6 6-6 6"
-            stroke-linecap="round"
-            stroke-linejoin="round"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d={ICON_PATHS.chevronRight}
           />
         </svg>
       ) : null}

@@ -1,5 +1,5 @@
 <template>
-  <div ref="containerRef" class="react-host-container"></div>
+  <component :is="tag || 'div'" ref="containerRef" class="react-host-container contents" />
 </template>
 
 <script setup lang="ts">
@@ -8,6 +8,7 @@ import { ref, onMounted, onBeforeUnmount, watch } from 'vue';
 const props = defineProps<{
   component: any;
   props?: any;
+  tag?: string;
 }>();
 
 const containerRef = ref<HTMLDivElement | null>(null);

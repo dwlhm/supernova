@@ -26,66 +26,9 @@ Show badge — Shows or hides the badge.
 Badge label — Sets the badge text.
 Submenu content — Slot for nested navigation content.
 
-## Live Preview
+## Live Preview & Usage
 
 <FrameworkPreview name="MenuItem" />
-
-## Usage
-
-::: code-group
-
-```tsx [React]
-import { MenuItem } from './MenuItem';
-
-export default function Example() {
-  return (
-    <MenuItem badge label="New" label="Menu">
-      MenuItem
-    </MenuItem>
-  );
-}
-```
-
-```vue [Vue 3]
-<script setup lang="ts">
-import { MenuItem } from './MenuItem';
-</script>
-
-<template>
-  <MenuItem badge label="New" label="Menu">
-    MenuItem
-  </MenuItem>
-</template>
-```
-
-```svelte [Svelte]
-<script lang="ts">
-  import MenuItem from './MenuItem.svelte';
-</script>
-
-<MenuItem badge label="New" label="Menu">
-  MenuItem
-</MenuItem>
-```
-
-```ts [Angular]
-import { Component } from '@angular/core';
-import { MenuItemComponent } from './menu-item.component';
-
-@Component({
-  selector: 'app-root',
-  standalone: true,
-  imports: [MenuItemComponent],
-  template: `
-    <app-menu-item badge label="New" label="Menu">
-      MenuItem
-    </app-menu-item>
-  `,
-})
-export class AppComponent {}
-```
-
-:::
 
 ## Props & Variants
 

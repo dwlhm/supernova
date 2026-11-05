@@ -1,9 +1,9 @@
 "use client";
 import * as React from "react";
-import { useState } from "react";
 
 export interface InputFileDropZoneProps {
   id?: string;
+  name?: string;
   label?: string;
   primaryText?: string;
   supportingText?: string;
@@ -19,17 +19,25 @@ export interface InputFileDropZoneProps {
   showHint?: boolean;
   className?: string;
   onFileNameChange?: (fileName: string) => void;
+  onFilesChange?: (files: unknown[]) => void;
 }
 
-import { cn } from "./utils";
+import {
+  cn,
+  getFileState,
+  handleFileSelectEvent,
+  ICON_PATHS,
+  bindControllerProps,
+} from "./utils";
 
 function InputFileDropZone(props: InputFileDropZoneProps) {
   props = {
     id: "file-drop-zone",
+    name: "drop-file",
     label: "Documents",
-    primaryText: "Drag and drop files here, or",
+    primaryText: "or drag and drop files here",
     supportingText: "PNG, JPG, or PDF up to 10 MB",
-    browseText: "browse",
+    browseText: "Browse",
     fileName: "",
     fileMetadata: "",
     hint: "You can upload one file.",
@@ -42,120 +50,79 @@ function InputFileDropZone(props: InputFileDropZoneProps) {
     className: "",
     ...props,
   };
-  const [isDragging, setIsDragging] = useState(() => false);
-
-  function hasError() {
-    return props.errorMessage !== "";
-  }
-
-  function hasFile() {
-    return props.fileName !== "";
-  }
-
-  function containerClasses() {
-    if (hasError()) {
-      return "border-components-input-file-drop-zone-color-container-border-error";
-    }
-    if (isDragging) {
-      return "border-components-input-file-drop-zone-color-container-border-focus bg-background-subtle";
-    }
-    return "border-components-input-file-drop-zone-color-container-border-default border-dashed";
-  }
-
-  function supportingText() {
-    return hasError() ? props.errorMessage : props.hint;
-  }
-
-  function supportingClasses() {
-    return hasError()
-      ? "text-components-input-file-drop-zone-color-supporting-text-foreground-error"
-      : "text-components-input-file-drop-zone-color-supporting-text-foreground-default";
-  }
-
-  function setDragging(value: boolean) {
-    setIsDragging(value);
-  }
-
-  function setName(fileName: string) {
-    if (props.onFileNameChange) {
-      props.onFileNameChange(fileName);
-    }
-  }
-
+  const [__ctrlState, __setCtrlState] = React.useState<Record<string, any>>({});
+  props = bindControllerProps(props, __ctrlState, __setCtrlState);
   return (
-    <div className={cn("flex w-full flex-col gap-3", props.className)}>
+    <div
+      data-ctrl={typeof bindControllerProps}
+      className={cn("flex w-full flex-col gap-3", props.className)}
+    >
       {props.showLabel && props.label !== "" ? (
-        <span className="flex items-center gap-1 text-sm font-medium text-components-input-file-drop-zone-color-label-foreground-default">
+        <label
+          className="flex items-center gap-1 text-sm font-medium text-foreground-default"
+          htmlFor={props.id}
+        >
           {props.label}
           {props.required ? (
-            <span
-              aria-hidden="true"
-              className="text-components-input-file-drop-zone-color-required-indicator-foreground-default"
-            >
+            <span aria-hidden="true" className="text-destructive-default">
               *
             </span>
           ) : null}
-        </span>
+        </label>
       ) : null}
       <label
+        htmlFor={props.id}
         className={cn(
-          "flex flex-col items-center justify-center gap-4 rounded-rounded-lg border bg-components-input-file-drop-zone-color-container-background-default px-6 py-6 text-center transition-colors",
-          containerClasses(),
+          "flex flex-col items-center justify-center gap-3 rounded-lg border bg-background-default px-6 py-6 text-center shadow-sm transition-colors",
+          getFileState(props).hasError
+            ? "border-destructive-default focus-within:ring-2 focus-within:ring-focus-ring-error"
+            : "border-border-default border-dashed focus-within:border-primary-border-emphasis focus-within:ring-2 focus-within:ring-focus-ring-primary",
           props.disabled ? "cursor-not-allowed opacity-50" : "cursor-pointer"
         )}
-        onDragEnter={(event) => setDragging(true)}
         onDragOver={(event) => event.preventDefault()}
-        onDragLeave={(event) => setDragging(false)}
-        onDrop={(event) => {
-          event.preventDefault();
-          setDragging(false);
-          setName(
-            event.dataTransfer &&
-              event.dataTransfer.files &&
-              event.dataTransfer.files.length > 0
-              ? event.dataTransfer.files[0].name
-              : ""
-          );
-        }}
+        onDrop={(event) =>
+          !props.disabled &&
+          handleFileSelectEvent(
+            event,
+            props.onFileNameChange,
+            props.onFilesChange
+          )
+        }
       >
         <svg
           aria-hidden="true"
-          className="h-6 w-6 shrink-0 text-components-input-file-drop-zone-color-vector-stroke-default"
+          className="h-6 w-6 shrink-0 text-foreground-default"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
-          stroke-width="1.5"
+          strokeWidth="1.5"
         >
           <path
-            d="M12 16V4m0 0L8 8m4-4 4 4"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          />
-          <path
-            d="M4 16v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"
-            stroke-linecap="round"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d={ICON_PATHS.upload}
           />
         </svg>
-        {!hasFile() ? (
+        {!getFileState(props).hasFile ? (
           <span className="flex flex-col items-center gap-1">
-            <span className="text-sm text-components-input-file-drop-zone-color-primary-text-foreground-default">
-              {props.primaryText}
-              <span className="font-medium underline underline-offset-2">
+            <span className="inline-flex flex-wrap items-center justify-center gap-1.5 text-base text-foreground-default">
+              <span className="inline-flex items-center rounded-lg bg-secondary-default px-2 py-0.5 text-sm font-medium text-secondary-foreground">
                 {props.browseText}
               </span>
+              <span>{props.primaryText}</span>
             </span>
-            <span className="text-xs text-components-input-file-drop-zone-color-supporting-text-foreground-default">
+            <span className="text-sm text-foreground-muted">
               {props.supportingText}
             </span>
           </span>
         ) : null}
-        {hasFile() ? (
+        {getFileState(props).hasFile ? (
           <span className="flex flex-col items-center gap-1">
-            <span className="text-sm font-medium text-components-input-file-drop-zone-color-file-name-foreground-filled">
+            <span className="text-sm font-medium text-foreground-default">
               {props.fileName}
             </span>
             {props.fileMetadata !== "" ? (
-              <span className="text-xs text-components-input-file-drop-zone-color-file-metadata-foreground-filled">
+              <span className="text-xs text-foreground-muted">
                 {props.fileMetadata}
               </span>
             ) : null}
@@ -165,22 +132,33 @@ function InputFileDropZone(props: InputFileDropZoneProps) {
           type="file"
           className="sr-only"
           id={props.id}
+          name={props.name}
           accept={props.accept}
           disabled={props.disabled}
           required={props.required}
-          aria-invalid={hasError()}
+          aria-invalid={getFileState(props).hasError}
+          aria-describedby={props.showHint ? props.id + "-hint" : undefined}
           onChange={(event) =>
-            setName(
-              event.target.files && event.target.files.length > 0
-                ? event.target.files[0].name
-                : ""
+            !props.disabled &&
+            handleFileSelectEvent(
+              event,
+              props.onFileNameChange,
+              props.onFilesChange
             )
           }
         />
       </label>
       {props.showHint ? (
-        <span className={cn("text-xs", supportingClasses())}>
-          {supportingText()}
+        <span
+          id={props.id + "-hint"}
+          className={cn(
+            "text-sm",
+            getFileState(props).hasError
+              ? "text-destructive-default"
+              : "text-foreground-muted"
+          )}
+        >
+          {getFileState(props).helpText}
         </span>
       ) : null}
     </div>

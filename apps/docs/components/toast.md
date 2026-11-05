@@ -27,66 +27,9 @@ PROPERTIES
 • Show Close Button — Shows or hides dismiss control.
 • clock — Shows or hides the timestamp.
 
-## Live Preview
+## Live Preview & Usage
 
 <FrameworkPreview name="Toast" />
-
-## Usage
-
-::: code-group
-
-```tsx [React]
-import { Toast } from './Toast';
-
-export default function Example() {
-  return (
-    <Toast action Text="Undo" description Text="Toast description text here">
-      Toast
-    </Toast>
-  );
-}
-```
-
-```vue [Vue 3]
-<script setup lang="ts">
-import { Toast } from './Toast';
-</script>
-
-<template>
-  <Toast action Text="Undo" description Text="Toast description text here">
-    Toast
-  </Toast>
-</template>
-```
-
-```svelte [Svelte]
-<script lang="ts">
-  import Toast from './Toast.svelte';
-</script>
-
-<Toast action Text="Undo" description Text="Toast description text here">
-  Toast
-</Toast>
-```
-
-```ts [Angular]
-import { Component } from '@angular/core';
-import { ToastComponent } from './toast.component';
-
-@Component({
-  selector: 'app-root',
-  standalone: true,
-  imports: [ToastComponent],
-  template: `
-    <app-toast action Text="Undo" description Text="Toast description text here">
-      Toast
-    </app-toast>
-  `,
-})
-export class AppComponent {}
-```
-
-:::
 
 ## Props & Variants
 

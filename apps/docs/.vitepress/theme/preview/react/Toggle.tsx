@@ -8,12 +8,12 @@ export interface ToggleProps {
   showText?: boolean;
   label?: string;
   className?: string;
-  children?: any;
+  children?: React.ReactNode;
   ariaLabel?: string;
   onPressedChange?: (pressed: boolean) => void;
 }
 
-import { cn } from "./utils";
+import { cn, cva, ICON_PATHS, bindControllerProps } from "./utils";
 
 function Toggle(props: ToggleProps) {
   props = {
@@ -26,58 +26,44 @@ function Toggle(props: ToggleProps) {
     ariaLabel: "",
     ...props,
   };
-  function sizeClasses() {
-    switch (props.size) {
-      case "small":
-        return "p-0.5 gap-0.5 text-xs";
-      case "large":
-        return "p-2 gap-1 text-base";
-      case "medium":
-      default:
-        return "p-1 gap-1 text-sm";
-    }
-  }
-
-  function iconClasses() {
-    switch (props.size) {
-      case "small":
-        return "h-3 w-3";
-      case "large":
-        return "h-5 w-5";
-      case "medium":
-      default:
-        return "h-4 w-4";
-    }
-  }
-
-  function pressedClasses() {
-    return props.pressed
-      ? "bg-components-toggle-active-color-container-background-default"
-      : "bg-transparent";
-  }
-
-  function handleToggle() {
-    if (props.disabled) {
-      return;
-    }
-    if (props.onPressedChange) {
-      props.onPressedChange(!props.pressed);
-    }
-  }
-
+  const [__ctrlState, __setCtrlState] = React.useState<Record<string, any>>({});
+  props = bindControllerProps(props, __ctrlState, __setCtrlState);
   return (
     <button
       type="button"
+      data-ctrl={typeof bindControllerProps}
       aria-pressed={props.pressed}
       aria-label={props.ariaLabel !== "" ? props.ariaLabel : props.label}
       disabled={props.disabled}
       className={cn(
-        "inline-flex items-center justify-center rounded-rounded-lg text-components-toggle-all-color-label-foreground-default transition-colors hover:bg-background-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring-primary disabled:pointer-events-none disabled:opacity-50",
-        sizeClasses(),
-        pressedClasses(),
+        "inline-flex items-center justify-center rounded-lg text-foreground-default transition-colors hover:bg-background-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring-primary disabled:pointer-events-none disabled:opacity-50",
+        props.showText
+          ? cva(
+              props.size,
+              {
+                small: "px-2 py-1 gap-1.5 text-xs",
+                medium: "px-3 py-1.5 gap-2 text-sm",
+                large: "px-4 py-2 gap-2.5 text-base",
+              },
+              "medium"
+            )
+          : cva(
+              props.size,
+              {
+                small: "h-4 w-4 p-0.5",
+                medium: "h-6 w-6 p-1",
+                large: "h-9 w-9 p-2",
+              },
+              "medium"
+            ),
+        props.pressed ? "bg-background-muted shadow-xs" : "bg-transparent",
         props.className
       )}
-      onClick={(event) => handleToggle()}
+      onClick={(event) =>
+        !props.disabled &&
+        props.onPressedChange &&
+        props.onPressedChange(!props.pressed)
+      }
     >
       {props.children ? <>{props.children}</> : null}
       {!props.children ? (
@@ -86,13 +72,26 @@ function Toggle(props: ToggleProps) {
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
-          stroke-width="1.5"
-          className={cn("shrink-0", iconClasses())}
+          strokeWidth="1.5"
+          className={cn(
+            "shrink-0",
+            cva(
+              props.size,
+              {
+                small: "h-3 w-3",
+                medium: "h-4 w-4",
+                large: "h-5 w-5",
+              },
+              "medium"
+            )
+          )}
         >
-          <path d="M12 3v18M3 12h18" stroke-linecap="round" />
+          <path strokeLinecap="round" d={ICON_PATHS.plus} />
         </svg>
       ) : null}
-      {props.showText ? <span className="truncate">{props.label}</span> : null}
+      {props.showText ? (
+        <span className="truncate font-medium">{props.label}</span>
+      ) : null}
     </button>
   );
 }

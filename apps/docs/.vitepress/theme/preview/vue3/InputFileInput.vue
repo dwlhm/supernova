@@ -1,64 +1,78 @@
 <template>
-  <div :class="cn('flex w-full flex-col gap-3', className)">
+  <div
+    :data-ctrl="typeof bindControllerProps"
+    :class="cn('flex w-full flex-col gap-3', className)"
+  >
     <template v-if="showLabel && label !== ''">
-      <span
-        class="flex items-center gap-1 text-sm font-medium text-components-input-file-input-color-label-foreground-default"
+      <label
+        class="flex items-center gap-1 text-sm font-medium text-foreground-default"
+        :for="id"
         >{{ label }}
         <template v-if="required">
-          <span
-            aria-hidden="true"
-            class="text-components-input-file-input-color-required-indicator-foreground-default"
-          >
-            *
-          </span>
+          <span aria-hidden="true" class="text-destructive-default">*</span>
         </template>
-      </span>
+      </label>
     </template>
 
-    <label
+    <div
       :class="
         cn(
-          'flex items-center gap-2.5 rounded-rounded-lg border bg-components-input-file-input-color-container-background-default px-3 py-1 transition-colors',
-          containerClasses,
-          disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'
+          'flex items-center gap-3 rounded-lg border bg-background-default px-3 py-1 shadow-xs transition-colors',
+          getFileState(props).hasError
+            ? 'border-destructive-border focus-within:ring-2 focus-within:ring-focus-ring-error'
+            : 'border-border-default focus-within:border-primary-border-emphasis focus-within:ring-2 focus-within:ring-focus-ring-primary',
+          disabled && 'cursor-not-allowed opacity-50'
         )
       "
-      ><span
-        class="inline-flex h-7 shrink-0 items-center rounded-rounded-sm bg-components-button-secondary-color-container-background-default px-3 text-xs font-medium text-components-input-file-input-color-button-label-foreground-default"
-        >{{ buttonText }}</span
-      ><span
+    >
+      <label
+        :for="id"
         :class="
           cn(
-            'truncate py-1 text-sm',
-            hasFile
-              ? 'text-components-input-file-input-color-file-name-foreground-filled'
-              : 'text-components-input-file-input-color-file-name-foreground-default'
+            'flex min-w-0 flex-1 items-center gap-3',
+            disabled ? 'cursor-not-allowed' : 'cursor-pointer'
           )
         "
-        >{{ displayName }}</span
-      ><input
-        type="file"
-        class="sr-only"
-        :id="id"
-        :accept="accept"
-        :disabled="disabled"
-        :required="required"
-        :aria-invalid="hasError"
-        @change="
-          async (event) =>
-            setName(
-              event.target.files && event.target.files.length > 0
-                ? event.target.files[0].name
-                : ''
+        ><span
+          class="inline-flex h-7 shrink-0 items-center rounded-sm bg-secondary-default px-3 text-sm font-medium text-secondary-foreground"
+          >{{ buttonText }}</span
+        ><span
+          :class="
+            cn(
+              'truncate py-1 text-sm',
+              getFileState(props).hasFile
+                ? 'text-foreground-default'
+                : 'text-foreground-subtle'
             )
-        "
-      />
-      <template v-if="hasFile">
+          "
+          >{{ getFileState(props).displayName }}</span
+        ><input
+          type="file"
+          class="sr-only"
+          :id="id"
+          :name="name"
+          :accept="accept"
+          :disabled="disabled"
+          :required="required"
+          :aria-invalid="getFileState(props).hasError"
+          :aria-describedby="showHint ? id + '-hint' : undefined"
+          @change="
+            async (event) =>
+              !disabled &&
+              handleFileSelectEvent(event, onFileNameChange, onFilesChange)
+          "
+      /></label>
+      <template v-if="getFileState(props).hasFile">
         <button
           type="button"
           aria-label="Remove file"
-          class="ml-auto inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-rounded-full text-components-input-file-input-color-file-name-foreground-filled hover:bg-background-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring-primary"
-          @click="async (event) => clear()"
+          class="ml-auto inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-foreground-default hover:bg-background-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring-primary disabled:pointer-events-none"
+          :disabled="disabled"
+          @click="
+            async (event) =>
+              !disabled &&
+              clearFileInputEvent(event, onFileNameChange, onFilesChange)
+          "
         >
           <svg
             aria-hidden="true"
@@ -68,26 +82,41 @@
             stroke="currentColor"
             stroke-width="2"
           >
-            <path d="M6 6l12 12M18 6 6 18" stroke-linecap="round"></path>
+            <path stroke-linecap="round" :d="ICON_PATHS.close"></path>
           </svg>
         </button>
       </template>
-    </label>
+    </div>
     <template v-if="showHint">
-      <span :class="cn('text-xs', supportingClasses)">{{
-        supportingText
-      }}</span>
+      <span
+        :id="id + '-hint'"
+        :class="
+          cn(
+            'text-sm',
+            getFileState(props).hasError
+              ? 'text-destructive-foreground'
+              : 'text-foreground-muted'
+          )
+        "
+        >{{ getFileState(props).helpText }}</span
+      >
     </template>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
-
-import { cn } from "./utils";
+import {
+  cn,
+  getFileState,
+  handleFileSelectEvent,
+  clearFileInputEvent,
+  ICON_PATHS,
+  bindControllerProps,
+} from "./utils";
 
 export interface InputFileInputProps {
   id?: string;
+  name?: string;
   label?: string;
   buttonText?: string;
   fileName?: string;
@@ -100,54 +129,24 @@ export interface InputFileInputProps {
   showHint?: boolean;
   className?: string;
   onFileNameChange?: (fileName: string) => void;
+  onFilesChange?: (files: unknown[]) => void;
 }
 
 const props = withDefaults(defineProps<InputFileInputProps>(), {
-  errorMessage: "",
-  fileName: "",
-  hint: "Supported formats: PNG, JPG, or PDF.",
-  onFileNameChange: undefined,
   className: "",
   showLabel: true,
   label: "Picture",
+  id: "input-file",
   required: false,
   disabled: false,
   buttonText: "Choose File",
-  id: "input-file",
+  name: "file",
   accept: "image/png,image/jpeg,application/pdf",
   showHint: true,
+  onFileNameChange: undefined,
+  onFilesChange: undefined,
+  fileName: '',
+  hint: 'Supported formats: PNG, JPG, or PDF.',
+  errorMessage: '',
 });
-
-const hasError = computed(() => {
-  return props.errorMessage !== "";
-});
-const hasFile = computed(() => {
-  return props.fileName !== "";
-});
-const containerClasses = computed(() => {
-  if (hasError) {
-    return "border-components-input-file-input-color-container-border-error";
-  }
-  return "border-components-input-file-input-color-container-border-default focus-within:border-components-input-file-input-color-container-border-focus";
-});
-const supportingText = computed(() => {
-  return hasError ? props.errorMessage : props.hint;
-});
-const supportingClasses = computed(() => {
-  return hasError
-    ? "text-components-input-file-input-color-supporting-text-foreground-error"
-    : "text-components-input-file-input-color-supporting-text-foreground-default";
-});
-const displayName = computed(() => {
-  return hasFile ? props.fileName : "No file chosen";
-});
-
-function setName(fileName: string) {
-  if (props.onFileNameChange) {
-    props.onFileNameChange(fileName);
-  }
-}
-function clear() {
-  setName("");
-}
 </script>

@@ -26,66 +26,9 @@ Show Toggle 3: Shows or hides the third toggle row.
 Show Toggle 4: Shows or hides the fourth toggle row.
 Show Toggle 5: Shows or hides the fifth toggle row.
 
-## Live Preview
+## Live Preview & Usage
 
 <FrameworkPreview name="ToggleGroup" />
-
-## Usage
-
-::: code-group
-
-```tsx [React]
-import { ToggleGroup } from './ToggleGroup';
-
-export default function Example() {
-  return (
-    <ToggleGroup show Toggle 1 show Toggle 2>
-      ToggleGroup
-    </ToggleGroup>
-  );
-}
-```
-
-```vue [Vue 3]
-<script setup lang="ts">
-import { ToggleGroup } from './ToggleGroup';
-</script>
-
-<template>
-  <ToggleGroup show Toggle 1 show Toggle 2>
-    ToggleGroup
-  </ToggleGroup>
-</template>
-```
-
-```svelte [Svelte]
-<script lang="ts">
-  import ToggleGroup from './ToggleGroup.svelte';
-</script>
-
-<ToggleGroup show Toggle 1 show Toggle 2>
-  ToggleGroup
-</ToggleGroup>
-```
-
-```ts [Angular]
-import { Component } from '@angular/core';
-import { ToggleGroupComponent } from './toggle-group.component';
-
-@Component({
-  selector: 'app-root',
-  standalone: true,
-  imports: [ToggleGroupComponent],
-  template: `
-    <app-toggle-group show Toggle 1 show Toggle 2>
-      ToggleGroup
-    </app-toggle-group>
-  `,
-})
-export class AppComponent {}
-```
-
-:::
 
 ## Props & Variants
 

@@ -16,173 +16,96 @@
 </script>
 
 <script lang="ts">
-  import { cn } from "./utils";
+  import {
+    cn,
+    cva,
+    getToastIconPath,
+    ICON_PATHS,
+    bindControllerProps,
+  } from "./utils";
 
   export let type: ToastProps["type"] = "default";
-  export let onAction: ToastProps["onAction"];
-  export let onClose: ToastProps["onClose"];
+  export let showDescription: ToastProps["showDescription"] = false;
   export let className: ToastProps["className"] = "";
   export let title: ToastProps["title"] = "Toast Text";
-  export let showDescription: ToastProps["showDescription"] = false;
   export let description: ToastProps["description"] =
     "Toast description text here";
   export let showTimestamp: ToastProps["showTimestamp"] = true;
-  export let timestamp: ToastProps["timestamp"] = "";
+  export let timestamp: ToastProps["timestamp"] = "11.29.45 AM";
   export let showAction: ToastProps["showAction"] = false;
+  export let onAction: ToastProps["onAction"];
   export let actionText: ToastProps["actionText"] = "Undo";
   export let showClose: ToastProps["showClose"] = false;
-
-  function handleAction() {
-    if (onAction) {
-      onAction();
-    }
-  }
-  function handleClose() {
-    if (onClose) {
-      onClose();
-    }
-  }
-  $: role = () => {
-    return type === "error" ? "alert" : "status";
-  };
-  $: iconContainerClasses = () => {
-    switch (type) {
-      case "success":
-        return "bg-components-toast-success-color-icon-container-background-default";
-      case "error":
-        return "bg-components-toast-error-color-icon-container-background-default";
-      case "warning":
-        return "bg-components-toast-warning-color-icon-container-background-default";
-      case "info":
-        return "bg-components-toast-info-color-icon-container-background-default";
-      case "default":
-      default:
-        return "bg-components-toast-default-color-icon-container-background-default";
-    }
-  };
-  $: titleClasses = () => {
-    switch (type) {
-      case "success":
-        return "text-components-toast-success-color-title-text-default";
-      case "error":
-        return "text-components-toast-error-color-title-text-default";
-      case "warning":
-        return "text-components-toast-warning-color-title-text-default";
-      case "info":
-        return "text-components-toast-info-color-title-text-default";
-      case "default":
-      default:
-        return "text-components-toast-default-color-title-text-default";
-    }
-  };
+  export let onClose: ToastProps["onClose"];
 </script>
 
 <div
-  role={role()}
+  data-ctrl={typeof bindControllerProps}
+  role={type === "error" ? "alert" : "status"}
   class={cn(
-    "flex w-full max-w-md items-center gap-1.5 rounded-rounded-full border border-border-subtle bg-components-toast-default-color-container-background-default px-3 py-2 shadow-lg transition-colors hover:bg-components-toast-default-color-container-background-hover",
+    "flex w-full max-w-md items-center gap-1.5 bg-background-default px-3 py-2 shadow-md transition-shadow hover:shadow-lg",
+    showDescription ? "rounded-xl" : "rounded-full",
     className
   )}
 >
   <span
     aria-hidden="true"
     class={cn(
-      "flex h-6 w-6 shrink-0 items-center justify-center rounded-rounded-full",
-      iconContainerClasses()
+      "flex h-7 w-7 shrink-0 items-center justify-center rounded-full p-1.5",
+      cva(
+        type,
+        {
+          success: "bg-success-subtle text-success-foreground",
+          error: "bg-destructive-subtle text-destructive-foreground",
+          warning: "bg-warning-subtle text-warning-foreground",
+          info: "bg-info-subtle text-info-foreground",
+          default: "bg-background-muted text-foreground-default",
+        },
+        "default"
+      )
     )}
-  >
-    {#if type === "success"}
-      <svg
-        class="h-3.5 w-3.5 text-components-toast-default-color-icon-foreground-default"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        ><path
-          d="M5 13l4 4L19 7"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        /></svg
-      >
-    {/if}
-    {#if type === "error"}
-      <svg
-        class="h-3.5 w-3.5 text-components-toast-default-color-icon-foreground-default"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        ><path d="M12 8v5" stroke-linecap="round" /><circle
-          cx="12"
-          cy="16.5"
-          r="0.75"
-        /></svg
-      >
-    {/if}
-    {#if type === "warning"}
-      <svg
-        class="h-3.5 w-3.5 text-components-toast-default-color-icon-foreground-default"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        ><path
-          d="M12 4l9 16H3z"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        /><path d="M12 10v4" stroke-linecap="round" /></svg
-      >
-    {/if}
-    {#if type === "info"}
-      <svg
-        class="h-3.5 w-3.5 text-components-toast-default-color-icon-foreground-default"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        ><circle cx="12" cy="12" r="9" /><path
-          d="M12 11v5"
-          stroke-linecap="round"
-        /><circle cx="12" cy="8" r="0.75" /></svg
-      >
-    {/if}
-    {#if type === "default"}
-      <svg
-        class="h-3.5 w-3.5 text-components-toast-default-color-icon-foreground-default"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        ><path d="M10 21h4" stroke-linecap="round" /><path
-          d="M18 8a6 6 0 1 0-12 0c0 6-2 7-2 7h16s-2-1-2-7"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        /></svg
-      >
-    {/if}</span
+    ><svg
+      class="h-4 w-4"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      ><path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        d={getToastIconPath(type)}
+      /></svg
+    ></span
   ><span class="flex min-w-0 flex-1 flex-col"
-    ><span class={cn("truncate text-sm font-medium", titleClasses())}
-      >{title}</span
+    ><span
+      class={cn(
+        "truncate text-sm font-semibold",
+        cva(
+          type,
+          {
+            success: "text-success-foreground",
+            error: "text-destructive-foreground",
+            warning: "text-warning-foreground",
+            info: "text-info-foreground",
+            default: "text-foreground-default",
+          },
+          "default"
+        )
+      )}>{title}</span
     >
     {#if showDescription}
-      <span
-        class="truncate text-xs text-components-toast-default-color-description-text-default"
-        >{description}</span
-      >
+      <span class="text-xs text-foreground-muted">{description}</span>
     {/if}</span
   >
   {#if showTimestamp && timestamp !== ""}
-    <span
-      class="shrink-0 text-xs text-components-toast-default-color-timestamp-text-default"
-      >{timestamp}</span
-    >
+    <span class="shrink-0 text-xs text-foreground-muted">{timestamp}</span>
   {/if}
   {#if showAction}
     <button
       type="button"
-      class="shrink-0 rounded-rounded-sm px-2 py-1 text-xs font-medium text-components-toast-default-color-action-text-default underline-offset-4 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring-primary"
+      class="shrink-0 rounded-md bg-secondary-default px-2 py-1 text-xs font-medium text-secondary-foreground transition-colors hover:bg-secondary-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring-primary"
       on:click={(event) => {
-        handleAction();
+        onAction && onAction();
       }}>{actionText}</button
     >
   {/if}
@@ -190,9 +113,9 @@
     <button
       type="button"
       aria-label="Dismiss notification"
-      class="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-rounded-full text-components-toast-default-color-close-text-default transition-colors hover:bg-background-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring-primary"
+      class="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-foreground-muted transition-colors hover:bg-background-muted hover:text-foreground-default focus:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring-primary"
       on:click={(event) => {
-        handleClose();
+        onClose && onClose();
       }}
       ><svg
         aria-hidden="true"
@@ -201,7 +124,7 @@
         fill="none"
         stroke="currentColor"
         stroke-width="2"
-        ><path d="M6 6l12 12M18 6 6 18" stroke-linecap="round" /></svg
+        ><path stroke-linecap="round" d={ICON_PATHS.close} /></svg
       ></button
     >
   {/if}

@@ -6,39 +6,30 @@ export interface IconPlaceholderProps {
   className?: string;
 }
 
-import { cn } from "./utils";
+import { cn, bindControllerProps } from "./utils";
 
 function IconPlaceholder(props: IconPlaceholderProps) {
-  props = { size: 16, ariaLabel: "Placeholder icon", className: "", ...props };
-  function dimensionStyle() {
-    return {
-      width: props.size + "px",
-      height: props.size + "px",
-    };
-  }
-
+  props = { size: 12, ariaLabel: "Placeholder icon", className: "", ...props };
+  const [__ctrlState, __setCtrlState] = React.useState<Record<string, any>>({});
+  props = bindControllerProps(props, __ctrlState, __setCtrlState);
   return (
-    <span
+    <svg
       role="img"
+      viewBox="0 0 12 12"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1"
+      data-ctrl={typeof bindControllerProps}
       aria-label={props.ariaLabel}
+      width={props.size}
+      height={props.size}
       className={cn(
-        "inline-flex shrink-0 items-center justify-center",
+        "inline-block shrink-0 text-foreground-muted",
         props.className
       )}
-      style={dimensionStyle()}
     >
-      <svg
-        className="h-full w-full text-foreground-muted"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="1.5"
-        aria-hidden="true"
-      >
-        <rect x="3" y="3" width="18" height="18" rx="2" />
-        <path d="M7 17 17 7" stroke-linecap="round" />
-      </svg>
-    </span>
+      <circle cx="6" cy="6" r="5" />
+    </svg>
   );
 }
 

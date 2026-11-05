@@ -16,8 +16,8 @@ hero:
 features:
   - title: Whole Document Extraction
     details: Custom Figma plugin using loadAllPagesAsync() traverses every page, collecting design tokens (variables, paint styles, text styles) and component sets.
-  - title: Hexagonal Go Orchestrator
-    details: Clean Ports & Adapters architecture isolating domain logic from HTTP, filesystem, subprocesses, and AI providers.
+  - title: Full-TypeScript In-Process Engine
+    details: Pure Node.js 22 & TypeScript backend directly importing @supernova/mitosis-author and @supernova/mitosis-compiler with zero subprocess serialization overhead and built-in node:sqlite persistence.
   - title: LLM Mitosis Authoring & Repair Loop
     details: OpenAI-compatible authoring client (Ollama, OpenAI, vLLM) with structured output and automated compiler feedback repair loop.
   - title: 5 Target Frameworks

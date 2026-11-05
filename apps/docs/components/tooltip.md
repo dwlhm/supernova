@@ -20,66 +20,9 @@ PROPERTIES
 • Position: Top, Bottom, Left, or Right. Controls where the tooltip appears relative to its trigger.
 • Text content: Overrides the tooltip message for the instance.
 
-## Live Preview
+## Live Preview & Usage
 
 <FrameworkPreview name="Tooltip" />
-
-## Usage
-
-::: code-group
-
-```tsx [React]
-import { Tooltip } from './Tooltip';
-
-export default function Example() {
-  return (
-    <Tooltip position="Top" text content="Label">
-      Tooltip
-    </Tooltip>
-  );
-}
-```
-
-```vue [Vue 3]
-<script setup lang="ts">
-import { Tooltip } from './Tooltip';
-</script>
-
-<template>
-  <Tooltip position="Top" text content="Label">
-    Tooltip
-  </Tooltip>
-</template>
-```
-
-```svelte [Svelte]
-<script lang="ts">
-  import Tooltip from './Tooltip.svelte';
-</script>
-
-<Tooltip position="Top" text content="Label">
-  Tooltip
-</Tooltip>
-```
-
-```ts [Angular]
-import { Component } from '@angular/core';
-import { TooltipComponent } from './tooltip.component';
-
-@Component({
-  selector: 'app-root',
-  standalone: true,
-  imports: [TooltipComponent],
-  template: `
-    <app-tooltip position="Top" text content="Label">
-      Tooltip
-    </app-tooltip>
-  `,
-})
-export class AppComponent {}
-```
-
-:::
 
 ## Props & Variants
 

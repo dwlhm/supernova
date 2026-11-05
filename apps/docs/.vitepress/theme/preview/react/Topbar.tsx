@@ -7,49 +7,44 @@ export interface TopbarProps {
   searchValue?: string;
   showSidebarToggle?: boolean;
   sidebarToggleLabel?: string;
+  breadcrumbRoot?: string;
+  breadcrumbCurrent?: string;
   className?: string;
-  children?: any;
+  children?: React.ReactNode;
   onSearchChange?: (value: string) => void;
   onToggleSidebar?: () => void;
 }
 
-import { cn } from "./utils";
+import { cn, ICON_PATHS, bindControllerProps } from "./utils";
 
 function Topbar(props: TopbarProps) {
   props = {
-    showSearch: true,
+    showSearch: false,
     searchPlaceholder: "Search",
     searchValue: "",
     showSidebarToggle: true,
     sidebarToggleLabel: "Toggle sidebar",
+    breadcrumbRoot: "Home",
+    breadcrumbCurrent: "Breadcrumb",
     className: "",
     ...props,
   };
-  function handleSearch(rawValue: string) {
-    if (props.onSearchChange) {
-      props.onSearchChange(rawValue);
-    }
-  }
-
-  function handleToggle() {
-    if (props.onToggleSidebar) {
-      props.onToggleSidebar();
-    }
-  }
-
+  const [__ctrlState, __setCtrlState] = React.useState<Record<string, any>>({});
+  props = bindControllerProps(props, __ctrlState, __setCtrlState);
   return (
     <header
+      data-ctrl={typeof bindControllerProps}
       className={cn(
-        "flex w-full items-center gap-2.5 border-b border-components-topbar-all-color-container-border-default bg-components-topbar-all-color-container-background-default px-4 py-3",
+        "flex h-16 w-full items-center gap-2 border-b border-border-default bg-background-default px-6",
         props.className
       )}
     >
       {props.showSidebarToggle ? (
         <button
           type="button"
-          className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-rounded-md text-components-topbar-all-color-navigation-icon-stroke-default transition-colors hover:bg-background-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring-primary"
+          className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md p-2 text-foreground-default transition-colors hover:bg-background-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring-primary"
           aria-label={props.sidebarToggleLabel}
-          onClick={(event) => handleToggle()}
+          onClick={(event) => props.onToggleSidebar && props.onToggleSidebar()}
         >
           <svg
             aria-hidden="true"
@@ -57,37 +52,55 @@ function Topbar(props: TopbarProps) {
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
-            stroke-width="1.5"
+            strokeWidth="1.5"
           >
             <rect x="3" y="4" width="18" height="16" rx="2" />
-            <path d="M9 4v16" stroke-linecap="round" />
+            <path d="M9 4v16" strokeLinecap="round" />
           </svg>
         </button>
       ) : null}
+      <nav
+        aria-label="Breadcrumb"
+        className="flex items-center gap-1.5 text-sm"
+      >
+        <span className="text-foreground-muted">{props.breadcrumbRoot}</span>
+        <span aria-hidden="true" className="text-foreground-muted">
+          /
+        </span>
+        <span
+          aria-current="page"
+          className="font-normal text-foreground-default"
+        >
+          {props.breadcrumbCurrent}
+        </span>
+      </nav>
       {props.showSearch ? (
-        <div className="flex h-8 w-full max-w-sm items-center gap-2 rounded-rounded-lg border border-components-topbar-all-color-search-border-default bg-components-topbar-all-color-search-background-default px-3">
+        <div className="ml-4 flex h-8 w-full max-w-xs items-center gap-2 rounded-lg border border-border-default bg-background-default px-3 focus-within:ring-2 focus-within:ring-focus-ring-primary">
           <svg
             aria-hidden="true"
-            className="h-4 w-4 shrink-0 text-components-topbar-all-color-search-placeholder-foreground-default"
+            className="h-4 w-4 shrink-0 text-foreground-muted"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
-            stroke-width="1.5"
+            strokeWidth="1.5"
           >
-            <circle cx="11" cy="11" r="7" />
-            <path d="m20 20-3.5-3.5" stroke-linecap="round" />
+            <path strokeLinecap="round" d={ICON_PATHS.search} />
           </svg>
           <input
             type="search"
-            className="w-full bg-transparent text-sm text-foreground-default outline-none placeholder:text-components-topbar-all-color-search-placeholder-foreground-default"
+            className="w-full bg-transparent text-sm text-foreground-default outline-none placeholder:text-foreground-muted"
             value={props.searchValue}
             placeholder={props.searchPlaceholder}
             aria-label={props.searchPlaceholder}
-            onInput={(event) => handleSearch(event.target.value)}
+            onChange={(event) =>
+              props.onSearchChange && props.onSearchChange(event.target.value)
+            }
           />
         </div>
       ) : null}
-      <div className="ml-auto flex items-center gap-2.5">{props.children}</div>
+      <div className="ml-auto flex flex-1 items-center justify-end gap-2">
+        {props.children}
+      </div>
     </header>
   );
 }

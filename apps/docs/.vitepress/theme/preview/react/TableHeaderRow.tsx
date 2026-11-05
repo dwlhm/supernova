@@ -12,10 +12,11 @@ export interface TableHeaderRowProps {
   allSelected?: boolean;
   checkboxAriaLabel?: string;
   className?: string;
+  children?: React.ReactNode;
   onSelectAll?: (checked: boolean) => void;
 }
 
-import { cn } from "./utils";
+import { cn, cva, bindControllerProps } from "./utils";
 import TableNoHeaderCell from "./TableNoHeaderCell";
 import TableCheckboxHeaderCell from "./TableCheckboxHeaderCell";
 
@@ -29,26 +30,13 @@ function TableHeaderRow(props: TableHeaderRowProps) {
     className: "",
     ...props,
   };
-  function alignmentClasses(align: string) {
-    if (align === "center") {
-      return "text-center";
-    }
-    if (align === "right") {
-      return "text-right";
-    }
-    return "text-left";
-  }
-
-  function handleSelectAll(checked: boolean) {
-    if (props.onSelectAll) {
-      props.onSelectAll(checked);
-    }
-  }
-
+  const [__ctrlState, __setCtrlState] = React.useState<Record<string, any>>({});
+  props = bindControllerProps(props, __ctrlState, __setCtrlState);
   return (
     <tr
+      data-ctrl={typeof bindControllerProps}
       className={cn(
-        "border-b border-components-table-default-color-divider-border-default",
+        "border-b border-border-default bg-background-muted",
         props.className
       )}
     >
@@ -57,23 +45,40 @@ function TableHeaderRow(props: TableHeaderRowProps) {
         <TableCheckboxHeaderCell
           checked={props.allSelected}
           ariaLabel={props.checkboxAriaLabel}
-          onCheckedChange={(checked) => handleSelectAll(checked)}
+          onCheckedChange={(checked) =>
+            props.onSelectAll && props.onSelectAll(checked)
+          }
         />
       ) : null}
-      {props.columns?.map((column) => (
-        <th
-          scope="col"
-          key={column.id}
-          className={cn(
-            "whitespace-nowrap bg-components-table-default-color-header-background-default px-4 py-3 text-xs font-semibold uppercase tracking-wide text-components-table-default-color-header-foreground-default",
-            alignmentClasses(column.align)
-          )}
-        >
-          {column.label}
-        </th>
-      ))}
+      {props.children ? <>{props.children}</> : null}
+      {!props.children ? (
+        <>
+          {props.columns?.map((column) => (
+            <th
+              scope="col"
+              key={column.id}
+              className={cn(
+                "whitespace-nowrap bg-background-muted px-4 py-3 text-sm font-medium text-foreground-default",
+                cva(
+                  column.align,
+                  {
+                    left: "text-left",
+                    center: "text-center",
+                    right: "text-right",
+                  },
+                  "left"
+                )
+              )}
+            >
+              {column.label}
+            </th>
+          ))}
+        </>
+      ) : null}
     </tr>
   );
 }
+
+Object.assign(TableHeaderRow, { TableNoHeaderCell, TableCheckboxHeaderCell });
 
 export default TableHeaderRow;

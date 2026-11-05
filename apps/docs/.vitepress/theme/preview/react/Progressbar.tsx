@@ -7,7 +7,7 @@ export interface ProgressbarProps {
   className?: string;
 }
 
-import { cn } from "./utils";
+import { cn, getProgressState, bindControllerProps } from "./utils";
 
 function Progressbar(props: ProgressbarProps) {
   props = {
@@ -17,42 +17,30 @@ function Progressbar(props: ProgressbarProps) {
     className: "",
     ...props,
   };
-  function percentage() {
-    const raw = props.value;
-    if (raw < 0) {
-      return 0;
-    }
-    if (raw > 100) {
-      return 100;
-    }
-    return raw;
-  }
-
-  function barStyle() {
-    return {
-      width: percentage() + "%",
-    };
-  }
-
+  const [__ctrlState, __setCtrlState] = React.useState<Record<string, any>>({});
+  props = bindControllerProps(props, __ctrlState, __setCtrlState);
   return (
-    <div className={cn("flex w-full flex-col gap-2", props.className)}>
+    <div
+      data-ctrl={typeof bindControllerProps}
+      className={cn("flex w-full flex-col gap-2", props.className)}
+    >
       {props.showLabel ? (
         <div className="flex items-center justify-between text-xs text-foreground-muted">
           <span>{props.label}</span>
-          <span>{percentage()}%</span>
+          <span>{getProgressState(props.value).percentage}%</span>
         </div>
       ) : null}
       <div
         role="progressbar"
-        className="h-2 w-full overflow-hidden rounded-rounded-full bg-components-progressbar-all-color-track-background-default"
-        aria-valuenow={percentage()}
+        className="h-2 w-full overflow-hidden rounded-full bg-background-muted"
+        aria-valuenow={getProgressState(props.value).percentage}
         aria-valuemin={0}
         aria-valuemax={100}
         aria-label={props.label}
       >
         <div
-          className="h-2 rounded-rounded-full bg-components-progressbar-all-color-indicator-background-default transition-all"
-          style={barStyle()}
+          className="h-2 rounded-full bg-primary-default transition-all"
+          style={getProgressState(props.value).barStyle}
         />
       </div>
     </div>

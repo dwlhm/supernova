@@ -26,66 +26,9 @@ Show trailing icon — Shows or hides the trailing icon.
 Show badge — Shows or hides the badge.
 Badge label — Sets the badge text.
 
-## Live Preview
+## Live Preview & Usage
 
 <FrameworkPreview name="MainMenu" />
-
-## Usage
-
-::: code-group
-
-```tsx [React]
-import { MainMenu } from './MainMenu';
-
-export default function Example() {
-  return (
-    <MainMenu badge label="New" label="Menu">
-      MainMenu
-    </MainMenu>
-  );
-}
-```
-
-```vue [Vue 3]
-<script setup lang="ts">
-import { MainMenu } from './MainMenu';
-</script>
-
-<template>
-  <MainMenu badge label="New" label="Menu">
-    MainMenu
-  </MainMenu>
-</template>
-```
-
-```svelte [Svelte]
-<script lang="ts">
-  import MainMenu from './MainMenu.svelte';
-</script>
-
-<MainMenu badge label="New" label="Menu">
-  MainMenu
-</MainMenu>
-```
-
-```ts [Angular]
-import { Component } from '@angular/core';
-import { MainMenuComponent } from './main-menu.component';
-
-@Component({
-  selector: 'app-root',
-  standalone: true,
-  imports: [MainMenuComponent],
-  template: `
-    <app-main-menu badge label="New" label="Menu">
-      MainMenu
-    </app-main-menu>
-  `,
-})
-export class AppComponent {}
-```
-
-:::
 
 ## Props & Variants
 

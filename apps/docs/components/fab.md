@@ -27,66 +27,9 @@ Size: Small (40×40), Regular (56×56), Large (96×96), Extended (120×56)
 State: Default, Hover, Focus, Disabled
 Label: Editable text shown only in the Extended size
 
-## Live Preview
+## Live Preview & Usage
 
 <FrameworkPreview name="FAB" />
-
-## Usage
-
-::: code-group
-
-```tsx [React]
-import { FAB } from './FAB';
-
-export default function Example() {
-  return (
-    <FAB label="Label" size="Small">
-      FAB
-    </FAB>
-  );
-}
-```
-
-```vue [Vue 3]
-<script setup lang="ts">
-import { FAB } from './FAB';
-</script>
-
-<template>
-  <FAB label="Label" size="Small">
-    FAB
-  </FAB>
-</template>
-```
-
-```svelte [Svelte]
-<script lang="ts">
-  import FAB from './FAB.svelte';
-</script>
-
-<FAB label="Label" size="Small">
-  FAB
-</FAB>
-```
-
-```ts [Angular]
-import { Component } from '@angular/core';
-import { FABComponent } from './fab.component';
-
-@Component({
-  selector: 'app-root',
-  standalone: true,
-  imports: [FABComponent],
-  template: `
-    <app-fab label="Label" size="Small">
-      Fab
-    </app-fab>
-  `,
-})
-export class AppComponent {}
-```
-
-:::
 
 ## Props & Variants
 

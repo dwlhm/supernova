@@ -8,36 +8,31 @@ export interface SidebarProps {
   accountInitials?: string;
   brandInitials?: string;
   className?: string;
-  children?: any;
+  children?: React.ReactNode;
 }
 
-import { cn } from "./utils";
+import { cn, bindControllerProps } from "./utils";
 
 function Sidebar(props: SidebarProps) {
   props = {
-    expanded: true,
+    expanded: false,
     brand: "Komerce",
-    accountLabel: "Account",
-    accountMeta: "account@example.com",
-    accountInitials: "AB",
+    accountLabel: "Lionel Messi",
+    accountMeta: "messi@gmail.com",
+    accountInitials: "LM",
     brandInitials: "K",
     className: "",
     ...props,
   };
-  function widthClasses() {
-    return props.expanded ? "w-60" : "w-16";
-  }
-
-  function hasAccount() {
-    return props.accountLabel !== "" || props.accountMeta !== "";
-  }
-
+  const [__ctrlState, __setCtrlState] = React.useState<Record<string, any>>({});
+  props = bindControllerProps(props, __ctrlState, __setCtrlState);
   return (
     <aside
+      data-ctrl={typeof bindControllerProps}
       aria-label={props.brand}
       className={cn(
-        "flex h-full shrink-0 flex-col justify-between border-r border-components-sidebar-expanded-rebind-color-container-border-default bg-components-sidebar-expanded-rebind-color-container-background-default pb-2",
-        widthClasses(),
+        "flex h-full shrink-0 flex-col justify-between border-r border-border-default bg-background-default pb-2",
+        props.expanded ? "w-60" : "w-16",
         props.className
       )}
     >
@@ -49,13 +44,13 @@ function Sidebar(props: SidebarProps) {
           )}
         >
           <span
-            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-rounded-md bg-components-sidebar-expanded-rebind-color-container-background-default-2 text-sm font-semibold text-components-sidebar-expanded-rebind-color-label-foreground-default-2"
+            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-primary-default text-sm font-semibold text-primary-foreground"
             aria-hidden="true"
           >
             {props.brandInitials}
           </span>
           {props.expanded ? (
-            <span className="truncate text-sm font-semibold text-components-sidebar-expanded-rebind-color-label-foreground-default">
+            <span className="truncate text-sm font-semibold text-foreground-default">
               {props.brand}
             </span>
           ) : null}
@@ -64,28 +59,28 @@ function Sidebar(props: SidebarProps) {
           {props.children}
         </nav>
       </div>
-      {hasAccount() ? (
+      {props.accountLabel !== "" || props.accountMeta !== "" ? (
         <div
           className={cn("px-2", props.expanded ? "" : "flex justify-center")}
         >
           <div
             className={cn(
-              "flex items-center gap-2 rounded-rounded-xl bg-background-subtle px-2 py-2",
+              "flex items-center gap-2 rounded-xl bg-background-muted px-2 py-2",
               props.expanded ? "" : "justify-center"
             )}
           >
             <span
-              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-rounded-full bg-background-muted text-xs font-medium text-components-sidebar-expanded-rebind-color-section-label-foreground-default"
+              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-background-subtle text-xs font-medium text-foreground-muted"
               aria-hidden="true"
             >
               {props.accountInitials}
             </span>
             {props.expanded ? (
               <span className="flex min-w-0 flex-col">
-                <span className="truncate text-sm font-medium text-components-sidebar-expanded-rebind-color-label-foreground-default">
+                <span className="truncate text-sm font-medium text-foreground-default">
                   {props.accountLabel}
                 </span>
-                <span className="truncate text-xs text-components-sidebar-expanded-rebind-color-section-label-foreground-default">
+                <span className="truncate text-xs text-foreground-muted">
                   {props.accountMeta}
                 </span>
               </span>

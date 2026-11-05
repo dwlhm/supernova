@@ -3,6 +3,7 @@ import * as React from "react";
 
 export interface InputImageUploaderProps {
   id?: string;
+  name?: string;
   label?: string;
   primaryText?: string;
   supportingText?: string;
@@ -18,13 +19,23 @@ export interface InputImageUploaderProps {
   showHint?: boolean;
   className?: string;
   onFileNameChange?: (fileName: string) => void;
+  onFilesChange?: (files: unknown[]) => void;
+  onPreviewChange?: (url: string) => void;
 }
 
-import { cn } from "./utils";
+import {
+  cn,
+  getFileState,
+  handleFileSelectEvent,
+  clearFileInputEvent,
+  ICON_PATHS,
+  bindControllerProps,
+} from "./utils";
 
 function InputImageUploader(props: InputImageUploaderProps) {
   props = {
     id: "image-uploader",
+    name: "image-file",
     label: "Profile image",
     primaryText: "Upload an image",
     supportingText: "Square JPG or PNG, up to 5 MB",
@@ -41,66 +52,38 @@ function InputImageUploader(props: InputImageUploaderProps) {
     className: "",
     ...props,
   };
-  function hasError() {
-    return props.errorMessage !== "";
-  }
-
-  function hasFile() {
-    return props.fileName !== "";
-  }
-
-  function containerClasses() {
-    if (hasError()) {
-      return "border-components-input-image-uploader-color-container-border-error";
-    }
-    return "border-components-input-image-uploader-color-container-border-default focus-within:border-components-input-image-uploader-color-container-border-focus";
-  }
-
-  function supportingText() {
-    return hasError() ? props.errorMessage : props.hint;
-  }
-
-  function supportingClasses() {
-    return hasError()
-      ? "text-components-input-image-uploader-color-helper-text-foreground-error"
-      : "text-components-input-image-uploader-color-helper-text-foreground-default";
-  }
-
-  function setName(fileName: string) {
-    if (props.onFileNameChange) {
-      props.onFileNameChange(fileName);
-    }
-  }
-
-  function clear() {
-    setName("");
-  }
-
+  const [__ctrlState, __setCtrlState] = React.useState<Record<string, any>>({});
+  props = bindControllerProps(props, __ctrlState, __setCtrlState);
   return (
-    <div className={cn("flex w-full flex-col gap-3", props.className)}>
+    <div
+      data-ctrl={typeof bindControllerProps}
+      className={cn("flex w-full flex-col gap-3", props.className)}
+    >
       {props.showLabel && props.label !== "" ? (
-        <span className="flex items-center gap-1 text-sm font-medium text-components-input-image-uploader-color-label-foreground-default">
+        <label
+          className="flex items-center gap-1 text-sm font-medium text-foreground-default"
+          htmlFor={props.id}
+        >
           {props.label}
           {props.required ? (
-            <span
-              aria-hidden="true"
-              className="text-components-input-image-uploader-color-required-indicator-foreground-default"
-            >
+            <span aria-hidden="true" className="text-destructive-default">
               *
             </span>
           ) : null}
-        </span>
+        </label>
       ) : null}
       <div
         className={cn(
-          "flex items-center gap-4 rounded-rounded-lg border bg-components-input-image-uploader-color-container-background-default p-3 transition-colors",
-          containerClasses(),
-          props.disabled && "opacity-50"
+          "flex items-center gap-4 rounded-lg border bg-background-default p-3 shadow-xs transition-colors",
+          getFileState(props).hasError
+            ? "border-destructive-border focus-within:ring-2 focus-within:ring-focus-ring-error"
+            : "border-border-default focus-within:border-primary-border-emphasis focus-within:ring-2 focus-within:ring-focus-ring-primary",
+          props.disabled && "cursor-not-allowed opacity-50"
         )}
       >
         <span
-          className="flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-rounded-lg bg-components-input-image-uploader-color-preview-background-default"
           aria-hidden="true"
+          className="flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-background-muted"
         >
           {props.imageSrc !== "" ? (
             <img
@@ -111,58 +94,79 @@ function InputImageUploader(props: InputImageUploaderProps) {
           ) : null}
           {props.imageSrc === "" ? (
             <svg
-              className="h-8 w-8 text-components-input-image-uploader-color-icon-fill-default"
+              className="h-8 w-8 text-foreground-subtle"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
-              stroke-width="1.5"
+              strokeWidth="1.5"
             >
-              <rect x="3" y="3" width="18" height="18" rx="2" />
               <path
-                d="m21 15-5-5L5 21"
-                stroke-linecap="round"
-                stroke-linejoin="round"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d={ICON_PATHS.image}
               />
-              <circle cx="8.5" cy="8.5" r="1.5" />
             </svg>
           ) : null}
         </span>
         <span className="flex min-w-0 flex-1 flex-col gap-2">
-          <span className="truncate text-sm font-medium text-components-input-image-uploader-color-primary-text-foreground-default">
-            {hasFile() ? <>{props.fileName}</> : <>{props.primaryText}</>}
+          <span className="truncate text-sm font-medium text-foreground-default">
+            {getFileState(props).hasFile ? (
+              <>{props.fileName}</>
+            ) : (
+              <>{props.primaryText}</>
+            )}
           </span>
-          <span className="truncate text-xs text-components-input-image-uploader-color-supporting-text-foreground-default">
-            {hasFile() && props.fileMetadata !== "" ? (
+          <span className="truncate text-sm text-foreground-muted">
+            {getFileState(props).hasFile && props.fileMetadata !== "" ? (
               <>{props.fileMetadata}</>
             ) : (
               <>{props.supportingText}</>
             )}
           </span>
           <span className="flex items-center gap-2">
-            <label className="inline-flex cursor-pointer items-center rounded-rounded-sm border border-components-input-image-uploader-color-container-border-default bg-components-input-image-uploader-color-container-background-default px-3 py-1 text-xs font-medium text-components-input-image-uploader-color-primary-text-foreground-default focus-within:ring-2 focus-within:ring-focus-ring-primary">
-              {hasFile() ? <>Replace</> : <>Browse</>}
+            <label
+              htmlFor={props.id}
+              className={cn(
+                "inline-flex items-center rounded-lg bg-secondary-default px-2 py-0.5 text-sm font-medium text-secondary-foreground hover:bg-secondary-hover focus-within:ring-2 focus-within:ring-focus-ring-primary",
+                props.disabled
+                  ? "pointer-events-none cursor-not-allowed"
+                  : "cursor-pointer"
+              )}
+            >
+              {getFileState(props).hasFile ? <>Replace</> : <>Choose image</>}
               <input
                 type="file"
                 className="sr-only"
                 id={props.id}
+                name={props.name}
                 accept={props.accept}
                 disabled={props.disabled}
                 required={props.required}
-                aria-invalid={hasError()}
+                aria-invalid={getFileState(props).hasError}
                 onChange={(event) =>
-                  setName(
-                    event.target.files && event.target.files.length > 0
-                      ? event.target.files[0].name
-                      : ""
+                  !props.disabled &&
+                  handleFileSelectEvent(
+                    event,
+                    props.onFileNameChange,
+                    props.onFilesChange,
+                    props.onPreviewChange
                   )
                 }
               />
             </label>
-            {hasFile() ? (
+            {getFileState(props).hasFile ? (
               <button
                 type="button"
-                className="inline-flex items-center rounded-rounded-sm px-2 py-1 text-xs font-medium text-components-input-image-uploader-color-primary-text-foreground-default hover:bg-background-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring-primary"
-                onClick={(event) => clear()}
+                className="inline-flex items-center rounded-lg px-2 py-0.5 text-sm font-medium text-foreground-default hover:bg-background-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring-primary"
+                disabled={props.disabled}
+                onClick={(event) =>
+                  !props.disabled &&
+                  clearFileInputEvent(
+                    event,
+                    props.onFileNameChange,
+                    props.onFilesChange
+                  )
+                }
               >
                 Remove
               </button>
@@ -171,8 +175,16 @@ function InputImageUploader(props: InputImageUploaderProps) {
         </span>
       </div>
       {props.showHint ? (
-        <span className={cn("text-xs", supportingClasses())}>
-          {supportingText()}
+        <span
+          id={props.id + "-hint"}
+          className={cn(
+            "text-sm",
+            getFileState(props).hasError
+              ? "text-destructive-foreground"
+              : "text-foreground-muted"
+          )}
+        >
+          {getFileState(props).helpText}
         </span>
       ) : null}
     </div>

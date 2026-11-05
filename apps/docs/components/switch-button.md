@@ -25,66 +25,9 @@ Size: Small, Medium, or Large.
 leftLabel: Shows or hides the optional label on the left.
 rightLabel: Shows or hides the optional label on the right. Prefer one label position at a time.
 
-## Live Preview
+## Live Preview & Usage
 
 <FrameworkPreview name="SwitchButton" />
-
-## Usage
-
-::: code-group
-
-```tsx [React]
-import { SwitchButton } from './SwitchButton';
-
-export default function Example() {
-  return (
-    <SwitchButton disabled="False" size="Small">
-      SwitchButton
-    </SwitchButton>
-  );
-}
-```
-
-```vue [Vue 3]
-<script setup lang="ts">
-import { SwitchButton } from './SwitchButton';
-</script>
-
-<template>
-  <SwitchButton disabled="False" size="Small">
-    SwitchButton
-  </SwitchButton>
-</template>
-```
-
-```svelte [Svelte]
-<script lang="ts">
-  import SwitchButton from './SwitchButton.svelte';
-</script>
-
-<SwitchButton disabled="False" size="Small">
-  SwitchButton
-</SwitchButton>
-```
-
-```ts [Angular]
-import { Component } from '@angular/core';
-import { SwitchButtonComponent } from './switch-button.component';
-
-@Component({
-  selector: 'app-root',
-  standalone: true,
-  imports: [SwitchButtonComponent],
-  template: `
-    <app-switch-button disabled="False" size="Small">
-      SwitchButton
-    </app-switch-button>
-  `,
-})
-export class AppComponent {}
-```
-
-:::
 
 ## Props & Variants
 

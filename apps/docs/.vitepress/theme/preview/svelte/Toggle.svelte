@@ -6,75 +6,60 @@
     showText?: boolean;
     label?: string;
     className?: string;
-    children?: any;
+
     ariaLabel?: string;
     onPressedChange?: (pressed: boolean) => void;
   }
 </script>
 
 <script lang="ts">
-  import { cn } from "./utils";
+  interface $$Slots {
+    default: Record<string, never>;
+  }
+  import { cn, cva, ICON_PATHS, bindControllerProps } from "./utils";
 
-  export let size: ToggleProps["size"] = "medium";
   export let pressed: ToggleProps["pressed"] = false;
-  export let disabled: ToggleProps["disabled"] = false;
-  export let onPressedChange: ToggleProps["onPressedChange"];
   export let ariaLabel: ToggleProps["ariaLabel"] = "";
   export let label: ToggleProps["label"] = "Toggle";
-  export let className: ToggleProps["className"] = "";
-
+  export let disabled: ToggleProps["disabled"] = false;
   export let showText: ToggleProps["showText"] = false;
-
-  function handleToggle() {
-    if (disabled) {
-      return;
-    }
-    if (onPressedChange) {
-      onPressedChange(!pressed);
-    }
-  }
-  $: sizeClasses = () => {
-    switch (size) {
-      case "small":
-        return "p-0.5 gap-0.5 text-xs";
-      case "large":
-        return "p-2 gap-1 text-base";
-      case "medium":
-      default:
-        return "p-1 gap-1 text-sm";
-    }
-  };
-  $: iconClasses = () => {
-    switch (size) {
-      case "small":
-        return "h-3 w-3";
-      case "large":
-        return "h-5 w-5";
-      case "medium":
-      default:
-        return "h-4 w-4";
-    }
-  };
-  $: pressedClasses = () => {
-    return pressed
-      ? "bg-components-toggle-active-color-container-background-default"
-      : "bg-transparent";
-  };
+  export let size: ToggleProps["size"] = "medium";
+  export let className: ToggleProps["className"] = "";
+  export let onPressedChange: ToggleProps["onPressedChange"];
 </script>
 
 <button
   type="button"
+  data-ctrl={typeof bindControllerProps}
   aria-pressed={pressed}
   aria-label={ariaLabel !== "" ? ariaLabel : label}
   {disabled}
   class={cn(
-    "inline-flex items-center justify-center rounded-rounded-lg text-components-toggle-all-color-label-foreground-default transition-colors hover:bg-background-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring-primary disabled:pointer-events-none disabled:opacity-50",
-    sizeClasses(),
-    pressedClasses(),
+    "inline-flex items-center justify-center rounded-lg text-foreground-default transition-colors hover:bg-background-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring-primary disabled:pointer-events-none disabled:opacity-50",
+    showText
+      ? cva(
+          size,
+          {
+            small: "px-2 py-1 gap-1.5 text-xs",
+            medium: "px-3 py-1.5 gap-2 text-sm",
+            large: "px-4 py-2 gap-2.5 text-base",
+          },
+          "medium"
+        )
+      : cva(
+          size,
+          {
+            small: "h-4 w-4 p-0.5",
+            medium: "h-6 w-6 p-1",
+            large: "h-9 w-9 p-2",
+          },
+          "medium"
+        ),
+    pressed ? "bg-background-muted shadow-xs" : "bg-transparent",
     className
   )}
   on:click={(event) => {
-    handleToggle();
+    !disabled && onPressedChange && onPressedChange(!pressed);
   }}
 >
   {#if $$slots.default}
@@ -87,11 +72,21 @@
       fill="none"
       stroke="currentColor"
       stroke-width="1.5"
-      class={cn("shrink-0", iconClasses())}
-      ><path d="M12 3v18M3 12h18" stroke-linecap="round" /></svg
+      class={cn(
+        "shrink-0",
+        cva(
+          size,
+          {
+            small: "h-3 w-3",
+            medium: "h-4 w-4",
+            large: "h-5 w-5",
+          },
+          "medium"
+        )
+      )}><path stroke-linecap="round" d={ICON_PATHS.plus} /></svg
     >
   {/if}
   {#if showText}
-    <span class="truncate">{label}</span>
+    <span class="truncate font-medium">{label}</span>
   {/if}</button
 >

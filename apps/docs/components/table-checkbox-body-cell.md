@@ -17,66 +17,9 @@ Do not use it for an editable boolean data field.
 Properties
 Checkbox state — Configure the nested checkbox instance.
 
-## Live Preview
+## Live Preview & Usage
 
 <FrameworkPreview name="TableCheckboxBodyCell" />
-
-## Usage
-
-::: code-group
-
-```tsx [React]
-import { TableCheckboxBodyCell } from './TableCheckboxBodyCell';
-
-export default function Example() {
-  return (
-    <TableCheckboxBodyCell>
-      TableCheckboxBodyCell
-    </TableCheckboxBodyCell>
-  );
-}
-```
-
-```vue [Vue 3]
-<script setup lang="ts">
-import { TableCheckboxBodyCell } from './TableCheckboxBodyCell';
-</script>
-
-<template>
-  <TableCheckboxBodyCell>
-    TableCheckboxBodyCell
-  </TableCheckboxBodyCell>
-</template>
-```
-
-```svelte [Svelte]
-<script lang="ts">
-  import TableCheckboxBodyCell from './TableCheckboxBodyCell.svelte';
-</script>
-
-<TableCheckboxBodyCell>
-  TableCheckboxBodyCell
-</TableCheckboxBodyCell>
-```
-
-```ts [Angular]
-import { Component } from '@angular/core';
-import { TableCheckboxBodyCellComponent } from './table-checkbox-body-cell.component';
-
-@Component({
-  selector: 'app-root',
-  standalone: true,
-  imports: [TableCheckboxBodyCellComponent],
-  template: `
-    <app-table-checkbox-body-cell>
-      TableCheckboxBodyCell
-    </app-table-checkbox-body-cell>
-  `,
-})
-export class AppComponent {}
-```
-
-:::
 
 ## Props & Variants
 
