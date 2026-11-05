@@ -7,6 +7,7 @@ export interface CompileRequest {
   allowedClasses?: string[];
   checks?: { lint?: boolean; render?: boolean; targets?: boolean };
   siblingSources?: Record<string, string>;
+  normalize?: boolean;
 }
 
 export interface CompiledArtifact {

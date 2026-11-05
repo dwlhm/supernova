@@ -309,6 +309,21 @@ export default function SvgIcon() {
     assert.strictEqual(vue3Errors[0].target, 'vue3');
     assert.strictEqual(vue3Errors[0].rule, 'target-invalid');
 
+    // Vue 3 un-unwrapped computed ref inside <script setup>
+    const vue3ComputedRefErrors = await validateArtifact({
+      target: 'vue3',
+      fileName: 'BadComputed.vue',
+      code: `<template><div>{{ containerClasses }}</div></template>
+<script setup lang="ts">
+import { computed } from 'vue';
+const hasError = computed(() => false);
+const containerClasses = computed(() => (hasError ? 'border-error' : 'border-default'));
+</script>`,
+    });
+    assert.ok(vue3ComputedRefErrors.length > 0);
+    assert.strictEqual(vue3ComputedRefErrors[0].target, 'vue3');
+    assert.strictEqual(vue3ComputedRefErrors[0].rule, 'target-invalid');
+
     // Vue 2
     const vue2Errors = await validateArtifact({
       target: 'vue2',

@@ -2,6 +2,12 @@ import * as mitosisModule from '@builder.io/mitosis';
 import { lintSource } from './lint.js';
 import { renderCheck } from './render-check.js';
 import { validateArtifact } from './validate.js';
+import { normalizeMitosisSource } from './normalize.js';
+import { adaptReactOutput } from './adapter-react.js';
+import { adaptVue3Output } from './adapter-vue3.js';
+import { adaptSvelteOutput } from './adapter-svelte.js';
+import { adaptVue2Output } from './adapter-vue2.js';
+import { adaptAngularOutput } from './adapter-angular.js';
 import { COMPONENT_NAME_PATTERN, isValidComponentName } from './names.js';
 import type {
   CompileError,
@@ -36,47 +42,53 @@ const SVG_CAMEL_TO_KEBAB: Record<string, string> = {
   stopOpacity: 'stop-opacity',
   textAnchor: 'text-anchor',
   dominantBaseline: 'dominant-baseline',
+  vectorEffect: 'vector-effect',
 };
 
-function svgKebabPlugin() {
-  const walk = (node: any) => {
-    if (!node || typeof node !== 'object') return;
-    if (node['@type'] === '@builder.io/mitosis/node') {
-      for (const [camel, kebab] of Object.entries(SVG_CAMEL_TO_KEBAB)) {
-        if (node.properties && camel in node.properties) {
-          node.properties[kebab] = node.properties[camel];
-          delete node.properties[camel];
-        }
-        if (node.bindings && camel in node.bindings) {
-          node.bindings[kebab] = node.bindings[camel];
-          delete node.bindings[camel];
-        }
+const SVG_KEBAB_TO_CAMEL: Record<string, string> = {
+  ...Object.fromEntries(
+    Object.entries(SVG_CAMEL_TO_KEBAB).map(([camel, kebab]) => [kebab, camel])
+  ),
+  maxlength: 'maxLength',
+  minlength: 'minLength',
+  tabindex: 'tabIndex',
+  readonly: 'readOnly',
+  autocomplete: 'autoComplete',
+  colspan: 'colSpan',
+  rowspan: 'rowSpan',
+};
+
+function transformAstAttrs(node: any, attrMap: Record<string, string>) {
+  if (!node || typeof node !== 'object') return;
+  if (node['@type'] === '@builder.io/mitosis/node') {
+    for (const [fromAttr, toAttr] of Object.entries(attrMap)) {
+      if (node.properties && fromAttr in node.properties) {
+        node.properties[toAttr] = node.properties[fromAttr];
+        delete node.properties[fromAttr];
+      }
+      if (node.bindings && fromAttr in node.bindings) {
+        node.bindings[toAttr] = node.bindings[fromAttr];
+        delete node.bindings[fromAttr];
       }
     }
-    for (const val of Object.values(node)) {
-      if (Array.isArray(val)) {
-        val.forEach(walk);
-      } else if (val && typeof val === 'object') {
-        walk(val);
-      }
-    }
+  }
+  for (const val of Object.values(node)) {
+    if (Array.isArray(val)) val.forEach((child) => transformAstAttrs(child, attrMap));
+    else if (val && typeof val === 'object') transformAstAttrs(val, attrMap);
+  }
+}
+
+function createSvgAttrPlugin(attrMap: Record<string, string>) {
+  const runPre = (json: any) => {
+    transformAstAttrs(json, attrMap);
+    return json;
   };
-  const plugin = () => ({
-    json: {
-      pre: (json: any) => {
-        walk(json);
-        return json;
-      },
-    },
-  });
-  plugin.json = {
-    pre: (json: any) => {
-      walk(json);
-      return json;
-    },
-  };
+  const plugin = () => ({ json: { pre: runPre } });
+  plugin.json = { pre: runPre };
   return plugin as any;
 }
+
+const svgKebabPlugin = () => createSvgAttrPlugin(SVG_CAMEL_TO_KEBAB);
 
 function cloneAst<T>(ast: T): T {
   return JSON.parse(JSON.stringify(ast));
@@ -85,10 +97,13 @@ function cloneAst<T>(ast: T): T {
 export async function compileMitosis(req: CompileRequest): Promise<CompileResponse> {
   const targets: TargetFramework[] =
     req?.targets && req.targets.length > 0 ? req.targets : ALL_TARGETS;
+  const effectiveSource = req?.normalize
+    ? normalizeMitosisSource(req.source, req.componentName)
+    : req.source;
 
   let parsed: any;
   try {
-    parsed = parseJsx(req.source, { typescript: true });
+    parsed = parseJsx(effectiveSource, { typescript: true });
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : String(err);
     return {
@@ -115,7 +130,7 @@ export async function compileMitosis(req: CompileRequest): Promise<CompileRespon
   const errors: CompileError[] = [];
 
   if (req.checks?.lint !== false) {
-    const lintErrors = lintSource(req.source);
+    const lintErrors = lintSource(effectiveSource);
     if (lintErrors.length > 0) {
       errors.push(...lintErrors);
       return {
@@ -129,7 +144,7 @@ export async function compileMitosis(req: CompileRequest): Promise<CompileRespon
   if (req.checks?.render === true) {
     const renderErrors = await renderCheck({
       componentName,
-      source: req.source,
+      source: effectiveSource,
       siblingSources: req.siblingSources,
       allowedClasses: req.allowedClasses,
     });
@@ -155,42 +170,48 @@ export async function compileMitosis(req: CompileRequest): Promise<CompileRespon
 
       switch (target) {
         case 'mitosis': {
-          code = req.source;
+          code = effectiveSource;
           fileName = `${componentName}.lite.tsx`;
           break;
         }
         case 'react': {
+          transformAstAttrs(component, SVG_KEBAB_TO_CAMEL);
           const generator = componentToReact({ typescript: true });
           const res = generator({ component });
-          code = typeof res === 'string' ? res : await res;
+          const rawReact = typeof res === 'string' ? res : await res;
+          code = adaptReactOutput(rawReact);
           fileName = `${componentName}.tsx`;
           break;
         }
         case 'svelte': {
           const generator = componentToSvelte({ typescript: true, plugins: [svgKebabPlugin()] });
           const res = generator({ component });
-          code = typeof res === 'string' ? res : await res;
+          const rawSvelte = typeof res === 'string' ? res : await res;
+          code = adaptSvelteOutput(rawSvelte, effectiveSource);
           fileName = `${componentName}.svelte`;
           break;
         }
         case 'vue3': {
           const generator = componentToVue({ api: 'composition', typescript: true, plugins: [svgKebabPlugin()] });
           const res = generator({ component });
-          code = typeof res === 'string' ? res : await res;
+          const rawVue3 = typeof res === 'string' ? res : await res;
+          code = adaptVue3Output(rawVue3, effectiveSource);
           fileName = `${componentName}.vue`;
           break;
         }
         case 'vue2': {
           const generator = componentToVue({ api: 'options', defineComponent: false, typescript: true, plugins: [svgKebabPlugin()] });
           const res = generator({ component });
-          code = typeof res === 'string' ? res : await res;
+          const rawVue2 = typeof res === 'string' ? res : await res;
+          code = adaptVue2Output(rawVue2, effectiveSource);
           fileName = `${componentName}.vue`;
           break;
         }
         case 'angular': {
           const generator = componentToAngular({ typescript: true, plugins: [svgKebabPlugin()] });
           const res = generator({ component });
-          code = typeof res === 'string' ? res : await res;
+          const rawAngular = typeof res === 'string' ? res : await res;
+          code = adaptAngularOutput(rawAngular, effectiveSource);
           fileName = `${componentName}.ts`;
           break;
         }

@@ -12,7 +12,7 @@ const __dirname = dirname(__filename);
 // In compiled dist, worker is at ./render-worker.js
 const workerPath = resolve(__dirname, './render-worker.js');
 
-const DEFAULT_TIMEOUT_MS = 5000;
+const DEFAULT_TIMEOUT_MS = 15000;
 
 export async function renderCheck(
   opts: RenderCheckOptions,
