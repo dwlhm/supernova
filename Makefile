@@ -1,58 +1,42 @@
-.PHONY: install fmt-check vet test-go test-ts typecheck build check clean run dev review preview-pr preview-build dev-sync
+.PHONY: install test test-ts typecheck build check clean run dev review preview-pr preview-build dev-sync
 
-GO_MODULES := apps/api packages/contracts
+HAS_PNPM := $(shell command -v pnpm 2>/dev/null)
+NIX_BIN := $(shell command -v nix 2>/dev/null || echo /nix/var/nix/profiles/default/bin/nix)
+NIX_EXEC := $(if $(HAS_PNPM),,$(NIX_BIN) develop --command)
 
 install:
-	pnpm install
+	$(NIX_EXEC) pnpm install
 
 run:
-	go run ./apps/api/cmd/api
+	$(NIX_EXEC) node apps/api/dist/cli.js
 
-dev: run
+dev: build run
 
 review:
-	pnpm --dir apps/docs dev
+	$(NIX_EXEC) pnpm --dir apps/docs dev
 
 preview-pr:
-	@./scripts/preview-pr.sh "$(BRANCH)" dev
+	$(NIX_EXEC) ./scripts/preview-pr.sh "$(BRANCH)" dev
 
 preview-build:
-	@./scripts/preview-pr.sh "$(BRANCH)" build
+	$(NIX_EXEC) ./scripts/preview-pr.sh "$(BRANCH)" build
 
 dev-sync:
-	@./scripts/dev-sync.sh $(ARGS)
-
-fmt-check:
-	@diff=$$(gofmt -l $(GO_MODULES)); \
-	if [ -n "$$diff" ]; then \
-		echo "Unformatted Go files:"; \
-		echo "$$diff"; \
-		exit 1; \
-	fi
-
-vet:
-	@set -e; for mod in $(GO_MODULES); do \
-		echo "==> go vet in $$mod"; \
-		(cd $$mod && go vet ./...); \
-	done
-
-test-go:
-	@set -e; for mod in $(GO_MODULES); do \
-		echo "==> go test in $$mod"; \
-		(cd $$mod && go test ./...); \
-	done
-
-test-ts:
-	pnpm test
-
-typecheck:
-	pnpm typecheck
+	$(NIX_EXEC) ./scripts/dev-sync.sh $(ARGS)
 
 build:
-	pnpm build
+	$(NIX_EXEC) pnpm build
 
-check: fmt-check vet build test-go typecheck test-ts
+typecheck:
+	$(NIX_EXEC) pnpm typecheck
+
+test:
+	$(NIX_EXEC) pnpm test
+
+test-ts: test
+
+check: build typecheck test
 	@echo "All checks passed successfully."
 
 clean:
-	rm -rf node_modules apps/*/node_modules packages/*/node_modules var/
+	rm -rf dist

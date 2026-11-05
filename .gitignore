@@ -14,11 +14,15 @@ apps/docs/.vitepress/cache/
 apps/docs/.vitepress/dist/
 /docs/
 
-# Environment
+# Environment & Nix
 .env
 .env.*
 !.env.example
+.direnv/
+result
+result-*
 
-# OS files
+# OS & Agent files
 .DS_Store
 Thumbs.db
+/skills/

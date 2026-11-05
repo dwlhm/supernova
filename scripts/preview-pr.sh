@@ -37,14 +37,16 @@ fi
 TMP_EXTRACT_DIR=""
 DOCS_BACKUP_DIR=""
 cleanup() {
+  unset DS_REPO_DIR || true
+  if [ -n "${TMP_EXTRACT_DIR}" ] && [ -d "${TMP_EXTRACT_DIR}" ]; then
+    rm -rf "${TMP_EXTRACT_DIR}"
+  fi
   if [ -n "${DOCS_BACKUP_DIR}" ] && [ -d "${DOCS_BACKUP_DIR}" ]; then
-    cp -R "${DOCS_BACKUP_DIR}/components/." "${REPO_ROOT}/apps/docs/components/"
+    rm -rf "${REPO_ROOT}/apps/docs/components"
+    cp -R "${DOCS_BACKUP_DIR}/components" "${REPO_ROOT}/apps/docs/components"
     cp "${DOCS_BACKUP_DIR}/tokens.md" "${REPO_ROOT}/apps/docs/tokens.md"
     rm -rf "${DOCS_BACKUP_DIR}"
     node "${REPO_ROOT}/apps/docs/scripts/compile-docs-components.mjs" > /dev/null 2>&1 || true
-  fi
-  if [ -n "${TMP_EXTRACT_DIR}" ] && [ -d "${TMP_EXTRACT_DIR}" ]; then
-    rm -rf "${TMP_EXTRACT_DIR}"
   fi
 }
 trap cleanup EXIT

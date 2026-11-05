@@ -14,11 +14,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Go
-        uses: actions/setup-go@v5
-        with:
-          go-version-file: go.work
-
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
 
@@ -43,6 +38,3 @@ jobs:
           name: supernova-ui-preview
           path: apps/docs/.vitepress/dist
           retention-days: 14
-
-      - name: Security audit (apps/api)
-        run: cd apps/api && go run golang.org/x/vuln/cmd/govulncheck@latest ./...

@@ -4,6 +4,9 @@ set -euo pipefail
 FIXTURE="${1:-latest}"
 SERVER_URL="${SUPERNOVA_API_URL:-http://localhost:8080}"
 API_TOKEN="${API_TOKEN:-}"
+if [ -z "${API_TOKEN}" ] && [ -f ".env" ]; then
+  API_TOKEN=$(grep -E '^API_TOKEN=' .env | head -n 1 | cut -d= -f2- | sed -e 's/^"//' -e 's/"$//' -e "s/^'//" -e "s/'$//" || true)
+fi
 
 # Terminal color codes
 BOLD='\033[1m'
