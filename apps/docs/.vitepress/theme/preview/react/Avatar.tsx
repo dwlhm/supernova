@@ -48,14 +48,14 @@ function Avatar(props: AvatarProps) {
         props.className
       )}
     >
-      {props.type === "image" && Boolean(props.src) ? (
+      {props.type === "image" ? (
         <img
           alt=""
           className="h-full w-full rounded-full object-cover"
           src={props.src}
         />
       ) : null}
-      {props.type === "icon" || (props.type === "image" && !props.src) ? (
+      {props.type === "icon" ? (
         <svg
           aria-hidden="true"
           viewBox="0 0 24 24"

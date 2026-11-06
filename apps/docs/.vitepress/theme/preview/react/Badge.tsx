@@ -1,7 +1,6 @@
 import * as React from "react";
 
 export interface BadgeProps {
-  label?: string;
   variant?:
     | "primary"
     | "secondary"
@@ -14,17 +13,14 @@ export interface BadgeProps {
   children?: React.ReactNode;
 }
 
-import { cn, cva, bindControllerProps } from "./utils";
+import { cn, cva } from "./utils";
 
 function Badge(props: BadgeProps) {
-  props = { label: "Badge", variant: "primary", className: "", ...props };
-  const [__ctrlState, __setCtrlState] = React.useState<Record<string, any>>({});
-  props = bindControllerProps(props, __ctrlState, __setCtrlState);
+  props = { variant: "primary", className: "", ...props };
   return (
     <span
-      data-ctrl={typeof bindControllerProps}
       className={cn(
-        "inline-flex max-w-full items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium leading-4",
+        "inline-flex max-w-full items-center justify-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium leading-4",
         cva(
           props.variant,
           {
@@ -42,11 +38,7 @@ function Badge(props: BadgeProps) {
         props.className
       )}
     >
-      {props.children ? (
-        <>{props.children}</>
-      ) : (
-        <span className="truncate">{props.label}</span>
-      )}
+      {props.children}
     </span>
   );
 }

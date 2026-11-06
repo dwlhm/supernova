@@ -5,6 +5,8 @@ import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 import * as svelteCompiler from 'svelte/compiler';
 import * as esbuild from 'esbuild';
+import { transformAsync } from '@babel/core';
+import angularLinker from '@angular/compiler-cli/linker/babel';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -37,6 +39,31 @@ function sveltePlugin() {
   };
 }
 
+const ANGULAR_PACKAGES = ['@angular/core', '@angular/common', '@angular/platform-browser'];
+
+/**
+ * Angular publishes partially compiled packages (`ɵɵngDeclare*`). Link them at build time, as the Angular CLI
+ * does; runtime JIT linking breaks once the bundle is minified.
+ */
+function angularLinkerPlugin() {
+  return {
+    name: 'vitepress-angular-linker',
+    enforce: 'pre' as const,
+    async transform(code: string, id: string) {
+      if (!/[\\/]@angular[\\/]/.test(id) || !code.includes('ɵɵngDeclare')) return null;
+      const result = await transformAsync(code, {
+        filename: id,
+        plugins: [angularLinker],
+        babelrc: false,
+        configFile: false,
+        compact: false,
+        sourceMaps: false,
+      });
+      return result?.code ?? null;
+    },
+  };
+}
+
 function utilsResolverPlugin() {
   return {
     name: 'vitepress-utils-resolver',
@@ -65,7 +92,10 @@ export default defineConfig({
       react(),
       sveltePlugin(),
       utilsResolverPlugin(),
+      angularLinkerPlugin(),
     ],
+    // Pre-bundling would bypass the linker in dev; Angular is only loaded by the Angular preview tab.
+    optimizeDeps: { exclude: ANGULAR_PACKAGES },
     resolve: {
       alias: [
         { find: /^@ui\/(.*)$/, replacement: path.resolve(__dirname, 'theme/preview/$1') },

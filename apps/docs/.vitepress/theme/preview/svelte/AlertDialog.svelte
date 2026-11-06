@@ -27,10 +27,9 @@
   export let onCancel: AlertDialogProps["onCancel"];
   export let showDescription: AlertDialogProps["showDescription"] = true;
   export let className: AlertDialogProps["className"] = "";
-  export let heading: AlertDialogProps["heading"] = "Are you absolutely sure?";
+  export let heading: AlertDialogProps["heading"] = "";
   export let showCloseButton: AlertDialogProps["showCloseButton"] = true;
-  export let description: AlertDialogProps["description"] =
-    "This action cannot be undone. This will permanently delete your account and remove your data from our servers.";
+  export let description: AlertDialogProps["description"] = "";
 
   export let cancelLabel: AlertDialogProps["cancelLabel"] = "Cancel";
   export let destructive: AlertDialogProps["destructive"] = false;
@@ -119,28 +118,26 @@
       {#if $$slots.default}
         <slot />
       {/if}
-      {#if !$$slots.default}
-        <div class="flex items-center justify-end gap-2">
-          <button
-            type="button"
-            class="inline-flex h-9 items-center justify-center rounded-lg bg-secondary-default px-4 py-2 text-sm font-medium text-secondary-foreground shadow-xs transition-colors hover:bg-secondary-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring-primary"
-            on:click={(event) => {
-              onCancel && onCancel();
-            }}>{cancelLabel}</button
-          ><button
-            type="button"
-            class={cn(
-              "inline-flex h-9 items-center justify-center rounded-lg px-4 py-2 text-sm font-medium text-primary-foreground shadow-xs transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring-primary",
-              destructive
-                ? "bg-destructive-background hover:bg-destructive-hover active:bg-destructive-pressed"
-                : "bg-primary-default hover:bg-primary-hover active:bg-primary-pressed"
-            )}
-            on:click={(event) => {
-              onConfirm && onConfirm();
-            }}>{confirmLabel}</button
-          >
-        </div>
-      {/if}
+      <div class="flex items-center justify-end gap-2">
+        <button
+          type="button"
+          class="inline-flex h-9 items-center justify-center rounded-lg bg-secondary-default px-4 py-2 text-sm font-medium text-secondary-foreground shadow-xs transition-colors hover:bg-secondary-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring-primary"
+          on:click={(event) => {
+            onCancel && onCancel();
+          }}>{cancelLabel}</button
+        ><button
+          type="button"
+          class={cn(
+            "inline-flex h-9 items-center justify-center rounded-lg px-4 py-2 text-sm font-medium text-primary-foreground shadow-xs transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring-primary",
+            destructive
+              ? "bg-destructive-background hover:bg-destructive-hover active:bg-destructive-pressed"
+              : "bg-primary-default hover:bg-primary-hover active:bg-primary-pressed"
+          )}
+          on:click={(event) => {
+            onConfirm && onConfirm();
+          }}>{confirmLabel}</button
+        >
+      </div>
     </div>
   </div>
 {/if}

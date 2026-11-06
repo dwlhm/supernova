@@ -6,8 +6,6 @@ export interface FABProps {
   variant?: "primary" | "secondary" | "outline";
   size?: "small" | "regular" | "large" | "extended";
   disabled?: boolean;
-  label?: string;
-  showLabel?: boolean;
   ariaLabel?: string;
   className?: string;
   children?: React.ReactNode;
@@ -22,16 +20,14 @@ function FAB(props: FABProps) {
     variant: "primary",
     size: "small",
     disabled: false,
-    label: "Label",
-    showLabel: true,
-    ariaLabel: "",
+    ariaLabel: "Action",
     className: "",
     ...props,
   };
   return (
     <button
       type={props.type || "button"}
-      aria-label={props.ariaLabel || props.label || "Action"}
+      aria-label={props.ariaLabel || "Action"}
       disabled={props.disabled}
       className={cn(
         "inline-flex shrink-0 items-center justify-center rounded-full shadow-md transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring-primary disabled:pointer-events-none disabled:opacity-50",
@@ -61,33 +57,30 @@ function FAB(props: FABProps) {
       )}
       onClick={(event) => !props.disabled && props.onClick && props.onClick()}
     >
-      {props.children ? <>{props.children}</> : null}
-      {!props.children ? (
-        <svg
-          aria-hidden="true"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.5"
-          className={cn(
-            "shrink-0",
-            cva(
-              props.size,
-              {
-                small: "h-4 w-4",
-                regular: "h-5 w-5",
-                large: "h-7 w-7",
-                extended: "h-5 w-5",
-              },
-              "small"
-            )
-          )}
-        >
-          <path strokeLinecap="round" d={ICON_PATHS.plus} />
-        </svg>
-      ) : null}
-      {props.size === "extended" && props.showLabel ? (
-        <span className="truncate text-sm font-medium">{props.label}</span>
+      <svg
+        aria-hidden="true"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        className={cn(
+          "shrink-0",
+          cva(
+            props.size,
+            {
+              small: "h-4 w-4",
+              regular: "h-5 w-5",
+              large: "h-7 w-7",
+              extended: "h-5 w-5",
+            },
+            "small"
+          )
+        )}
+      >
+        <path strokeLinecap="round" d={ICON_PATHS.plus} />
+      </svg>
+      {props.size === "extended" ? (
+        <span className="truncate text-sm font-medium">{props.children}</span>
       ) : null}
     </button>
   );

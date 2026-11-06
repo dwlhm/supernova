@@ -93,30 +93,28 @@
           <slot />
         </template>
 
-        <template v-if="!$slots.default">
-          <div class="flex items-center justify-end gap-2">
-            <button
-              type="button"
-              class="inline-flex h-9 items-center justify-center rounded-lg bg-secondary-default px-4 py-2 text-sm font-medium text-secondary-foreground shadow-xs transition-colors hover:bg-secondary-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring-primary"
-              @click="async (event) => onCancel && onCancel()"
-            >
-              {{ cancelLabel }}</button
-            ><button
-              type="button"
-              :class="
-                cn(
-                  'inline-flex h-9 items-center justify-center rounded-lg px-4 py-2 text-sm font-medium text-primary-foreground shadow-xs transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring-primary',
-                  destructive
-                    ? 'bg-destructive-background hover:bg-destructive-hover active:bg-destructive-pressed'
-                    : 'bg-primary-default hover:bg-primary-hover active:bg-primary-pressed'
-                )
-              "
-              @click="async (event) => onConfirm && onConfirm()"
-            >
-              {{ confirmLabel }}
-            </button>
-          </div>
-        </template>
+        <div class="flex items-center justify-end gap-2">
+          <button
+            type="button"
+            class="inline-flex h-9 items-center justify-center rounded-lg bg-secondary-default px-4 py-2 text-sm font-medium text-secondary-foreground shadow-xs transition-colors hover:bg-secondary-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring-primary"
+            @click="async (event) => onCancel && onCancel()"
+          >
+            {{ cancelLabel }}</button
+          ><button
+            type="button"
+            :class="
+              cn(
+                'inline-flex h-9 items-center justify-center rounded-lg px-4 py-2 text-sm font-medium text-primary-foreground shadow-xs transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring-primary',
+                destructive
+                  ? 'bg-destructive-background hover:bg-destructive-hover active:bg-destructive-pressed'
+                  : 'bg-primary-default hover:bg-primary-hover active:bg-primary-pressed'
+              )
+            "
+            @click="async (event) => onConfirm && onConfirm()"
+          >
+            {{ confirmLabel }}
+          </button>
+        </div>
       </div>
     </div>
   </template>
@@ -147,10 +145,9 @@ const props = withDefaults(defineProps<AlertDialogProps>(), {
   onCancel: undefined,
   showDescription: true,
   className: "",
-  heading: "Are you absolutely sure?",
+  heading: "",
   showCloseButton: true,
-  description:
-    "This action cannot be undone. This will permanently delete your account and remove your data from our servers.",
+  description: "",
 
   cancelLabel: "Cancel",
   destructive: false,

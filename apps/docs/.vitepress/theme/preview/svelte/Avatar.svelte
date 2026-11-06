@@ -45,10 +45,10 @@
     className
   )}
 >
-  {#if type === "image" && Boolean(src)}
+  {#if type === "image"}
     <img alt="" class="h-full w-full rounded-full object-cover" {src} />
   {/if}
-  {#if type === "icon" || (type === "image" && !src)}
+  {#if type === "icon"}
     <svg
       aria-hidden="true"
       viewBox="0 0 24 24"

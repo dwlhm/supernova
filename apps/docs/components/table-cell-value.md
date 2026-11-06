@@ -1,59 +1,31 @@
 # TableCellValue
 
-Description
 A flexible set of content patterns for table cells, including text, media, selection controls, status, links, badges, actions, products, and custom slot content.
 
+## When to Use
 
-When to use
-Use within Table Body Cell to represent the semantic type of data or control required by a column.
+- Use within Table Body Cell to represent the semantic type of data or control required by a column.
 
+## Usage Guidelines
 
-Usage guidelines
-Select the Type variant based on meaning, not visual preference.
-Keep repeated cells in a column consistent.
-Use interactive variants only when the table supports that action.
-Keep labels brief and provide accessible names for icon-only actions.
-Use Slot only when none of the standard variants fit.
-
-
-Properties
-Type — Selects the cell-value pattern.
-Value — Sets the primary displayed text where supported.
-Show Affiliate, Show Komlabs, Show Raja Ongkir, Show Komads, Show Komcards, Show Komchat, Show Komclass, Show Kompack, Show Komplace, Show Komship, Show Komtim, Show Komed, Show Komstore, Show Komerce — Controls product marks in the Product variant.
-Show Edit, Show Delete, Show More — Controls visible actions in Action (Icon).
-Slot — Replaces the custom content in the Slot variant.
+- Compose semantic child components or pass cell values based on meaning, not visual preference.
+- Keep repeated cells in a column consistent.
+- Use interactive variants only when the table supports that action.
+- Keep labels brief and provide accessible names for icon-only actions.
+- Pass custom child components via children/slots when needed.
 
 ## Live Preview & Usage
 
-<FrameworkPreview name="TableCellValue" />
+<ComponentPreview name="TableCellValue" />
 
 ## Props & Variants
 
-| Property | Type | Default | Description |
+| Prop | Type | Default | Options |
 | :--- | :--- | :--- | :--- |
-| `Show Affiliate` | `boolean` | `true` | - |
-| `Show Delete` | `boolean` | `true` | - |
-| `Show Edit` | `boolean` | `true` | - |
-| `Show Komads` | `boolean` | `true` | - |
-| `Show Komcards` | `boolean` | `true` | - |
-| `Show Komchat` | `boolean` | `true` | - |
-| `Show Komclass` | `boolean` | `true` | - |
-| `Show Komed` | `boolean` | `true` | - |
-| `Show Komerce` | `boolean` | `true` | - |
-| `Show Komlabs` | `boolean` | `true` | - |
-| `Show Kompack` | `boolean` | `true` | - |
-| `Show Komplace` | `boolean` | `true` | - |
-| `Show Komship` | `boolean` | `true` | - |
-| `Show Komstore` | `boolean` | `true` | - |
-| `Show Komtim` | `boolean` | `true` | - |
-| `Show More` | `boolean` | `true` | - |
-| `Show Raja Ongkir` | `boolean` | `true` | - |
-| `Slot` | `slot` | - | Custom component content used by the Slot variant. Prefer a standard cell type when one is available. |
-| `Type` | ``Text` \| `Image Text` \| `Image` \| `Action` \| `Badge` \| `Stacked Text` \| `Link` \| `Checkbox` \| `Toggle` \| `Avatar Text` \| `Status` \| `Number` \| `Action (Icon)` \| `Product` \| `Slot`` | `Text` | - |
-| `Value` | `text` | `Cell Value` | - |
-
-## Accessibility (a11y)
-
-- **Keyboard Navigation**: Ensure interactive child elements are reachable and operable via standard keyboard sequences (<kbd>Tab</kbd>, <kbd>Enter</kbd>, <kbd>Space</kbd>).
-- **WAI-ARIA Roles & States**: Appropriate ARIA roles and dynamic state attributes (e.g. `aria-expanded`, `aria-selected`, `aria-hidden`) reflect component status.
-- **Color Contrast**: All typography and interactive UI boundaries satisfy WCAG 2.1 AA requirements (4.5:1 for normal text, 3:1 for large text and UI components).
+| `layout` | `'row' \| 'stacked'` | `'row'` | row, stacked |
+| `align` | `'left' \| 'center' \| 'right'` | `'left'` | left, center, right |
+| `status` | `'none' \| 'success' \| 'warning' \| 'destructive' \| 'info'` | `'none'` | none, success, warning, destructive, info |
+| `imageSrc` | `string` | `''` | - |
+| `imageAlt` | `string` | `''` | - |
+| `className` | `string` | `''` | - |
+| `children` | `ReactNode \| Slot \| ng-content` | `-` | - |

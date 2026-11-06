@@ -1,7 +1,7 @@
 <template>
   <button
     :type="type || 'button'"
-    :aria-label="ariaLabel || label || 'Action'"
+    :aria-label="ariaLabel || 'Action'"
     :disabled="disabled"
     :class="
       cn(
@@ -33,39 +33,32 @@
     "
     @click="async (event) => !disabled && onClick && onClick()"
   >
-    <template v-if="$slots.default">
-      <slot />
-    </template>
-
-    <template v-if="!$slots.default">
-      <svg
-        aria-hidden="true"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="1.5"
-        :class="
-          cn(
-            'shrink-0',
-            cva(
-              size,
-              {
-                small: 'h-4 w-4',
-                regular: 'h-5 w-5',
-                large: 'h-7 w-7',
-                extended: 'h-5 w-5',
-              },
-              'small'
-            )
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.5"
+      :class="
+        cn(
+          'shrink-0',
+          cva(
+            size,
+            {
+              small: 'h-4 w-4',
+              regular: 'h-5 w-5',
+              large: 'h-7 w-7',
+              extended: 'h-5 w-5',
+            },
+            'small'
           )
-        "
-      >
-        <path stroke-linecap="round" :d="ICON_PATHS.plus"></path>
-      </svg>
-    </template>
-
-    <template v-if="size === 'extended' && showLabel">
-      <span class="truncate text-sm font-medium">{{ label }}</span>
+        )
+      "
+    >
+      <path stroke-linecap="round" :d="ICON_PATHS.plus"></path>
+    </svg>
+    <template v-if="size === 'extended'">
+      <span class="truncate text-sm font-medium"><slot /></span>
     </template>
   </button>
 </template>
@@ -78,8 +71,6 @@ export interface FABProps {
   variant?: "primary" | "secondary" | "outline";
   size?: "small" | "regular" | "large" | "extended";
   disabled?: boolean;
-  label?: string;
-  showLabel?: boolean;
   ariaLabel?: string;
   className?: string;
 
@@ -88,15 +79,12 @@ export interface FABProps {
 
 const props = withDefaults(defineProps<FABProps>(), {
   type: "button",
-  ariaLabel: "",
-  label: "Label",
+  ariaLabel: "Action",
   disabled: false,
   variant: "primary",
   size: "small",
   className: "",
   onClick: undefined,
-
-  showLabel: true,
 });
 defineSlots<{ default?: () => any }>();
 </script>

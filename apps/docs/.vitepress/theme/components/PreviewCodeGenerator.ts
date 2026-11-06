@@ -1,4 +1,7 @@
-export type UsageFramework = 'react' | 'vue3' | 'svelte' | 'vue2' | 'angular';
+import type { PreviewFramework } from '../preview/registry';
+
+/** Usage snippets cover the same frameworks as the live preview (single source: the generated registry). */
+export type UsageFramework = PreviewFramework;
 
 const TYPE_IMPORTS_BY_PROP: Record<string, Record<string, string>> = {
   Table: { columns: 'TableColumn', rows: 'TableRowData' },
@@ -57,7 +60,7 @@ function partitionProps(compName: string, rawProps: Record<string, unknown>): Pa
   const propTypeMap = TYPE_IMPORTS_BY_PROP[compName] || {};
 
   for (const [key, val] of Object.entries(rawProps)) {
-    if (IGNORED_PREVIEW_KEYS.has(key) || key.startsWith('on') || typeof val === 'function') continue;
+    if (IGNORED_PREVIEW_KEYS.has(key) || key === 'children' || key.startsWith('on') || typeof val === 'function') continue;
     if (val === undefined || val === '') continue;
     const isComplex = Array.isArray(val) || (typeof val === 'object' && val !== null);
     if (isComplex) {
@@ -92,18 +95,16 @@ function formatAttr(fw: UsageFramework, key: string, val: unknown, isComplex: bo
   return `:${key}="${val}"`;
 }
 
-function buildElementCall(compName: string, fw: UsageFramework, attrs: string[], indent: string): string {
+/** Renders the element; text `content` (the `children` fixture) becomes the element body in every framework. */
+function buildElementCall(compName: string, fw: UsageFramework, attrs: string[], indent: string, content?: string): string {
   const isAngular = fw === 'angular';
   const tag = isAngular ? `spn-${compName.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase()}` : compName;
-  if (attrs.length === 0) return isAngular ? `${indent}<${tag}></${tag}>` : `${indent}<${tag} />`;
-  if (attrs.length <= 2 && attrs.join(' ').length <= 52) {
-    const inline = attrs.join(' ');
-    return isAngular ? `${indent}<${tag} ${inline}></${tag}>` : `${indent}<${tag} ${inline} />`;
-  }
+  const hasBody = isAngular || content !== undefined;
+  const body = hasBody ? `>${content ?? ''}</${tag}>` : ' />';
+  if (attrs.length === 0) return `${indent}<${tag}${hasBody ? body : ' />'}`;
+  if (attrs.length <= 2 && attrs.join(' ').length <= 52) return `${indent}<${tag} ${attrs.join(' ')}${body}`;
   const attrLines = attrs.map((a) => `${indent}  ${a}`).join('\n');
-  return isAngular
-    ? `${indent}<${tag}\n${attrLines}\n${indent}></${tag}>`
-    : `${indent}<${tag}\n${attrLines}\n${indent}/>`;
+  return `${indent}<${tag}\n${attrLines}\n${indent}${hasBody ? body : '/>'}`;
 }
 
 function buildImportStatement(compName: string, pkgSubpath: string, tsTypes: string[]): string {
@@ -117,19 +118,20 @@ export function generateLiveUsageCode(
   rawProps: Record<string, unknown>
 ): string {
   const { tsTypes, varDecls, entries } = partitionProps(compName, rawProps);
+  const content = typeof rawProps.children === 'string' ? rawProps.children : undefined;
   const attrs = entries.map((e) => formatAttr(framework, e.key, e.val, e.isComplex));
   const declBlock = varDecls.map((d) => `const ${d.key}${d.typeAnnotation} = ${d.valueCode};`).join('\n\n');
 
   if (framework === 'react') {
     const imp = buildImportStatement(compName, 'react', tsTypes);
-    const call = buildElementCall(compName, 'react', attrs, '    ');
+    const call = buildElementCall(compName, 'react', attrs, '    ', content);
     const body = call.includes('\n') ? `  return (\n${call}\n  );` : `  return ${call.trim()};`;
     return [imp, declBlock, `export default function App() {\n${body}\n}`].filter(Boolean).join('\n\n');
   }
   if (framework === 'vue3') {
     const imp = buildImportStatement(compName, 'vue3', tsTypes);
     const scriptBody = [imp, declBlock].filter(Boolean).join('\n\n');
-    const call = buildElementCall(compName, 'vue3', attrs, '  ');
+    const call = buildElementCall(compName, 'vue3', attrs, '  ', content);
     return `<script setup lang="ts">\n${scriptBody}\n</script>\n\n<template>\n${call}\n</template>`;
   }
   if (framework === 'svelte') {
@@ -138,12 +140,12 @@ export function generateLiveUsageCode(
       ? declBlock.split('\n').map((l) => (l.trim() ? `  ${l}` : l)).join('\n')
       : '';
     const scriptBody = [imp, indentedDecls].filter(Boolean).join('\n\n');
-    const call = buildElementCall(compName, 'svelte', attrs, '');
+    const call = buildElementCall(compName, 'svelte', attrs, '', content);
     return `<script lang="ts">\n${scriptBody}\n</script>\n\n${call}`;
   }
   if (framework === 'vue2') {
     const imp = buildImportStatement(compName, 'vue2', []);
-    const call = buildElementCall(compName, 'vue2', attrs, '  ');
+    const call = buildElementCall(compName, 'vue2', attrs, '  ', content);
     const dataReturn = varDecls.length
       ? `\n  data() {\n    return {\n${varDecls.map((d) => `      ${d.key},`).join('\n')}\n    };\n  },`
       : '';
@@ -153,7 +155,7 @@ export function generateLiveUsageCode(
       .join('\n\n');
     return `<template>\n${call}\n</template>\n\n<script>\n${scriptBody}\n</script>`;
   }
-  const call = buildElementCall(compName, 'angular', attrs, '    ');
+  const call = buildElementCall(compName, 'angular', attrs, '    ', content);
   const classProps = varDecls.length
     ? '\n' +
       varDecls

@@ -4,7 +4,7 @@
     rowId?: string;
     ariaLabel?: string;
     className?: string;
-    onCheckedChange?: (rowId: string, checked: boolean) => void;
+    onCheckedChange?: (event: { rowId: string; checked: boolean }) => void;
   }
 </script>
 
@@ -24,14 +24,18 @@
     "w-12 whitespace-nowrap border-t border-border-default px-4 py-3 text-center",
     className
   )}
-  ><span class="relative inline-flex h-4 w-4 items-center justify-center"
+  ><span class="relative inline-flex h-3.5 w-3.5 items-center justify-center"
     ><input
       type="checkbox"
-      class="peer absolute inset-0 h-4 w-4 cursor-pointer appearance-none rounded-sm border border-border-default bg-background-default checked:border-primary-default checked:bg-primary-default peer-focus-visible:ring-2 peer-focus-visible:ring-focus-ring-primary"
+      class="peer absolute inset-0 h-3.5 w-3.5 cursor-pointer appearance-none rounded-sm border border-border-default bg-background-default checked:border-primary-default checked:bg-primary-default peer-focus-visible:ring-2 peer-focus-visible:ring-focus-ring-primary"
       {checked}
       aria-label={ariaLabel}
       on:change={(event) => {
-        onCheckedChange && onCheckedChange(rowId || "", !checked);
+        onCheckedChange &&
+          onCheckedChange({
+            rowId: rowId || "",
+            checked: !checked,
+          });
       }}
     /><svg
       aria-hidden="true"
@@ -40,7 +44,7 @@
       stroke="currentColor"
       stroke-width="3"
       class={cn(
-        "pointer-events-none relative h-3 w-3 text-primary-foreground",
+        "pointer-events-none relative h-2.5 w-2.5 text-primary-foreground",
         checked ? "opacity-100" : "opacity-0"
       )}
       ><path

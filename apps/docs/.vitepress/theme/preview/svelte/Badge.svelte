@@ -1,6 +1,5 @@
 <script context="module" lang="ts">
   export interface BadgeProps {
-    label?: string;
     variant?:
       | "primary"
       | "secondary"
@@ -17,18 +16,15 @@
   interface $$Slots {
     default: Record<string, never>;
   }
-  import { cn, cva, bindControllerProps } from "./utils";
+  import { cn, cva } from "./utils";
 
   export let variant: BadgeProps["variant"] = "primary";
   export let className: BadgeProps["className"] = "";
-
-  export let label: BadgeProps["label"] = "Badge";
 </script>
 
 <span
-  data-ctrl={typeof bindControllerProps}
   class={cn(
-    "inline-flex max-w-full items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium leading-4",
+    "inline-flex max-w-full items-center justify-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium leading-4",
     cva(
       variant,
       {
@@ -44,11 +40,5 @@
       "primary"
     ),
     className
-  )}
->
-  {#if $$slots.default}
-    <slot />
-  {:else}
-    <span class="truncate">{label}</span>
-  {/if}</span
+  )}><slot /></span
 >

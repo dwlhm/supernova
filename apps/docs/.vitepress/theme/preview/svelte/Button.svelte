@@ -1,6 +1,5 @@
 <script context="module" lang="ts">
   export interface ButtonProps {
-    label?: string;
     type?: "button" | "submit" | "reset";
     variant?:
       | "primary"
@@ -12,7 +11,6 @@
     size?: "large" | "regular" | "small" | "mini";
     roundness?: "default" | "round";
     disabled?: boolean;
-    showLabel?: boolean;
     showLeftIcon?: boolean;
     showRightIcon?: boolean;
     ariaLabel?: string;
@@ -31,8 +29,6 @@
   export let type: ButtonProps["type"] = "button";
   export let disabled: ButtonProps["disabled"] = false;
   export let ariaLabel: ButtonProps["ariaLabel"] = "";
-  export let showLabel: ButtonProps["showLabel"] = true;
-  export let label: ButtonProps["label"] = "Label";
   export let variant: ButtonProps["variant"] = "primary";
   export let size: ButtonProps["size"] = "regular";
   export let roundness: ButtonProps["roundness"] = "default";
@@ -47,7 +43,7 @@
   type={type || "button"}
   {disabled}
   aria-disabled={disabled}
-  aria-label={ariaLabel !== "" ? ariaLabel : !showLabel ? label : undefined}
+  aria-label={ariaLabel || undefined}
   class={cn(
     "inline-flex items-center justify-center font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring-primary disabled:opacity-50 disabled:pointer-events-none",
     cva(
@@ -93,9 +89,6 @@
       stroke-width="1.5"
       ><path stroke-linecap="round" d={ICON_PATHS.plus} /></svg
     >
-  {/if}
-  {#if showLabel && (!$$slots.default || label !== "Label")}
-    <span class="truncate">{label}</span>
   {/if}<slot />
   {#if showRightIcon}
     <svg

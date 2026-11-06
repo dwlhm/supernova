@@ -5,9 +5,9 @@
     :aria-current="active ? 'page' : undefined"
     :class="
       cn(
-        'flex w-full items-center gap-2 rounded-md px-2 py-3 text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring-primary',
+        'flex w-full items-center gap-2 rounded-lg px-2 py-3 text-sm font-normal transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring-primary',
         active
-          ? 'bg-primary-subtle'
+          ? 'bg-primary-subtle hover:bg-primary-muted'
           : 'hover:bg-background-muted active:bg-background-interactive',
         className
       )
@@ -24,27 +24,19 @@
               : 'text-foreground-default'
           )
         "
-      >
-        <template v-if="$slots.default">
-          <slot />
-        </template>
-
-        <template v-if="!$slots.default">
-          <svg
-            aria-hidden="true"
-            class="h-4 w-4"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.5"
-          >
-            <rect x="3" y="3" width="7" height="7" rx="1.5"></rect>
-            <rect x="14" y="3" width="7" height="7" rx="1.5"></rect>
-            <rect x="3" y="14" width="7" height="7" rx="1.5"></rect>
-            <rect x="14" y="14" width="7" height="7" rx="1.5"></rect>
-          </svg>
-        </template>
-      </span>
+        ><svg
+          aria-hidden="true"
+          class="h-4 w-4"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+        >
+          <rect x="3" y="3" width="7" height="7" rx="1.5"></rect>
+          <rect x="14" y="3" width="7" height="7" rx="1.5"></rect>
+          <rect x="3" y="14" width="7" height="7" rx="1.5"></rect>
+          <rect x="14" y="14" width="7" height="7" rx="1.5"></rect></svg
+      ></span>
     </template>
 
     <template v-if="showLabel">
@@ -57,8 +49,8 @@
               : 'text-foreground-default'
           )
         "
-        >{{ label }}</span
-      >
+        ><slot
+      /></span>
     </template>
 
     <template v-if="showBadge">
@@ -103,7 +95,6 @@
 import { cn, ICON_PATHS, bindControllerProps } from "./utils";
 
 export interface MainMenuProps {
-  label?: string;
   active?: boolean;
   showLabel?: boolean;
   showLeadingIcon?: boolean;
@@ -120,11 +111,10 @@ const props = withDefaults(defineProps<MainMenuProps>(), {
   className: "",
   onClick: undefined,
   showLeadingIcon: true,
-
   showLabel: true,
-  label: "Menu",
+
   showBadge: false,
-  badgeLabel: "New",
+  badgeLabel: "",
   showTrailingIcon: true,
 });
 defineSlots<{ default?: () => any }>();

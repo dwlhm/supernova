@@ -17,6 +17,7 @@
 import { useData } from 'vitepress';
 import IsolatedFrame from './IsolatedFrame.vue';
 import FrameworkPreviewCard from './FrameworkPreviewCard.vue';
+import type { PreviewFramework } from '../preview/registry';
 
 const { isDark } = useData();
 
@@ -24,7 +25,7 @@ withDefaults(
   defineProps<{
     name: string;
     defaultProps?: Record<string, any>;
-    initialFramework?: 'react' | 'vue3' | 'svelte';
+    initialFramework?: PreviewFramework;
   }>(),
   {
     defaultProps: () => ({}),
