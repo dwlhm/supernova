@@ -4,6 +4,7 @@ import { getUtilsSource } from '@supernova/mitosis-compiler';
 import {
   artifactPath,
   GROUP_COMPONENTS,
+  GROUP_EXAMPLES,
   GROUP_ICONS,
   normalizeGroup,
   validFileName,
@@ -39,9 +40,25 @@ export function resolveComponentGroup(
   return GROUP_COMPONENTS;
 }
 
+/** Derived compound parts of `parent` (excluding examples), by name. */
+function siblingSourcesOf(
+  parent: string,
+  authoredComponents: Record<string, string>,
+  derivedFrom: Record<string, string>,
+  groups: Record<string, string>
+): Record<string, string> {
+  return Object.fromEntries(
+    Object.entries(derivedFrom)
+      .filter(([name, owner]) => owner === parent && groups[name] !== GROUP_EXAMPLES && authoredComponents[name])
+      .map(([name]) => [name, authoredComponents[name]!])
+  );
+}
+
 export function buildDocArtifacts(
   job: Job,
-  authoredComponents: Record<string, string>
+  authoredComponents: Record<string, string>,
+  derivedFrom: Record<string, string> = {},
+  groups: Record<string, string> = {}
 ): CompiledArtifact[] {
   const tokensDoc = generateTokensDoc(job.document.tokens || []);
   const indexDoc = generateComponentsIndexDoc(job.document.components || []);
@@ -58,7 +75,7 @@ export function buildDocArtifacts(
       target: 'docs',
       fileName: `${kebabName}.md`,
       group: 'docs',
-      code: generateComponentDoc(comp, sourceCode),
+      code: generateComponentDoc(comp, sourceCode, siblingSourcesOf(compName, authoredComponents, derivedFrom, groups)),
     });
   }
   return docArtifacts;

@@ -67,23 +67,38 @@ function extractFallbackSpecProps(comp: FigmaComponentSpec): DocPropRow[] {
   return rows;
 }
 
-export function generateComponentDoc(comp: FigmaComponentSpec, sourceCode?: string): string {
+function astPropRows(sourceCode?: string): DocPropRow[] {
+  return extractPropsFromLiteSource(sourceCode).map((p) => ({
+    name: p.name,
+    type: p.type.replace(/\|/g, '\\|'),
+    defaultVal: p.defaultValue ?? '-',
+    options: p.type.includes("'")
+      ? p.type
+          .split('|')
+          .map((s) => s.trim().replace(/^['"]|['"]$/g, ''))
+          .join(', ')
+      : '-',
+  }));
+}
+
+function propsTable(rows: DocPropRow[]): string[] {
+  if (rows.length === 0) return ['No configurable properties defined.', ''];
+  return [
+    '| Prop | Type | Default | Options |',
+    '| :--- | :--- | :--- | :--- |',
+    ...rows.map((r) => `| \`${r.name}\` | \`${r.type}\` | \`${r.defaultVal}\` | ${r.options} |`),
+    '',
+  ];
+}
+
+/**
+ * Renders a component page. `siblings` are derived compound parts (e.g. StepperItem for Stepper),
+ * documented on the parent page because consumers compose them together.
+ */
+export function generateComponentDoc(comp: FigmaComponentSpec, sourceCode?: string, siblings: Record<string, string> = {}): string {
   const compName = normalizeComponentName(comp.name);
-  const astProps = extractPropsFromLiteSource(sourceCode);
-  const rows: DocPropRow[] =
-    astProps.length > 0
-      ? astProps.map((p) => ({
-          name: p.name,
-          type: p.type.replace(/\|/g, '\\|'),
-          defaultVal: p.defaultValue ?? '-',
-          options: p.type.includes("'")
-            ? p.type
-                .split('|')
-                .map((s) => s.trim().replace(/^['"]|['"]$/g, ''))
-                .join(', ')
-            : '-',
-        }))
-      : extractFallbackSpecProps(comp);
+  const astRows = astPropRows(sourceCode);
+  const rows = astRows.length > 0 ? astRows : extractFallbackSpecProps(comp);
 
   const lines: string[] = [`# ${compName}`, ''];
   const descSection = formatDescriptionSections(comp.description);
@@ -92,16 +107,9 @@ export function generateComponentDoc(comp: FigmaComponentSpec, sourceCode?: stri
   }
 
   lines.push('## Live Preview & Usage', '', `<ComponentPreview name="${compName}" />`, '');
-  lines.push('## Props & Variants', '');
-
-  if (rows.length === 0) {
-    lines.push('No configurable properties defined.', '');
-  } else {
-    lines.push('| Prop | Type | Default | Options |', '| :--- | :--- | :--- | :--- |');
-    for (const r of rows) {
-      lines.push(`| \`${r.name}\` | \`${r.type}\` | \`${r.defaultVal}\` | ${r.options} |`);
-    }
-    lines.push('');
+  lines.push('## Props & Variants', '', ...propsTable(rows));
+  for (const [name, source] of Object.entries(siblings).sort(([a], [b]) => a.localeCompare(b))) {
+    lines.push(`### \`${name}\``, '', ...propsTable(astPropRows(source)));
   }
 
   return lines.join('\n');

@@ -24,6 +24,10 @@ describe('Domain Contracts & ArtifactPath (@supernova/api)', () => {
       'src/icons/IconSearch.lite.tsx'
     );
     assert.equal(
+      artifactPath({ target: 'mitosis', fileName: 'StepperExample.lite.tsx', code: '', group: 'examples' }),
+      'src/examples/StepperExample.lite.tsx'
+    );
+    assert.equal(
       artifactPath({ target: 'tokens', fileName: 'theme.css', code: '' }),
       'src/tokens/theme.css'
     );
@@ -84,13 +88,17 @@ describe('Domain Contracts & ArtifactPath (@supernova/api)', () => {
         status: 'succeeded',
         tasks: [],
         components: [],
-        artifacts: [{ target: 'mitosis', fileName: 'AlertDialog.lite.tsx', code: '', group: 'components' }],
+        artifacts: [
+          { target: 'mitosis', fileName: 'AlertDialog.lite.tsx', code: '', group: 'components' },
+          { target: 'mitosis', fileName: 'AlertDialogExample.lite.tsx', code: '', group: 'examples' },
+        ],
         createdAt: '',
         updatedAt: '',
       },
     });
     assert.match(prBody, /https:\/\/dwlhm\.github\.io\/supernova\/pr-preview\/pr-13\/showcase/);
     assert.match(prBody, /https:\/\/dwlhm\.github\.io\/supernova\/pr-preview\/pr-13\/components\/alert-dialog/);
+    assert.doesNotMatch(prBody, /AlertDialogExample/, 'examples are not listed as components');
     assert.match(prBody, /src\/components\/AlertDialog\.lite\.tsx/);
   });
 });
@@ -114,6 +122,27 @@ describe('MemStore & SqliteStore (node:sqlite) (@supernova/api)', () => {
       assert.deepEqual(await store.listJobIdsByStatus(['authoring', 'publishing']), ['a']);
       assert.equal((await store.getLatestJobByBranch('supernova/ds')).documentName, 'Newer');
       assert.equal(await store.getLatestJobByBranch('missing'), null);
+    });
+
+    it(`${label} keeps every concurrent partial update of the same job (no lost updates)`, async () => {
+      const store = createStore();
+      const names = Array.from({ length: 24 }, (_, i) => `C${i}`);
+      await store.save({
+        id: 'job', documentName: 'DS', document: { components: [] }, targets: [], publishers: [], status: 'authoring',
+        tasks: names.map((n) => ({ id: n, runId: 'r', componentName: n, status: 'queued', attemptCount: 0 })),
+        components: names.map((name) => ({ name, status: 'pending' })), artifacts: [], createdAt: '1', updatedAt: '1',
+      });
+      await Promise.all(
+        names.flatMap((n) => [
+          store.updateComponent('job', { name: n, status: 'done' }),
+          store.updateTask('job', { id: n, runId: 'r', componentName: n, status: 'ready', attemptCount: 1 }),
+          store.saveArtifacts('job', [{ target: 'mitosis', fileName: `${n}.lite.tsx`, code: n }]),
+        ])
+      );
+      const job = await store.get('job');
+      assert.ok(job.components.every((c) => c.status === 'done'), 'component progress');
+      assert.ok(job.tasks.every((t) => t.status === 'ready'), 'task state');
+      assert.equal(job.artifacts.length, names.length, 'artifacts');
     });
 
     it(`${label} persists jobs, artifacts, zips, snapshots, and sync plans`, async () => {

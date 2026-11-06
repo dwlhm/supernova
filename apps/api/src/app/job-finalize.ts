@@ -5,11 +5,10 @@ import {
   hashComponentSpec,
   hashTokens,
   normalizeComponentName,
-  type CompiledArtifact,
   type Run,
 } from '../domain/models.js';
 import { buildDocArtifacts, syncDocsDirectory, syncGeneratedDirectory } from './docs-writer.js';
-import type { JobRunnerContext } from './job-runner.js';
+import type { JobAccumulator, JobRunnerContext } from './job-runner.js';
 
 export async function failJob(ctx: JobRunnerContext, jobId: string, run: Run | undefined, stage: string, message: string): Promise<void> {
   await ctx.store.updateStatus(jobId, 'failed', { stage, message });
@@ -26,10 +25,9 @@ export async function finalizeJobArtifacts(
   jobId: string,
   run: Run,
   docName: string,
-  authoredComponents: Record<string, string>,
-  componentGroups: Record<string, string>,
-  allArtifacts: CompiledArtifact[]
+  acc: JobAccumulator
 ): Promise<void> {
+  const { authoredComponents, componentGroups, derivedFrom, artifacts: allArtifacts } = acc;
   if (allArtifacts.length === 0) {
     for (const [compName, code] of Object.entries(authoredComponents)) {
       allArtifacts.push({ target: 'mitosis', fileName: `${compName}.lite.tsx`, code, group: componentGroups[compName] || 'components' });
@@ -44,7 +42,7 @@ export async function finalizeJobArtifacts(
   await ctx.store.saveArtifacts(jobId, allArtifacts);
 
   let job = await ctx.store.get(jobId);
-  const docArtifacts = buildDocArtifacts(job, authoredComponents);
+  const docArtifacts = buildDocArtifacts(job, authoredComponents, derivedFrom, componentGroups);
   await ctx.store.saveArtifacts(jobId, docArtifacts);
 
   job = await ctx.store.get(jobId);
@@ -54,12 +52,12 @@ export async function finalizeJobArtifacts(
   const nowSnap = new Date().toISOString();
   for (const [compName, src] of Object.entries(authoredComponents)) {
     const spec = job.document.components.find((c) => normalizeComponentName(c.name) === compName);
-    if (spec) {
-      await ctx.store.saveComponentSnapshot({
-        documentName: docName, componentName: compName, contentHash: hashComponentSpec(spec),
-        spec, sourceCode: src, updatedAt: nowSnap,
-      });
-    }
+    const parent = derivedFrom[compName];
+    if (!spec && !parent) continue;
+    await ctx.store.saveComponentSnapshot({
+      documentName: docName, componentName: compName, sourceCode: src, updatedAt: nowSnap,
+      ...(spec ? { contentHash: hashComponentSpec(spec), spec } : { contentHash: '', derivedFrom: parent, group: componentGroups[compName] }),
+    });
   }
   await ctx.store.saveSnapshot({
     id: crypto.randomUUID(), documentName: docName,

@@ -132,7 +132,7 @@ export interface components {
         /** @enum {string} */
         PublisherType: "download" | "pull_request";
         /** @enum {string} */
-        JobStatus: "queued" | "authoring" | "compiling" | "publishing" | "succeeded" | "failed";
+        JobStatus: "queued" | "authoring" | "compiling" | "publishing" | "succeeded" | "partially_succeeded" | "failed";
         /** @enum {string} */
         TaskStatus: "queued" | "authoring" | "verifying" | "ready" | "failed";
         /** @enum {string} */
@@ -274,6 +274,8 @@ export interface components {
             modes?: {
                 [key: string]: string;
             };
+            /** @description Target variable name or ID when this token is a variable alias */
+            aliasTo?: string;
         };
         FigmaComponentSpec: {
             id: string;
@@ -317,6 +319,8 @@ export interface components {
              */
             publishers: components["schemas"]["PublisherType"][];
             options?: components["schemas"]["ExtractionOptions"];
+            /** @description Component names forced through LLM authoring even when their Figma spec is unchanged. Other components follow the incremental rules (new/changed are authored; unchanged are compiled from their previous source and re-authored only if the quality gate fails). Unknown names are rejected with INVALID_PAYLOAD. */
+            selectedComponents?: string[];
         };
         ExtractionResponse: {
             /** Format: uuid */
@@ -367,7 +371,7 @@ export interface components {
             targets?: components["schemas"]["Framework"][];
             publishers?: components["schemas"]["PublisherType"][];
             options?: components["schemas"]["ExtractionOptions"];
-            /** @description Optional subset of component names to author (defaults to all new & changed) */
+            /** @description Component names forced through LLM authoring even when their Figma spec is unchanged. Other components follow the incremental rules (new/changed are authored; unchanged are compiled from their previous source and re-authored only if the quality gate fails). Unknown names are rejected with INVALID_PAYLOAD. */
             selectedComponents?: string[];
         };
         StageError: {

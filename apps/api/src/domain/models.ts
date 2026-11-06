@@ -129,6 +129,8 @@ export interface Job {
   documentName: string;
   document: FigmaDocument;
   options?: ExtractionOptions;
+  /** Components forced through LLM authoring even when unchanged. */
+  selectedComponents?: string[];
   targets: Framework[];
   publishers: PublisherType[];
   status: JobStatus;
@@ -155,6 +157,10 @@ export interface ComponentSnapshot {
   contentHash: string;
   spec?: FigmaComponentSpec;
   sourceCode?: string;
+  /** Set for siblings authored alongside a Figma component (e.g. StepperItem for Stepper); they have no own spec. */
+  derivedFrom?: string;
+  /** Artifact group of a derived sibling (`components` or `examples`). */
+  group?: string;
   updatedAt: string;
 }
 

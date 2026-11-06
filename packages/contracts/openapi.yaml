@@ -250,6 +250,7 @@ components:
         - compiling
         - publishing
         - succeeded
+        - partially_succeeded
         - failed
 
     TaskStatus:
@@ -542,6 +543,9 @@ components:
           type: object
           additionalProperties:
             type: string
+        aliasTo:
+          type: string
+          description: Target variable name or ID when this token is a variable alias
 
     FigmaComponentSpec:
       type: object
@@ -624,6 +628,11 @@ components:
             - download
         options:
           $ref: '#/components/schemas/ExtractionOptions'
+        selectedComponents:
+          type: array
+          items:
+            type: string
+          description: Component names forced through LLM authoring even when their Figma spec is unchanged. Other components follow the incremental rules (new/changed are authored; unchanged are compiled from their previous source and re-authored only if the quality gate fails). Unknown names are rejected with INVALID_PAYLOAD.
 
     ExtractionResponse:
       type: object
@@ -766,7 +775,7 @@ components:
           type: array
           items:
             type: string
-          description: Optional subset of component names to author (defaults to all new & changed)
+          description: Component names forced through LLM authoring even when their Figma spec is unchanged. Other components follow the incremental rules (new/changed are authored; unchanged are compiled from their previous source and re-authored only if the quality gate fails). Unknown names are rejected with INVALID_PAYLOAD.
 
     StageError:
       type: object
