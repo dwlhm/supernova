@@ -1,5 +1,33 @@
-export interface CanonicalPropDef { name: string; tsType: string; defaultValue?: any; options?: string[]; }
-export interface BlueprintNodeSummary { name: string; type: string; tailwindClasses: string[]; textContent?: string; children?: BlueprintNodeSummary[]; }
+import {
+  applyVisualTailwindClasses,
+  buildTokenIdIndex,
+  pxToSpacingToken,
+} from './blueprint-tokens.js';
+
+export { buildTokenIdIndex };
+
+export interface CanonicalPropDef {
+  name: string;
+  tsType: string;
+  defaultValue?: any;
+  options?: string[];
+}
+
+export interface BlueprintNodeSummary {
+  name: string;
+  type: string;
+  tailwindClasses: string[];
+  textContent?: string;
+  propBind?: Record<string, string>;
+  children?: BlueprintNodeSummary[];
+}
+
+export interface VariantDiffSummary {
+  rootClasses?: string[];
+  childOrder?: string[];
+  changedNodes?: Record<string, string[]>;
+}
+
 export interface ComponentBlueprint {
   componentName: string;
   baseTailwindClasses: string[];
@@ -8,103 +36,8 @@ export interface ComponentBlueprint {
   variantTailwindMap: Record<string, string[]>;
   hierarchy: BlueprintNodeSummary[];
   variantHierarchies?: Record<string, BlueprintNodeSummary[]>;
-}
-
-const SPACING_SCALE: Array<[number, string]> = [
-  [0, '0'], [2, '0.5'], [4, '1'], [6, '1.5'], [8, '2'], [10, '2.5'],
-  [12, '3'], [14, '3.5'], [16, '4'], [20, '5'], [24, '6'], [28, '7'],
-  [32, '8'], [36, '9'], [40, '10'], [48, '12'], [56, '14'], [64, '16'],
-];
-
-function pxToSpacingToken(px: number): string {
-  let best = '0', minDiff = Infinity;
-  for (const [val, token] of SPACING_SCALE) {
-    const diff = Math.abs(px - val);
-    if (diff < minDiff) { minDiff = diff; best = token; }
-  }
-  return best;
-}
-
-function radiusToTailwind(r: number): string | null {
-  if (!r || r <= 0) return null;
-  if (r <= 2) return 'rounded-sm';
-  if (r <= 4) return 'rounded';
-  if (r <= 6) return 'rounded-md';
-  if (r <= 8) return 'rounded-lg';
-  if (r <= 12) return 'rounded-xl';
-  if (r <= 16) return 'rounded-2xl';
-  return r >= 999 ? 'rounded-full' : 'rounded-lg';
-}
-
-function toCanonicalTokenSlug(rawName: string): string {
-  return rawName.replace(/^[^\w]+/, '')
-    .replace(/^(?:semantic|primitive|primitives)\/(?:colors?|radius|radii|spacing|typography|shadows?|effects?)\//i, '')
-    .replace(/^rounded-/, '').trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
-}
-
-export function buildTokenIdIndex(rawTokens?: any): Map<string, string> {
-  const map = new Map<string, string>();
-  if (!rawTokens) return map;
-  const list = Array.isArray(rawTokens)
-    ? rawTokens
-    : typeof rawTokens === 'object'
-      ? Object.entries(rawTokens).map(([k, v]: [string, any]) => ({ id: v?.id || k, name: v?.name || k, value: v?.value }))
-      : [];
-  const semByValue = new Map<string, string[]>();
-  for (const item of list) {
-    const rawName = String(item?.name || '');
-    const val = item?.value !== undefined ? String(item.value).trim() : '';
-    if (/^(?:🌱\s*)?semantic\/colors?\//i.test(rawName) && val) {
-      const slug = toCanonicalTokenSlug(rawName);
-      if (!/^(primary-on-primary|destructive-on-destructive|foreground-static-|foreground-base|background-accent|border-on-accent|utility-spacer)$/.test(slug)) {
-        const arr = semByValue.get(val) || [];
-        arr.push(slug);
-        semByValue.set(val, arr);
-      }
-    }
-  }
-  for (const item of list) {
-    const id = String(item?.id || '');
-    const rawName = String(item?.name || item?.id || '');
-    const val = item?.value !== undefined ? String(item.value).trim() : '';
-    let slug = toCanonicalTokenSlug(rawName);
-    const candidates = val && /^(?:🧩\s*components|🌍\s*primitive)/i.test(rawName) ? semByValue.get(val) : undefined;
-    if (candidates && candidates.length > 0) {
-      const lower = rawName.toLowerCase();
-      slug = candidates.find((c) => lower.includes(c.split('-')[0]!)) || candidates[0]!;
-    }
-    if (id && slug) {
-      map.set(id, slug);
-      map.set(id.startsWith('VariableID:') ? id.slice('VariableID:'.length) : `VariableID:${id}`, slug);
-    }
-    if (rawName && slug) map.set(rawName, slug);
-  }
-  return map;
-}
-
-function resolveBoundVariableSlug(bvEntry: any, fallbackEntry: any, tokenIndex?: Map<string, string>): string | undefined {
-  if (!tokenIndex) return undefined;
-  const firstId = (Array.isArray(bvEntry) ? bvEntry[0]?.id : bvEntry?.id) || fallbackEntry?.id;
-  return firstId ? tokenIndex.get(firstId) : undefined;
-}
-
-function applyVisualTailwindClasses(node: any, l: any, classes: string[], tokenIndex?: Map<string, string>): void {
-  const rad = radiusToTailwind(typeof l.cornerRadius === 'number' ? l.cornerRadius : typeof node.cornerRadius === 'number' ? node.cornerRadius : 0);
-  if (rad) classes.push(rad);
-  const hasStroke = (node.strokeWeight && node.strokeWeight > 0) ||
-    (Array.isArray(node.strokes) && node.strokes.some((s: any) => s?.visible !== false && (s?.weight ?? 1) > 0));
-  if (hasStroke && node.type !== 'VECTOR') classes.push('border');
-
-  const fillSlug = resolveBoundVariableSlug(node.boundVariables?.fills, node.fills?.[0]?.boundVariables?.color, tokenIndex);
-  if (fillSlug) classes.push(node.type === 'TEXT' ? `text-${fillSlug}` : `bg-${fillSlug}`);
-
-  const strokeSlug = resolveBoundVariableSlug(node.boundVariables?.strokes, node.strokes?.[0]?.boundVariables?.color, tokenIndex);
-  if (strokeSlug) classes.push(node.type === 'VECTOR' ? `stroke-${strokeSlug}` : `border-${strokeSlug}`);
-
-  if (Array.isArray(node.effects)) {
-    const shadow = node.effects.find((e: any) => e && e.visible !== false && e.type === 'DROP_SHADOW');
-    if (shadow) classes.push((shadow.radius ?? 0) >= 15 ? 'shadow-lg' : (shadow.radius ?? 0) >= 6 ? 'shadow-md' : 'shadow-sm');
-  }
+  variantDiffs?: Record<string, VariantDiffSummary>;
+  stateStyles?: Record<string, string[]>;
 }
 
 export function computeNodeTailwindClasses(node: any, tokenIndex?: Map<string, string>): string[] {
@@ -168,7 +101,13 @@ export function extractCanonicalProps(rawProps: Record<string, any>): CanonicalP
     if (!name || seen.has(name) || CANVAS_MOCKUP_PROP_RE.test(name)) continue;
 
     if (propType === 'VARIANT' && Array.isArray(def?.variantOptions)) {
-      const nonVisualOptions = def.variantOptions.map((o: any) => String(o).trim()).filter((o: string) => !VISUAL_STATE_VALUES.has(o.toLowerCase()));
+      const nonVisualOptions: string[] = Array.from(
+        new Set<string>(
+          def.variantOptions
+            .map((o: any) => String(o).trim().toLowerCase().replace(/\s+/g, '-'))
+            .filter((o: string) => Boolean(o) && !VISUAL_STATE_VALUES.has(o))
+        )
+      );
       if (VISUAL_STATE_NAMES.has(name.toLowerCase()) && nonVisualOptions.length <= 1) continue;
       if (nonVisualOptions.length > 10 && nonVisualOptions.some((o: string) => o.toLowerCase() === 'slot')) {
         if (!seen.has('children')) { seen.add('children'); result.push({ name: 'children', tsType: 'any' }); }
@@ -189,15 +128,92 @@ export function extractCanonicalProps(rawProps: Record<string, any>): CanonicalP
   return result;
 }
 
+function extractPropBind(refs: any): Record<string, string> | undefined {
+  if (!refs || typeof refs !== 'object') return undefined;
+  const out: Record<string, string> = {};
+  for (const [k, v] of Object.entries(refs)) {
+    if (typeof v === 'string') {
+      const propName = toCamelPropName(v);
+      if (propName && !CANVAS_MOCKUP_PROP_RE.test(propName)) out[k] = propName;
+    }
+  }
+  return Object.keys(out).length > 0 ? out : undefined;
+}
+
 function buildHierarchy(children: any[], tokenIndex: Map<string, string>, maxDepth = 5, depth = 0): BlueprintNodeSummary[] {
   if (!Array.isArray(children) || depth >= maxDepth) return [];
   return children.filter((c: any) => c && c.visible !== false).slice(0, 25).map((c: any) => {
     const nodeSummary: BlueprintNodeSummary = { name: c.name || 'Node', type: c.type || 'FRAME', tailwindClasses: computeNodeTailwindClasses(c, tokenIndex) };
     const rawText = typeof c.characters === 'string' ? c.characters : c.typography?.characters;
     if (typeof rawText === 'string' && rawText.trim()) nodeSummary.textContent = rawText.trim();
+    const propBind = extractPropBind(c.componentPropertyReferences);
+    if (propBind) nodeSummary.propBind = propBind;
     if (Array.isArray(c.children) && c.children.length > 0) nodeSummary.children = buildHierarchy(c.children, tokenIndex, maxDepth, depth + 1);
     return nodeSummary;
   });
+}
+
+function flattenHierarchyMap(nodes: BlueprintNodeSummary[], prefix = '', out: Record<string, string[]> = {}, orders: string[] = []): { map: Record<string, string[]>; orders: string[] } {
+  if (nodes.length > 1) {
+    orders.push(`${prefix || 'root'}: [${nodes.map((n) => n.name).join(', ')}]`);
+  }
+  for (const n of nodes) {
+    const path = prefix ? `${prefix} > ${n.name}` : n.name;
+    if (n.tailwindClasses.length > 0) out[path] = n.tailwindClasses;
+    if (n.children && n.children.length > 0) flattenHierarchyMap(n.children, path, out, orders);
+  }
+  return { map: out, orders };
+}
+
+function normalizeStatePath(path: string): string {
+  return path.replace(/\b(Step|Connector|Column|Row|Item|Tab|Cell|Dot|Slide)\s+\d+\b/gi, '$1');
+}
+
+function buildMultiVariantSynthesis(
+  variants: any[],
+  defaultTarget: any,
+  baseHierarchy: BlueprintNodeSummary[],
+  tokenIndex: Map<string, string>
+): { variantDiffs: Record<string, VariantDiffSummary>; stateStyles: Record<string, string[]> } {
+  const baseFlat = flattenHierarchyMap(baseHierarchy);
+  const variantDiffs: Record<string, VariantDiffSummary> = {};
+  const stateStyles: Record<string, string[]> = {};
+
+  for (const [rawPath, cls] of Object.entries(baseFlat.map)) {
+    const path = normalizeStatePath(rawPath);
+    if (/\b(completed|active|upcoming|selected|disabled|error|destructive|checked|unchecked|indeterminate|vector|indicator|connector|line)\b/i.test(path)) {
+      stateStyles[path] = cls;
+    }
+  }
+
+  for (const v of variants) {
+    if (!v?.name || v === defaultTarget || !Array.isArray(v.children)) continue;
+    if (/\b(?:state|interaction)\s*=\s*(?:hover|hovered|focus|focused|pressed|active)\b/i.test(v.name)) continue;
+    const h = buildHierarchy(v.children, tokenIndex, 4);
+    const flat = flattenHierarchyMap(h);
+    const changedNodes: Record<string, string[]> = {};
+    for (const [rawPath, cls] of Object.entries(flat.map)) {
+      const path = normalizeStatePath(rawPath);
+      const prev = baseFlat.map[rawPath] || stateStyles[path];
+      if (!prev || prev.join(' ') !== cls.join(' ')) {
+        changedNodes[path] = cls;
+      }
+      if (/\b(completed|active|upcoming|selected|disabled|error|destructive|checked|unchecked|indeterminate|vector|indicator|connector|line)\b/i.test(path)) {
+        const key = stateStyles[path] && stateStyles[path]!.join(' ') !== cls.join(' ') ? `${path} (${v.name})` : path;
+        if (!Object.values(stateStyles).some((existing) => existing.join(' ') === cls.join(' ')) || !stateStyles[path]) {
+          stateStyles[key] = cls;
+        }
+      }
+    }
+    const orderDiffs = flat.orders.filter((o) => !baseFlat.orders.includes(o));
+    if (Object.keys(changedNodes).length > 0 || orderDiffs.length > 0) {
+      variantDiffs[v.name] = {
+        ...(orderDiffs.length > 0 ? { childOrder: orderDiffs } : {}),
+        ...(Object.keys(changedNodes).length > 0 ? { changedNodes } : {}),
+      };
+    }
+  }
+  return { variantDiffs, stateStyles };
 }
 
 function collectComposedInstances(node: any, out = new Set<string>()): string[] {
@@ -233,6 +249,8 @@ export function buildComponentBlueprint(componentName: string, spec: any, rawTok
     }
   }
   const composedComponents = collectComposedInstances(rootNode);
+  const hierarchy = buildHierarchy(defaultTarget?.children || [], tokenIndex);
+  const { variantDiffs, stateStyles } = buildMultiVariantSynthesis(variants, defaultTarget, hierarchy, tokenIndex);
 
   return {
     componentName,
@@ -240,7 +258,9 @@ export function buildComponentBlueprint(componentName: string, spec: any, rawTok
     canonicalProps: extractCanonicalProps(rawProps),
     ...(composedComponents.length > 0 ? { composedComponents } : {}),
     variantTailwindMap,
-    hierarchy: buildHierarchy(defaultTarget?.children || [], tokenIndex),
+    hierarchy,
     ...(Object.keys(variantHierarchies).length > 0 ? { variantHierarchies } : {}),
+    ...(Object.keys(variantDiffs).length > 0 ? { variantDiffs } : {}),
+    ...(Object.keys(stateStyles).length > 0 ? { stateStyles } : {}),
   };
 }
