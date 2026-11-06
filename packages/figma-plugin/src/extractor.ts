@@ -92,12 +92,17 @@ export function formatVariableToken(
 ): FigmaToken {
   const modeKeys = Object.keys(variable.valuesByMode || {});
   let rawValue = modeKeys.length > 0 ? variable.valuesByMode[modeKeys[0]!] : null;
+  let aliasTo: string | undefined = undefined;
 
-  if (tokensOrMap && rawValue && typeof rawValue === 'object' && rawValue.type === 'VARIABLE_ALIAS') {
-    const map = tokensOrMap instanceof Map ? tokensOrMap : new Map(tokensOrMap.map((t) => [t.id, t]));
-    const target = map.get(rawValue.id);
-    if (target) {
-      rawValue = target.value;
+  if (rawValue && typeof rawValue === 'object' && rawValue.type === 'VARIABLE_ALIAS') {
+    aliasTo = rawValue.id;
+    if (tokensOrMap) {
+      const map = tokensOrMap instanceof Map ? tokensOrMap : new Map(tokensOrMap.map((t) => [t.id, t]));
+      const target = map.get(rawValue.id);
+      if (target) {
+        aliasTo = target.name || target.id;
+        rawValue = target.value;
+      }
     }
   }
 
@@ -112,6 +117,7 @@ export function formatVariableToken(
     scopes: variable.scopes || undefined,
     valuesByMode: variable.valuesByMode || undefined,
     modes: modesMap || undefined,
+    ...(aliasTo ? { aliasTo } : {}),
   };
 }
 
@@ -170,6 +176,23 @@ export function resolveVariableAliases(tokens: FigmaToken[]): FigmaToken[] {
     return val;
   }
 
+  function resolveAliasTargetName(val: any): string | undefined {
+    const seen = new Set<string>();
+    let curr = val;
+    let semanticName: string | undefined;
+    let firstTargetName: string | undefined;
+    while (isAlias(curr) && !seen.has(curr.id)) {
+      seen.add(curr.id);
+      const target = tokenMap.get(curr.id);
+      if (!target) break;
+      const tName = target.name || target.id;
+      if (!firstTargetName) firstTargetName = tName;
+      if (/^(?:🌱\s*)?semantic\//i.test(tName)) semanticName = tName;
+      curr = target.value;
+    }
+    return semanticName || firstTargetName;
+  }
+
   return tokens.map((token) => {
     const visited = new Set<string>();
     if (token.id) {
@@ -180,6 +203,10 @@ export function resolveVariableAliases(tokens: FigmaToken[]): FigmaToken[] {
         visited.add(`VariableID:${token.id}`);
       }
     }
+
+    const modeValues = token.valuesByMode ? Object.values(token.valuesByMode) : [];
+    const rawAliasSource = isAlias(token.value) ? token.value : modeValues.find((v) => isAlias(v));
+    const aliasTo = (token as any).aliasTo || (rawAliasSource ? resolveAliasTargetName(rawAliasSource) : undefined);
 
     let resolvedVal = resolveVal(token.value, visited);
     if (isColorObject(resolvedVal)) {
@@ -205,6 +232,7 @@ export function resolveVariableAliases(tokens: FigmaToken[]): FigmaToken[] {
       ...token,
       value: resolvedVal,
       valuesByMode: resolvedValuesByMode || token.valuesByMode,
+      ...(aliasTo ? { aliasTo } : {}),
     };
   });
 }
@@ -276,7 +304,14 @@ export function serializeEffect(effect: any): FigmaEffect {
  * Formats a component node into FigmaComponentSpec.
  */
 export function formatComponentSpec(
-  node: { id: string; name: string; key?: string; description?: string; parent?: { name?: string; type?: string } },
+  node: {
+    id: string;
+    name: string;
+    key?: string;
+    description?: string;
+    componentPropertyDefinitions?: Record<string, any>;
+    parent?: { name?: string; type?: string };
+  },
   serializedNodeData: FigmaSceneNode,
   pageName?: string
 ): FigmaComponentSpec {
@@ -286,6 +321,9 @@ export function formatComponentSpec(
     node: serializedNodeData,
   };
 
+  if (node.componentPropertyDefinitions && Object.keys(node.componentPropertyDefinitions).length > 0) {
+    spec.properties = { ...node.componentPropertyDefinitions };
+  }
   if (pageName) {
     spec.pageName = pageName;
   }

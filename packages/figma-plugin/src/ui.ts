@@ -577,9 +577,12 @@ async function handleJobEvent(
     statusBadge.className = 'status-badge badge-running';
     statusMessage.textContent = `Job status: ${ev.status}`;
   } else if (ev.eventType === 'job_completed') {
-    statusBadge.textContent = 'succeeded';
+    const partial = ev.status === 'partially_succeeded';
+    statusBadge.textContent = ev.status || 'succeeded';
     statusBadge.className = 'status-badge badge-succeeded';
-    statusMessage.textContent = 'PR Published Successfully!';
+    statusMessage.textContent = partial
+      ? `PR published with failures (${ev.error || 'some components failed'})`
+      : 'PR Published Successfully!';
     applyPlanBtn.disabled = false;
     applyPlanBtn.textContent = 'Create / Update PR ↗';
     await fetchFinalJobStatus(backendUrl, jobId, apiToken);
@@ -627,7 +630,7 @@ async function fetchFinalJobStatus(backendUrl: string, jobId: string, apiToken?:
     if (!res.ok) return;
 
     const job: JobResponse = await res.json();
-    if (job.status === 'succeeded' && job.publishResults?.pullRequestUrl) {
+    if ((job.status === 'succeeded' || job.status === 'partially_succeeded') && job.publishResults?.pullRequestUrl) {
       actionArea.innerHTML = '';
       actionArea.style.display = 'flex';
 

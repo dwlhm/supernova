@@ -141,17 +141,23 @@ describe('Figma Extractor Utilities', () => {
     assert.deepEqual(spec.node, { width: 100, height: 32 });
   });
 
-  test('formatComponentSpec attaches pageName when supplied', () => {
+  test('formatComponentSpec attaches pageName and standalone componentPropertyDefinitions when supplied', () => {
     const spec = formatComponentSpec(
       {
-        id: 'comp-btn-small',
-        name: 'Size=Small, Variant=Primary',
+        id: 'comp-alert-dialog',
+        name: 'Alert dialog',
+        componentPropertyDefinitions: {
+          'Show description#1:0': { type: 'BOOLEAN', defaultValue: true },
+        },
       },
-      { width: 100, height: 32 },
+      { width: 512, height: 177 },
       'Components Page'
     );
 
     assert.equal(spec.pageName, 'Components Page');
+    assert.deepEqual(spec.properties, {
+      'Show description#1:0': { type: 'BOOLEAN', defaultValue: true },
+    });
   });
 
   test('serializeEffect extracts shadow effect parameters', () => {
@@ -298,8 +304,10 @@ describe('Figma Extractor Utilities', () => {
     assert.equal(resolved[0].value, 'rgb(26, 128, 255)');
     // Direct alias resolved to base color
     assert.equal(resolved[1].value, 'rgb(26, 128, 255)');
-    // Chained alias resolved to base color
+    assert.equal(resolved[1].aliasTo, 'base/blue');
+    // Chained alias resolved to base color and preserves semantic aliasTo
     assert.equal(resolved[2].value, 'rgb(26, 128, 255)');
+    assert.equal(resolved[2].aliasTo, 'semantic/primary');
     // Cycle handled safely without infinite loop
     assert.ok(resolved[3].value !== undefined);
     assert.ok(resolved[4].value !== undefined);
