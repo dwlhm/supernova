@@ -1,0 +1,3 @@
+import{b as e,a as s}from"./utils.BBpd638g.js";const t={name:"table",props:{className:{default:""},caption:{default:"Data table"}},computed:{props(){return this}},data(){return{cn:s,bindControllerProps:e}}};var o=function(){var a=this,r=a._self._c;return r("div",{class:a.cn("w-full overflow-x-auto rounded-lg border border-border-default bg-background-default",a.className),attrs:{"data-ctrl":typeof a.bindControllerProps}},[r("table",{staticClass:"w-full border-collapse"},[a.caption?[r("caption",{staticClass:"sr-only"},[a._v(`
+        `+a._s(a.caption)+`
+      `)])]:a._e(),a._v(" "),a._t("default")],2)])},l=[];t.render=o;t.staticRenderFns=l;export{t as default};

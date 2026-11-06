@@ -1,0 +1,1 @@
+import{j as o}from"./jsx-runtime.BjG_zV1W.js";import{r as s}from"./index.DEG99W5Y.js";import{b as e,a as l}from"./utils.BBpd638g.js";function b(t){t={className:"",...t};const[r,a]=s.useState({});return t=e(t,r,a),o.jsx("tr",{"data-ctrl":typeof e,className:l("border-b border-border-default bg-background-subtle",t.className),children:t.children})}export{b as default};
