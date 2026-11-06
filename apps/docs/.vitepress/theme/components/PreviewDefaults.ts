@@ -1,4 +1,13 @@
-import { componentRegistry, type ComponentLoader } from '../preview/registry';
+import { componentExamples, componentRegistry, type ComponentLoader, type PreviewFramework } from '../preview/registry';
+
+/** Frameworks offered by every preview surface (tabs, usage snippets, showcase switcher). */
+export const PREVIEW_FRAMEWORKS: ReadonlyArray<{ id: PreviewFramework; label: string }> = [
+  { id: 'react', label: 'React' },
+  { id: 'vue3', label: 'Vue 3' },
+  { id: 'svelte', label: 'Svelte' },
+  { id: 'vue2', label: 'Vue 2' },
+  { id: 'angular', label: 'Angular' },
+];
 
 const SAMPLE_CHART_POINTS = [
   { label: 'Mon', value: 34, values: [34, 45] },
@@ -13,10 +22,14 @@ const SAMPLE_CHART_POINTS = [
 const SAMPLE_IMAGE_URI =
   "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='96' height='96' viewBox='0 0 96 96'><rect width='96' height='96' rx='16' fill='%232563eb'/><circle cx='48' cy='38' r='16' fill='%23ffffff' fill-opacity='0.9'/><path d='M22 80c4-14 15-22 26-22s22 8 26 22' fill='%23ffffff' fill-opacity='0.9'/></svg>";
 
+/**
+ * Prop fixtures for prop-driven previews; `children` (string) is rendered as text content in every framework.
+ * Compound components have no entry here: they preview their compiled `<Name>Example` instead.
+ */
 export const DEFAULT_PROPS_BY_COMPONENT: Record<string, Record<string, any>> = {
-  Button: { label: 'Click Me', variant: 'primary', size: 'regular', roundness: 'default', showLabel: true, showLeftIcon: true },
-  FAB: { label: 'New Action', variant: 'primary', size: 'regular', showLabel: true },
-  Badge: { label: 'Active', variant: 'primary' },
+  Button: { children: 'Click Me', variant: 'primary', size: 'regular', roundness: 'default', showLeftIcon: true },
+  FAB: { children: 'New Action', variant: 'primary', size: 'extended' },
+  Badge: { children: 'Active', variant: 'primary' },
   Avatar: { initialsText: 'KM', src: SAMPLE_IMAGE_URI, type: 'initials', size: 'regular', showStatus: true, status: 'online' },
   InputText: { label: 'Email Address', placeholder: 'name@komerce.id', showLabel: true, showHint: true, showLeftIcon: true },
   InputTextArea: { label: 'Notes', placeholder: 'Enter description or comments...', showLabel: true, showHint: true, showCharacterCount: true, maxLength: 200 },
@@ -37,28 +50,12 @@ export const DEFAULT_PROPS_BY_COMPONENT: Record<string, Record<string, any>> = {
   Checkbox: { label: 'I agree to the terms and privacy policy', rightLabel: true, checked: true },
   RadioButton: { label: 'Fast Express Delivery (1-2 days)', rightLabel: true, checked: true },
   SwitchButton: { label: 'Enable email notifications', rightLabel: true, checked: true },
-  Toggle: { label: 'Auto-sync', pressed: true, showText: true, size: 'medium' },
-  ToggleGroup: {
-    label: 'View Mode', showLabel: true, size: 'medium',
-    items: [
-      { id: 'email', label: 'Email notifications', checked: true },
-      { id: 'sms', label: 'SMS alerts', checked: false },
-      { id: 'push', label: 'Push notifications', checked: true },
-    ],
-  },
+  Toggle: { children: 'Auto-sync', pressed: true, showText: true, size: 'medium' },
   Slider: { value: 65, min: 0, max: 100, step: 1, label: 'Volume', showValue: true },
   DatePicker: { label: 'Select Date', placeholder: 'Choose a date', month: 10, year: 2026, value: 26, displayValue: 'Oct 26, 2026', open: false, showLabel: true },
   Progressbar: { value: 72, label: 'Syncing assets', showLabel: true },
   Spinner: { size: '24', label: 'Loading...' },
   MetricCard: { label: 'Total Revenue', value: 'Rp 148.500.000', showValue: true, showTrend: true, trendDirection: 'up', trendText: '+18.4%', descriptionText: 'vs last month', showDescription: true, showIcon: true, showStatus: true, statusLabel: 'On track', statusVariant: 'success', progress: 68 },
-  Chart: {
-    type: 'bar', title: 'Revenue Overview', description: 'Weekly revenue breakdown by day', showTitle: true, showDescription: true, showLegend: true,
-    data: SAMPLE_CHART_POINTS,
-    legend: [
-      { label: 'Current Period', colorClass: 'bg-chart-series-1' },
-      { label: 'Target Goal', colorClass: 'bg-chart-series-2' },
-    ],
-  },
   ChartBar: { data: SAMPLE_CHART_POINTS, showGridLines: true, showDataLabels: true, showAxisLabels: true, ariaLabel: 'Weekly Bar Chart' },
   ChartLine: { data: SAMPLE_CHART_POINTS, area: true, showGridLines: true, showDataLabels: false, showAxisLabels: true, ariaLabel: 'Revenue Trend Line Chart' },
   ChartPie: {
@@ -68,58 +65,22 @@ export const DEFAULT_PROPS_BY_COMPONENT: Record<string, Record<string, any>> = {
   ChartLegend: {
     items: [{ label: 'Revenue', colorClass: 'bg-chart-series-1' }, { label: 'Orders', colorClass: 'bg-chart-series-2' }, { label: 'Returns', colorClass: 'bg-chart-series-3' }],
   },
-  Breadcrumb: {
-    type: 'deep', showEllipsis: true, maxItems: 4,
-    items: [{ label: 'Home', href: '#home' }, { label: 'Orders', href: '#orders' }, { label: 'Shipments', href: '#shipments' }, { label: 'Tracking Details', href: '#details' }],
-  },
   AlertDialog: { open: true, inline: true, heading: 'Are you absolutely sure?', description: 'This action cannot be undone. This will permanently delete your account and remove your data from our servers.', showDescription: true, showCloseButton: true, cancelLabel: 'Cancel', confirmLabel: 'Continue', destructive: false },
   Toast: { type: 'success', title: 'Changes Saved', description: 'Your configuration was successfully updated.', showDescription: true, showAction: true, actionText: 'Undo', showClose: true, timestamp: 'Just now', showTimestamp: true },
-  Tooltip: { text: 'Helpful guidance or contextual tip', position: 'top' },
+  Tooltip: { children: 'Hover me', text: 'Label', position: 'top' },
   Pagination: { currentPage: 2, totalPages: 10, previousLabel: 'Previous', nextLabel: 'Next' },
-  TabItem: { label: 'General', active: true, showIcon: true, showNum: true, num: '4' },
-  Tabs: {
-    activeTab: 'overview',
-    tabs: [{ id: 'overview', label: 'Overview', num: '12' }, { id: 'orders', label: 'Orders', num: '4' }, { id: 'settings', label: 'Settings' }],
-  },
+  TabItem: { children: 'General', active: true, showIcon: true, showNum: true, num: '4' },
   BubbleChat: { direction: 'incoming', type: 'text', messageState: 'default', text: 'Hello! How can we assist your integration today?', showTime: true, showStatus: true, timeText: '10:24 AM', statusText: 'Delivered' },
-  Table: {
-    state: 'default', caption: 'Customer Transactions', showCheckbox: false, showNo: false,
-    showPagination: true, currentPage: 2, totalPages: 10, pageSize: 10,
-    columns: [
-      { id: 'name', label: 'Name', align: 'left' },
-      { id: 'status', label: 'Status', align: 'left' },
-      { id: 'amount', label: 'Amount', align: 'left' },
-      { id: 'actions', label: 'Actions', align: 'left' },
-      { id: 'date', label: 'Date', align: 'left' },
-    ],
-    rows: [
-      { id: '1', cells: [{ value: 'John Doe', imageSrc: 'placeholder' }, { badgeLabel: 'Badge' }, '$1,200', { buttonLabel: 'Label' }, '2024-01-15'], selected: false },
-      { id: '2', cells: [{ value: 'Jane Smith', imageSrc: 'placeholder' }, { badgeLabel: 'Badge' }, '$850', { buttonLabel: 'Label' }, '2024-02-20'], selected: false },
-      { id: '3', cells: [{ value: 'Bob Johnson', imageSrc: 'placeholder' }, { badgeLabel: 'Badge' }, '$2,400', { buttonLabel: 'Label' }, '2024-03-10'], selected: false },
-      { id: '4', cells: [{ value: 'Alice Brown', imageSrc: 'placeholder' }, { badgeLabel: 'Badge' }, '$0', { buttonLabel: 'Label' }, '2024-04-05'], selected: false },
-      { id: '5', cells: [{ value: 'Charlie Lee', imageSrc: 'placeholder' }, { badgeLabel: 'Badge' }, '$3,100', { buttonLabel: 'Label' }, '2024-05-18'], selected: false },
-      { id: '7', cells: [{ value: 'Evan Park', imageSrc: 'placeholder' }, { badgeLabel: 'Badge' }, '$1,750', { buttonLabel: 'Label' }, '2024-07-12'], selected: false },
-      { id: '8', cells: [{ value: 'Fiona Chen', imageSrc: 'placeholder' }, { badgeLabel: 'Badge' }, '$4,200', { buttonLabel: 'Label' }, '2024-08-03'], selected: false },
-      { id: '9', cells: [{ value: 'George Kim', imageSrc: 'placeholder' }, { badgeLabel: 'Badge' }, '$600', { buttonLabel: 'Label' }, '2024-09-22'], selected: false },
-      { id: '10', cells: [{ value: 'Hannah Liu', imageSrc: 'placeholder' }, { badgeLabel: 'Badge' }, '$2,800', { buttonLabel: 'Label' }, '2024-10-14'], selected: false },
-    ],
-  },
-  TableHeaderRow: {
-    showCheckbox: true, showNo: true,
-    columns: [{ id: 'id', label: 'Order ID' }, { id: 'customer', label: 'Customer' }, { id: 'status', label: 'Status' }, { id: 'total', label: 'Total', align: 'right' }],
-  },
-  TableBodyRow: { rowId: 'row-1', no: 1, showNo: true, showCheckbox: true, cells: ['ORD-9021', 'Budi Santoso', 'Delivered', 'Rp 245.000'] },
-  TableBodyCell: { value: 'ORD-9021', secondaryValue: 'Express Shipping', badgeLabel: 'Paid' },
-  TableCellValue: { value: 'ORD-9021', secondaryValue: 'Express Shipping', badgeLabel: 'Paid' },
+  TableBodyCell: { children: 'ORD-9021' },
+  TableCellValue: { children: 'ORD-9021' },
   TableCheckboxHeaderCell: { checked: true, indeterminate: false },
   TableCheckboxBodyCell: { checked: true, rowId: 'row-1' },
   TableNoHeaderCell: { label: 'No.' },
   TableNoBodyCell: { no: 1 },
   Sidebar: { expanded: true, brand: 'Komerce', accountLabel: 'Lionel Messi', accountMeta: 'messi@gmail.com', accountInitials: 'LM', brandInitials: 'K', className: 'min-h-[260px] rounded-xl border border-border-default' },
   Topbar: { showSearch: true, searchPlaceholder: 'Search components...', showSidebarToggle: true },
-  MainMenu: { label: 'Dashboard', active: true, showLabel: true, showLeadingIcon: true, showTrailingIcon: true, showBadge: true, badgeLabel: 'New' },
+  MainMenu: { children: 'Dashboard', active: true, showLabel: true, showLeadingIcon: true, showTrailingIcon: true, showBadge: true, badgeLabel: 'New' },
   MenuItem: { label: 'Settings', active: false, showLabel: true, showLeadingIcon: true },
-  Stepper: { orientation: 'horizontal', current: 2, steps: ['Cart', 'Shipping', 'Payment', 'Review'] },
   IconPlaceholder: { size: 32 },
   IconTruckDelivery: { size: 36 },
   TablerTruckDelivery: { size: 36 },
@@ -198,6 +159,11 @@ export function getComponentLoader(name: string): ComponentLoader | undefined {
     }
   }
   return undefined;
+}
+
+/** Compiled `<Name>Example` for compound components; it composes children, so it takes no props. */
+export function getExampleLoader(name: string): ComponentLoader | undefined {
+  return componentExamples[normalizeRegistryComponentName(name)];
 }
 
 export interface VariantOptionGroup {

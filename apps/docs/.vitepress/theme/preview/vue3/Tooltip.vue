@@ -1,7 +1,11 @@
 <template>
   <span
     :data-ctrl="typeof bindControllerProps"
-    :aria-describedby="id"
+    :aria-describedby="
+      createTooltipState({
+        id: id,
+      }).getTriggerProps()['aria-describedby']
+    "
     :class="
       cn('group relative inline-flex items-center justify-center', className)
     "
@@ -10,47 +14,48 @@
       <slot />
     </template>
 
-    <template v-if="!$slots.default">
-      <button
-        type="button"
-        class="inline-flex h-8 items-center justify-center rounded-lg border border-border-default bg-background-subtle px-3 text-xs font-medium text-foreground-default"
-        :aria-describedby="id"
-      >
-        Hover target
-      </button>
-    </template>
-
     <span
-      role="tooltip"
-      :id="id"
+      :role="
+        createTooltipState({
+          id: id,
+        }).getContentProps().role
+      "
+      :id="
+        createTooltipState({
+          id: id,
+        }).getContentProps().id
+      "
       :class="
         cn(
-          'pointer-events-none absolute z-50 max-w-xs whitespace-nowrap rounded-md bg-foreground-default px-3 py-2 text-sm font-normal text-background-default shadow-md transition-opacity',
-          $slots.default
-            ? 'invisible opacity-0 group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100'
-            : 'visible opacity-100',
+          'pointer-events-none z-50 inline-flex items-center justify-center gap-0.5 whitespace-nowrap transition-opacity',
           cva(
             position,
             {
-              bottom: 'left-1/2 top-full mt-2 -translate-x-1/2',
-              left: 'right-full top-1/2 mr-2 -translate-y-1/2',
-              right: 'left-full top-1/2 ml-2 -translate-y-1/2',
-              top: 'bottom-full left-1/2 mb-2 -translate-x-1/2',
+              top: 'flex-col',
+              bottom: 'flex-col-reverse',
+              left: 'flex-row',
+              right: 'flex-row-reverse',
             },
             'top'
           )
         )
       "
-      >{{ text }}</span
-    ></span
-  >
+      ><span
+        class="inline-flex items-center justify-center rounded-lg bg-primary-default px-3 py-2 font-body text-sm font-normal leading-5 text-primary-foreground"
+        >{{ textContent || text }}</span
+      ><span
+        aria-hidden="true"
+        class="h-1.5 w-1.5 shrink-0 rounded-full bg-primary-default"
+      ></span></span
+  ></span>
 </template>
 
 <script setup lang="ts">
-import { cn, cva, bindControllerProps } from "./utils";
+import { cn, cva, createTooltipState, bindControllerProps } from "./utils";
 
 export interface TooltipProps {
   text?: string;
+  textContent?: string;
   position?: "top" | "bottom" | "left" | "right";
   id?: string;
   className?: string;
@@ -61,7 +66,8 @@ const props = withDefaults(defineProps<TooltipProps>(), {
   className: "",
 
   position: "top",
-  text: "Label",
+  textContent: "",
+  text: "",
 });
 defineSlots<{ default?: () => any }>();
 </script>

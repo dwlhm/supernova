@@ -2,6 +2,9 @@
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import fs from 'node:fs/promises';
+import { FRAMEWORKS, compileExamples } from './examples.mjs';
+import { buildAngularPreview, buildVue2Preview } from './framework-builds.mjs';
+import { renderRegistry } from './registry.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -46,9 +49,13 @@ async function resolveDsRepoRoot() {
 const targetPreviewDir = path.resolve(docsRoot, '.vitepress/theme/preview');
 const targetVue3Dir = path.resolve(targetPreviewDir, 'vue3');
 const targetReactDir = path.resolve(targetPreviewDir, 'react');
+const targetVue2Dir = path.resolve(targetPreviewDir, 'vue2');
+const targetAngularDir = path.resolve(targetPreviewDir, 'angular');
+const angularWorkDir = path.resolve(docsRoot, '.vitepress/cache/angular-build');
 const targetSvelteDir = path.resolve(targetPreviewDir, 'svelte');
 const targetUtilsFile = path.resolve(targetPreviewDir, 'utils.ts');
 const targetRegistryFile = path.resolve(targetPreviewDir, 'registry.ts');
+const targetExampleUsageFile = path.resolve(targetPreviewDir, 'example-usage.ts');
 const targetTokensDir = path.resolve(docsRoot, '.vitepress/theme/tokens');
 
 async function loadCompiler() {
@@ -93,7 +100,12 @@ async function collectFromRoot(rootDir) {
       };
     });
 
-  return [...componentFiles, ...iconFiles];
+  const examplesSrcDir = path.resolve(rootDir, 'src/examples');
+  const exampleFiles = (await readDirSafe(examplesSrcDir))
+    .filter((f) => f.endsWith('.lite.tsx'))
+    .map((f) => ({ name: f.replace(/\.lite\.tsx$/, ''), group: 'examples', filePath: path.join(examplesSrcDir, f) }));
+
+  return [...componentFiles, ...iconFiles, ...exampleFiles];
 }
 
 async function getLiteComponentFiles(dsRepoRoot) {
@@ -262,6 +274,32 @@ async function syncGeneratedDocs(dsRepoRoot) {
   }
 }
 
+const PREVIEW_DIR_BY_TARGET = { vue3: targetVue3Dir, react: targetReactDir, svelte: targetSvelteDir };
+/** Vue 2 SFCs and Angular sources need a second build step, so they are collected by component name. */
+const pendingBuilds = { vue2: new Map(), angular: new Map() };
+
+async function writePreviewArtifact(artifact) {
+  const pending = pendingBuilds[artifact.target];
+  if (pending) {
+    pending.set(artifact.fileName.replace(/\.(vue|ts)$/, ''), artifact.code);
+    return;
+  }
+  const destDir = PREVIEW_DIR_BY_TARGET[artifact.target];
+  if (destDir) await fs.writeFile(path.join(destDir, artifact.fileName), artifact.code, 'utf-8');
+}
+
+/** Builds the Vue 2 and Angular preview modules; returns built file names and diagnostics per framework. */
+async function buildSecondaryFrameworks(utilsSource) {
+  const vue2 = await buildVue2Preview(pendingBuilds.vue2, targetVue2Dir);
+  const angular = await buildAngularPreview(pendingBuilds.angular, { workDir: angularWorkDir, outDir: targetAngularDir, utilsSource });
+  const errors = {};
+  for (const [fw, result] of Object.entries({ vue2, angular })) {
+    for (const [name, message] of Object.entries(result.errors)) (errors[name] ||= {})[fw] = message;
+  }
+  console.log(`[compile-docs-components] Built ${vue2.built.size} Vue 2 and ${angular.built.size} Angular preview modules (${Object.keys(errors).length} with diagnostics).`);
+  return { built: { vue2: vue2.built, angular: angular.built }, errors };
+}
+
 async function main() {
   const dsRepoRoot = await resolveDsRepoRoot();
   console.log(`[compile-docs-components] Using design system source root: ${dsRepoRoot}`);
@@ -283,13 +321,15 @@ async function main() {
   await fs.mkdir(targetTokensDir, { recursive: true });
 
   // Read all .lite.tsx components (baseline + overlay)
-  const componentEntries = await getLiteComponentFiles(dsRepoRoot);
+  const allEntries = await getLiteComponentFiles(dsRepoRoot);
+  const componentEntries = allEntries.filter((e) => e.group !== 'examples');
+  const exampleEntries = allEntries.filter((e) => e.group === 'examples');
   console.log(`[compile-docs-components] Found ${componentEntries.length} component files.`);
 
   // Sort component names alphabetically
   componentEntries.sort((a, b) => a.name.localeCompare(b.name));
 
-  const targets = ['vue3', 'react', 'svelte'];
+  const targets = FRAMEWORKS;
   const sourceByName = {};
 
   for (const { name, filePath } of componentEntries) {
@@ -301,6 +341,8 @@ async function main() {
       source,
       targets,
       normalize: true,
+      // Docs only renders sources; authoring quality is gated by the author pipeline.
+      checks: { lint: false },
     });
 
     if (!result.success) {
@@ -308,27 +350,29 @@ async function main() {
       throw new Error(`Failed to compile ${name}: ${errMsgs}`);
     }
 
-    for (const artifact of result.artifacts) {
-      let destDir;
-      if (artifact.target === 'vue3') {
-        destDir = targetVue3Dir;
-      } else if (artifact.target === 'react') {
-        destDir = targetReactDir;
-      } else if (artifact.target === 'svelte') {
-        destDir = targetSvelteDir;
-      } else {
-        continue;
-      }
-
-      await fs.writeFile(path.join(destDir, artifact.fileName), artifact.code, 'utf-8');
-    }
+    for (const artifact of result.artifacts) await writePreviewArtifact(artifact);
   }
 
-  console.log(`[compile-docs-components] Compiled ${componentEntries.length} components into vue3, react, svelte.`);
+  const examples = await compileExamples({
+    compileMitosis,
+    entries: exampleEntries,
+    componentNames: new Set(componentEntries.map((e) => e.name)),
+    readSource: (filePath) => fs.readFile(filePath, 'utf-8'),
+    writeArtifact: writePreviewArtifact,
+  });
+  await fs.writeFile(
+    targetExampleUsageFile,
+    `// Auto-generated usage snippets compiled from src/examples/*Example.lite.tsx\nexport const exampleUsage: Record<string, Record<string, string>> = ${JSON.stringify(examples.usage, null, 2)};\n`,
+    'utf-8'
+  );
+  console.log(`[compile-docs-components] Compiled ${examples.parents.length} composition examples.`);
+
+  console.log(`[compile-docs-components] Compiled ${componentEntries.length} components into ${FRAMEWORKS.join(', ')}.`);
 
   // Write canonical utils.ts
   const utilsContent = getUtilsSource ? getUtilsSource() : await fs.readFile(utilsSrcFile, 'utf-8');
   await fs.writeFile(targetUtilsFile, utilsContent, 'utf-8');
+  const secondary = await buildSecondaryFrameworks(utilsContent);
   console.log('[compile-docs-components] Wrote canonical utils.ts into .vitepress/theme/preview/utils.ts.');
 
   // Copy tokens (with normalized opacity/font-weight/px values) and append deterministic dark-mode overrides
@@ -363,34 +407,12 @@ async function main() {
     }
   }
 
-  // Generate registry.ts
-  const registryLines = componentEntries.map(
-    ({ name }) =>
-      `  '${name}': { vue3: () => import('./vue3/${name}.vue'), react: () => import('./react/${name}.tsx'), svelte: () => import('./svelte/${name}.svelte') },`
-  );
-
-  const registryContent = `// Auto-generated component registry for VitePress Multi-Framework Preview
-export interface ComponentLoader {
-  vue3?: () => Promise<any>;
-  react?: () => Promise<any>;
-  svelte?: () => Promise<any>;
-}
-
-export interface ComponentMeta {
-  name: string;
-  group?: string;
-  variants?: Record<string, string[]>;
-  booleans?: string[];
-  totalVariants?: number;
-}
-
-export const componentRegistry: Record<string, ComponentLoader> = {
-${registryLines.join('\n')}
-};
-
-export const componentMetadata: Record<string, ComponentMeta> = ${JSON.stringify(metaMap, null, 2)};
-`;
-
+  const registryContent = renderRegistry({
+    componentNames: componentEntries.map(({ name }) => name),
+    exampleParents: examples.parents,
+    metaMap,
+    ...secondary,
+  });
   await fs.writeFile(targetRegistryFile, registryContent, 'utf-8');
   console.log('[compile-docs-components] Generated .vitepress/theme/preview/registry.ts with metadata.');
   console.log('[compile-docs-components] Compilation completed successfully.');

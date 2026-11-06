@@ -2,53 +2,43 @@
 
 A multi-line text input for collecting longer free-form content such as messages, comments, notes, feedback, or descriptions.
 
-WHEN TO USE
-• Use when the expected response may span multiple lines.
-• Use for open-ended input that benefits from a larger writing area.
-• Use a single-line text input for short, predictable values.
+## When to Use
 
-USAGE GUIDELINES
-• Keep the label visible and specific.
-• Use placeholder text only as a short example, never as a replacement for the label.
-• Show helper text for useful context and a specific corrective message for errors.
-• Use a character count when a limit matters.
-• Preserve entered content between states and use Disabled sparingly.
+- Use when the expected response may span multiple lines.
+- Use for open-ended input that benefits from a larger writing area.
+- Use a single-line text input for short, predictable values.
 
-PROPERTIES
-• State — Default, Focus, Filled, Error, or Disabled.
-• Label text — Field label.
-• Placeholder text — Example shown while empty.
-• Hint/Error text — Supporting guidance or validation message.
-• Character Count — Current and maximum character count.
-• Show required — Toggles the required indicator.
-• Icon — Selects the icon used in the icon slot.
-• Show Character Count — Toggles the character count.
-• Show hint — Toggles supporting or error text.
-• Show left icon / Show right icon — Toggles leading and trailing icons.
+## Usage Guidelines
+
+- Keep the label visible and specific.
+- Use placeholder text only as a short example, never as a replacement for the label.
+- Show helper text for useful context and a specific corrective message for errors.
+- Use a character count when a limit matters.
+- Preserve entered content between states and use Disabled sparingly.
 
 ## Live Preview & Usage
 
-<FrameworkPreview name="InputTextArea" />
+<ComponentPreview name="InputTextArea" />
 
 ## Props & Variants
 
-| Property | Type | Default | Description |
+| Prop | Type | Default | Options |
 | :--- | :--- | :--- | :--- |
-| `Character Count` | `text` | `0 / 200` | - |
-| `Hint/Error text` | `text` | `Your message will be copied to the support team.` | - |
-| `Icon` | `instance_swap` | `2375:99747` | - |
-| `Label text` | `text` | `Your message` | - |
-| `Placeholder text` | `text` | `Type your message here.` | - |
-| `Show Character Count` | `boolean` | `true` | - |
-| `Show hint` | `boolean` | `true` | - |
-| `Show label` | `boolean` | `true` | - |
-| `Show left icon` | `boolean` | `false` | - |
-| `Show required` | `boolean` | `false` | - |
-| `Show right icon` | `boolean` | `false` | - |
-| `State` | ``Default` \| `Focus` \| `Filled` \| `Error` \| `Disabled`` | `Default` | - |
-
-## Accessibility (a11y)
-
-- **Form Label Association**: Ensure every input is explicitly associated with a `<label>` element using `id` and `for` / `htmlFor`.
-- **Validation Errors**: Announce field error messages using `aria-describedby` referencing the error container.
-- **Required & Disabled States**: Reflect state with `aria-required="true"` and `aria-invalid` when inputs fail validation.
+| `value` | `string` | `''` | - |
+| `name` | `string` | `'input-textarea'` | - |
+| `id` | `string` | `'input-textarea'` | - |
+| `label` | `string` | `'Your message'` | - |
+| `placeholder` | `string` | `'Type your message here.'` | - |
+| `hint` | `string` | `'Your message will be copied to the support team.'` | - |
+| `errorMessage` | `string` | `''` | - |
+| `disabled` | `boolean` | `false` | - |
+| `required` | `boolean` | `false` | - |
+| `rows` | `number` | `4` | - |
+| `showLabel` | `boolean` | `true` | - |
+| `showHint` | `boolean` | `true` | - |
+| `showCharacterCount` | `boolean` | `true` | - |
+| `maxLength` | `number` | `200` | - |
+| `showLeftIcon` | `boolean` | `false` | - |
+| `showRightIcon` | `boolean` | `false` | - |
+| `className` | `string` | `''` | - |
+| `onValueChange` | `(value: string) => void` | `-` | - |

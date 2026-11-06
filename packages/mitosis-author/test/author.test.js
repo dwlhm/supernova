@@ -1,9 +1,9 @@
-import { describe, it } from 'node:test';
+import { afterEach, beforeEach, describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
-import { readFileSync, existsSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import {
   getAuthorConfig,
   createAuthorTools,
@@ -55,6 +55,20 @@ function runCliSubprocess(payload, env = {}) {
 }
 
 describe('Mitosis Author - Config & Environment Guards', () => {
+  // These cases exercise the openai provider; a developer shell may export LLM_PROVIDER/AGY_MODEL from .env.
+  const isolated = ['LLM_PROVIDER', 'AGY_MODEL'];
+  let saved = {};
+  beforeEach(() => {
+    saved = Object.fromEntries(isolated.map((k) => [k, process.env[k]]));
+    for (const k of isolated) delete process.env[k];
+  });
+  afterEach(() => {
+    for (const k of isolated) {
+      if (saved[k] === undefined) delete process.env[k];
+      else process.env[k] = saved[k];
+    }
+  });
+
   it('throws an explicit error when LLM_BASE_URL is missing', () => {
     const oldBase = process.env.LLM_BASE_URL;
     const oldKey = process.env.LLM_API_KEY;
@@ -249,14 +263,7 @@ describe('Mitosis Author - Manifest Compaction', () => {
   });
 
   it('buildAuthorUserPrompt yields >95% prompt size reduction compared to raw AST dump', () => {
-    const fixturePath = resolve(
-      __dirname,
-      '../../../backup/scripts/fixtures/ButtonPrimary.figma.json'
-    );
-    if (!existsSync(fixturePath)) {
-      return;
-    }
-
+    const fixturePath = resolve(__dirname, 'fixtures/ButtonPrimary.figma.json');
     const rawFixture = JSON.parse(readFileSync(fixturePath, 'utf8'));
     const rawAstString = JSON.stringify(rawFixture, null, 2);
 
@@ -506,9 +513,12 @@ describe('Mitosis Author - SYSTEM_PROMPT Engineering Standards', () => {
     assert.match(SYSTEM_PROMPT, /export default function Button\(props: ButtonProps\)/);
   });
 
-  it('mandates compound decomposition, zero mock data, and no visual state props in section 9', () => {
+  it('mandates composition-only compounds, zero mock data, and no visual state props in section 6', () => {
     assert.match(SYSTEM_PROMPT, /ARCHITECTURE OVER FIGMA FIDELITY/);
-    assert.match(SYSTEM_PROMPT, /Structural Decomposition/);
+    assert.match(SYSTEM_PROMPT, /Composition-Only Compound Components/);
+    assert.match(SYSTEM_PROMPT, /Item Components Own Per-Item State/);
+    assert.match(SYSTEM_PROMPT, /Size Budget: Every \.lite\.tsx stays within 80 non-blank lines/);
+    assert.doesNotMatch(SYSTEM_PROMPT, /declarative data-array props as a fallback/);
     assert.match(SYSTEM_PROMPT, /Sibling Composition/);
     assert.match(SYSTEM_PROMPT, /State vs Prop Rule/);
     assert.match(SYSTEM_PROMPT, /Zero Mock\/Demo Data/);
@@ -811,6 +821,7 @@ describe('Mitosis Author - Tools', () => {
 describe('Mitosis Author - CLI Subprocess', () => {
   it('exits with code 1 and outputs error JSON when required env vars are missing', async () => {
     const result = await runCliSubprocess({}, {
+      LLM_PROVIDER: 'openai',
       LLM_BASE_URL: '',
       LLM_API_KEY: '',
       LLM_MODEL: '',
@@ -1078,6 +1089,116 @@ export default function Badge(props: BadgeProps) {
     const compact = compactComponentSpec(spec);
     assert.ok(!('Show Column 1' in compact.properties));
     assert.ok(!compact.description?.includes('Show Column 1–10'));
+  });
+
+  it('synthesizes multi-variant stateStyles, variantDiffs, dimensions, typography, and semantic Mapping descriptions without RGB collisions', () => {
+    const rawTokens = [
+      { id: 'VariableID:sem-focus', name: '🌱 Semantic/colors/focus/ring-default', value: 'rgb(212, 212, 212)' },
+      { id: 'VariableID:sem-border', name: '🌱 Semantic/colors/border/default', value: 'rgb(212, 212, 212)' },
+      {
+        id: 'VariableID:comp-conn',
+        name: '🧩 Components/stepper/default/color/connector/background/upcoming',
+        value: 'rgb(212, 212, 212)',
+        description: 'Mapping: Default → 🌱 Semantic `colors/utility/spacer`.',
+      },
+      {
+        id: 'VariableID:comp-done-bg',
+        name: '🧩 Components/stepper/default/color/indicator/background/completed',
+        value: 'rgb(240, 253, 244)',
+        description: 'Mapping: Default → 🌱 Semantic `colors/success/subtle`.',
+      },
+      {
+        id: 'VariableID:comp-active-bg',
+        name: '🧩 Components/stepper/default/color/indicator/background/active',
+        value: 'rgb(229, 85, 20)',
+        description: 'Mapping: Default → 🌱 Semantic `colors/primary/default`.',
+      },
+    ];
+    const spec = {
+      name: 'Stepper',
+      properties: {
+        Position: { type: 'VARIANT', defaultValue: 'Top', variantOptions: ['Top', 'Bottom'] },
+      },
+      node: {
+        type: 'COMPONENT_SET',
+        variants: [
+          {
+            name: 'Type=Horizontal, Current=1',
+            node: {
+              type: 'COMPONENT',
+              children: [
+                {
+                  name: 'Step 1 / active',
+                  type: 'FRAME',
+                  layout: { layoutMode: 'VERTICAL', width: 64, height: 61 },
+                  children: [
+                    {
+                      name: 'Indicator',
+                      type: 'FRAME',
+                      layout: { layoutMode: 'HORIZONTAL', width: 32, height: 32, cornerRadius: 9999 },
+                      boundVariables: { fills: [{ id: 'VariableID:comp-active-bg' }] },
+                    },
+                    {
+                      name: 'Step 1 Label',
+                      type: 'TEXT',
+                      typography: { characters: 'Cart', fontSize: 14, fontWeight: '600', textAlignHorizontal: 'CENTER' },
+                      componentPropertyReferences: { characters: 'Label#3574:0' },
+                    },
+                  ],
+                },
+                {
+                  name: 'Connector 1',
+                  type: 'FRAME',
+                  children: [
+                    {
+                      name: 'Line',
+                      type: 'FRAME',
+                      layout: { width: 60, height: 2 },
+                      boundVariables: { fills: [{ id: 'VariableID:comp-conn' }] },
+                    },
+                  ],
+                },
+              ],
+            },
+          },
+          {
+            name: 'Type=Horizontal, Current=2',
+            node: {
+              type: 'COMPONENT',
+              children: [
+                {
+                  name: 'Step 1 / completed',
+                  type: 'FRAME',
+                  layout: { layoutMode: 'VERTICAL', width: 64, height: 61 },
+                  children: [
+                    {
+                      name: 'Indicator',
+                      type: 'FRAME',
+                      layout: { layoutMode: 'HORIZONTAL', width: 32, height: 32, cornerRadius: 9999 },
+                      boundVariables: { fills: [{ id: 'VariableID:comp-done-bg' }] },
+                    },
+                  ],
+                },
+              ],
+            },
+          },
+        ],
+      },
+    };
+
+    const bp = buildComponentBlueprint('Stepper', spec, rawTokens);
+    assert.deepEqual(bp.canonicalProps[0].options, ['top', 'bottom']);
+    assert.ok(bp.stateStyles?.['Step / active > Indicator']?.includes('w-8'));
+    assert.ok(bp.stateStyles?.['Step / active > Indicator']?.includes('h-8'));
+    assert.ok(bp.stateStyles?.['Step / active > Indicator']?.includes('bg-primary-default'));
+    assert.ok(bp.stateStyles?.['Step / completed > Indicator']?.includes('bg-success-subtle'));
+    assert.ok(bp.stateStyles?.['Connector > Line']?.includes('bg-border-default'));
+    assert.ok(bp.stateStyles?.['Connector > Line']?.includes('h-0.5'));
+    const labelNode = bp.hierarchy[0]?.children?.[1];
+    assert.ok(labelNode?.tailwindClasses.includes('text-sm'));
+    assert.ok(labelNode?.tailwindClasses.includes('font-semibold'));
+    assert.ok(labelNode?.tailwindClasses.includes('text-center'));
+    assert.equal(labelNode?.propBind?.characters, 'label');
   });
 });
 

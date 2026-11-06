@@ -3,7 +3,7 @@
     :type="type || 'button'"
     :disabled="disabled"
     :aria-disabled="disabled"
-    :aria-label="ariaLabel !== '' ? ariaLabel : !showLabel ? label : undefined"
+    :aria-label="ariaLabel || undefined"
     :class="
       cn(
         'inline-flex items-center justify-center font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring-primary disabled:opacity-50 disabled:pointer-events-none',
@@ -53,10 +53,6 @@
       </svg>
     </template>
 
-    <template v-if="showLabel && (!$slots.default || label !== 'Label')">
-      <span class="truncate">{{ label }}</span>
-    </template>
-
     <slot />
     <template v-if="showRightIcon">
       <svg
@@ -81,7 +77,6 @@
 import { cn, cva, ICON_PATHS } from "./utils";
 
 export interface ButtonProps {
-  label?: string;
   type?: "button" | "submit" | "reset";
   variant?:
     | "primary"
@@ -93,7 +88,6 @@ export interface ButtonProps {
   size?: "large" | "regular" | "small" | "mini";
   roundness?: "default" | "round";
   disabled?: boolean;
-  showLabel?: boolean;
   showLeftIcon?: boolean;
   showRightIcon?: boolean;
   ariaLabel?: string;
@@ -106,8 +100,6 @@ const props = withDefaults(defineProps<ButtonProps>(), {
   type: "button",
   disabled: false,
   ariaLabel: "",
-  showLabel: true,
-  label: "Label",
   variant: "primary",
   size: "regular",
   roundness: "default",

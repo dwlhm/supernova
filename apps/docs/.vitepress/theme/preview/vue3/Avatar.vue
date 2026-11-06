@@ -21,11 +21,11 @@
       )
     "
   >
-    <template v-if="type === 'image' && Boolean(src)">
+    <template v-if="type === 'image'">
       <img alt="" class="h-full w-full rounded-full object-cover" :src="src" />
     </template>
 
-    <template v-if="type === 'icon' || (type === 'image' && !src)">
+    <template v-if="type === 'icon'">
       <svg
         aria-hidden="true"
         viewBox="0 0 24 24"

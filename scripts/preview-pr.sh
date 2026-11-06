@@ -18,15 +18,24 @@ cd "${REPO_ROOT}"
 export COREPACK_ENABLE_STRICT=0
 export npm_config_manage_package_manager_versions=false
 
+has_lite_components() {
+  local dir="$1"
+  set -- "${dir}"/*.lite.tsx
+  [ -e "${1:-}" ]
+}
+
+# Sync remote supernova/* PR branches created via GitHub API (allow force-updated PR refs)
+git fetch --quiet origin '+refs/heads/supernova/*:refs/remotes/origin/supernova/*' 2>/dev/null || true
+
 # Auto-detect latest supernova/* PR branch if not specified
 if [ -z "${BRANCH}" ]; then
   # Check if current working tree already has src/components/*.lite.tsx
-  if compgen -G "${REPO_ROOT}/src/components/*.lite.tsx" > /dev/null; then
+  if has_lite_components "${REPO_ROOT}/src/components"; then
     echo -e "${GREEN}✓ Detected active PR components in working directory (${REPO_ROOT}/src/components).${NC}"
     export DS_REPO_DIR="${REPO_ROOT}"
   else
     # Find most recent supernova/* branch locally or in origin
-    BRANCH=$(git for-each-ref --sort=-committerdate --format='%(refname:short)' refs/heads/supernova/ refs/remotes/origin/supernova/ | head -n 1 || true)
+    BRANCH=$(git for-each-ref --sort=-committerdate --format='%(refname:short)' refs/remotes/origin/supernova/ refs/heads/supernova/ | head -n 1 || true)
     if [ -z "${BRANCH}" ]; then
       echo -e "${YELLOW}⚠ No supernova/* PR branch found in git. Falling back to templates/ds-repo.${NC}"
       export DS_REPO_DIR="${REPO_ROOT}/templates/ds-repo"
@@ -53,8 +62,12 @@ trap cleanup EXIT
 
 if [ -n "${BRANCH}" ] && [ -z "${DS_REPO_DIR:-}" ]; then
   if ! git rev-parse --verify "${BRANCH}" > /dev/null 2>&1; then
-    echo -e "${RED}❌ Git branch or ref '${BRANCH}' not found.${NC}"
-    exit 1
+    if git rev-parse --verify "origin/${BRANCH}" > /dev/null 2>&1; then
+      BRANCH="origin/${BRANCH}"
+    else
+      echo -e "${RED}❌ Git branch or ref '${BRANCH}' not found.${NC}"
+      exit 1
+    fi
   fi
 
   DOCS_BACKUP_DIR="$(mktemp -d "${TMPDIR:-/tmp}/supernova-docs-backup.XXXXXX")"
@@ -65,15 +78,24 @@ if [ -n "${BRANCH}" ] && [ -z "${DS_REPO_DIR:-}" ]; then
   echo -e "${BOLD}${BLUE}📦 Extracting PR branch '${BRANCH}' into temporary workspace...${NC}"
   git archive "${BRANCH}" | tar -x -C "${TMP_EXTRACT_DIR}"
 
-  if ! compgen -G "${TMP_EXTRACT_DIR}/src/components/*.lite.tsx" > /dev/null; then
+  if ! has_lite_components "${TMP_EXTRACT_DIR}/src/components"; then
     echo -e "${YELLOW}⚠ Branch '${BRANCH}' has no src/components/*.lite.tsx at root; checking templates/ds-repo...${NC}"
-    if compgen -G "${TMP_EXTRACT_DIR}/templates/ds-repo/src/components/*.lite.tsx" > /dev/null; then
+    if has_lite_components "${TMP_EXTRACT_DIR}/templates/ds-repo/src/components"; then
       export DS_REPO_DIR="${TMP_EXTRACT_DIR}/templates/ds-repo"
     else
       echo -e "${RED}❌ No .lite.tsx components found in '${BRANCH}'.${NC}"
       exit 1
     fi
   else
+    # Backfill any baseline subcomponents (e.g. TableCellInput) not directly emitted into src/components
+    if has_lite_components "${REPO_ROOT}/templates/ds-repo/src/components"; then
+      for base_file in "${REPO_ROOT}/templates/ds-repo/src/components/"*.lite.tsx; do
+        base_name="$(basename "${base_file}")"
+        if [ ! -e "${TMP_EXTRACT_DIR}/src/components/${base_name}" ]; then
+          cp "${base_file}" "${TMP_EXTRACT_DIR}/src/components/${base_name}"
+        fi
+      done
+    fi
     export DS_REPO_DIR="${TMP_EXTRACT_DIR}"
   fi
 

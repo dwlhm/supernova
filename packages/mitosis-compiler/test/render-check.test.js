@@ -198,6 +198,26 @@ describe('renderCheck - sibling resolution', () => {
     assert.strictEqual(response.success, true);
     assert.deepStrictEqual(response.errors, []);
   });
+
+  it('resolves siblings imported from another directory by component name', async () => {
+    const response = await compileMitosis({
+      componentName: 'ParentExample',
+      source: `
+        import Child from '../components/Child.lite';
+
+        export default function ParentExample() {
+          return <Child title="From Example" />;
+        }
+      `,
+      siblingSources: {
+        Child: `export default function Child(props: { title?: string }) { return <span>{props.title}</span>; }`,
+      },
+      checks: { render: true },
+    });
+
+    assert.strictEqual(response.success, true);
+    assert.deepStrictEqual(response.errors, []);
+  });
 });
 
 describe('renderCheck - render-crash', () => {

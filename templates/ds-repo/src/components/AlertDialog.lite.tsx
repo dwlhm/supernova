@@ -19,8 +19,7 @@ export interface AlertDialogProps {
 
 export default function AlertDialog(props: AlertDialogProps) {
   useDefaultProps({
-    open: true, inline: false, heading: 'Are you absolutely sure?',
-    description: 'This action cannot be undone. This will permanently delete your account and remove your data from our servers.',
+    open: true, inline: false, heading: '', description: '',
     showDescription: true, showCloseButton: true, cancelLabel: 'Cancel', confirmLabel: 'Continue', destructive: false, className: '',
   });
 
@@ -51,25 +50,23 @@ export default function AlertDialog(props: AlertDialogProps) {
             </Show>
           </div>
           <Show when={props.children}>{props.children}</Show>
-          <Show when={!props.children}>
-            <div class="flex items-center justify-end gap-2">
-              <button type="button" class="inline-flex h-9 items-center justify-center rounded-lg bg-secondary-default px-4 py-2 text-sm font-medium text-secondary-foreground shadow-xs transition-colors hover:bg-secondary-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring-primary" onClick={() => props.onCancel && props.onCancel()}>
-                {props.cancelLabel}
-              </button>
-              <button
-                type="button"
-                class={cn(
-                  'inline-flex h-9 items-center justify-center rounded-lg px-4 py-2 text-sm font-medium text-primary-foreground shadow-xs transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring-primary',
-                  props.destructive
-                    ? 'bg-destructive-background hover:bg-destructive-hover active:bg-destructive-pressed'
-                    : 'bg-primary-default hover:bg-primary-hover active:bg-primary-pressed'
-                )}
-                onClick={() => props.onConfirm && props.onConfirm()}
-              >
-                {props.confirmLabel}
-              </button>
-            </div>
-          </Show>
+          <div class="flex items-center justify-end gap-2">
+            <button type="button" class="inline-flex h-9 items-center justify-center rounded-lg bg-secondary-default px-4 py-2 text-sm font-medium text-secondary-foreground shadow-xs transition-colors hover:bg-secondary-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring-primary" onClick={() => props.onCancel && props.onCancel()}>
+              {props.cancelLabel}
+            </button>
+            <button
+              type="button"
+              class={cn(
+                'inline-flex h-9 items-center justify-center rounded-lg px-4 py-2 text-sm font-medium text-primary-foreground shadow-xs transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring-primary',
+                props.destructive
+                  ? 'bg-destructive-background hover:bg-destructive-hover active:bg-destructive-pressed'
+                  : 'bg-primary-default hover:bg-primary-hover active:bg-primary-pressed'
+              )}
+              onClick={() => props.onConfirm && props.onConfirm()}
+            >
+              {props.confirmLabel}
+            </button>
+          </div>
         </div>
       </div>
     </Show>

@@ -57,6 +57,20 @@ describe('AST-Driven Documentation Generator (@supernova/api)', () => {
     assert.ok(!md.includes('instance_swap'));
   });
 
+  it('documents derived compound parts on the parent page', () => {
+    const stepper = `export interface StepperProps { orientation?: 'horizontal' | 'vertical'; children?: any; }
+      export default function Stepper(props: StepperProps) { useDefaultProps({ orientation: 'horizontal' }); return <ol>{props.children}</ol>; }`;
+    const item = `export interface StepperItemProps { label?: string; status?: 'completed' | 'active' | 'upcoming'; }
+      export default function StepperItem(props: StepperItemProps) { useDefaultProps({ label: '', status: 'upcoming' }); return <li>{props.label}</li>; }`;
+
+    const md = generateComponentDoc({ id: '1', name: 'Stepper' }, stepper, { StepperItem: item });
+
+    assert.match(md, /\| `orientation` \|/);
+    assert.match(md, /### `StepperItem`\n\n\| Prop \| Type \| Default \| Options \|/);
+    assert.match(md, /\| `status` \| `'completed' \\\| 'active' \\\| 'upcoming'` \| `'upcoming'` \| completed, active, upcoming \|/);
+    assert.ok(md.indexOf('### `StepperItem`') > md.indexOf('| `orientation` |'), 'parts follow the parent props');
+  });
+
   it('sanitizes fallback Figma spec properties when .lite.tsx source is not provided', () => {
     const spec = {
       id: '1:2',

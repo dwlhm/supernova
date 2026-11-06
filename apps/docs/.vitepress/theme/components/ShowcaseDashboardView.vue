@@ -72,7 +72,7 @@
             Compiled TSX
           </span>
         </div>
-        <FrameworkPreviewCard name="Button" initial-framework="react" :default-props="{ variant: 'primary', label: 'React Primary', showLeftIcon: true }" />
+        <FrameworkPreviewCard name="Button" initial-framework="react" :default-props="{ variant: 'primary', children: 'React Primary', showLeftIcon: true }" />
         <FrameworkPreviewCard name="MetricCard" initial-framework="react" :default-props="{ label: 'Total Revenue', value: 'Rp 45.200.000', trendText: '+12.5%', showValue: true, showTrend: true }" />
         <FrameworkPreviewCard name="InputText" initial-framework="react" :default-props="{ label: 'Username', placeholder: 'Komerce Admin', showLeftIcon: true }" />
         <FrameworkPreviewCard name="RadioButton" initial-framework="react" :default-props="{ label: 'Fast Delivery', checked: true }" />
@@ -88,7 +88,7 @@
             Compiled Vue SFC
           </span>
         </div>
-        <FrameworkPreviewCard name="Button" initial-framework="vue3" :default-props="{ variant: 'primary', label: 'Vue Primary', showLeftIcon: true }" />
+        <FrameworkPreviewCard name="Button" initial-framework="vue3" :default-props="{ variant: 'primary', children: 'Vue Primary', showLeftIcon: true }" />
         <FrameworkPreviewCard name="MetricCard" initial-framework="vue3" :default-props="{ label: 'Total Revenue', value: 'Rp 45.200.000', trendText: '+12.5%', showValue: true, showTrend: true }" />
         <FrameworkPreviewCard name="InputText" initial-framework="vue3" :default-props="{ label: 'Username', placeholder: 'Komerce Admin', showLeftIcon: true }" />
         <FrameworkPreviewCard name="RadioButton" initial-framework="vue3" :default-props="{ label: 'Fast Delivery', checked: true }" />
@@ -104,9 +104,9 @@
           <span class="text-xs text-foreground-muted">Button, FAB, IconTruckDelivery</span>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <FrameworkPreviewCard name="Button" :initial-framework="activeFramework" :default-props="{ variant: 'primary', label: 'Primary Action', showLeftIcon: true }" />
-          <FrameworkPreviewCard name="Button" :initial-framework="activeFramework" :default-props="{ variant: 'secondary', label: 'Secondary Action', showRightIcon: true }" />
-          <FrameworkPreviewCard name="FAB" :initial-framework="activeFramework" :default-props="{ label: 'New Order' }" />
+          <FrameworkPreviewCard name="Button" :initial-framework="activeFramework" :default-props="{ variant: 'primary', children: 'Primary Action', showLeftIcon: true }" />
+          <FrameworkPreviewCard name="Button" :initial-framework="activeFramework" :default-props="{ variant: 'secondary', children: 'Secondary Action', showRightIcon: true }" />
+          <FrameworkPreviewCard name="FAB" :initial-framework="activeFramework" :default-props="{ children: 'New Order', size: 'extended' }" />
           <FrameworkPreviewCard name="IconTruckDelivery" :initial-framework="activeFramework" :default-props="{ size: 36 }" />
         </div>
       </section>
@@ -134,11 +134,11 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <FrameworkPreviewCard name="MetricCard" :initial-framework="activeFramework" :default-props="{ label: 'Shipped Packages', value: '1,420', trendText: '+8.4%', showValue: true, showTrend: true }" />
           <FrameworkPreviewCard name="Progressbar" :initial-framework="activeFramework" :default-props="{ value: 72, label: 'Shipment SLA', showLabel: true }" />
-          <FrameworkPreviewCard name="Badge" :initial-framework="activeFramework" :default-props="{ label: 'Active Order', variant: 'success' }" />
+          <FrameworkPreviewCard name="Badge" :initial-framework="activeFramework" :default-props="{ children: 'Active Order', variant: 'success' }" />
           <FrameworkPreviewCard name="Avatar" :initial-framework="activeFramework" :default-props="{ initialsText: 'DI', type: 'initials', size: 'regular', showStatus: true }" />
         </div>
         <div>
-          <FrameworkPreviewCard name="Table" :initial-framework="activeFramework" :default-props="sampleTableProps" />
+          <FrameworkPreviewCard name="Table" :initial-framework="activeFramework" />
         </div>
       </section>
 
@@ -160,15 +160,13 @@
 import { ref } from 'vue';
 import FrameworkIcon from './FrameworkIcon.vue';
 import FrameworkPreviewCard from './FrameworkPreviewCard.vue';
+import { PREVIEW_FRAMEWORKS } from './PreviewDefaults';
+import type { PreviewFramework } from '../preview/registry';
 
-type Framework = 'react' | 'vue3' | 'svelte';
+type Framework = PreviewFramework;
 type ViewMode = 'single' | 'split';
 
-const frameworks = [
-  { id: 'react' as const, label: 'React' },
-  { id: 'vue3' as const, label: 'Vue 3' },
-  { id: 'svelte' as const, label: 'Svelte' },
-];
+const frameworks = PREVIEW_FRAMEWORKS;
 
 const activeFramework = ref<Framework>('react');
 const viewMode = ref<ViewMode>('single');
@@ -183,18 +181,4 @@ const sampleChartData = [
   { label: 'Sun', value: 45 },
 ];
 
-const sampleTableProps = {
-  columns: [
-    { id: 'id', label: 'Order ID' },
-    { id: 'customer', label: 'Customer' },
-    { id: 'status', label: 'Status' },
-    { id: 'amount', label: 'Amount', align: 'right' as const },
-  ],
-  rows: [
-    { id: '1', cells: ['ORD-9021', 'Budi Santoso', 'Delivered', 'Rp 245.000'] },
-    { id: '2', cells: ['ORD-9022', 'Siti Rahma', 'Shipped', 'Rp 510.000'] },
-    { id: '3', cells: ['ORD-9023', 'Ahmad Dani', 'Pending', 'Rp 120.000'] },
-  ],
-  showCheckbox: true,
-};
 </script>

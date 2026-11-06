@@ -1,287 +1,142 @@
 # Supernova
 
-Supernova is an automated, multi-framework design system component pipeline that bridges Figma design tokens and component specs with production code.
+Supernova turns Figma design tokens and component specs into a reviewable, multi-framework design system. An LLM authors universal Mitosis components (`.lite.tsx`). A deterministic compiler checks each one against React, Vue 3, Svelte, Vue 2 and Angular, and the result is opened as a GitHub pull request.
 
----
-
-## Overview
-
-The Supernova component pipeline operates through the following stages:
+## Pipeline
 
 ```text
-[ Figma File / Plugin ]
-          │
-          │ 1. Extracts Component Specs & Design Tokens
+[ Figma Plugin (packages/figma-plugin) ]
+          │ 1. Extracts variables, styles and component sets
           ▼
-[ Go Backend API (apps/api) ]
-          │
-          ├─► 2. Checks Existing Code from Git Repository (Incremental Mode)
-          ├─► 3. LLM Authoring (packages/mitosis-author)
-          │      - Generates universal Mitosis (.lite.tsx) component
-          │      - Discovers missing tokens & names them semantically (newTokens)
-          ├─► 4. Pre-flight Quality Gate (packages/mitosis-compiler)
-          │      - Tests compilation to React, Svelte, Vue 3, Vue 2, Angular
-          │      - Triggers Self-Healing Repair Loop if errors occur
-          │
+[ TypeScript API (apps/api) ]
+          ├─► 2. Incremental sync plan against the previous snapshot (SQLite)
+          ├─► 3. Blueprint pre-compiler (packages/mitosis-author)
+          │      Figma geometry, typography and tokens → Tailwind/Mitosis blueprint
+          ├─► 4. LLM authoring (packages/mitosis-author)
+          │      Base-first edits of templates/ds-repo components
+          ├─► 5. Quality gate (packages/mitosis-compiler)
+          │      AST normalize → lint → compile to 5 targets → render check,
+          │      with a stateful repair loop on errors
           ▼
-[ GitHub PR / GitLab MR Review ]
-          │
-          ├─► 5. Programmer Reviews Minimal Diff:
-          │      - src/components/{Component}.lite.tsx
-          │      - src/tokens/tokens.json
-          ├─► 6. Programmer tweaks/commits directly to the PR branch
-          │
+[ GitHub PR on the design system repo ]
+          ├─► 6. Review only .lite.tsx sources, tokens and docs
+          ├─► 7. `/supernova regenerate <Component>: <notes>` comments re-author a component
           ▼
-[ CI/CD Release Pipeline (on merge) ]
-          │
-          └─► 7. Compiles universal Mitosis code to 5 target frameworks
-                 and publishes multi-framework packages (@ui-react, @ui-vue, etc.)
+[ Design system repo CI (templates/ds-repo) ]
+          └─► 8. Compiles to every framework and publishes packages on merge
 ```
-
----
 
 ## Workspace Layout
 
-| Path | Description | Tech Stack |
-| --- | --- | --- |
-| `apps/api` | Backend API and orchestration service | Go 1.25 |
-| `apps/docs` | Project documentation site | VitePress |
-| `packages/contracts` | Shared OpenAPI specs and generated TypeScript/Go types | OpenAPI / TypeScript |
-| `packages/figma-plugin` | Figma extraction and synchronization plugin | TypeScript / esbuild |
-| `packages/mitosis-author` | LLM-assisted Mitosis component authoring engine | Go 1.25 |
-| `packages/mitosis-compiler` | Cross-framework compilation pipeline | Node.js 22 / TypeScript |
-
----
+| Path | Description |
+| --- | --- |
+| `apps/api` | Node.js 22 API: jobs, sync plans, SSE progress, GitHub publisher and webhook |
+| `apps/docs` | VitePress docs with an isolated multi-framework live preview and catalog |
+| `packages/contracts` | OpenAPI schema (`openapi.yaml`) and generated TypeScript types |
+| `packages/figma-plugin` | Figma extractor plugin (TypeScript + esbuild) |
+| `packages/mitosis-author` | Blueprint pre-compiler and LLM authoring agent (`agy` or OpenAI-compatible) |
+| `packages/mitosis-compiler` | Normalizer, linter, cross-framework compiler and headless runtime helpers |
+| `templates/ds-repo` | Scaffolding and baseline components for the target design system repo |
 
 ## Prerequisites
 
-Before getting started, make sure you have the following installed:
+- Node.js `>= 22` and pnpm `>= 10`, or Nix: `nix develop` gives you both through `flake.nix`. The Makefile uses Nix automatically when `pnpm` is not on `PATH`.
+- Figma Desktop, needed to import a development plugin.
+- An LLM provider: the Antigravity CLI (`agy`, recommended; uses your local `agy` session) or any OpenAI-compatible endpoint.
 
-- **Go**: `>= 1.25`
-- **Node.js**: `>= 22.0.0`
-- **pnpm**: `>= 10.0.0`
-- **Figma Desktop App** (required for importing local development plugins)
-- **LLM Engine**: Either a local instance of [Ollama](https://ollama.com/) (free & offline) or an OpenAI / OpenRouter API Key.
-
----
-
-## Setup & Configuration
-
-### 1. Clone & Install Dependencies
+## Setup
 
 ```bash
-# Clone the repository
 git clone https://github.com/dwlhm/supernova.git
 cd supernova
-
-# Install dependencies across all monorepo packages
 make install
-```
-
-### 2. Configure Environment Variables (`.env`)
-
-Copy the example environment file to `.env`:
-
-```bash
 cp .env.example .env
 ```
 
-Open `.env` and configure your settings:
+`.env.example` documents every variable. You need at least these:
 
-```dotenv
-# ==============================================================================
-# Server Configuration
-# ==============================================================================
-PORT=8080
+| Variable | Purpose |
+| --- | --- |
+| `API_TOKEN` | Bearer token for the API and the Figma plugin (`openssl rand -hex 32`). The server refuses to start without it unless `SUPERNOVA_INSECURE_NO_AUTH=true` is set. |
+| `LLM_PROVIDER` | `agy` (default model `gemini-4-argon-medium`) or `openai` (also needs `LLM_BASE_URL`, `LLM_API_KEY` and `LLM_MODEL`) |
+| `LLM_TIMEOUT` | Authoring timeout, e.g. `180s` or `5m` (default `10m`) |
+| `GITHUB_TOKEN`, `GITHUB_REPO`, `GITHUB_BASE_BRANCH` | Turn on PR publishing. The token needs Contents and Pull Requests read/write. |
+| `GITHUB_WEBHOOK_SECRET` | Turns on `/v1/webhooks/github`. Without it the endpoint returns 503. |
+| `SUPERNOVA_DEV_MOCK_LLM` | `true` switches to deterministic mock authoring, with no token cost |
 
-# Bearer Token for the Backend API (required). Paste the same value into the Figma plugin.
-# Generate one with: openssl rand -hex 32
-API_TOKEN=
+Jobs, snapshots and artifacts are stored in `var/supernova.db` (`DATABASE_PATH`), and raw extractions in `var/extractions` (`EXTRACTIONS_DIR`).
 
-# Local development only: run without auth. The server refuses to start with an empty
-# API_TOKEN unless this is exactly "true".
-# SUPERNOVA_INSECURE_NO_AUTH=true
+## Running
 
-# ==============================================================================
-# LLM Provider Configuration (OpenAI-compatible)
-# ==============================================================================
-
-# Option A: Local Ollama (Default - 100% Local & Free)
-LLM_BASE_URL=http://localhost:11434/v1
-LLM_API_KEY=ollama
-LLM_MODEL=llama3.2
-# Recommended alternative Ollama models: qwen2.5-coder, deepseek-r1:8b, mistral
-
-# Option B: OpenAI Cloud
-# LLM_BASE_URL=https://api.openai.com/v1
-# LLM_API_KEY=sk-proj-xxxxxxxxxxxxxxxxxxxxxxxx
-# LLM_MODEL=gpt-4o-mini
-
-# Option C: OpenRouter
-# LLM_BASE_URL=https://openrouter.ai/api/v1
-# LLM_API_KEY=sk-or-v1-xxxxxxxxxxxxxxxxxxxxxxx
-# LLM_MODEL=anthropic/claude-3.5-sonnet
-
-# ==============================================================================
-# GitHub PR Integration (Required for Automated Git PR Output)
-# ==============================================================================
-# Generate a GitHub Personal Access Token (classic or fine-grained)
-# Permissions needed: 'repo' (or 'Contents: Read & Write' and 'Pull Requests: Read & Write')
-GITHUB_TOKEN=ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-GITHUB_REPO=your-org/your-design-system-repo
-GITHUB_BASE_BRANCH=main
-```
-
----
-
-## Running the Components
-
-### Step 1: Start the Backend API Server
-
-In a new terminal window:
+### 1. API server
 
 ```bash
-cd apps/api
-go run ./cmd/api
-```
-
-You should see high-visibility startup logs:
-
-```text
-2026/10/07 15:00:00 INFO [SERVER] Loading environment configuration...
-2026/10/07 15:00:00 INFO [SERVER] Supernova API configured | port=8080 auth_enabled=false llm_model=llama3.2 llm_base_url=http://localhost:11434/v1 github_repo=your-org/your-design-system-repo
-2026/10/07 15:00:00 INFO [SERVER] Starting Supernova API server on port 8080
-```
-
-Verify that the server is healthy:
-
-```bash
+make dev          # build every package, then start apps/api on $PORT (default 8080)
 curl http://localhost:8080/v1/health
-# Response: {"status":"ok","version":"1.0.0"}
+# {"status":"ok","version":"1.0.0"}
 ```
 
----
-
-### Step 2: Build the Figma Plugin
-
-In a separate terminal window, build the Figma plugin bundle:
+### 2. Figma plugin
 
 ```bash
 pnpm --filter @supernova/figma-plugin build
 ```
 
-This compiles `src/code.ts` and `src/ui.ts` into the `packages/figma-plugin/dist/` directory.
+In Figma Desktop, open **Plugins → Development → Import plugin from manifest…**, select `packages/figma-plugin/manifest.json`, and run **Extractor**. Fill in the API URL (`http://localhost:8080`) and your `API_TOKEN`, pick targets and publishers (GitHub PR and/or ZIP download), then start the extraction.
 
----
+### 3. Live preview
 
-### Step 3: Load the Plugin into Figma Desktop App
+```bash
+make review                                    # preview templates/ds-repo baseline components
+make preview-pr                                # preview the latest supernova/* PR branch
+make preview-pr BRANCH=supernova/<branch>      # preview a specific PR branch
+make preview-build BRANCH=supernova/<branch>   # static build of a PR branch preview
+```
 
-1. Open the **Figma Desktop App**.
-2. Open any Figma design file containing your design components and styles/variables.
-3. Click the **Figma Menu** (top-left) ➔ **Plugins** ➔ **Development** ➔ **Import plugin from manifest...**.
-4. In the file picker, select:
-   ```text
-   <your-project-path>/packages/figma-plugin/manifest.json
-   ```
-5. The plugin **Supernova Design System Extractor** is now registered under your development plugins!
+## Reviewing a PR
 
----
+- A Supernova PR contains only universal sources: `src/components/*.lite.tsx`, `src/icons/*.lite.tsx`, `src/tokens/*` and `docs/`. Framework outputs are built by the design system repo's CI.
+- Sync commits stack on the existing PR branch and never force-push, so your review commits are preserved.
+- To have a component re-authored, comment on the PR. Only OWNER, MEMBER and COLLABORATOR comments are accepted.
 
-## End-to-End Workflow Tutorial
+  ```text
+  /supernova regenerate Button: use the destructive token for the hover state
+  ```
 
-### 1. Triggering the Sync from Figma
+## API
 
-1. In Figma, right-click on the canvas or press `Cmd + /` (macOS) / `Ctrl + /` (Windows).
-2. Type `Supernova` and launch **Supernova Design System Extractor**.
-3. In the plugin popup:
-   - **Backend API URL**: Keep as `http://localhost:8080` (or your remote URL).
-   - **API Bearer Token**: The `API_TOKEN` value from your `.env` (leave blank only when running with `SUPERNOVA_INSECURE_NO_AUTH=true`).
-   - **Target Frameworks**: Check the frameworks you plan to build (React, Svelte, Vue 3, Vue 2, Angular).
-   - **Publish Outputs**:
-     - Check **GitHub PR** to create a clean reviewable Pull Request on GitHub.
-     - Check **Download ZIP** if you also want a direct zip download.
-4. Click **Extract Entire Document & Generate**.
+| Method | Path | Purpose |
+| --- | --- | --- |
+| `GET` | `/v1/health` | Liveness check (no auth) |
+| `POST` | `/v1/extractions` | Submit a full extraction job |
+| `POST` | `/v1/extractions/replay` | Re-run a stored extraction (`{ jobId? }`) |
+| `POST` | `/v1/syncs` | Compute an incremental sync plan |
+| `POST` | `/v1/syncs/replay` | Recompute a plan from a stored job or fixture |
+| `POST` | `/v1/syncs/{syncId}/apply` | Apply a sync plan as a job |
+| `GET` | `/v1/jobs/{jobId}` | Job status, components and publish results |
+| `GET` | `/v1/jobs/{jobId}/events` | Server-sent progress events |
+| `GET` | `/v1/jobs/{jobId}/download` | ZIP of the job's artifacts |
+| `POST` | `/v1/webhooks/github` | GitHub `issue_comment` webhook (HMAC-verified) |
 
----
-
-### 2. Monitoring Real-Time Backend Telemetry
-
-Look at your backend terminal. The backend logs every single phase with high clarity:
-
-1. **HTTP Inbound**: Logs request method, path, remote IP, and request ID.
-2. **Repository Pre-fetch**: Checks if `src/components/{Component}.lite.tsx` already exists in your GitHub repository. If found, switches to **Incremental Refactoring Mode**.
-3. **LLM Authoring**: Calls the LLM to generate Mitosis code and discover any unmapped design tokens.
-4. **Pre-flight Quality Check**: Invokes the `mitosis-compiler` locally to verify that the universal JSX compiles to all selected frameworks without errors.
-   - If a syntax warning or error occurs, the **Self-Healing Repair Loop** kicks in automatically to fix it!
-5. **Git Pull Request**: Opens a clean GitHub PR with only the universal Mitosis code and design tokens.
-
----
-
-### 3. Reviewing the Pull Request in GitHub
-
-Once finished, the Figma plugin UI displays a link to the created Pull Request:
-
-1. Click the PR link (e.g. `https://github.com/your-org/your-design-system-repo/pull/42`).
-2. **Review the Clean Diff**:
-   - `src/components/{Component}.lite.tsx`: The clean, universal Mitosis component definition.
-   - `src/tokens/tokens.json`: The consolidated design tokens (including semantic tokens discovered by AI).
-   - **Zero Diff Fatigue**: No overwhelming 50+ compiled files to review.
-3. **Make Adjustments (Human-in-the-Loop)**:
-   - You can leave comments or suggested changes directly on lines of code.
-   - You or other developers can checkout the branch (`git checkout supernova/figma-xxxx`) and push commits directly to the PR branch.
-4. **Merge & Release**:
-   - Merge the Pull Request into `main`.
-   - Your CI/CD pipeline builds the production packages for React, Vue 3, Svelte, etc., and publishes them to your organization's registry.
-
----
-
-## Core Features & Intelligence
-
-### 1. Incremental Authoring (Preserving Developer Code)
-When a component already exists in your target Git repository:
-- Supernova fetches the existing `.lite.tsx` file from the base branch.
-- The LLM is instructed to update the component to match the new Figma design specs **while strictly preserving** any custom helper functions, custom state hooks, and analytics integrations added by developers.
-
-### 2. Auto-Discovery of Missing Tokens
-- If a Figma component uses hardcoded colors or styles not registered in the Figma token catalog, the LLM identifies them and names them semantically (e.g., `color/button-destructive-hover`).
-- These tokens are automatically merged into `src/tokens/tokens.json` and saved with the PR.
-
----
+Every route except health and the webhook requires `Authorization: Bearer $API_TOKEN`. The full schema is in `packages/contracts/openapi.yaml`.
 
 ## Developer Commands
 
-Run all quality checks (Go formatting, vet, Go unit tests, TypeScript typechecks, TS unit tests, and package builds):
-
 ```bash
-make check
+make check                    # build, typecheck and test every package
+make build | make typecheck | make test
+pnpm --dir apps/docs build    # docs and preview build (also run in CI)
+make dev-sync                 # replay a stored extraction (default: latest) through sync → apply → PR, streaming progress; needs a running API
+pnpm --dir packages/contracts generate   # regenerate src/schema.ts from openapi.yaml
 ```
-
-Run specific test suites:
-
-```bash
-# Run Go unit & integration tests
-make test-go
-
-# Run TypeScript tests
-make test-ts
-
-# Run static typechecks
-make typecheck
-```
-
----
 
 ## Troubleshooting
 
-- **Connection Refused (`http://localhost:8080`) in Figma Plugin**:
-  Ensure the Go backend is running (`cd apps/api && go run ./cmd/api`). If you are running Figma in the browser instead of the desktop app, ensure CORS or localhost networking permissions are enabled.
-- **GitHub PR Fails with 401/404**:
-  Verify that your `GITHUB_TOKEN` has `repo` write permissions, and that `GITHUB_REPO` is set in format `owner/repo-name` and exists.
-- **LLM Timeout or Connection Error**:
-  - If using Ollama: ensure Ollama is running (`ollama serve`) and the model is downloaded (`ollama pull llama3.2`).
-  - If using OpenAI: check that `LLM_API_KEY` is valid and has sufficient credits.
-
----
+- **Figma plugin gets connection refused:** check that the API is running (`make dev`). If you use Figma in the browser, allow localhost network access.
+- **401 from the API:** the plugin token must match `API_TOKEN`.
+- **GitHub PR fails with 401 or 404:** check the `GITHUB_TOKEN` permissions and that `GITHUB_REPO` is `owner/repo`.
+- **Webhook returns 503:** set `GITHUB_WEBHOOK_SECRET` and use the same secret in the GitHub webhook settings.
+- **LLM timeout:** raise `LLM_TIMEOUT`. With `agy`, check that the CLI is installed and logged in.
 
 ## License
 

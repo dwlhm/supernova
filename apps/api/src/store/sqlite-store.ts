@@ -65,18 +65,34 @@ export class SqliteStore implements JobStore {
     stmt.run(job.id, JSON.stringify(job), job.updatedAt);
   }
 
-  async update(job: Job): Promise<void> {
-    await this.get(job.id);
+  private readJob(jobId: string): Job {
+    const row = this.db.prepare(`SELECT payload FROM jobs WHERE id = ?`).get(jobId) as { payload: string } | undefined;
+    if (!row) throw new DomainError('JOB_NOT_FOUND', `job ${jobId} not found`);
+    return JSON.parse(row.payload) as Job;
+  }
+
+  private writeJob(job: Job): void {
     job.updatedAt = new Date().toISOString();
-    const stmt = this.db.prepare(`UPDATE jobs SET payload = ?, updated_at = ? WHERE id = ?`);
-    stmt.run(JSON.stringify(job), job.updatedAt, job.id);
+    this.db.prepare(`UPDATE jobs SET payload = ?, updated_at = ? WHERE id = ?`).run(JSON.stringify(job), job.updatedAt, job.id);
+  }
+
+  /**
+   * Read-modify-write without yielding: concurrent component workers each patch one field of the same job
+   * row, and an `await` between the read and the write would let them overwrite each other's updates.
+   */
+  private mutateJob(jobId: string, mutate: (job: Job) => void): void {
+    const job = this.readJob(jobId);
+    mutate(job);
+    this.writeJob(job);
+  }
+
+  async update(job: Job): Promise<void> {
+    this.readJob(job.id);
+    this.writeJob(job);
   }
 
   async get(jobId: string): Promise<Job> {
-    const stmt = this.db.prepare(`SELECT payload FROM jobs WHERE id = ?`);
-    const row = stmt.get(jobId) as { payload: string } | undefined;
-    if (!row) throw new DomainError('JOB_NOT_FOUND', `job ${jobId} not found`);
-    return JSON.parse(row.payload) as Job;
+    return this.readJob(jobId);
   }
 
   async listJobIdsByStatus(statuses: JobStatus[]): Promise<string[]> {
@@ -98,40 +114,38 @@ export class SqliteStore implements JobStore {
   }
 
   async updateStatus(jobId: string, status: JobStatus, stageError?: StageError): Promise<void> {
-    const job = await this.get(jobId);
-    job.status = status;
-    if (stageError) job.error = stageError;
-    await this.update(job);
+    this.mutateJob(jobId, (job) => {
+      job.status = status;
+      if (stageError) job.error = stageError;
+    });
   }
 
   async updateComponent(jobId: string, progress: ComponentProgress): Promise<void> {
-    const job = await this.get(jobId);
-    const idx = job.components.findIndex((c) => c.name === progress.name);
-    if (idx >= 0) job.components[idx] = progress;
-    else job.components.push(progress);
-    await this.update(job);
+    this.mutateJob(jobId, (job) => {
+      const idx = job.components.findIndex((c) => c.name === progress.name);
+      if (idx >= 0) job.components[idx] = progress;
+      else job.components.push(progress);
+    });
   }
 
   async saveArtifacts(jobId: string, artifacts: CompiledArtifact[]): Promise<void> {
-    const job = await this.get(jobId);
-    for (const art of artifacts) {
-      const idx = job.artifacts.findIndex(
-        (a) => a.target === art.target && a.fileName === art.fileName
-      );
-      if (idx >= 0) job.artifacts[idx] = art;
-      else job.artifacts.push(art);
-    }
-    await this.update(job);
+    this.mutateJob(jobId, (job) => {
+      for (const art of artifacts) {
+        const idx = job.artifacts.findIndex((a) => a.target === art.target && a.fileName === art.fileName);
+        if (idx >= 0) job.artifacts[idx] = art;
+        else job.artifacts.push(art);
+      }
+    });
   }
 
   async savePublishResults(jobId: string, results: PublishResults): Promise<void> {
-    const job = await this.get(jobId);
-    job.publishResults = results;
-    await this.update(job);
+    this.mutateJob(jobId, (job) => {
+      job.publishResults = results;
+    });
   }
 
   async saveZip(jobId: string, data: Uint8Array): Promise<void> {
-    await this.get(jobId);
+    this.readJob(jobId);
     const stmt = this.db.prepare(`UPDATE jobs SET zip_data = ? WHERE id = ?`);
     stmt.run(data, jobId);
   }
@@ -158,11 +172,11 @@ export class SqliteStore implements JobStore {
   }
 
   async updateTask(jobId: string, task: Task): Promise<void> {
-    const job = await this.get(jobId);
-    const idx = job.tasks.findIndex((t) => t.id === task.id);
-    if (idx >= 0) job.tasks[idx] = task;
-    else job.tasks.push(task);
-    await this.update(job);
+    this.mutateJob(jobId, (job) => {
+      const idx = job.tasks.findIndex((t) => t.id === task.id);
+      if (idx >= 0) job.tasks[idx] = task;
+      else job.tasks.push(task);
+    });
   }
 
   async saveSnapshot(snapshot: Snapshot): Promise<void> {

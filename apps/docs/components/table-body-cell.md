@@ -1,33 +1,26 @@
 # TableBodyCell
 
-Description
 A reusable body cell container for table rows. It hosts a selectable Table Cell Value component so each column can display the appropriate content type while preserving consistent spacing and alignment.
 
+## When to Use
 
-When to use
-Use inside Table Body Row when building data rows with text, badges, actions, status, product, or other supported cell content.
+- Use inside Table Body Row when building data rows with text, badges, actions, status, product, or other supported cell content.
 
+## Usage Guidelines
 
-Usage guidelines
-Keep one content type per cell.
-Choose a cell-value variant that matches the data semantics.
-Keep content concise; use truncation or a wider column for long values.
-Maintain consistent alignment for cells in the same column.
-
-
-Properties
-Cell Value — Swaps the nested Table Cell Value component used by the cell.
+- Keep one content type per cell.
+- Choose a cell-value variant that matches the data semantics.
+- Keep content concise; use truncation or a wider column for long values.
+- Maintain consistent alignment for cells in the same column.
 
 ## Live Preview & Usage
 
-<FrameworkPreview name="TableBodyCell" />
+<ComponentPreview name="TableBodyCell" />
 
 ## Props & Variants
 
-This component has no configurable variant properties.
-
-## Accessibility (a11y)
-
-- **Keyboard Navigation**: Ensure interactive child elements are reachable and operable via standard keyboard sequences (<kbd>Tab</kbd>, <kbd>Enter</kbd>, <kbd>Space</kbd>).
-- **WAI-ARIA Roles & States**: Appropriate ARIA roles and dynamic state attributes (e.g. `aria-expanded`, `aria-selected`, `aria-hidden`) reflect component status.
-- **Color Contrast**: All typography and interactive UI boundaries satisfy WCAG 2.1 AA requirements (4.5:1 for normal text, 3:1 for large text and UI components).
+| Prop | Type | Default | Options |
+| :--- | :--- | :--- | :--- |
+| `align` | `'left' \| 'center' \| 'right'` | `'left'` | left, center, right |
+| `className` | `string` | `''` | - |
+| `children` | `ReactNode \| Slot \| ng-content` | `-` | - |

@@ -9,6 +9,13 @@ export const LINT_RULES = {
   noJsxPropValue: 'no-jsx-prop-value',
   noPropShadow: 'no-prop-shadow',
   noOnChangeTextInput: 'no-onchange-text-input',
+  tier3MaxLines: 'tier3-max-lines',
+  noFixtureDefaults: 'no-fixture-defaults',
+  noDualModeList: 'no-dual-mode-list',
+  noRepeatedItemState: 'no-repeated-item-state',
+  noChildrenCondition: 'no-children-condition',
+  noLocalBinding: 'no-local-binding',
+  singleArgCallback: 'single-arg-callback',
 } as const;
 
 const ARBITRARY_COLOR_PREFIXES = [

@@ -18,7 +18,8 @@
     "react-dom": "^19.0.0",
     "svelte": "^3.59.2",
     "tailwind-merge": "^3.0.0",
-    "typescript": "^5.8.2"
+    "typescript": "^5.8.2",
+    "vue2": "npm:vue@2.7.16"
   },
   "devDependencies": {
     "@types/node": "^22.13.0",

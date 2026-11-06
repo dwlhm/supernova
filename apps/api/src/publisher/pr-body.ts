@@ -1,3 +1,4 @@
+import { GROUP_COMPONENTS, GROUP_EXAMPLES, GROUP_ICONS } from '../domain/artifact-path.js';
 import { camelToKebab, normalizeComponentName, type Job } from '../domain/models.js';
 
 export interface PullRequestBodyParams {
@@ -12,9 +13,9 @@ export interface PullRequestBodyParams {
 function extractComponentNames(job: Job): Array<{ name: string; group: string; slug: string }> {
   const seen = new Map<string, { name: string; group: string; slug: string }>();
   for (const art of job.artifacts || []) {
-    if (art.target === 'mitosis' && art.fileName.endsWith('.lite.tsx')) {
+    if (art.target === 'mitosis' && art.fileName.endsWith('.lite.tsx') && art.group !== GROUP_EXAMPLES) {
       const name = art.fileName.slice(0, -'.lite.tsx'.length);
-      const group = art.group === 'icons' ? 'icons' : 'components';
+      const group = art.group === GROUP_ICONS ? GROUP_ICONS : GROUP_COMPONENTS;
       const slug = camelToKebab(normalizeComponentName(name));
       seen.set(name, { name, group, slug });
     }

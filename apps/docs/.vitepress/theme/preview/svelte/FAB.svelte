@@ -4,8 +4,6 @@
     variant?: "primary" | "secondary" | "outline";
     size?: "small" | "regular" | "large" | "extended";
     disabled?: boolean;
-    label?: string;
-    showLabel?: boolean;
     ariaLabel?: string;
     className?: string;
 
@@ -20,20 +18,17 @@
   import { cn, cva, ICON_PATHS } from "./utils";
 
   export let type: FABProps["type"] = "button";
-  export let ariaLabel: FABProps["ariaLabel"] = "";
-  export let label: FABProps["label"] = "Label";
+  export let ariaLabel: FABProps["ariaLabel"] = "Action";
   export let disabled: FABProps["disabled"] = false;
   export let variant: FABProps["variant"] = "primary";
   export let size: FABProps["size"] = "small";
   export let className: FABProps["className"] = "";
   export let onClick: FABProps["onClick"];
-
-  export let showLabel: FABProps["showLabel"] = true;
 </script>
 
 <button
   type={type || "button"}
-  aria-label={ariaLabel || label || "Action"}
+  aria-label={ariaLabel || "Action"}
   {disabled}
   class={cn(
     "inline-flex shrink-0 items-center justify-center rounded-full shadow-md transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring-primary disabled:pointer-events-none disabled:opacity-50",
@@ -64,33 +59,27 @@
   on:click={(event) => {
     !disabled && onClick && onClick();
   }}
->
-  {#if $$slots.default}
-    <slot />
-  {/if}
-  {#if !$$slots.default}
-    <svg
-      aria-hidden="true"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      stroke-width="1.5"
-      class={cn(
-        "shrink-0",
-        cva(
-          size,
-          {
-            small: "h-4 w-4",
-            regular: "h-5 w-5",
-            large: "h-7 w-7",
-            extended: "h-5 w-5",
-          },
-          "small"
-        )
-      )}><path stroke-linecap="round" d={ICON_PATHS.plus} /></svg
-    >
-  {/if}
-  {#if size === "extended" && showLabel}
-    <span class="truncate text-sm font-medium">{label}</span>
+  ><svg
+    aria-hidden="true"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="1.5"
+    class={cn(
+      "shrink-0",
+      cva(
+        size,
+        {
+          small: "h-4 w-4",
+          regular: "h-5 w-5",
+          large: "h-7 w-7",
+          extended: "h-5 w-5",
+        },
+        "small"
+      )
+    )}><path stroke-linecap="round" d={ICON_PATHS.plus} /></svg
+  >
+  {#if size === "extended"}
+    <span class="truncate text-sm font-medium"><slot /></span>
   {/if}</button
 >

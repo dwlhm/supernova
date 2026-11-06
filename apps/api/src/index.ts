@@ -3,7 +3,6 @@ export * from './domain/models.js';
 export * from './domain/artifact-path.js';
 export * from './app/tokens.js';
 export * from './app/docgen-ast.js';
-export * from './app/docgen-samples.js';
 export * from './app/docgen.js';
 export * from './app/events.js';
 export * from './app/sync.js';

@@ -95,6 +95,11 @@ function serializeNode(node: SceneNode, depth: number = 0): FigmaSceneNode {
     base.boundVariables = (node as any).boundVariables;
   }
 
+  // Component property references (boolean visibility, text character bindings, instance swaps)
+  if ('componentPropertyReferences' in node && (node as any).componentPropertyReferences) {
+    (base as any).componentPropertyReferences = (node as any).componentPropertyReferences;
+  }
+
   // Children
   if ('children' in node && Array.isArray(node.children)) {
     base.children = node.children.map((child) => serializeNode(child, depth + 1));

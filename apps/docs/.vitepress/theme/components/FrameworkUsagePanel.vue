@@ -22,7 +22,7 @@
           <span>Usage Code</span>
         </button>
         <span class="text-[11px] text-foreground-muted hidden sm:inline">
-          • Synced with Live Preview state
+          • {{ exampleUsage[name] ? 'Composition example' : 'Synced with Live Preview state' }}
         </span>
       </div>
 
@@ -72,24 +72,21 @@
 import { ref, computed, watch } from 'vue';
 import FrameworkIcon from './FrameworkIcon.vue';
 import { generateLiveUsageCode, type UsageFramework } from './PreviewCodeGenerator';
+import { exampleUsage } from '../preview/example-usage';
+import type { PreviewFramework } from '../preview/registry';
+import { PREVIEW_FRAMEWORKS } from './PreviewDefaults';
 
 const props = defineProps<{
   name: string;
-  activeFramework: 'react' | 'vue3' | 'svelte';
+  activeFramework: PreviewFramework;
   interactiveProps: Record<string, any>;
 }>();
 
 const emit = defineEmits<{
-  (e: 'select-preview-framework', fw: 'react' | 'vue3' | 'svelte'): void;
+  (e: 'select-preview-framework', fw: PreviewFramework): void;
 }>();
 
-const allFrameworks: Array<{ id: UsageFramework; label: string }> = [
-  { id: 'react', label: 'React' },
-  { id: 'vue3', label: 'Vue 3' },
-  { id: 'svelte', label: 'Svelte' },
-  { id: 'vue2', label: 'Vue 2' },
-  { id: 'angular', label: 'Angular' },
-];
+const allFrameworks = PREVIEW_FRAMEWORKS;
 
 const expanded = ref(true);
 const copied = ref(false);
@@ -105,13 +102,14 @@ watch(
 function selectFramework(fw: UsageFramework) {
   selectedCodeFramework.value = fw;
   expanded.value = true;
-  if (fw === 'react' || fw === 'vue3' || fw === 'svelte') {
-    emit('select-preview-framework', fw);
-  }
+  emit('select-preview-framework', fw);
 }
 
-const usageCode = computed(() =>
-  generateLiveUsageCode(props.name, selectedCodeFramework.value, props.interactiveProps)
+// Compound components show their compiled composition example instead of a prop-driven snippet.
+const usageCode = computed(
+  () =>
+    exampleUsage[props.name]?.[selectedCodeFramework.value] ??
+    generateLiveUsageCode(props.name, selectedCodeFramework.value, props.interactiveProps)
 );
 
 async function copyCode() {

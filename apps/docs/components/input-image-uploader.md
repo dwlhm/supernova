@@ -2,50 +2,44 @@
 
 An image-specific uploader for selecting or dropping an image and communicating its preview or upload status.
 
-WHEN TO USE
-• Use for profile photos, cover images, product media, or other visual assets.
-• Use when image-specific constraints such as aspect ratio or dimensions matter.
-• Use a general file input for non-image documents.
+## When to Use
 
-USAGE GUIDELINES
-• State accepted formats, maximum size, and recommended dimensions or aspect ratio.
-• Show a preview after a valid image is selected.
-• Provide replace and remove actions.
-• Use a specific error message for unsupported, oversized, or corrupted images.
-• Include meaningful alternative-text handling elsewhere in the flow when the image conveys content.
+- Use for profile photos, cover images, product media, or other visual assets.
+- Use when image-specific constraints such as aspect ratio or dimensions matter.
+- Use a general file input for non-image documents.
 
-PROPERTIES
-• State — Default, Focus, Filled, Error, or Disabled.
-• Label text — Field label.
-• Hint/Error text — Supporting guidance or validation message.
-• Show required — Toggles the required indicator.
-• Show hint — Toggles supporting or error text.
-• Primary text — Main upload instruction.
-• Supporting text — Image requirements.
-• File name — Selected-image name.
-• File metadata — Dimensions, size, or upload status.
+## Usage Guidelines
+
+- State accepted formats, maximum size, and recommended dimensions or aspect ratio.
+- Show a preview after a valid image is selected.
+- Provide replace and remove actions.
+- Use a specific error message for unsupported, oversized, or corrupted images.
+- Include meaningful alternative-text handling elsewhere in the flow when the image conveys content.
 
 ## Live Preview & Usage
 
-<FrameworkPreview name="InputImageUploader" />
+<ComponentPreview name="InputImageUploader" />
 
 ## Props & Variants
 
-| Property | Type | Default | Description |
+| Prop | Type | Default | Options |
 | :--- | :--- | :--- | :--- |
-| `File metadata` | `text` | `1200 × 1200 · 1.8 MB` | - |
-| `File name` | `text` | `profile-photo.jpg` | - |
-| `Hint/Error text` | `text` | `For best results, use a 1:1 image.` | - |
-| `Label text` | `text` | `Profile image` | - |
-| `Primary text` | `text` | `Upload an image` | - |
-| `Show hint` | `boolean` | `true` | - |
-| `Show label` | `boolean` | `true` | - |
-| `Show required` | `boolean` | `true` | - |
-| `State` | ``Default` \| `Focus` \| `Filled` \| `Error` \| `Disabled`` | `Default` | - |
-| `Supporting text` | `text` | `Square JPG or PNG, up to 5 MB` | - |
-
-## Accessibility (a11y)
-
-- **Form Label Association**: Ensure every input is explicitly associated with a `<label>` element using `id` and `for` / `htmlFor`.
-- **Validation Errors**: Announce field error messages using `aria-describedby` referencing the error container.
-- **Required & Disabled States**: Reflect state with `aria-required="true"` and `aria-invalid` when inputs fail validation.
+| `id` | `string` | `'image-uploader'` | - |
+| `name` | `string` | `'image-file'` | - |
+| `label` | `string` | `'Profile image'` | - |
+| `primaryText` | `string` | `'Upload an image'` | - |
+| `supportingText` | `string` | `'Square JPG or PNG, up to 5 MB'` | - |
+| `fileName` | `string` | `''` | - |
+| `fileMetadata` | `string` | `''` | - |
+| `imageSrc` | `string` | `''` | - |
+| `hint` | `string` | `'For best results, use a 1:1 image.'` | - |
+| `errorMessage` | `string` | `''` | - |
+| `accept` | `string` | `'image/png,image/jpeg'` | - |
+| `disabled` | `boolean` | `false` | - |
+| `required` | `boolean` | `true` | - |
+| `showLabel` | `boolean` | `true` | - |
+| `showHint` | `boolean` | `true` | - |
+| `className` | `string` | `''` | - |
+| `onFileNameChange` | `(fileName: string) => void` | `-` | - |
+| `onFilesChange` | `(files: unknown[]) => void` | `-` | - |
+| `onPreviewChange` | `(url: string) => void` | `-` | - |

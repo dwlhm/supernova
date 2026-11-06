@@ -5,7 +5,8 @@ export interface CompileRequest {
   source: string;
   targets?: TargetFramework[];
   allowedClasses?: string[];
-  checks?: { lint?: boolean; render?: boolean; targets?: boolean };
+  /** `types` type-checks the source against `./utils` and `siblingSources` (opt-in: it needs every sibling). */
+  checks?: { lint?: boolean; types?: boolean; render?: boolean; targets?: boolean };
   siblingSources?: Record<string, string>;
   normalize?: boolean;
 }

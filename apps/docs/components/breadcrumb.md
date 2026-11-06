@@ -1,42 +1,43 @@
 # Breadcrumb
 
-Description
 A breadcrumb navigation component that communicates the user's current location within a hierarchical structure and provides a clear path back to higher levels.
 
+## When to Use
 
-When to use
-Use on pages that are nested within a clear hierarchy.
-Use when users may need to move quickly to a parent level.
-Use in content-heavy products, settings, catalogs, or multi-level navigation.
-Do not use as a replacement for primary navigation or for flat page structures.
+- Use on pages that are nested within a clear hierarchy.
+- Use when users may need to move quickly to a parent level.
+- Use in content-heavy products, settings, catalogs, or multi-level navigation.
+- Do not use as a replacement for primary navigation or for flat page structures.
 
+## Usage Guidelines
 
-Usage guidelines
-Keep labels concise, recognizable, and consistent with page titles.
-Arrange items from the highest level to the current page.
-Treat the final item as the current location; it should not navigate to itself.
-Use the shortest variant that accurately represents the hierarchy.
-For long paths, use the deep variant with an ellipsis to collapse intermediate levels.
-Keep separators visually consistent and ensure interactive items have clear hover and focus states.
-
-
-Properties
-Type — Controls the hierarchy depth: 1, 2, or deep.
-Show Ellipsis — Shows or hides the collapsed-path indicator. Use primarily with Type=deep when intermediate levels are omitted.
+- Keep labels concise, recognizable, and consistent with page titles.
+- Arrange items from the highest level to the current page.
+- Treat the final item as the current location; it should not navigate to itself.
+- Use the shortest variant that accurately represents the hierarchy.
+- For long paths, use the deep variant with an ellipsis to collapse intermediate levels.
+- Keep separators visually consistent and ensure interactive items have clear hover and focus states.
 
 ## Live Preview & Usage
 
-<FrameworkPreview name="Breadcrumb" />
+<ComponentPreview name="Breadcrumb" />
 
 ## Props & Variants
 
-| Property | Type | Default | Description |
+| Prop | Type | Default | Options |
 | :--- | :--- | :--- | :--- |
-| `Show Ellipsis` | `boolean` | `true` | - |
-| `Type` | ``2` \| `deep` \| `1`` | `2` | - |
+| `type` | `'1' \| '2' \| 'deep'` | `'2'` | 1, 2, deep |
+| `showEllipsis` | `boolean` | `true` | - |
+| `className` | `string` | `''` | - |
+| `children` | `ReactNode \| Slot \| ng-content` | `-` | - |
 
-## Accessibility (a11y)
+### `BreadcrumbItem`
 
-- **Keyboard Navigation**: Ensure interactive child elements are reachable and operable via standard keyboard sequences (<kbd>Tab</kbd>, <kbd>Enter</kbd>, <kbd>Space</kbd>).
-- **WAI-ARIA Roles & States**: Appropriate ARIA roles and dynamic state attributes (e.g. `aria-expanded`, `aria-selected`, `aria-hidden`) reflect component status.
-- **Color Contrast**: All typography and interactive UI boundaries satisfy WCAG 2.1 AA requirements (4.5:1 for normal text, 3:1 for large text and UI components).
+| Prop | Type | Default | Options |
+| :--- | :--- | :--- | :--- |
+| `href` | `string` | `'#'` | - |
+| `isCurrent` | `boolean` | `false` | - |
+| `isEllipsis` | `boolean` | `false` | - |
+| `className` | `string` | `''` | - |
+| `children` | `ReactNode \| Slot \| ng-content` | `-` | - |
+| `onNavigate` | `(href: string) => void` | `-` | - |

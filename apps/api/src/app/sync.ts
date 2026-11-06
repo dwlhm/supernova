@@ -106,7 +106,9 @@ export async function calculateSyncPlan(
   }
 
   for (const [name, prevComp] of Object.entries(existingComps)) {
-    if (!incomingMap.has(name)) {
+    // Derived siblings (e.g. StepperItem) live as long as their Figma parent does.
+    const owner = prevComp.derivedFrom || name;
+    if (!incomingMap.has(owner)) {
       removedCount++;
       compDiffs.push({
         name,

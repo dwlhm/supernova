@@ -21,7 +21,12 @@ export interface DiscoveredToken {
   description?: string;
 }
 
-export type ComponentGroup = 'components' | 'icons';
+export const COMPONENT_GROUPS = ['components', 'icons', 'examples'] as const;
+export type ComponentGroup = (typeof COMPONENT_GROUPS)[number];
+
+export function parseComponentGroup(raw: unknown): ComponentGroup {
+  return COMPONENT_GROUPS.find((g) => g === raw) ?? 'components';
+}
 
 export interface AuthorToolContext {
   workspaceDir?: string;
@@ -169,7 +174,7 @@ export function createAuthorTools(context: AuthorToolContext) {
           }))
           .min(1)
           .describe('Ordered list of targeted replacements to apply to the existing component source'),
-        group: z.enum(['components', 'icons']).default('components').describe('Semantic group: "components" or "icons"'),
+        group: z.enum(COMPONENT_GROUPS).default('components').describe('Semantic group: "components", "icons" or "examples"'),
         curatedDescription: z.string().optional().describe('Optional curated developer-facing markdown description (summary, When to Use, and Usage Guidelines) cleaned of Figma layer-toggle noise'),
       }),
       execute: async ({ componentName, edits, group, curatedDescription }) => {
@@ -185,7 +190,7 @@ export function createAuthorTools(context: AuthorToolContext) {
       parameters: z.object({
         componentName: nameSchema.describe('The name of the component, e.g. Button'),
         source: z.string().describe('Complete, valid Mitosis .lite.tsx JSX source code'),
-        group: z.enum(['components', 'icons']).describe('Semantic group: "components" or "icons"'),
+        group: z.enum(COMPONENT_GROUPS).describe('Semantic group: "components", "icons" or "examples"'),
         curatedDescription: z.string().optional().describe('Optional curated developer-facing markdown description (summary, When to Use, and Usage Guidelines) cleaned of Figma layer-toggle noise'),
       }),
       execute: async ({ componentName, source, group, curatedDescription }) => {

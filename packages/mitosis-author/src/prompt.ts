@@ -6,9 +6,10 @@ import {
   type CompactPropertyDef,
   type CompactToken,
 } from './manifest.js';
-import { SYSTEM_PROMPT, buildAuthorSystemPrompt } from './system-prompt.js';
+import { COMPOSITION_RULES, SYSTEM_PROMPT, buildAuthorSystemPrompt } from './system-prompt.js';
 
 export {
+  COMPOSITION_RULES,
   SYSTEM_PROMPT,
   buildAuthorSystemPrompt,
   compactComponentSpec,
@@ -26,6 +27,8 @@ export interface PromptAuthorRequest {
   tokenClasses?: string[];
   repairErrors?: string[];
   existingSource?: string;
+  /** Siblings that failed the gate together with the requested component in the previous attempt. */
+  siblingDrafts?: Record<string, string>;
   feedbackNotes?: string;
   existingComponentNames?: string[];
   components?: Array<{
@@ -94,6 +97,15 @@ export function buildAuthorUserPrompt(req: PromptAuthorRequest): string {
     parts.push('Please author the requested Mitosis component(s).\n');
   }
 
+  const drafts = Object.entries(req.siblingDrafts ?? {});
+  if (drafts.length > 0) {
+    parts.push(
+      'Sibling Components From the Previous Attempt (they failed the gate together with the component above; fix them with targeted edits against this source instead of rewriting them):',
+      ...drafts.map(([name, source]) => `#### ${name}\nExisting Source:\n${source}`),
+      ''
+    );
+  }
+
   if (req.existingComponentNames && req.existingComponentNames.length > 0) {
     parts.push(
       `Existing Components in Workspace (use readExistingComponent to inspect):\n${req.existingComponentNames.map((n) => `- ${n}`).join('\n')}\n`
@@ -111,7 +123,7 @@ export function buildAuthorUserPrompt(req: PromptAuthorRequest): string {
     `Engineering Workflow (Base-First AI Editing):
 1. Inspect the Base Component Source (from templates/ds-repo/src) provided above (or via readExistingComponent).
 2. Call readComponentDetails({ componentName }) to inspect the latest Figma Auto Layout, pre-compiled Tailwind blueprint, visible child hierarchy, and text defaults.
-3. Compare the Base Component Source against the Figma specification: preserve the base headless helpers (./utils), ARIA attributes, and callbacks, and EDIT the JSX structure, child elements (e.g. header close button, icons, slots), Tailwind token classes, dimensions/spacing/radius/shadows, and default prop values to match the latest Figma design.
+3. Compare the Base Component Source against the Figma specification: preserve the base headless helpers (./utils), ARIA attributes, and callbacks, and EDIT the JSX structure, child elements (e.g. header close button, icons, slots), Tailwind token classes, dimensions/spacing/radius/shadows, and enum/boolean/size defaults to match the latest Figma design (Figma text/canvas content is never a default value; see the composition & data rules).
 4. Prefer calling editComponent({ componentName, edits: [{ oldText, newText }], group }) to apply targeted edits (which auto-compiles across all 6 targets and saves when valid), or testCompile + saveComponent for full rewrites.
 5. Call finishAuthoring when all requested components are saved.`
   );

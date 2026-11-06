@@ -35,10 +35,10 @@ export default function Avatar(props: AvatarProps) {
         props.className
       )}
     >
-      <Show when={props.type === 'image' && Boolean(props.src)}>
+      <Show when={props.type === 'image'}>
         <img src={props.src} alt="" class="h-full w-full rounded-full object-cover" />
       </Show>
-      <Show when={props.type === 'icon' || (props.type === 'image' && !props.src)}>
+      <Show when={props.type === 'icon'}>
         <svg
           aria-hidden="true"
           class={cn(

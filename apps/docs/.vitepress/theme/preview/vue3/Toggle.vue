@@ -3,11 +3,11 @@
     type="button"
     :data-ctrl="typeof bindControllerProps"
     :aria-pressed="pressed"
-    :aria-label="ariaLabel !== '' ? ariaLabel : label"
+    :aria-label="ariaLabel"
     :disabled="disabled"
     :class="
       cn(
-        'inline-flex items-center justify-center rounded-lg text-foreground-default transition-colors hover:bg-background-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring-primary disabled:pointer-events-none disabled:opacity-50',
+        'inline-flex flex-row items-center justify-center rounded-lg text-foreground-default transition-colors hover:bg-background-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring-primary disabled:pointer-events-none disabled:opacity-50',
         showText
           ? cva(
               size,
@@ -21,13 +21,13 @@
           : cva(
               size,
               {
-                small: 'h-4 w-4 p-0.5',
-                medium: 'h-6 w-6 p-1',
-                large: 'h-9 w-9 p-2',
+                small: 'h-4 w-4 gap-0.5 px-0.5 py-0.5',
+                medium: 'h-6 w-6 gap-1 px-1 py-1',
+                large: 'h-9 w-9 gap-1 px-2 py-2',
               },
               'medium'
             ),
-        pressed ? 'bg-background-muted shadow-xs' : 'bg-transparent',
+        pressed ? 'bg-background-muted shadow-sm' : 'bg-transparent',
         className
       )
     "
@@ -35,11 +35,7 @@
       async (event) => !disabled && onPressedChange && onPressedChange(!pressed)
     "
   >
-    <template v-if="$slots.default">
-      <slot />
-    </template>
-
-    <template v-if="!$slots.default">
+    <template v-if="showIcon">
       <svg
         aria-hidden="true"
         viewBox="0 0 24 24"
@@ -65,8 +61,8 @@
       </svg>
     </template>
 
-    <template v-if="showText">
-      <span class="truncate font-medium">{{ label }}</span>
+    <template v-if="$slots.default">
+      <span class="truncate font-medium"><slot /></span>
     </template>
   </button>
 </template>
@@ -79,7 +75,7 @@ export interface ToggleProps {
   disabled?: boolean;
   size?: "small" | "medium" | "large";
   showText?: boolean;
-  label?: string;
+  showIcon?: boolean;
   className?: string;
 
   ariaLabel?: string;
@@ -88,13 +84,13 @@ export interface ToggleProps {
 
 const props = withDefaults(defineProps<ToggleProps>(), {
   pressed: false,
-  ariaLabel: "",
-  label: "Toggle",
+  ariaLabel: "Toggle",
   disabled: false,
   showText: false,
   size: "medium",
   className: "",
   onPressedChange: undefined,
+  showIcon: true,
 });
 defineSlots<{ default?: () => any }>();
 </script>

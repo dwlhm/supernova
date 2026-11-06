@@ -103,7 +103,9 @@ export function findSiblingEntry(
   if (Object.prototype.hasOwnProperty.call(siblingSources, normalizedId)) {
     return { key: normalizedId, source: siblingSources[normalizedId]! };
   }
-  const baseName = normalizedId.replace(/\.lite(\.[jt]sx?)?$/, '').replace(/\.[jt]sx?$/, '');
+  // Siblings are keyed by component name, so `../components/Stepper.lite` resolves like `./Stepper.lite`.
+  const fileName = normalizedId.split('/').pop() || normalizedId;
+  const baseName = fileName.replace(/\.lite(\.[jt]sx?)?$/, '').replace(/\.[jt]sx?$/, '');
   const candidates = [
     baseName,
     `${baseName}.lite`,

@@ -3,6 +3,8 @@ import { DomainError, type CompiledArtifact } from './models.js';
 
 export const GROUP_COMPONENTS = 'components';
 export const GROUP_ICONS = 'icons';
+/** Composition examples: compiled by the gate and docs, never published in the package build. */
+export const GROUP_EXAMPLES = 'examples';
 
 const RE_COMPONENT_NAME = /^[A-Z][A-Za-z0-9]{0,63}$/;
 const RE_FILE_NAME = /^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$/;
@@ -17,7 +19,7 @@ export function validFileName(name: string): boolean {
 
 export function normalizeGroup(raw?: string): string {
   const g = (raw ?? '').trim().toLowerCase();
-  if (g === GROUP_COMPONENTS || g === GROUP_ICONS) return g;
+  if (g === GROUP_COMPONENTS || g === GROUP_ICONS || g === GROUP_EXAMPLES) return g;
   return '';
 }
 

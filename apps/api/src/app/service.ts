@@ -32,6 +32,18 @@ export interface ServicePaths {
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
+/** Normalizes requested names and rejects any that are not components of the submitted document. */
+function resolveSelectedComponents(requested: string[] | undefined, components: ComponentProgress[]): string[] {
+  if (!requested || requested.length === 0) return [];
+  const known = new Set(components.map((c) => c.name));
+  const selected = [...new Set(requested.map((n) => normalizeComponentName(n)))];
+  const unknown = selected.filter((n) => !known.has(n));
+  if (unknown.length > 0) {
+    throw new DomainError('INVALID_PAYLOAD', `selectedComponents not in document: ${unknown.join(', ')}`);
+  }
+  return selected;
+}
+
 export class Service {
   private publishers = new Map<string, ArtifactPublisher>();
   private prManager?: PullRequestManager;
@@ -108,6 +120,8 @@ export class Service {
       };
     });
 
+    const selectedComponents = resolveSelectedComponents(req.selectedComponents, components);
+
     const jobId = crypto.randomUUID();
     const now = new Date().toISOString();
     const job: Job = {
@@ -115,6 +129,7 @@ export class Service {
       documentName: req.document.name || 'Design System',
       document: req.document,
       options: req.options,
+      ...(selectedComponents.length > 0 ? { selectedComponents } : {}),
       targets,
       publishers,
       status: 'queued',
@@ -198,6 +213,7 @@ export class Service {
       targets: overrides?.targets?.length ? overrides.targets : plan.targets || ['mitosis'],
       publishers: overrides?.publishers?.length ? overrides.publishers : plan.publishers || ['download'],
       options: overrides?.options ?? plan.options,
+      ...(overrides?.selectedComponents ? { selectedComponents: overrides.selectedComponents } : {}),
     };
     return this.submitExtraction(extractionReq);
   }

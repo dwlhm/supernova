@@ -8,6 +8,7 @@ import { ref, onMounted, onBeforeUnmount, watch } from 'vue';
 const props = defineProps<{
   component: any;
   props?: any;
+  content?: string;
   tag?: string;
 }>();
 
@@ -20,7 +21,7 @@ function render() {
   const createElement = reactModule.createElement || (reactModule.default && reactModule.default.createElement);
   if (!createElement) return;
   const Comp = props.component.default || props.component;
-  root.render(createElement(Comp, props.props || {}));
+  root.render(createElement(Comp, props.props || {}, props.content));
 }
 
 onMounted(async () => {
@@ -35,7 +36,7 @@ onMounted(async () => {
 });
 
 watch(
-  () => [props.component, props.props],
+  () => [props.component, props.props, props.content],
   () => {
     render();
   },

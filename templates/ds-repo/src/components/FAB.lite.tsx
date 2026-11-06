@@ -6,8 +6,6 @@ export interface FABProps {
   variant?: 'primary' | 'secondary' | 'outline';
   size?: 'small' | 'regular' | 'large' | 'extended';
   disabled?: boolean;
-  label?: string;
-  showLabel?: boolean;
   ariaLabel?: string;
   className?: string;
   children?: any;
@@ -17,13 +15,13 @@ export interface FABProps {
 export default function FAB(props: FABProps) {
   useDefaultProps({
     type: 'button', variant: 'primary', size: 'small', disabled: false,
-    label: 'Label', showLabel: true, ariaLabel: '', className: '',
+    ariaLabel: 'Action', className: '',
   });
 
   return (
     <button
       type={props.type || 'button'}
-      aria-label={props.ariaLabel || props.label || 'Action'}
+      aria-label={props.ariaLabel || 'Action'}
       disabled={props.disabled}
       class={cn(
         'inline-flex shrink-0 items-center justify-center rounded-full shadow-md transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring-primary disabled:pointer-events-none disabled:opacity-50',
@@ -37,14 +35,11 @@ export default function FAB(props: FABProps) {
       )}
       onClick={() => !props.disabled && props.onClick && props.onClick()}
     >
-      <Show when={props.children}>{props.children}</Show>
-      <Show when={!props.children}>
-        <svg aria-hidden="true" class={cn('shrink-0', cva(props.size, { small: 'h-4 w-4', regular: 'h-5 w-5', large: 'h-7 w-7', extended: 'h-5 w-5' }, 'small'))} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-          <path d={ICON_PATHS.plus} stroke-linecap="round" />
-        </svg>
-      </Show>
-      <Show when={props.size === 'extended' && props.showLabel}>
-        <span class="truncate text-sm font-medium">{props.label}</span>
+      <svg aria-hidden="true" class={cn('shrink-0', cva(props.size, { small: 'h-4 w-4', regular: 'h-5 w-5', large: 'h-7 w-7', extended: 'h-5 w-5' }, 'small'))} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d={ICON_PATHS.plus} stroke-linecap="round" />
+      </svg>
+      <Show when={props.size === 'extended'}>
+        <span class="truncate text-sm font-medium">{props.children}</span>
       </Show>
     </button>
   );

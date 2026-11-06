@@ -1,34 +1,24 @@
 import * as React from "react";
 
 export interface TableCellValueProps {
-  value?: string;
-  secondaryValue?: string;
-  badgeLabel?: string;
-  buttonLabel?: string;
-  statusLabel?: string;
-  imageSrc?: string;
-  avatarInitials?: string;
-  href?: string;
+  layout?: "row" | "stacked";
   align?: "left" | "center" | "right";
+  status?: "none" | "success" | "warning" | "destructive" | "info";
+  imageSrc?: string;
+  imageAlt?: string;
   className?: string;
   children?: React.ReactNode;
 }
 
 import { cn, cva, bindControllerProps } from "./utils";
-import Badge from "./Badge";
-import Button from "./Button";
 
 function TableCellValue(props: TableCellValueProps) {
   props = {
-    value: "Cell Value",
-    secondaryValue: "",
-    badgeLabel: "",
-    buttonLabel: "",
-    statusLabel: "",
-    imageSrc: "",
-    avatarInitials: "",
-    href: "",
+    layout: "row",
     align: "left",
+    status: "none",
+    imageSrc: "",
+    imageAlt: "",
     className: "",
     ...props,
   };
@@ -38,96 +28,56 @@ function TableCellValue(props: TableCellValueProps) {
     <span
       data-ctrl={typeof bindControllerProps}
       className={cn(
-        "flex min-w-0 items-center gap-2",
+        "flex min-w-0 text-sm text-foreground-default",
+        cva(
+          props.layout,
+          {
+            row: "flex-row items-center gap-2 font-normal",
+            stacked: "flex-col items-start gap-0.5 font-medium",
+          },
+          "row"
+        ),
         cva(
           props.align,
           {
-            left: "justify-start",
-            center: "justify-center",
-            right: "flex-row-reverse justify-start",
+            left: "justify-start text-left",
+            center: "justify-center text-center",
+            right: "justify-end text-right tabular-nums",
           },
           "left"
         ),
         props.className
       )}
     >
-      {props.imageSrc === "placeholder" ? (
-        <span
-          className="h-7 w-7 shrink-0 rounded bg-background-muted"
-          aria-hidden="true"
-        />
-      ) : null}
-      {props.imageSrc !== "" && props.imageSrc !== "placeholder" ? (
+      {props.imageSrc !== "" ? (
         <img
-          alt=""
-          className="h-7 w-7 shrink-0 rounded object-cover"
-          aria-hidden="true"
+          className="h-7 w-7 shrink-0 rounded-sm object-cover"
           src={props.imageSrc}
+          alt={props.imageAlt}
         />
       ) : null}
-      {props.avatarInitials !== "" ? (
+      {props.status !== "none" ? (
         <span
-          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-background-muted text-xs font-medium uppercase text-foreground-subtle"
           aria-hidden="true"
-        >
-          {props.avatarInitials}
-        </span>
-      ) : null}
-      {props.badgeLabel !== "" ? (
-        <Badge variant="primary" label={props.badgeLabel} />
-      ) : null}
-      {props.buttonLabel !== "" ? (
-        <Button variant="primary" size="small" label={props.buttonLabel} />
-      ) : null}
-      {props.badgeLabel === "" && props.buttonLabel === "" ? (
-        <span
           className={cn(
-            "flex min-w-0 flex-col gap-0.5",
+            "h-2 w-2 shrink-0 rounded-full",
             cva(
-              props.align,
+              props.status,
               {
-                left: "items-start text-left",
-                center: "items-center text-center",
-                right: "items-end text-right",
+                none: "hidden",
+                success: "bg-success-default",
+                warning: "bg-warning-default",
+                destructive: "bg-destructive-default",
+                info: "bg-info-default",
               },
-              "left"
+              "none"
             )
           )}
-        >
-          {props.href !== "" ? (
-            <a
-              className="truncate text-sm font-medium text-primary-default underline-offset-4 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring-primary"
-              href={props.href}
-            >
-              {props.value}
-            </a>
-          ) : null}
-          {props.href === "" && props.value !== "" ? (
-            <span className="truncate text-sm text-foreground-default">
-              {props.value}
-            </span>
-          ) : null}
-          {props.secondaryValue !== "" ? (
-            <span className="truncate text-xs text-foreground-muted">
-              {props.secondaryValue}
-            </span>
-          ) : null}
-          {props.statusLabel !== "" ? (
-            <span className="inline-flex w-fit items-center gap-1 text-xs text-foreground-muted">
-              <span
-                className="h-1.5 w-1.5 shrink-0 rounded-full bg-success-default"
-                aria-hidden="true"
-              />
-              {props.statusLabel}
-            </span>
-          ) : null}
-        </span>
+        />
       ) : null}
       {props.children ? <>{props.children}</> : null}
     </span>
   );
 }
-
-Object.assign(TableCellValue, { Badge, Button });
 
 export default TableCellValue;

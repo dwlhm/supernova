@@ -31,7 +31,7 @@
 
     <!-- Variant & Boolean Controls bar -->
     <div
-      v-if="variantOptions.length > 0 || booleanOptions.length > 0"
+      v-if="!exampleLoader && (variantOptions.length > 0 || booleanOptions.length > 0)"
       class="flex flex-wrap items-center gap-3 px-4 py-2.5 border-b border-border-default/60 bg-background-subtle/50 text-xs"
     >
       <div
@@ -83,7 +83,7 @@
       <div v-if="loading" class="text-sm text-foreground-muted">
         Loading preview...
       </div>
-      <div v-else-if="loadError" class="text-sm text-red-500">
+      <div v-else-if="loadError" class="max-w-full overflow-x-auto whitespace-pre-wrap font-mono text-xs text-red-500">
         {{ loadError }}
       </div>
       <div
@@ -115,33 +115,31 @@
 
 <script setup lang="ts">
 import { ref, shallowRef, computed, onMounted, onBeforeUnmount, watch, nextTick } from 'vue';
-import { componentMetadata } from '../preview/registry';
+import { componentMetadata, previewBuildErrors, type PreviewFramework } from '../preview/registry';
 import FrameworkIcon from './FrameworkIcon.vue';
 import FrameworkComponentMount from './FrameworkComponentMount.vue';
 import FrameworkUsagePanel from './FrameworkUsagePanel.vue';
 import {
   DEFAULT_PROPS_BY_COMPONENT,
+  PREVIEW_FRAMEWORKS,
   applyPreviewStatePatch,
   buildInteractivePreviewProps,
   extractVariantOptions,
   getComponentLoader,
+  getExampleLoader,
   getPreviewStageWidthClass,
   measurePopoverSpacing,
   normalizeRegistryComponentName,
 } from './PreviewDefaults';
 
-type Framework = 'react' | 'vue3' | 'svelte';
+type Framework = PreviewFramework;
 
 const props = withDefaults(
   defineProps<{ name: string; defaultProps?: Record<string, any>; initialFramework?: Framework }>(),
   { defaultProps: () => ({}), initialFramework: 'react' }
 );
 
-const frameworks = [
-  { id: 'react' as const, label: 'React' },
-  { id: 'vue3' as const, label: 'Vue 3' },
-  { id: 'svelte' as const, label: 'Svelte' },
-];
+const frameworks = PREVIEW_FRAMEWORKS;
 
 const activeFramework = ref<Framework>(props.initialFramework || 'react');
 const loadedComponent = shallowRef<any>(null);
@@ -163,6 +161,7 @@ const compMeta = computed(() => {
 const variantOptions = computed(() => extractVariantOptions(compMeta.value?.variants));
 const booleanOptions = computed<string[]>(() => compMeta.value?.booleans || []);
 const stageWidthClass = computed(() => getPreviewStageWidthClass(normalizedComponentName.value));
+const exampleLoader = computed(() => getExampleLoader(props.name));
 
 const interactiveProps = ref<Record<string, any>>({});
 const canvasRef = ref<HTMLElement | null>(null);
@@ -240,13 +239,13 @@ watch(
 );
 
 const resolvedProps = computed(() =>
-  buildInteractivePreviewProps(interactiveProps.value, (patch) => {
+  exampleLoader.value ? {} : buildInteractivePreviewProps(interactiveProps.value, (patch) => {
     interactiveProps.value = { ...interactiveProps.value, ...patch };
   })
 );
 
 async function loadActiveComponent() {
-  const entry = getComponentLoader(props.name);
+  const entry = exampleLoader.value || getComponentLoader(props.name);
   if (!entry) {
     loadError.value = `Component "${props.name}" not found in registry`;
     loadedComponent.value = null;
@@ -254,7 +253,11 @@ async function loadActiveComponent() {
   }
   const loader = entry[activeFramework.value];
   if (!loader) {
-    loadError.value = `Framework "${activeFramework.value}" not available for "${props.name}"`;
+    const file = exampleLoader.value ? `${normalizedComponentName.value}Example` : normalizedComponentName.value;
+    const reason = previewBuildErrors[file]?.[activeFramework.value];
+    loadError.value = reason
+      ? `${activeFramework.value} preview failed to build:\n${reason}`
+      : `Framework "${activeFramework.value}" not available for "${props.name}"`;
     loadedComponent.value = null;
     return;
   }

@@ -2,7 +2,6 @@
 import * as React from "react";
 
 export interface MainMenuProps {
-  label?: string;
   active?: boolean;
   showLabel?: boolean;
   showLeadingIcon?: boolean;
@@ -18,13 +17,12 @@ import { cn, ICON_PATHS, bindControllerProps } from "./utils";
 
 function MainMenu(props: MainMenuProps) {
   props = {
-    label: "Menu",
     active: false,
     showLabel: true,
     showLeadingIcon: true,
     showTrailingIcon: true,
     showBadge: false,
-    badgeLabel: "New",
+    badgeLabel: "",
     className: "",
     ...props,
   };
@@ -36,9 +34,9 @@ function MainMenu(props: MainMenuProps) {
       data-ctrl={typeof bindControllerProps}
       aria-current={props.active ? "page" : undefined}
       className={cn(
-        "flex w-full items-center gap-2 rounded-md px-2 py-3 text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring-primary",
+        "flex w-full items-center gap-2 rounded-lg px-2 py-3 text-sm font-normal transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring-primary",
         props.active
-          ? "bg-primary-subtle"
+          ? "bg-primary-subtle hover:bg-primary-muted"
           : "hover:bg-background-muted active:bg-background-interactive",
         props.className
       )}
@@ -53,22 +51,19 @@ function MainMenu(props: MainMenuProps) {
               : "text-foreground-default"
           )}
         >
-          {props.children ? <>{props.children}</> : null}
-          {!props.children ? (
-            <svg
-              aria-hidden="true"
-              className="h-4 w-4"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.5"
-            >
-              <rect x="3" y="3" width="7" height="7" rx="1.5" />
-              <rect x="14" y="3" width="7" height="7" rx="1.5" />
-              <rect x="3" y="14" width="7" height="7" rx="1.5" />
-              <rect x="14" y="14" width="7" height="7" rx="1.5" />
-            </svg>
-          ) : null}
+          <svg
+            aria-hidden="true"
+            className="h-4 w-4"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.5"
+          >
+            <rect x="3" y="3" width="7" height="7" rx="1.5" />
+            <rect x="14" y="3" width="7" height="7" rx="1.5" />
+            <rect x="3" y="14" width="7" height="7" rx="1.5" />
+            <rect x="14" y="14" width="7" height="7" rx="1.5" />
+          </svg>
         </span>
       ) : null}
       {props.showLabel ? (
@@ -80,7 +75,7 @@ function MainMenu(props: MainMenuProps) {
               : "text-foreground-default"
           )}
         >
-          {props.label}
+          {props.children}
         </span>
       ) : null}
       {props.showBadge ? (

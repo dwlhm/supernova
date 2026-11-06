@@ -2,37 +2,34 @@
 
 Toggle lets users switch a single setting between off and on, with the change taking effect immediately.
 
-When to use
-• Use for binary preferences or settings with an immediate result.
-• Use when users can clearly understand the effect of turning the option on or off.
-• Do not use for multiple-choice decisions, required acknowledgements, or actions that need confirmation.
+## When to Use
 
-Usage guidelines
-• Pair the toggle with a clear, concise label that describes the enabled state.
-• Keep the current state visually clear and avoid relying on color alone.
-• Use one size consistently within the same interface area.
-• Use supporting text when the outcome may not be obvious.
-• Keep disabled controls visible only when their context is useful, and explain why they are unavailable when needed.
+- Use for binary preferences or settings with an immediate result.
+- Use when users can clearly understand the effect of turning the option on or off.
+- Do not use for multiple-choice decisions, required acknowledgements, or actions that need confirmation.
 
-Properties
-• State — Default: off; Active: on; Disabled: unavailable for interaction.
-• Size — Small: compact layouts; Medium: standard interfaces; Large: prominent or touch-focused layouts.
-• Show Text — Shows or hides the accompanying text label.
+## Usage Guidelines
+
+- Pair the toggle with a clear, concise label that describes the enabled state.
+- Keep the current state visually clear and avoid relying on color alone.
+- Use one size consistently within the same interface area.
+- Use supporting text when the outcome may not be obvious.
+- Keep disabled controls visible only when their context is useful, and explain why they are unavailable when needed.
 
 ## Live Preview & Usage
 
-<FrameworkPreview name="Toggle" />
+<ComponentPreview name="Toggle" />
 
 ## Props & Variants
 
-| Property | Type | Default | Description |
+| Prop | Type | Default | Options |
 | :--- | :--- | :--- | :--- |
-| `Show Text` | `boolean` | `false` | - |
-| `Size` | ``Medium` \| `Large` \| `Small`` | `Small` | - |
-| `State` | ``Default` \| `Active` \| `Disabled`` | `Default` | - |
-
-## Accessibility (a11y)
-
-- **Keyboard Navigation**: Ensure interactive child elements are reachable and operable via standard keyboard sequences (<kbd>Tab</kbd>, <kbd>Enter</kbd>, <kbd>Space</kbd>).
-- **WAI-ARIA Roles & States**: Appropriate ARIA roles and dynamic state attributes (e.g. `aria-expanded`, `aria-selected`, `aria-hidden`) reflect component status.
-- **Color Contrast**: All typography and interactive UI boundaries satisfy WCAG 2.1 AA requirements (4.5:1 for normal text, 3:1 for large text and UI components).
+| `pressed` | `boolean` | `false` | - |
+| `disabled` | `boolean` | `false` | - |
+| `size` | `'small' \| 'medium' \| 'large'` | `'medium'` | small, medium, large |
+| `showText` | `boolean` | `false` | - |
+| `showIcon` | `boolean` | `true` | - |
+| `className` | `string` | `''` | - |
+| `children` | `ReactNode \| Slot \| ng-content` | `-` | - |
+| `ariaLabel` | `string` | `'Toggle'` | - |
+| `onPressedChange` | `(pressed: boolean) => void` | `-` | - |

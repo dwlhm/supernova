@@ -1,9 +1,8 @@
 <template>
   <span
-    :data-ctrl="typeof bindControllerProps"
     :class="
       cn(
-        'inline-flex max-w-full items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium leading-4',
+        'inline-flex max-w-full items-center justify-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium leading-4',
         cva(
           variant,
           {
@@ -21,22 +20,14 @@
         className
       )
     "
-  >
-    <template v-if="$slots.default">
-      <slot />
-    </template>
-
-    <template v-else>
-      <span class="truncate">{{ label }}</span>
-    </template>
-  </span>
+    ><slot
+  /></span>
 </template>
 
 <script setup lang="ts">
-import { cn, cva, bindControllerProps } from "./utils";
+import { cn, cva } from "./utils";
 
 export interface BadgeProps {
-  label?: string;
   variant?:
     | "primary"
     | "secondary"
@@ -51,8 +42,6 @@ export interface BadgeProps {
 const props = withDefaults(defineProps<BadgeProps>(), {
   variant: "primary",
   className: "",
-
-  label: "Badge",
 });
 defineSlots<{ default?: () => any }>();
 </script>

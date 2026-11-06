@@ -6,15 +6,18 @@ import {
   normalizeComponentName,
   taskToContract,
   type CompiledArtifact,
+  type ComponentProgress,
+  type ComponentSnapshot,
   type FigmaComponentSpec,
   type FigmaToken,
   type Job,
   type Run,
   type Task,
 } from '../domain/models.js';
+import { GROUP_COMPONENTS, normalizeGroup } from '../domain/artifact-path.js';
 import type { ArtifactPublisher } from '../publisher/download-publisher.js';
 import type { JobStore } from '../store/store.js';
-import type { MitosisAuthor } from './author-runner.js';
+import type { AuthorResult, MitosisAuthor } from './author-runner.js';
 import { resolveComponentGroup } from './docs-writer.js';
 import { failJob, finalizeJobArtifacts } from './job-finalize.js';
 import type { EventBroker } from './events.js';
@@ -57,78 +60,109 @@ async function saveTokenArtifacts(ctx: JobRunnerContext, jobId: string, resolved
   }
 }
 
+/** Results collected across all component tasks of one run. */
+export interface JobAccumulator {
+  authoredComponents: Record<string, string>;
+  componentGroups: Record<string, string>;
+  /** Sibling components authored alongside a Figma component, mapped to that component's name. */
+  derivedFrom: Record<string, string>;
+  artifacts: CompiledArtifact[];
+}
+
+interface RunInputs {
+  resolvedTokens: FigmaToken[];
+  tokenClasses: string[];
+  /** Previously authored sources of this document, so derived siblings resolve across runs. */
+  siblingSources: Record<string, string>;
+}
+
+interface ComponentTaskInput {
+  spec: FigmaComponentSpec;
+  task: Task;
+  isUnchanged: boolean;
+  forceAuthor: boolean;
+  existingSource: string;
+}
+
+async function publishTask(ctx: JobRunnerContext, job: Job, runId: string, task: Task, progress: Omit<ComponentProgress, 'name'>, error?: string) {
+  task.updatedAt = new Date().toISOString();
+  await ctx.store.updateTask(job.id, task);
+  await ctx.store.updateComponent(job.id, { name: task.componentName, ...progress });
+  ctx.broker.publish(job.id, {
+    eventType: 'task_status', jobId: job.id, runId, status: task.status, ...(error ? { error } : {}), task: taskToContract(task),
+  });
+}
+
+function recordAuthored(acc: JobAccumulator, compName: string, compGroup: string, res: AuthorResult): void {
+  const primary = res.components[compName] || Object.values(res.components)[0] || '';
+  if (primary) acc.authoredComponents[compName] = primary;
+  acc.componentGroups[compName] = compGroup;
+  if (!res.components[compName]) return;
+  for (const [name, source] of Object.entries(res.components)) {
+    if (name === compName || !source) continue;
+    acc.authoredComponents[name] = source;
+    acc.componentGroups[name] = normalizeGroup(res.componentGroups[name]) || GROUP_COMPONENTS;
+    acc.derivedFrom[name] = compName;
+  }
+}
+
+/** Re-emits stored siblings of parents that succeeded without re-authoring them (e.g. compile-only runs). */
+function carryDerivedSiblings(existing: Record<string, ComponentSnapshot>, acc: JobAccumulator): void {
+  for (const [name, snap] of Object.entries(existing)) {
+    const parent = snap.derivedFrom;
+    if (!parent || !snap.sourceCode || acc.authoredComponents[name] || !acc.authoredComponents[parent]) continue;
+    const group = normalizeGroup(snap.group) || GROUP_COMPONENTS;
+    acc.authoredComponents[name] = snap.sourceCode;
+    acc.componentGroups[name] = group;
+    acc.derivedFrom[name] = parent;
+    acc.artifacts.push({ target: 'mitosis', fileName: `${name}.lite.tsx`, group, code: snap.sourceCode });
+  }
+}
+
 async function runSingleComponentTask(
-  ctx: JobRunnerContext,
-  job: Job,
-  runId: string,
-  spec: FigmaComponentSpec,
-  task: Task,
-  isUnchanged: boolean,
-  existingSource: string,
-  resolvedTokens: FigmaToken[],
-  tokenClasses: string[],
-  authoredComponents: Record<string, string>,
-  componentGroups: Record<string, string>,
-  allArtifacts: CompiledArtifact[]
+  ctx: JobRunnerContext, job: Job, runId: string, input: ComponentTaskInput, inputs: RunInputs, acc: JobAccumulator
 ): Promise<boolean> {
+  const { spec, task } = input;
   const compName = task.componentName;
   const compGroup = resolveComponentGroup(undefined, compName, spec);
   task.status = 'authoring';
-  task.updatedAt = new Date().toISOString();
-  await ctx.store.updateTask(job.id, task);
-  await ctx.store.updateComponent(job.id, { name: compName, status: 'authoring', group: compGroup });
-  ctx.broker.publish(job.id, { eventType: 'task_status', jobId: job.id, runId, status: 'authoring', task: taskToContract(task) });
+  await publishTask(ctx, job, runId, task, { status: 'authoring', group: compGroup });
 
   let lastErr: Error | undefined;
-  let currentSource = existingSource;
+  let currentSource = input.existingSource;
   let repairErrors: string[] | undefined;
-
+  let siblingDrafts: Record<string, string> | undefined;
   for (let attempt = 1; attempt <= task.maxAttempts; attempt++) {
     task.attemptCount = attempt;
     try {
       const res = await ctx.author.authorDesignSystem({
-        componentName: compName,
-        components: [spec],
-        tokens: resolvedTokens,
-        tokenClasses,
-        existingSource: currentSource,
-        repairErrors,
-        compileOnly: isUnchanged && Boolean(currentSource) && attempt === 1,
-        targets: job.targets,
+        componentName: compName, components: [spec], tokens: inputs.resolvedTokens, tokenClasses: inputs.tokenClasses,
+        existingSource: currentSource, repairErrors, siblingDrafts, targets: job.targets,
+        siblingSources: { ...inputs.siblingSources, ...acc.authoredComponents },
+        compileOnly: input.isUnchanged && !input.forceAuthor && Boolean(currentSource) && attempt === 1,
       });
-      const compSource = res.components[compName] || Object.values(res.components)[0] || '';
-      if (compSource || res.artifacts.length > 0) {
+      if (Object.keys(res.components).length > 0 || res.artifacts.length > 0) {
+        recordAuthored(acc, compName, compGroup, res);
+        acc.artifacts.push(...res.artifacts);
         task.status = 'ready';
         task.artifacts = res.artifacts;
-        task.updatedAt = new Date().toISOString();
-        await ctx.store.updateTask(job.id, task);
-        await ctx.store.updateComponent(job.id, { name: compName, status: 'done', group: compGroup });
         if (res.artifacts.length > 0) await ctx.store.saveArtifacts(job.id, res.artifacts);
-        ctx.broker.publish(job.id, { eventType: 'task_status', jobId: job.id, runId, status: 'ready', task: taskToContract(task) });
-        if (compSource) authoredComponents[compName] = compSource;
-        componentGroups[compName] = compGroup;
-        allArtifacts.push(...res.artifacts);
+        await publishTask(ctx, job, runId, task, { status: 'done', group: compGroup });
         return true;
       }
       lastErr = new Error(`no code generated for ${compName}`);
     } catch (err: any) {
       lastErr = err instanceof Error ? err : new Error(String(err));
       repairErrors = [lastErr.message];
-      if (err?.partialComponents?.[compName]) currentSource = err.partialComponents[compName];
+      const { [compName]: draft, ...siblings } = (err?.partialComponents ?? {}) as Record<string, string>;
+      if (draft) currentSource = draft;
+      siblingDrafts = Object.keys(siblings).length > 0 ? siblings : undefined;
     }
   }
 
   task.status = 'failed';
   task.error = lastErr?.message || 'authoring failed';
-  task.updatedAt = new Date().toISOString();
-  await ctx.store.updateTask(job.id, task);
-  await ctx.store.updateComponent(job.id, {
-    name: compName, status: 'failed', group: compGroup,
-    stageError: { stage: 'authoring', message: task.error },
-  });
-  ctx.broker.publish(job.id, {
-    eventType: 'task_status', jobId: job.id, runId, status: 'failed', error: task.error, task: taskToContract(task),
-  });
+  await publishTask(ctx, job, runId, task, { status: 'failed', group: compGroup, stageError: { stage: 'authoring', message: task.error } }, task.error);
   return false;
 }
 
@@ -171,9 +205,12 @@ async function runExtractionJob(ctx: JobRunnerContext, jobId: string, state: { r
 
   const docName = job.documentName || job.document.name || 'Design System';
   const existingComps = await ctx.store.getComponentSnapshots(docName);
-  const authoredComponents: Record<string, string> = {};
-  const componentGroups: Record<string, string> = {};
-  const allArtifacts: CompiledArtifact[] = [];
+  const siblingSources = Object.fromEntries(
+    Object.entries(existingComps).flatMap(([name, snap]) => (snap.sourceCode ? [[name, snap.sourceCode]] : []))
+  );
+  const inputs: RunInputs = { resolvedTokens, tokenClasses, siblingSources };
+  const acc: JobAccumulator = { authoredComponents: {}, componentGroups: {}, derivedFrom: {}, artifacts: [] };
+  const selected = new Set(job.selectedComponents || []);
   let successCount = 0;
 
   const queue = job.document.components.map((spec, i) => ({ spec, task: tasks[i]! }));
@@ -182,20 +219,22 @@ async function runExtractionJob(ctx: JobRunnerContext, jobId: string, state: { r
       const item = queue.shift();
       if (!item) break;
       const prev = existingComps[item.task.componentName];
-      const ok = await runSingleComponentTask(
-        ctx, job, runId, item.spec, item.task,
-        prev?.contentHash === hashComponentSpec(item.spec), prev?.sourceCode || '',
-        resolvedTokens, tokenClasses, authoredComponents, componentGroups, allArtifacts
-      );
+      const ok = await runSingleComponentTask(ctx, job, runId, {
+        ...item,
+        isUnchanged: prev?.contentHash === hashComponentSpec(item.spec),
+        forceAuthor: selected.has(item.task.componentName),
+        existingSource: prev?.sourceCode || '',
+      }, inputs, acc);
       if (ok) successCount++;
     }
   });
   await Promise.all(workers);
+  carryDerivedSiblings(existingComps, acc);
 
   if (successCount === 0) {
     await failJob(ctx, jobId, run, 'authoring', 'all component authoring tasks failed');
     return;
   }
 
-  await finalizeJobArtifacts(ctx, jobId, run, docName, authoredComponents, componentGroups, allArtifacts);
+  await finalizeJobArtifacts(ctx, jobId, run, docName, acc);
 }

@@ -2,50 +2,43 @@
 
 A large upload target for adding a file by drag and drop or by opening the device file picker.
 
-WHEN TO USE
-• Use when file upload is a primary task.
-• Use when a large, discoverable target improves completion.
-• Keep a browse action available because drag and drop may not be available on every device.
+## When to Use
 
-USAGE GUIDELINES
-• State accepted formats, maximum size, and file-count limits before upload.
-• Provide visible feedback during drag-over and keyboard focus.
-• Show the selected file name and upload status.
-• Allow replacement or removal before submission.
-• Explain upload failures and how to resolve them.
+- Use when file upload is a primary task.
+- Use when a large, discoverable target improves completion.
+- Keep a browse action available because drag and drop may not be available on every device.
 
-PROPERTIES
-• State — Default, Focus, Filled, Error, or Disabled.
-• Label text — Field label.
-• Hint/Error text — Supporting guidance or validation message.
-• Show required — Toggles the required indicator.
-• Show hint — Toggles supporting or error text.
-• Primary text — Main upload instruction.
-• Supporting text — File requirements.
-• File name — Selected-file name.
-• File metadata — File size, type, or upload status.
+## Usage Guidelines
+
+- State accepted formats, maximum size, and file-count limits before upload.
+- Provide visible feedback during drag-over and keyboard focus.
+- Show the selected file name and upload status.
+- Allow replacement or removal before submission.
+- Explain upload failures and how to resolve them.
 
 ## Live Preview & Usage
 
-<FrameworkPreview name="InputFileDropZone" />
+<ComponentPreview name="InputFileDropZone" />
 
 ## Props & Variants
 
-| Property | Type | Default | Description |
+| Prop | Type | Default | Options |
 | :--- | :--- | :--- | :--- |
-| `File metadata` | `text` | `248 KB · Ready to upload` | - |
-| `File name` | `text` | `invoice-september.pdf` | - |
-| `Hint/Error text` | `text` | `You can upload one file.` | - |
-| `Label text` | `text` | `Documents` | - |
-| `Primary text` | `text` | `Drag and drop files here, or` | - |
-| `Show hint` | `boolean` | `true` | - |
-| `Show label` | `boolean` | `true` | - |
-| `Show required` | `boolean` | `false` | - |
-| `State` | ``Default` \| `Focus` \| `Filled` \| `Error` \| `Disabled`` | `Default` | - |
-| `Supporting text` | `text` | `PNG, JPG, or PDF up to 10 MB` | - |
-
-## Accessibility (a11y)
-
-- **Form Label Association**: Ensure every input is explicitly associated with a `<label>` element using `id` and `for` / `htmlFor`.
-- **Validation Errors**: Announce field error messages using `aria-describedby` referencing the error container.
-- **Required & Disabled States**: Reflect state with `aria-required="true"` and `aria-invalid` when inputs fail validation.
+| `id` | `string` | `'file-drop-zone'` | - |
+| `name` | `string` | `'drop-file'` | - |
+| `label` | `string` | `'Documents'` | - |
+| `primaryText` | `string` | `'or drag and drop files here'` | - |
+| `supportingText` | `string` | `'PNG, JPG, or PDF up to 10 MB'` | - |
+| `browseText` | `string` | `'Browse'` | - |
+| `fileName` | `string` | `''` | - |
+| `fileMetadata` | `string` | `''` | - |
+| `hint` | `string` | `'You can upload one file.'` | - |
+| `errorMessage` | `string` | `''` | - |
+| `accept` | `string` | `'image/png,image/jpeg,application/pdf'` | - |
+| `disabled` | `boolean` | `false` | - |
+| `required` | `boolean` | `false` | - |
+| `showLabel` | `boolean` | `true` | - |
+| `showHint` | `boolean` | `true` | - |
+| `className` | `string` | `''` | - |
+| `onFileNameChange` | `(fileName: string) => void` | `-` | - |
+| `onFilesChange` | `(files: unknown[]) => void` | `-` | - |

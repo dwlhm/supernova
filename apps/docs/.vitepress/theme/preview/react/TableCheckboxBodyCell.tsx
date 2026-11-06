@@ -6,7 +6,7 @@ export interface TableCheckboxBodyCellProps {
   rowId?: string;
   ariaLabel?: string;
   className?: string;
-  onCheckedChange?: (rowId: string, checked: boolean) => void;
+  onCheckedChange?: (event: { rowId: string; checked: boolean }) => void;
 }
 
 import { cn, ICON_PATHS, bindControllerProps } from "./utils";
@@ -29,15 +29,18 @@ function TableCheckboxBodyCell(props: TableCheckboxBodyCellProps) {
         props.className
       )}
     >
-      <span className="relative inline-flex h-4 w-4 items-center justify-center">
+      <span className="relative inline-flex h-3.5 w-3.5 items-center justify-center">
         <input
           type="checkbox"
-          className="peer absolute inset-0 h-4 w-4 cursor-pointer appearance-none rounded-sm border border-border-default bg-background-default checked:border-primary-default checked:bg-primary-default peer-focus-visible:ring-2 peer-focus-visible:ring-focus-ring-primary"
+          className="peer absolute inset-0 h-3.5 w-3.5 cursor-pointer appearance-none rounded-sm border border-border-default bg-background-default checked:border-primary-default checked:bg-primary-default peer-focus-visible:ring-2 peer-focus-visible:ring-focus-ring-primary"
           checked={props.checked}
           aria-label={props.ariaLabel}
           onChange={(event) =>
             props.onCheckedChange &&
-            props.onCheckedChange(props.rowId || "", !props.checked)
+            props.onCheckedChange({
+              rowId: props.rowId || "",
+              checked: !props.checked,
+            })
           }
         />
         <svg
@@ -47,7 +50,7 @@ function TableCheckboxBodyCell(props: TableCheckboxBodyCellProps) {
           stroke="currentColor"
           strokeWidth="3"
           className={cn(
-            "pointer-events-none relative h-3 w-3 text-primary-foreground",
+            "pointer-events-none relative h-2.5 w-2.5 text-primary-foreground",
             props.checked ? "opacity-100" : "opacity-0"
           )}
         >

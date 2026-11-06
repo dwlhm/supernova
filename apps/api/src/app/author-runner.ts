@@ -20,6 +20,10 @@ export interface AuthorRequest {
   tokens?: FigmaToken[];
   tokenClasses?: string[];
   existingSource?: string;
+  /** Sources of sibling components by name, used to resolve imports during the quality gate. */
+  siblingSources?: Record<string, string>;
+  /** Siblings from the previous failed attempt, so a repair edits them instead of rewriting them blind. */
+  siblingDrafts?: Record<string, string>;
   repairErrors?: string[];
   feedbackNotes?: string;
   existingComponentNames?: string[];
@@ -58,6 +62,8 @@ export class InProcessAuthor implements MitosisAuthor {
       tokens: req.tokens,
       tokenClasses: req.tokenClasses,
       existingSource: req.existingSource,
+      siblingSources: req.siblingSources,
+      siblingDrafts: req.siblingDrafts,
       repairErrors: req.repairErrors,
       feedbackNotes: req.feedbackNotes,
       existingComponentNames: req.existingComponentNames,

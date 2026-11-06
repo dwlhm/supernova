@@ -6,7 +6,7 @@ export interface ToggleProps {
   disabled?: boolean;
   size?: "small" | "medium" | "large";
   showText?: boolean;
-  label?: string;
+  showIcon?: boolean;
   className?: string;
   children?: React.ReactNode;
   ariaLabel?: string;
@@ -21,9 +21,9 @@ function Toggle(props: ToggleProps) {
     disabled: false,
     size: "medium",
     showText: false,
-    label: "Toggle",
+    showIcon: true,
     className: "",
-    ariaLabel: "",
+    ariaLabel: "Toggle",
     ...props,
   };
   const [__ctrlState, __setCtrlState] = React.useState<Record<string, any>>({});
@@ -33,10 +33,10 @@ function Toggle(props: ToggleProps) {
       type="button"
       data-ctrl={typeof bindControllerProps}
       aria-pressed={props.pressed}
-      aria-label={props.ariaLabel !== "" ? props.ariaLabel : props.label}
+      aria-label={props.ariaLabel}
       disabled={props.disabled}
       className={cn(
-        "inline-flex items-center justify-center rounded-lg text-foreground-default transition-colors hover:bg-background-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring-primary disabled:pointer-events-none disabled:opacity-50",
+        "inline-flex flex-row items-center justify-center rounded-lg text-foreground-default transition-colors hover:bg-background-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring-primary disabled:pointer-events-none disabled:opacity-50",
         props.showText
           ? cva(
               props.size,
@@ -50,13 +50,13 @@ function Toggle(props: ToggleProps) {
           : cva(
               props.size,
               {
-                small: "h-4 w-4 p-0.5",
-                medium: "h-6 w-6 p-1",
-                large: "h-9 w-9 p-2",
+                small: "h-4 w-4 gap-0.5 px-0.5 py-0.5",
+                medium: "h-6 w-6 gap-1 px-1 py-1",
+                large: "h-9 w-9 gap-1 px-2 py-2",
               },
               "medium"
             ),
-        props.pressed ? "bg-background-muted shadow-xs" : "bg-transparent",
+        props.pressed ? "bg-background-muted shadow-sm" : "bg-transparent",
         props.className
       )}
       onClick={(event) =>
@@ -65,8 +65,7 @@ function Toggle(props: ToggleProps) {
         props.onPressedChange(!props.pressed)
       }
     >
-      {props.children ? <>{props.children}</> : null}
-      {!props.children ? (
+      {props.showIcon ? (
         <svg
           aria-hidden="true"
           viewBox="0 0 24 24"
@@ -89,8 +88,8 @@ function Toggle(props: ToggleProps) {
           <path strokeLinecap="round" d={ICON_PATHS.plus} />
         </svg>
       ) : null}
-      {props.showText ? (
-        <span className="truncate font-medium">{props.label}</span>
+      {props.children ? (
+        <span className="truncate font-medium">{props.children}</span>
       ) : null}
     </button>
   );
