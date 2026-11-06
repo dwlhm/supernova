@@ -6,6 +6,7 @@ import * as path from 'node:path';
 import {
   getAuthorConfig,
   buildAgyAuthorPrompt,
+  COMPOSITION_RULES,
   parseAgyAuthorOutput,
   runAuthorAgent,
 } from '../dist/index.js';
@@ -110,6 +111,8 @@ describe('Mitosis Author - Agy CLI Provider', () => {
     assert.match(prompt, /Pre-Compiled Details for Badge/);
     assert.match(prompt, /Component Tokens for Badge/);
     assert.match(prompt, /rounded-full/);
+    assert.ok(prompt.includes(COMPOSITION_RULES), 'agy prompt must embed the shared composition rules');
+    assert.doesNotMatch(prompt, /Stepper connectors|Tooltip caret/);
   });
 
   it('parses direct JSON, fenced JSON blocks, and agy result envelopes', () => {
@@ -227,6 +230,86 @@ export default function Badge(props: BadgeProps) {
         assert.equal(res.success, false);
         assert.match(res.error, /Compilation failed/);
         assert.ok(res.components['Badge'], 'Preserves partialComponents for stateful repair');
+      });
+
+      const partialSiblingBin = createMockAgyScript(
+        tmpDir,
+        `
+        const ok = "import { useDefaultProps } from '@builder.io/mitosis';\\nimport { cn } from './utils';\\nexport interface BadgeProps { className?: string; }\\nexport default function Badge(props: BadgeProps) { useDefaultProps({ className: '' }); return <span class={cn('inline-flex', props.className)}>Ok</span>; }";
+        const bad = "import { useDefaultProps } from '@builder.io/mitosis';\\nimport { cn } from './utils';\\nexport interface BadgeItemProps { className?: string; }\\nexport default function BadgeItem(props: BadgeItemProps) { useDefaultProps({ className: '' }); return <span class={cn('bg-[#ff0000]', props.className)}>Bad</span>; }";
+        process.stdout.write(JSON.stringify({ components: [
+          { componentName: 'Badge', group: 'components', source: ok },
+          { componentName: 'BadgeItem', group: 'components', source: bad },
+        ] }));
+        `
+      );
+      await withEnv({ LLM_PROVIDER: 'agy', AGY_BIN: partialSiblingBin, LLM_TIMEOUT: '10s' }, async () => {
+        const res = await runAuthorAgent({ componentName: 'Badge' });
+        assert.equal(res.success, false, 'a failing sibling must fail the whole session');
+        assert.match(res.error, /\[BadgeItem\]/);
+        assert.deepEqual(res.artifacts, []);
+        assert.ok(res.components['Badge'] && res.components['BadgeItem'], 'keeps both sources for repair');
+      });
+    } finally {
+      fs.rmSync(tmpDir, { recursive: true, force: true });
+    }
+  });
+
+  it('shows failed sibling drafts in the agy prompt and applies edits to them', async () => {
+    const draft = "import { useDefaultProps } from '@builder.io/mitosis';\nimport { cn } from './utils';\nexport interface BadgeItemProps { className?: string; }\nexport default function BadgeItem(props: BadgeItemProps) { useDefaultProps({ className: '' }); return <span class={cn('inline-flex', props.className)}>DRAFT</span>; }";
+    const prompt = buildAgyAuthorPrompt({ componentName: 'Badge', siblingDrafts: { BadgeItem: draft } }, ['Badge'], {});
+    assert.match(prompt, /Sibling Components From the Previous Attempt/);
+    assert.match(prompt, /#### BadgeItem\nExisting Source:\n[\s\S]*DRAFT/);
+
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'agy-drafts-'));
+    const badge = "import { useDefaultProps } from '@builder.io/mitosis';\nimport { cn } from './utils';\nexport interface BadgeProps { className?: string; children?: any; }\nexport default function Badge(props: BadgeProps) { useDefaultProps({ className: '' }); return <div class={cn('flex', props.className)}>{props.children}</div>; }";
+    const output = { components: [
+      { componentName: 'Badge', group: 'components', source: badge },
+      { componentName: 'BadgeItem', group: 'components', edits: [{ oldText: 'DRAFT', newText: 'FIXED' }] },
+    ] };
+    try {
+      await withEnv({ LLM_PROVIDER: 'agy', AGY_BIN: createMockAgyScript(tmpDir, `process.stdout.write(${JSON.stringify(JSON.stringify(output))});`), LLM_TIMEOUT: '10s' }, async () => {
+        const res = await runAuthorAgent({ componentName: 'Badge', siblingDrafts: { BadgeItem: draft } });
+        assert.match(res.components.BadgeItem, /FIXED/, 'edits were applied to the sibling draft');
+      });
+    } finally {
+      fs.rmSync(tmpDir, { recursive: true, force: true });
+    }
+  });
+
+  it('requires a compilable <Name>Example for compound sessions and keeps it out of the barrel', async () => {
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'agy-example-'));
+    const lite = (name, body, imports = '') =>
+      `import { useDefaultProps } from '@builder.io/mitosis';\nimport { cn } from './utils';\n${imports}` +
+      `export interface ${name}Props { className?: string; children?: any; }\n` +
+      `export default function ${name}(props: ${name}Props) { useDefaultProps({ className: '' }); return ${body}; }`;
+    const outputs = (withExample) => [
+      { componentName: 'Badge', group: 'components', source: lite('Badge', "<div class={cn('flex', props.className)}>{props.children}</div>") },
+      { componentName: 'BadgeItem', group: 'components', source: lite('BadgeItem', "<span class={cn('inline-flex', props.className)}>Item</span>") },
+      ...(withExample
+        ? [{
+            componentName: 'BadgeExample',
+            group: 'examples',
+            source: "import Badge from '../components/Badge.lite';\nimport BadgeItem from '../components/BadgeItem.lite';\nexport default function BadgeExample() { return <Badge><BadgeItem /></Badge>; }",
+          }]
+        : []),
+    ];
+    const mockBin = (withExample) =>
+      createMockAgyScript(tmpDir, `process.stdout.write(${JSON.stringify(JSON.stringify({ components: outputs(withExample) }))});`);
+
+    try {
+      await withEnv({ LLM_PROVIDER: 'agy', AGY_BIN: mockBin(false), LLM_TIMEOUT: '10s' }, async () => {
+        const res = await runAuthorAgent({ componentName: 'Badge' });
+        assert.equal(res.success, false);
+        assert.match(res.error, /must include "BadgeExample"/);
+      });
+      await withEnv({ LLM_PROVIDER: 'agy', AGY_BIN: mockBin(true), LLM_TIMEOUT: '10s' }, async () => {
+        const res = await runAuthorAgent({ componentName: 'Badge' });
+        assert.equal(res.success, true, res.error);
+        assert.equal(res.componentGroups.BadgeExample, 'examples');
+        const barrels = res.artifacts.filter((a) => /^index\./.test(a.fileName));
+        assert.ok(barrels.length > 0);
+        for (const barrel of barrels) assert.doesNotMatch(barrel.code, /BadgeExample/);
       });
     } finally {
       fs.rmSync(tmpDir, { recursive: true, force: true });

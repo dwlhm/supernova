@@ -31,6 +31,10 @@ export interface AuthorAgentRequest {
   tokenClasses?: string[];
   repairErrors?: string[];
   existingSource?: string;
+  /** Sibling sources by component name (previous runs); overlays the template baseline for imports. */
+  siblingSources?: Record<string, string>;
+  /** Sibling drafts from the previous failed attempt; shown to the LLM and used as the base for edits. */
+  siblingDrafts?: Record<string, string>;
   feedbackNotes?: string;
   components?: ComponentRequestItem[];
   existingComponentNames?: string[];
@@ -89,6 +93,9 @@ function collectContextMaps(req: AuthorAgentRequest) {
       if (spec) rawSpecs[cName] = spec;
     }
   }
+  for (const [name, draft] of Object.entries(req.siblingDrafts ?? {})) {
+    if (!existingSources[name]) existingSources[name] = draft;
+  }
   return { existingSources, rawSpecs, requestedNames };
 }
 
@@ -117,6 +124,16 @@ function recoverMissingComponents(
       componentGroups[req.componentName] = componentGroups[savedName] || 'components';
     }
   }
+}
+
+/** A compound session (container + sibling components) must ship a compilable `<Name>Example`. */
+function missingExampleErrors(primary: string | undefined, groups: Record<string, ComponentGroup>): string[] {
+  if (!primary) return [];
+  const published = Object.keys(groups).filter((name) => groups[name] !== 'examples');
+  if (published.length < 2) return [];
+  const example = `${primary}Example`;
+  if (groups[example] === 'examples') return [];
+  return [`[${primary}][example] Compound component "${primary}" must include "${example}" (group "examples") composing ${published.join(', ')} as children.`];
 }
 
 export async function runAuthorAgent(
@@ -224,11 +241,11 @@ export async function runAuthorAgent(
     const artifacts: CompiledArtifact[] = [];
     const compileErrors: string[] = [];
 
-    const siblingSources = loadAllBaselineSiblings(components);
+    const siblingSources = loadAllBaselineSiblings({ ...req.siblingSources, ...components });
     for (const [name, source] of Object.entries(components)) {
       const compileRes = await compileMitosis({
         componentName: name, source, targets, allowedClasses: req.tokenClasses,
-        siblingSources, checks: { lint: true, render: true }, normalize: true,
+        siblingSources, checks: { lint: true, types: true, render: true }, normalize: true,
       });
       if (compileRes.success) {
         artifacts.push(...compileRes.artifacts);
@@ -237,7 +254,10 @@ export async function runAuthorAgent(
       }
     }
 
-    if (compileErrors.length > 0 && artifacts.length === 0) {
+    compileErrors.push(...missingExampleErrors(req.componentName, componentGroups));
+
+    // Any failing source fails the session: siblings import each other, so a partial set is unusable.
+    if (compileErrors.length > 0) {
       return {
         success: false, components, componentGroups, artifacts: [], newTokens,
         error: `Compilation failed for authored components: ${compileErrors.join('; ')}`,
@@ -245,7 +265,8 @@ export async function runAuthorAgent(
     }
 
     for (const target of targets) {
-      const indexArtifact = generateNamespaceIndex(Object.keys(components), target);
+      const exported = Object.keys(components).filter((name) => componentGroups[name] !== 'examples');
+      const indexArtifact = generateNamespaceIndex(exported, target);
       if (indexArtifact) artifacts.push(indexArtifact);
     }
 

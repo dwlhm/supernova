@@ -2,7 +2,8 @@ import { spawn } from 'node:child_process';
 import { normalizeMitosisSource } from '@supernova/mitosis-compiler';
 import type { AuthorConfig } from './config.js';
 import { buildAuthorUserPrompt, type PromptAuthorRequest } from './prompt.js';
-import type { ComponentGroup, DiscoveredToken } from './tools.js';
+import { COMPOSITION_RULES } from './system-prompt.js';
+import { parseComponentGroup, type ComponentGroup, type DiscoveredToken } from './tools.js';
 import { executeReadComponentDetails, queryComponentTokens } from './tools-inspect.js';
 
 export interface AgyComponentEdit {
@@ -42,9 +43,14 @@ const AGY_COMPACT_SYSTEM_PROMPT = `HEADLESS MITOSIS COMPILER MODE (OVERRIDES ALL
 ARCHITECTURAL INVARIANTS (3-Tier Pure Headless Mitosis .lite.tsx):
 1. Single Default Export: export default function ComponentName(props: ComponentNameProps) { ... }
 2. Strict No-Any: children?: any is the ONLY allowed any. Never use class, style, or key as prop names (use className).
-3. Pure Stateless UI: Use props, useDefaultProps, Show/For from '@builder.io/mitosis', and cn/cva/headless helpers from './utils' (zero useStore when possible; keep files <= 80 lines).
+3. Pure Stateless UI: Use props, useDefaultProps, Show/For from '@builder.io/mitosis', and cn/cva/headless helpers from './utils' (zero useStore when possible).
 4. Cross-Framework Safety: NEVER use React hooks (useState/useEffect), DOM globals, nested JSX in prop values, prop variable shadowing, or onChange on text inputs (use onInput).
-5. Canonical Semantic Tokens Only: Use ONLY semantic classes from Available Design System Tokens (zero arbitrary #hex/rgb/[...] or *-components-* / rounded-rounded-* classes).`;
+5. Canonical Semantic Tokens Only: Use ONLY semantic classes from Available Design System Tokens (zero arbitrary #hex/rgb/[...] or *-components-* / rounded-rounded-* classes).
+6. Figma Visual, State & Multi-Variant Fidelity: Audit Existing Source against blueprint.hierarchy, blueprint.stateStyles, and blueprint.variantDiffs. Align per-state surface/text colors, radii, explicit dimensions (w-*, h-*), typography, and directional child order / indicator nodes to the blueprint.
+7. Distinct Union Variants: Keep union prop options strictly lowercase/kebab-case (e.g. 'top' | 'bottom' | 'left' | 'right'); NEVER add duplicate capitalized options ('Top' | 'Bottom') as every union option must render distinct DOM markup.
+
+COMPOSITION & DATA RULES:
+${COMPOSITION_RULES}`;
 
 function formatCompactTokenCatalog(tokenClasses?: string[]): string {
   if (!tokenClasses || tokenClasses.length === 0) return '';
@@ -75,12 +81,16 @@ function formatCompactTokenCatalog(tokenClasses?: string[]): string {
 
 function compactBlueprint(bp: any): any {
   if (!bp || typeof bp !== 'object') return bp;
+  const hasDiffSynthesis =
+    (bp.variantDiffs && Object.keys(bp.variantDiffs).length > 0) ||
+    (bp.stateStyles && Object.keys(bp.stateStyles).length > 0);
+  const maxFullVariants = hasDiffSynthesis ? 1 : 4;
   const baseHierarchyJson = JSON.stringify(bp.hierarchy || []);
   const dedupHierarchies: Record<string, any> = {};
   const seenHierarchies = new Set<string>([baseHierarchyJson]);
   for (const [k, v] of Object.entries(bp.variantHierarchies || {})) {
     const s = JSON.stringify(v);
-    if (!seenHierarchies.has(s) && Object.keys(dedupHierarchies).length < 4) {
+    if (!seenHierarchies.has(s) && Object.keys(dedupHierarchies).length < maxFullVariants) {
       seenHierarchies.add(s);
       dedupHierarchies[k] = v;
     }
@@ -127,7 +137,8 @@ export function buildAgyAuthorPrompt(
     'OUTPUT FORMAT (SINGLE-TURN RAW JSON ONLY — ZERO TOOL CALLS):',
     '- Prefer targeted "edits": [{ "oldText": "...", "newText": "..." }] against Existing Source and OMIT "source".',
     '- If Existing Source already matches the Figma blueprint with zero errors, return "edits": [] and OMIT "source".',
-    '{ "components": [{ "componentName": "...", "group": "components" | "icons", "edits": [{ "oldText": "...", "newText": "..." }], "curatedDescription": "..." }], "newTokens": [] }'
+    '- New sibling components (e.g. "<Name>Item") and examples ("<Name>Example", group "examples") have no Existing Source: return their full "source".',
+    '{ "components": [{ "componentName": "...", "group": "components" | "icons" | "examples", "edits": [{ "oldText": "...", "newText": "..." }], "source": "...", "curatedDescription": "..." }], "newTokens": [] }'
   );
   return sections.join('\n');
 }
@@ -191,7 +202,7 @@ function spawnAgyProcess(config: AuthorConfig, prompt: string): Promise<string> 
 function applyComponentItem(item: AgyComponentOutput, fallbackName: string | undefined, ctx: AgyRunnerContext): void {
   const compName = (item.componentName || fallbackName || '').trim();
   if (!compName) return;
-  const group: ComponentGroup = item.group === 'icons' ? 'icons' : 'components';
+  const group: ComponentGroup = parseComponentGroup(item.group);
   const baseSource = ctx.existingSources[compName] || '';
   let resolvedSource = '';
 
