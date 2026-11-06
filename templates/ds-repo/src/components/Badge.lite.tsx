@@ -1,8 +1,7 @@
-import { useDefaultProps, Show } from '@builder.io/mitosis';
-import { cn, cva, bindControllerProps } from './utils';
+import { useDefaultProps } from '@builder.io/mitosis';
+import { cn, cva } from './utils';
 
 export interface BadgeProps {
-  label?: string;
   variant?: 'primary' | 'secondary' | 'destructive' | 'success' | 'warning' | 'info' | 'outline';
   className?: string;
   children?: any;
@@ -10,14 +9,14 @@ export interface BadgeProps {
 
 export default function Badge(props: BadgeProps) {
   useDefaultProps({
-    label: 'Badge', variant: 'primary', className: '',
+    variant: 'primary',
+    className: '',
   });
 
   return (
     <span
-      data-ctrl={typeof bindControllerProps}
       class={cn(
-        'inline-flex max-w-full items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium leading-4',
+        'inline-flex max-w-full items-center justify-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium leading-4',
         cva(props.variant, {
           secondary: 'bg-secondary-default text-secondary-foreground',
           destructive: 'bg-destructive-subtle text-destructive-foreground',
@@ -30,9 +29,7 @@ export default function Badge(props: BadgeProps) {
         props.className
       )}
     >
-      <Show when={props.children} else={<span class="truncate">{props.label}</span>}>
-        {props.children}
-      </Show>
+      {props.children}
     </span>
   );
 }

@@ -2,7 +2,6 @@ import { useDefaultProps, Show } from '@builder.io/mitosis';
 import { cn, ICON_PATHS, bindControllerProps } from './utils';
 
 export interface MainMenuProps {
-  label?: string;
   active?: boolean;
   showLabel?: boolean;
   showLeadingIcon?: boolean;
@@ -16,8 +15,8 @@ export interface MainMenuProps {
 
 export default function MainMenu(props: MainMenuProps) {
   useDefaultProps({
-    label: 'Menu', active: false, showLabel: true, showLeadingIcon: true,
-    showTrailingIcon: true, showBadge: false, badgeLabel: 'New', className: '',
+    active: false, showLabel: true, showLeadingIcon: true,
+    showTrailingIcon: true, showBadge: false, badgeLabel: '', className: '',
   });
 
   return (
@@ -26,9 +25,9 @@ export default function MainMenu(props: MainMenuProps) {
       type="button"
       aria-current={props.active ? 'page' : undefined}
       class={cn(
-        'flex w-full items-center gap-2 rounded-md px-2 py-3 text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring-primary',
+        'flex w-full items-center gap-2 rounded-lg px-2 py-3 text-sm font-normal transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring-primary',
         props.active
-          ? 'bg-primary-subtle'
+          ? 'bg-primary-subtle hover:bg-primary-muted'
           : 'hover:bg-background-muted active:bg-background-interactive',
         props.className
       )}
@@ -36,19 +35,16 @@ export default function MainMenu(props: MainMenuProps) {
     >
       <Show when={props.showLeadingIcon}>
         <span class={cn('flex shrink-0 items-center', props.active ? 'text-primary-subtle-foreground' : 'text-foreground-default')}>
-          <Show when={props.children}>{props.children}</Show>
-          <Show when={!props.children}>
-            <svg aria-hidden="true" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-              <rect x="3" y="3" width="7" height="7" rx="1.5" />
-              <rect x="14" y="3" width="7" height="7" rx="1.5" />
-              <rect x="3" y="14" width="7" height="7" rx="1.5" />
-              <rect x="14" y="14" width="7" height="7" rx="1.5" />
-            </svg>
-          </Show>
+          <svg aria-hidden="true" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <rect x="3" y="3" width="7" height="7" rx="1.5" />
+            <rect x="14" y="3" width="7" height="7" rx="1.5" />
+            <rect x="3" y="14" width="7" height="7" rx="1.5" />
+            <rect x="14" y="14" width="7" height="7" rx="1.5" />
+          </svg>
         </span>
       </Show>
       <Show when={props.showLabel}>
-        <span class={cn('flex-1 truncate text-left', props.active ? 'text-primary-subtle-foreground' : 'text-foreground-default')}>{props.label}</span>
+        <span class={cn('flex-1 truncate text-left', props.active ? 'text-primary-subtle-foreground' : 'text-foreground-default')}>{props.children}</span>
       </Show>
       <Show when={props.showBadge}>
         <span class={cn('inline-flex shrink-0 items-center rounded-xl px-2 py-0.5 text-xs font-medium leading-none', props.active ? 'bg-primary-default text-primary-foreground' : 'bg-primary-subtle text-primary-subtle-foreground')}>

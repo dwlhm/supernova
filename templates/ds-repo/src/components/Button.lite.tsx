@@ -2,13 +2,11 @@ import { useDefaultProps, Show } from '@builder.io/mitosis';
 import { cn, cva, ICON_PATHS } from './utils';
 
 export interface ButtonProps {
-  label?: string;
   type?: 'button' | 'submit' | 'reset';
   variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'destructive' | 'link';
   size?: 'large' | 'regular' | 'small' | 'mini';
   roundness?: 'default' | 'round';
   disabled?: boolean;
-  showLabel?: boolean;
   showLeftIcon?: boolean;
   showRightIcon?: boolean;
   ariaLabel?: string;
@@ -19,8 +17,8 @@ export interface ButtonProps {
 
 export default function Button(props: ButtonProps) {
   useDefaultProps({
-    label: 'Label', type: 'button', variant: 'primary', size: 'regular', roundness: 'default',
-    disabled: false, showLabel: true, showLeftIcon: false, showRightIcon: false, ariaLabel: '', className: '',
+    type: 'button', variant: 'primary', size: 'regular', roundness: 'default',
+    disabled: false, showLeftIcon: false, showRightIcon: false, ariaLabel: '', className: '',
   });
 
   return (
@@ -28,7 +26,7 @@ export default function Button(props: ButtonProps) {
       type={props.type || 'button'}
       disabled={props.disabled}
       aria-disabled={props.disabled}
-      aria-label={props.ariaLabel !== '' ? props.ariaLabel : !props.showLabel ? props.label : undefined}
+      aria-label={props.ariaLabel || undefined}
       class={cn(
         'inline-flex items-center justify-center font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring-primary disabled:opacity-50 disabled:pointer-events-none',
         cva(props.variant, {
@@ -54,9 +52,6 @@ export default function Button(props: ButtonProps) {
         <svg aria-hidden="true" class="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
           <path d={ICON_PATHS.plus} stroke-linecap="round" />
         </svg>
-      </Show>
-      <Show when={props.showLabel && (!props.children || props.label !== 'Label')}>
-        <span class="truncate">{props.label}</span>
       </Show>
       {props.children}
       <Show when={props.showRightIcon}>
