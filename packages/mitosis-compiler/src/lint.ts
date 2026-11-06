@@ -16,6 +16,8 @@ import {
   lintNoAny,
   type SourceViews,
 } from './lint-views.js';
+import { lintTier3 } from './lint-tier3.js';
+import { lintPortability } from './lint-portability.js';
 
 export { LINT_RULES };
 
@@ -231,6 +233,8 @@ export function lintSource(source: string): CompileError[] {
     ...lintNoPropShadow(views, lineOf),
     ...lintStorePropCollision(views, lineOf),
     ...lintNoOnChangeTextInput(views, lineOf),
+    ...lintTier3(source, lineOf),
+    ...lintPortability(source, lineOf),
   ];
 
   return errors.sort((a, b) => (a.line ?? 0) - (b.line ?? 0));

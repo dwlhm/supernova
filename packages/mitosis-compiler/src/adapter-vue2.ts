@@ -65,6 +65,39 @@ function buildBackfilledProps(
   return lines.length > 0 ? lines.join('\n') + '\n' : '';
 }
 
+/** Vue 2 forbids `:key` on `<template v-for>`; move it onto the first child element. */
+function moveTemplateKeysToChildren(template: string): string {
+  return template.replace(
+    /<template((?:\s[^>]*?)?)\s:key="([^"]*)"([^>]*)>(\s*)<([A-Za-z][\w-]*)/g,
+    (full, before: string, key: string, after: string, gap: string, tag: string) =>
+      /\bv-for=/.test(before + after) ? `<template${before}${after}>${gap}<${tag} :key="${key}"` : full
+  );
+}
+
+/** Vue 2 needs one real root element; a root `<template v-if>` (from a root <Show>) becomes a layout-neutral div. */
+function ensureSingleRootElement(template: string): string {
+  const inner = template.trim();
+  const open = inner.match(/^<template(\s[^>]*)>/);
+  if (!open || !inner.endsWith('</template>')) return template;
+  return `<div style="display: contents"${open[1]}>${inner.slice(open[0].length, -'</template>'.length)}</div>`;
+}
+
+/**
+ * Vue 2 only treats `(args) => ...` as a handler function; `async (args) => ...` is wrapped as a statement
+ * and never invoked. Generated handlers never await, so the `async` is dropped.
+ */
+function unwrapAsyncHandlers(template: string): string {
+  return template.replace(/((?:@|v-on:)[\w.:-]+=")async\s+(?=\(|[\w$]+\s*=>)/g, '$1');
+}
+
+function normalizeVue2Template(code: string): string {
+  const start = code.indexOf('<template>');
+  const end = code.lastIndexOf('</template>');
+  if (start !== 0 || end < 0) return code;
+  const body = code.slice('<template>'.length, end);
+  return `<template>\n${ensureSingleRootElement(moveTemplateKeysToChildren(unwrapAsyncHandlers(body)))}\n${code.slice(end)}`;
+}
+
 /**
  * Vue 2 Target Framework Adapter (`adapter-vue2.ts`)
  * 1. Backfills missing props from source `<Name>Props` and `useDefaultProps` into `props: { ... }`
@@ -73,11 +106,13 @@ function buildBackfilledProps(
  *    as required by Vue 2 Options API.
  * 3. Provides a reactive `props` getter in `computed: { props() { return this; } }`
  *    when `props` is referenced in templates or methods.
+ * 4. Fixes Vue 2-only template limits: no `:key` on `<template v-for>`, a single root element, and
+ *    handler expressions Vue 2 can invoke (no `async` arrow prefix).
  */
 export function adaptVue2Output(rawCode: string, source?: string): string {
   if (!rawCode) return rawCode;
 
-  let code = rawCode.replace(
+  let code = normalizeVue2Template(rawCode).replace(
     /(export\s+interface\s+\w+Props\s*\{)([\s\S]*?)(\})/m,
     (full, open: string, body: string, close: string) => {
       const stripped = body.replace(/^\s*children\s*\?\s*:\s*any\s*;?\s*$/gm, '');

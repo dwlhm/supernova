@@ -1,13 +1,15 @@
 import * as mitosisModule from '@builder.io/mitosis';
 import { lintSource } from './lint.js';
 import { renderCheck } from './render-check.js';
+import { typecheckSource } from './typecheck.js';
 import { validateArtifact } from './validate.js';
 import { normalizeMitosisSource } from './normalize.js';
 import { adaptReactOutput } from './adapter-react.js';
 import { adaptVue3Output } from './adapter-vue3.js';
 import { adaptSvelteOutput } from './adapter-svelte.js';
 import { adaptVue2Output } from './adapter-vue2.js';
-import { adaptAngularOutput } from './adapter-angular.js';
+import { adaptAngularOutput, mapAngularSiblingImport } from './adapter-angular.js';
+import { angularSiblingTagPlugin } from './angular-selectors.js';
 import { COMPONENT_NAME_PATTERN, isValidComponentName } from './names.js';
 import type {
   CompileError,
@@ -141,6 +143,13 @@ export async function compileMitosis(req: CompileRequest): Promise<CompileRespon
     }
   }
 
+  if (req.checks?.types === true) {
+    const typeErrors = typecheckSource(componentName, effectiveSource, req.siblingSources);
+    if (typeErrors.length > 0) {
+      return { success: false, artifacts: [], errors: [...errors, ...typeErrors] };
+    }
+  }
+
   if (req.checks?.render === true) {
     const renderErrors = await renderCheck({
       componentName,
@@ -208,7 +217,12 @@ export async function compileMitosis(req: CompileRequest): Promise<CompileRespon
           break;
         }
         case 'angular': {
-          const generator = componentToAngular({ typescript: true, plugins: [svgKebabPlugin()] });
+          const generator = componentToAngular({
+            typescript: true,
+            plugins: [svgKebabPlugin(), angularSiblingTagPlugin()],
+            preserveImports: true,
+            importMapper: mapAngularSiblingImport,
+          });
           const res = generator({ component });
           const rawAngular = typeof res === 'string' ? res : await res;
           code = adaptAngularOutput(rawAngular, effectiveSource);
