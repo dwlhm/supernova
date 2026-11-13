@@ -1,0 +1,3 @@
+import{d as e,a as s}from"./theme.CecfD-Na.js";import"./framework.DPU9SBEx.js";const a={name:"table",props:{className:{default:""},caption:{default:"Data table"}},computed:{props(){return this}},data(){return{cn:s,bindControllerProps:e}}};var o=function(){var r=this,t=r._self._c;return t("div",{class:r.cn("w-full overflow-x-auto rounded-lg border border-border-default bg-background-default",r.className),attrs:{"data-ctrl":typeof r.bindControllerProps}},[t("table",{staticClass:"w-full border-collapse"},[r.caption?[t("caption",{staticClass:"sr-only"},[r._v(`
+        `+r._s(r.caption)+`
+      `)])]:r._e(),r._v(" "),r._t("default")],2)])},l=[];a.render=o;a.staticRenderFns=l;export{a as default};

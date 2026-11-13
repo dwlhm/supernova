@@ -1,0 +1,1 @@
+import{a as s}from"./theme.CecfD-Na.js";import{d as r,o,c as t,n,k as l,r as c}from"./framework.DPU9SBEx.js";const d=r({__name:"CardFooter",props:{className:{default:""}},setup(e){return(a,m)=>(o(),t("div",{class:n(l(s)("flex flex-wrap items-center gap-2 pt-1",e.className))},[c(a.$slots,"default")],2))}});export{d as _};
