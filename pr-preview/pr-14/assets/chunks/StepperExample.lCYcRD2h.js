@@ -1,3 +1,0 @@
-import s from"./Stepper.DBEb_K9Q.js";import p from"./StepperItem.C8tXtQBr.js";import"./utils.BBpd638g.js";const r={name:"stepper-example",components:{Stepper:s,StepperItem:p}};var a=function(){var t=this,e=t._self._c;return e("Stepper",{attrs:{orientation:"horizontal",ariaLabel:"Checkout progress"}},[e("StepperItem",{attrs:{status:"completed",step:1}},[t._v(" Cart ")]),e("StepperItem",{attrs:{status:"active",step:2}},[t._v(" Shipping ")]),e("StepperItem",{attrs:{status:"upcoming",step:3}},[t._v(" Payment ")]),e("StepperItem",{attrs:{status:"upcoming",step:4,isLast:!0}},[t._v(`
-    Review
-  `)])],1)},n=[];r.render=a;r.staticRenderFns=n;export{r as default};

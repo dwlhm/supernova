@@ -1,1 +1,0 @@
-import{j as t}from"./jsx-runtime.BjG_zV1W.js";import{a as r}from"./theme.CecfD-Na.js";import"./framework.DPU9SBEx.js";function m(e){return e={no:1,className:"",...e},t.jsx("td",{className:r("w-12 whitespace-nowrap border-t border-border-default px-4 py-3 text-center text-sm font-normal text-foreground-muted",e.className),children:e.no})}export{m as default};

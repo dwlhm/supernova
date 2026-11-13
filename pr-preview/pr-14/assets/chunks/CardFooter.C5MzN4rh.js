@@ -1,1 +1,0 @@
-import{j as a}from"./jsx-runtime.BjG_zV1W.js";import{a as t}from"./theme.CecfD-Na.js";import"./framework.DPU9SBEx.js";function i(e){return e={className:"",...e},a.jsx("div",{className:t("flex flex-wrap items-center gap-2 pt-1",e.className),children:e.children})}export{i as default};

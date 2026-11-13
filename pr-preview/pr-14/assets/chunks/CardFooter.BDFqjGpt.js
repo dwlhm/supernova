@@ -1,1 +1,0 @@
-import{a}from"./theme.CecfD-Na.js";import"./framework.DPU9SBEx.js";const r={name:"card-footer",props:{className:{default:""}},computed:{props(){return this}},data(){return{cn:a}}};var s=function(){var e=this,t=e._self._c;return t("div",{class:e.cn("flex flex-wrap items-center gap-2 pt-1",e.className)},[e._t("default")],2)},n=[];r.render=s;r.staticRenderFns=n;export{r as default};

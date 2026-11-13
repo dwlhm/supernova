@@ -1,1 +1,0 @@
-import{j as r}from"./jsx-runtime.BjG_zV1W.js";import{a}from"./theme.CecfD-Na.js";import"./framework.DPU9SBEx.js";function o(e){return e={className:"",...e},r.jsx("tr",{className:a("border-b border-border-default bg-background-muted",e.className),children:e.children})}export{o as default};
