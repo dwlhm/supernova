@@ -1,4 +1,4 @@
-.PHONY: install test test-ts typecheck build check clean run dev review preview-pr preview-build dev-sync
+.PHONY: install test test-ts typecheck build check clean run dev listen sync regen compile review example-react preview-pr preview-build dev-sync
 
 HAS_PNPM := $(shell command -v pnpm 2>/dev/null)
 NIX_BIN := $(shell command -v nix 2>/dev/null || echo /nix/var/nix/profiles/default/bin/nix)
@@ -7,13 +7,28 @@ NIX_EXEC := $(if $(HAS_PNPM),,$(NIX_BIN) develop --command)
 install:
 	$(NIX_EXEC) pnpm install
 
+compile:
+	$(NIX_EXEC) node scripts/compile-library.mjs
+
+sync:
+	$(NIX_EXEC) node apps/api/dist/cli.js sync $(ARGS)
+
+regen:
+	$(NIX_EXEC) node apps/api/dist/cli.js regen $(ARGS)
+
+listen:
+	$(NIX_EXEC) node apps/api/dist/cli.js listen
+
 run:
 	$(NIX_EXEC) node apps/api/dist/cli.js
 
-dev: build run
+dev: build listen
 
 review:
 	$(NIX_EXEC) pnpm --dir apps/docs dev
+
+example-react:
+	$(NIX_EXEC) pnpm --dir apps/example-react dev
 
 preview-pr:
 	$(NIX_EXEC) ./scripts/preview-pr.sh "$(BRANCH)" dev

@@ -7,6 +7,13 @@
         <span class="text-xs font-semibold uppercase tracking-wider text-foreground-muted">
           {{ normalizedComponentName }}
         </span>
+        <span
+          v-if="clickCount > 0"
+          :key="clickCount"
+          class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary-default/15 text-primary-default text-[11px] font-semibold transition-all"
+        >
+          <span>Clicked ({{ clickCount }})</span>
+        </span>
       </div>
 
       <!-- Concentric radius: outer rounded-xl (12px) - p-1 (4px) = inner rounded-lg (8px) -->
@@ -70,6 +77,96 @@
         <span :class="['w-1.5 h-1.5 rounded-full', interactiveProps[bKey] ? 'bg-primary-default' : 'bg-foreground-muted/50']"></span>
         <span>{{ bKey }}</span>
       </button>
+
+      <div
+        v-if="'label' in interactiveProps"
+        class="flex items-center gap-1.5"
+      >
+        <span class="text-foreground-muted font-medium">Label:</span>
+        <input
+          type="text"
+          :value="formatInputPropValue(interactiveProps.label)"
+          placeholder="Custom label..."
+          class="w-32 bg-background-default border border-border-default rounded-lg px-2 py-1 text-xs text-foreground-default focus:outline-none focus:ring-1 focus:ring-primary-default"
+          @input="(e: any) => setProp('label', e.target.value)"
+        />
+      </div>
+
+      <div
+        v-if="normalizedComponentName === 'DatePicker' && interactiveProps.showTime"
+        class="flex items-center gap-1.5"
+      >
+        <span class="text-foreground-muted font-medium">Time Label:</span>
+        <input
+          type="text"
+          :value="interactiveProps.timeLabel ?? 'Time'"
+          placeholder="Time"
+          class="w-24 bg-background-default border border-border-default rounded-lg px-2 py-1 text-xs text-foreground-default focus:outline-none focus:ring-1 focus:ring-primary-default"
+          @input="(e: any) => setProp('timeLabel', e.target.value)"
+        />
+      </div>
+
+      <div
+        v-if="'placeholder' in interactiveProps"
+        class="flex items-center gap-1.5"
+      >
+        <span class="text-foreground-muted font-medium">Placeholder:</span>
+        <input
+          type="text"
+          :value="interactiveProps.placeholder ?? ''"
+          placeholder="Custom placeholder..."
+          class="w-36 bg-background-default border border-border-default rounded-lg px-2 py-1 text-xs text-foreground-default focus:outline-none focus:ring-1 focus:ring-primary-default"
+          @input="(e: any) => setProp('placeholder', e.target.value)"
+        />
+      </div>
+
+      <div
+        v-if="'hint' in interactiveProps"
+        class="flex items-center gap-1.5"
+      >
+        <span class="text-foreground-muted font-medium">Hint:</span>
+        <input
+          type="text"
+          :value="formatInputPropValue(interactiveProps.hint)"
+          :placeholder="normalizedComponentName === 'DatePicker' ? 'e.g. date => `date ${date.formatted}`' : 'e.g. val => `Hint: ${val}`'"
+          class="w-48 bg-background-default border border-border-default rounded-lg px-2 py-1 text-xs text-foreground-default focus:outline-none focus:ring-1 focus:ring-primary-default"
+          @input="(e: any) => setProp('hint', e.target.value)"
+        />
+      </div>
+
+      <!-- Restriction options for file upload components -->
+      <div
+        v-if="isFileUploadComponent"
+        class="flex items-center gap-1.5"
+      >
+        <span class="text-foreground-muted font-medium">Restriction:</span>
+        <select
+          :value="activeRestrictionPreset"
+          class="bg-background-default border border-border-default rounded-lg px-2.5 py-1 text-xs text-foreground-default font-medium focus:outline-none focus:ring-1 focus:ring-primary-default cursor-pointer"
+          @change="(e: any) => onRestrictionPresetChange(e.target.value)"
+        >
+          <option value="none">Default (Up to 10 MB)</option>
+          <option value="pdf">PDF Only (Max 5 MB)</option>
+          <option value="images">Images Only (Max 2 MB)</option>
+          <option value="max1mb">Strict Limit (Max 1 MB)</option>
+          <option value="error">Simulate Restriction Error</option>
+          <option v-if="activeRestrictionPreset === 'custom'" value="custom">Custom</option>
+        </select>
+      </div>
+
+      <div
+        v-if="isFileUploadComponent"
+        class="flex items-center gap-1.5"
+      >
+        <span class="text-foreground-muted font-medium">Accept:</span>
+        <input
+          type="text"
+          :value="interactiveProps.accept ?? ''"
+          placeholder="e.g. .pdf, .png"
+          class="w-32 bg-background-default border border-border-default rounded-lg px-2 py-1 text-xs text-foreground-default focus:outline-none focus:ring-1 focus:ring-primary-default"
+          @input="(e: any) => onCustomAcceptInput(e.target.value)"
+        />
+      </div>
     </div>
 
     <!-- Preview Studio Canvas with subtle dot grid -->
@@ -162,8 +259,13 @@ const variantOptions = computed(() => extractVariantOptions(compMeta.value?.vari
 const booleanOptions = computed<string[]>(() => compMeta.value?.booleans || []);
 const stageWidthClass = computed(() => getPreviewStageWidthClass(normalizedComponentName.value));
 const exampleLoader = computed(() => getExampleLoader(props.name));
+const isFileUploadComponent = computed(() =>
+  ['InputFileDropZone', 'InputFileInput', 'InputImageUploader', 'InputMultipleFileUpload'].includes(normalizedComponentName.value)
+);
+const activeRestrictionPreset = ref('none');
 
 const interactiveProps = ref<Record<string, any>>({});
+const clickCount = ref(0);
 const canvasRef = ref<HTMLElement | null>(null);
 const stageRef = ref<HTMLElement | null>(null);
 const popoverPadTop = ref(0);
@@ -202,10 +304,47 @@ function syncPreviewFocus(shouldFocus: boolean) {
   });
 }
 
+function formatInputPropValue(val: unknown): string {
+  if (typeof val === 'function') {
+    return (val as { __source?: string }).__source || val.toString();
+  }
+  return typeof val === 'string' ? val : '';
+}
+
+function parsePreviewTextOrCallback(raw: unknown): unknown {
+  if (typeof raw !== 'string') return raw;
+  const trimmed = raw.trim();
+  if (/^(?:\([^)]*\)|[a-zA-Z_$][a-zA-Z0-9_$]*)\s*=>/.test(trimmed)) {
+    try {
+      const compiled = new Function(`return (${trimmed});`)();
+      if (typeof compiled === 'function') {
+        const safeFn = (arg: unknown) => {
+          try {
+            const res = compiled(arg);
+            return res === undefined || res === null ? '' : String(res);
+          } catch {
+            return trimmed;
+          }
+        };
+        (safeFn as { __source?: string }).__source = trimmed;
+        return safeFn;
+      }
+    } catch {
+      // Keep raw string while arrow expression is incomplete
+    }
+  }
+  return raw;
+}
+
 function setProp(key: string, value: any) {
   if (key === 'previewState') {
     interactiveProps.value = applyPreviewStatePatch(normalizedComponentName.value, String(value), interactiveProps.value);
     syncPreviewFocus(String(value).toLowerCase() === 'focus');
+    return;
+  }
+  if (key === 'error') {
+    const nextErrMsg = value ? applyPreviewStatePatch(normalizedComponentName.value, 'error', interactiveProps.value).errorMessage : '';
+    interactiveProps.value = { ...interactiveProps.value, error: value, errorMessage: nextErrMsg, state: value ? 'error' : 'default', previewState: value ? 'error' : 'default' };
     return;
   }
   if (key === 'disabled' && 'previewState' in interactiveProps.value) {
@@ -213,12 +352,137 @@ function setProp(key: string, value: any) {
     interactiveProps.value = { ...interactiveProps.value, disabled: value, errorMessage: value ? '' : interactiveProps.value.errorMessage, previewState: nextState };
     return;
   }
+  if (key === 'trigger') {
+    interactiveProps.value = { ...interactiveProps.value, trigger: value, open: false };
+    return;
+  }
+  if (key === 'icon') {
+    interactiveProps.value = { ...interactiveProps.value, icon: value, showIcon: true };
+    return;
+  }
+  if (key === 'leftIcon') {
+    interactiveProps.value = { ...interactiveProps.value, leftIcon: value, showLeftIcon: true };
+    return;
+  }
+  if (key === 'rightIcon') {
+    interactiveProps.value = { ...interactiveProps.value, rightIcon: value, showRightIcon: true };
+    return;
+  }
+  if (key === 'leadingIcon') {
+    interactiveProps.value = { ...interactiveProps.value, leadingIcon: value, showLeadingIcon: true };
+    return;
+  }
+  if (key === 'trailingIcon') {
+    interactiveProps.value = { ...interactiveProps.value, trailingIcon: value, showTrailingIcon: true };
+    return;
+  }
+  if (normalizedComponentName.value === 'DatePicker' && key === 'mode') {
+    interactiveProps.value = {
+      ...interactiveProps.value,
+      mode: value,
+      value: 0,
+      displayValue: '',
+      inputText: '',
+      viewMode: '',
+      month: 6,
+      year: value === 'year' ? 2026 : 2025,
+      selectedMonth: 0,
+      selectedYear: 0,
+      startMonth: 0,
+      startYear: 0,
+      endMonth: 7,
+      endYear: 2025,
+      endValue: 9,
+      hoverMonth: 0,
+      hoverYear: 0,
+      hoverValue: 0,
+      __rangeSelectingEnd: false,
+      open: true,
+    };
+    return;
+  }
+  if (key === 'label') {
+    const parsed = parsePreviewTextOrCallback(value);
+    interactiveProps.value = { ...interactiveProps.value, label: parsed, ...(value ? { showLabel: true } : {}) };
+    return;
+  }
+  if (key === 'hint') {
+    const parsed = parsePreviewTextOrCallback(value);
+    interactiveProps.value = { ...interactiveProps.value, hint: parsed, ...(value ? { showHint: true } : {}) };
+    return;
+  }
   interactiveProps.value = { ...interactiveProps.value, [key]: value };
+}
+
+function onRestrictionPresetChange(preset: string) {
+  activeRestrictionPreset.value = preset;
+  if (preset === 'pdf') {
+    interactiveProps.value = {
+      ...interactiveProps.value,
+      accept: '.pdf,application/pdf',
+      supportingText: 'Only PDF documents up to 5 MB',
+      maxSizeBytes: 5 * 1024 * 1024,
+      error: false,
+      errorMessage: '',
+      state: interactiveProps.value.fileName ? 'filled' : 'default',
+      previewState: interactiveProps.value.fileName ? 'filled' : 'default',
+    };
+  } else if (preset === 'images') {
+    interactiveProps.value = {
+      ...interactiveProps.value,
+      accept: 'image/png,image/jpeg,.png,.jpg',
+      supportingText: 'PNG or JPG images up to 2 MB',
+      maxSizeBytes: 2 * 1024 * 1024,
+      error: false,
+      errorMessage: '',
+      state: interactiveProps.value.fileName ? 'filled' : 'default',
+      previewState: interactiveProps.value.fileName ? 'filled' : 'default',
+    };
+  } else if (preset === 'max1mb') {
+    interactiveProps.value = {
+      ...interactiveProps.value,
+      accept: '.pdf,.png,.jpg,image/png,image/jpeg,application/pdf',
+      supportingText: 'Maximum file size is 1 MB',
+      maxSizeBytes: 1 * 1024 * 1024,
+      error: false,
+      errorMessage: '',
+      state: interactiveProps.value.fileName ? 'filled' : 'default',
+      previewState: interactiveProps.value.fileName ? 'filled' : 'default',
+    };
+  } else if (preset === 'error') {
+    interactiveProps.value = {
+      ...interactiveProps.value,
+      accept: '.pdf,application/pdf',
+      supportingText: 'Only PDF documents up to 5 MB',
+      error: true,
+      errorMessage: 'File format not supported or size exceeds limit.',
+      state: 'error',
+      previewState: 'error',
+    };
+  } else {
+    activeRestrictionPreset.value = 'none';
+    interactiveProps.value = {
+      ...interactiveProps.value,
+      accept: '',
+      supportingText: 'PNG, JPG, or PDF up to 10 MB',
+      maxSizeBytes: 10 * 1024 * 1024,
+      error: false,
+      errorMessage: '',
+      state: interactiveProps.value.fileName ? 'filled' : 'default',
+      previewState: interactiveProps.value.fileName ? 'filled' : 'default',
+    };
+  }
+}
+
+function onCustomAcceptInput(val: string) {
+  activeRestrictionPreset.value = 'custom';
+  setProp('accept', val);
 }
 
 watch(
   () => [props.name, props.defaultProps, variantOptions.value],
   () => {
+    activeRestrictionPreset.value = 'none';
     const compKey = normalizedComponentName.value;
     const defaults: Record<string, any> = {
       ...(DEFAULT_PROPS_BY_COMPONENT[compKey] || DEFAULT_PROPS_BY_COMPONENT[props.name] || {}),
@@ -234,15 +498,25 @@ watch(
       }
     }
     interactiveProps.value = defaults;
+    clickCount.value = 0;
   },
   { immediate: true }
 );
 
-const resolvedProps = computed(() =>
-  exampleLoader.value ? {} : buildInteractivePreviewProps(interactiveProps.value, (patch) => {
+const resolvedProps = computed(() => {
+  if (exampleLoader.value) return {};
+  const built = buildInteractivePreviewProps(interactiveProps.value, (patch) => {
     interactiveProps.value = { ...interactiveProps.value, ...patch };
-  })
-);
+  });
+  const baseOnClick = built.onClick;
+  built.onClick = () => {
+    if (!interactiveProps.value.disabled) {
+      clickCount.value += 1;
+    }
+    baseOnClick?.();
+  };
+  return built;
+});
 
 async function loadActiveComponent() {
   const entry = exampleLoader.value || getComponentLoader(props.name);

@@ -12,7 +12,7 @@ const TYPE_IMPORTS_BY_PROP: Record<string, Record<string, string>> = {
   ChartPie: { data: 'ChartDataPoint' },
 };
 
-const IGNORED_PREVIEW_KEYS = new Set(['previewState', 'inline']);
+const IGNORED_PREVIEW_KEYS = new Set(['previewState', 'inline', 'maxSizeBytes']);
 
 function formatTsLiteral(val: unknown, indent = 0): string {
   const pad = '  '.repeat(indent);
@@ -53,15 +53,42 @@ interface PartitionedProps {
   entries: Array<{ key: string; val: unknown; isComplex: boolean }>;
 }
 
-function partitionProps(compName: string, rawProps: Record<string, unknown>): PartitionedProps {
+const ICON_PROP_KEYS = new Set(['icon', 'leftIcon', 'rightIcon', 'leadingIcon', 'trailingIcon']);
+
+function toPascalIconName(val: unknown, fallback: string): string {
+  if (typeof val === 'string' && val.trim() && val.trim() !== 'default') {
+    return val
+      .trim()
+      .split(/[-_\s]+|(?=[A-Z])/)
+      .filter(Boolean)
+      .map((s) => s.charAt(0).toUpperCase() + s.slice(1).toLowerCase())
+      .join('');
+  }
+  return fallback;
+}
+
+function partitionProps(compName: string, rawProps: Record<string, unknown>, fw: UsageFramework): PartitionedProps {
   const tsTypes: string[] = [];
   const varDecls: Array<{ key: string; typeAnnotation: string; valueCode: string }> = [];
   const entries: Array<{ key: string; val: unknown; isComplex: boolean }> = [];
   const propTypeMap = TYPE_IMPORTS_BY_PROP[compName] || {};
 
   for (const [key, val] of Object.entries(rawProps)) {
-    if (IGNORED_PREVIEW_KEYS.has(key) || key === 'children' || key.startsWith('on') || typeof val === 'function') continue;
+    if (IGNORED_PREVIEW_KEYS.has(key) || key === 'children' || key.startsWith('on')) continue;
     if (val === undefined || val === '') continue;
+    if (ICON_PROP_KEYS.has(key)) continue;
+    if (compName === 'Button' && (key === 'showLeftIcon' || key === 'showRightIcon')) continue;
+    if (typeof val === 'function') {
+      const fnCode = typeof (val as { __source?: string }).__source === 'string'
+        ? (val as { __source: string }).__source
+        : val.toString();
+      const needsVarDecl = fw === 'angular';
+      if (needsVarDecl) {
+        varDecls.push({ key, typeAnnotation: '', valueCode: fnCode });
+      }
+      entries.push({ key, val, isComplex: needsVarDecl });
+      continue;
+    }
     const isComplex = Array.isArray(val) || (typeof val === 'object' && val !== null);
     if (isComplex) {
       const itemType = propTypeMap[key];
@@ -81,6 +108,13 @@ function formatAttr(fw: UsageFramework, key: string, val: unknown, isComplex: bo
     if (fw === 'angular') return `[${key}]="${key}"`;
     return `:${key}="${key}"`;
   }
+  if (typeof val === 'function') {
+    const fnCode = typeof (val as { __source?: string }).__source === 'string'
+      ? (val as { __source: string }).__source
+      : val.toString();
+    if (fw === 'react' || fw === 'svelte') return `${key}={${fnCode}}`;
+    return `:${key}="${fnCode.replace(/"/g, "'")}"`;
+  }
   if (typeof val === 'string') {
     const clean = val.startsWith('data:image/') ? '/avatar-sample.svg' : val.replace(/"/g, '&quot;');
     return `${key}="${clean}"`;
@@ -98,7 +132,7 @@ function formatAttr(fw: UsageFramework, key: string, val: unknown, isComplex: bo
 /** Renders the element; text `content` (the `children` fixture) becomes the element body in every framework. */
 function buildElementCall(compName: string, fw: UsageFramework, attrs: string[], indent: string, content?: string): string {
   const isAngular = fw === 'angular';
-  const tag = isAngular ? `spn-${compName.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase()}` : compName;
+  const tag = isAngular ? `kd-${compName.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase()}` : compName;
   const hasBody = isAngular || content !== undefined;
   const body = hasBody ? `>${content ?? ''}</${tag}>` : ' />';
   if (attrs.length === 0) return `${indent}<${tag}${hasBody ? body : ' />'}`;
@@ -109,7 +143,7 @@ function buildElementCall(compName: string, fw: UsageFramework, attrs: string[],
 
 function buildImportStatement(compName: string, pkgSubpath: string, tsTypes: string[]): string {
   const specs = [compName, ...tsTypes.map((t) => `type ${t}`)].join(', ');
-  return `import { ${specs} } from '@supernova/design-system/${pkgSubpath}';`;
+  return `import { ${specs} } from '@komerce-design/${pkgSubpath}';`;
 }
 
 export function generateLiveUsageCode(
@@ -117,29 +151,57 @@ export function generateLiveUsageCode(
   framework: UsageFramework,
   rawProps: Record<string, unknown>
 ): string {
-  const { tsTypes, varDecls, entries } = partitionProps(compName, rawProps);
+  const { tsTypes, varDecls, entries } = partitionProps(compName, rawProps, framework);
   const content = typeof rawProps.children === 'string' ? rawProps.children : undefined;
   const attrs = entries.map((e) => formatAttr(framework, e.key, e.val, e.isComplex));
+  const iconEntries: Array<{ propKey: string; compSymbol: string }> = [];
+  for (const propKey of ICON_PROP_KEYS) {
+    const rawVal = rawProps[propKey];
+    const hasShowFallback =
+      compName === 'Button' &&
+      ((propKey === 'leftIcon' && Boolean(rawProps.showLeftIcon)) ||
+        (propKey === 'rightIcon' && Boolean(rawProps.showRightIcon)));
+    const isCustomIcon = typeof rawVal === 'string' && rawVal.trim() !== '' && rawVal.trim() !== 'default';
+    if (isCustomIcon || hasShowFallback) {
+      const defaultSymbol = propKey === 'rightIcon' || propKey === 'trailingIcon' ? 'ArrowRight' : 'Plus';
+      iconEntries.push({ propKey, compSymbol: toPascalIconName(rawVal, defaultSymbol) });
+    }
+  }
+  for (const { propKey, compSymbol } of iconEntries) {
+    attrs.push(
+      framework === 'react'
+        ? `${propKey}={<${compSymbol} className="h-4 w-4" />}`
+        : framework === 'svelte'
+          ? `${propKey}={${compSymbol}}`
+          : framework === 'angular'
+            ? `[${propKey}]="${compSymbol}IconComponent"`
+            : `:${propKey}="${compSymbol}"`
+    );
+  }
+  const iconSpecs = [...new Set(iconEntries.map((e) => e.compSymbol))].join(', ');
   const declBlock = varDecls.map((d) => `const ${d.key}${d.typeAnnotation} = ${d.valueCode};`).join('\n\n');
 
   if (framework === 'react') {
     const imp = buildImportStatement(compName, 'react', tsTypes);
+    const iconImp = iconSpecs ? `import { ${iconSpecs} } from 'lucide-react';` : '';
     const call = buildElementCall(compName, 'react', attrs, '    ', content);
     const body = call.includes('\n') ? `  return (\n${call}\n  );` : `  return ${call.trim()};`;
-    return [imp, declBlock, `export default function App() {\n${body}\n}`].filter(Boolean).join('\n\n');
+    return [[imp, iconImp].filter(Boolean).join('\n'), declBlock, `export default function App() {\n${body}\n}`].filter(Boolean).join('\n\n');
   }
   if (framework === 'vue3') {
     const imp = buildImportStatement(compName, 'vue3', tsTypes);
-    const scriptBody = [imp, declBlock].filter(Boolean).join('\n\n');
+    const iconImp = iconSpecs ? `import { ${iconSpecs} } from 'lucide-vue-next';` : '';
+    const scriptBody = [[imp, iconImp].filter(Boolean).join('\n'), declBlock].filter(Boolean).join('\n\n');
     const call = buildElementCall(compName, 'vue3', attrs, '  ', content);
     return `<script setup lang="ts">\n${scriptBody}\n</script>\n\n<template>\n${call}\n</template>`;
   }
   if (framework === 'svelte') {
     const imp = `  ${buildImportStatement(compName, 'svelte', tsTypes)}`;
+    const iconImp = iconSpecs ? `  import { ${iconSpecs} } from 'lucide-svelte';` : '';
     const indentedDecls = declBlock
       ? declBlock.split('\n').map((l) => (l.trim() ? `  ${l}` : l)).join('\n')
       : '';
-    const scriptBody = [imp, indentedDecls].filter(Boolean).join('\n\n');
+    const scriptBody = [[imp, iconImp].filter(Boolean).join('\n'), indentedDecls].filter(Boolean).join('\n\n');
     const call = buildElementCall(compName, 'svelte', attrs, '', content);
     return `<script lang="ts">\n${scriptBody}\n</script>\n\n${call}`;
   }
@@ -169,7 +231,7 @@ export function generateLiveUsageCode(
   const typeImport = tsTypes.length ? `, type ${tsTypes.join(', type ')}` : '';
   return [
     "import { Component } from '@angular/core';",
-    `import { ${compName}Module${typeImport} } from '@supernova/design-system/angular';`,
+    `import { ${compName}Module${typeImport} } from '@komerce-design/angular';`,
     '',
     '@Component({',
     "  selector: 'app-root',",

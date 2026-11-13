@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Supernova Extractor</title>
+  <title>Komerce Design Extractor</title>
   <style>
     :root {
       --font-family: Inter, system-ui, -apple-system, sans-serif;
@@ -457,7 +457,7 @@
 </head>
 <body>
   <div class="header">
-    <h1>Supernova Extractor</h1>
+    <h1>Komerce Design Extractor</h1>
     <p>Extract entire document & compile to multi-framework design system</p>
   </div>
 
@@ -519,11 +519,12 @@
   <div class="form-group">
     <label>Deployment Workflow</label>
     <div class="output-preview-hint">
-      Changes are published directly to GitHub Design System repo (<code>Pull Request</code>)
+      Export JSON for CLI (<code>komerce sync</code>) or sync directly to local workspace (<code>src/*</code> &amp; <code>library/*</code>)
     </div>
   </div>
 
-  <button type="button" id="startBtn" class="btn-primary" disabled>Compute Sync Plan</button>
+  <button type="button" id="exportJsonBtn" class="btn-primary" style="background: #111827;" disabled>Export Extraction JSON ⬇</button>
+  <button type="button" id="startBtn" class="btn-primary" disabled>Compute Local Sync Plan</button>
 
   <div id="planPanel" class="plan-card" style="display: none;">
     <div class="discovery-header">
@@ -531,7 +532,7 @@
     </div>
     <div id="planSummary" class="plan-summary"></div>
     <div id="planComponentList" class="component-list" style="max-height: 140px;"></div>
-    <button type="button" id="applyPlanBtn" class="btn-primary" style="margin-top: 10px; background: #059669;">Create / Update PR ↗</button>
+    <button type="button" id="applyPlanBtn" class="btn-primary" style="margin-top: 10px; background: #059669;">Apply Sync to Workspace</button>
   </div>
 
   <div id="statusPanel" class="status-panel">

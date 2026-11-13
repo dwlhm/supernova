@@ -1,5 +1,5 @@
 {
-  "name": "@supernova/figma-plugin",
+  "name": "@komerce-design/figma-plugin",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -11,7 +11,7 @@
   },
   "devDependencies": {
     "@figma/plugin-typings": "^1.106.0",
-    "@supernova/contracts": "workspace:*",
+    "@komerce-design/contracts": "workspace:*",
     "@types/node": "^22.13.0",
     "esbuild": "^0.25.0",
     "typescript": "^5.8.2"

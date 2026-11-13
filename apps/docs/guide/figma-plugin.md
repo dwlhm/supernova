@@ -18,18 +18,19 @@ This ensures all `PageNode` objects are fully initialized in memory prior to tra
 
 1. Build the plugin bundle:
    ```bash
-   pnpm --filter @supernova/figma-plugin build
+   pnpm --filter @komerce-design/figma-plugin build
    ```
 2. Open Figma Desktop App.
 3. Navigate to **Plugins** -> **Development** -> **Import plugin from manifest...**.
 4. Select `packages/figma-plugin/manifest.json`.
 
-## Configuration Options
+## Sync Workflows in the Plugin UI
 
-Inside the plugin UI:
-- **Backend API URL**: `http://localhost:8080` (default) or deployed backend endpoint.
-- **Bearer Token**: Optional authorization header when the backend runs with `API_TOKEN`.
-- **Target Frameworks**: Select any subset of React, Svelte, Vue 3, Vue 2, Angular (all selected by default).
-- **Publish Outputs**:
-  - `Download ZIP`: Downloads the complete multi-framework bundle.
-  - `GitHub PR`: Automatically creates a branch and opens a Pull Request.
+Inside the plugin UI, select the components you want to sync and choose either workflow:
+
+1. **Export Extraction JSON ⬇ (Zero Server)**:
+   - Downloads `<document>-figma.json` directly from Figma.
+   - Run `pnpm komerce sync ./<document>-figma.json` in your terminal to author `src/*` and compile `library/*` in-process.
+2. **Compute Local Sync Plan → Apply Sync to Workspace (1-Click Listener)**:
+   - Start `pnpm komerce listen` in your terminal (`http://127.0.0.1:8080`, no `API_TOKEN` needed).
+   - Click **Compute Local Sync Plan** to preview `New`, `Changed`, and `Unchanged` components, then click **Apply Sync to Workspace** to stream progress and write directly to `src/*`, `library/*`, and `apps/docs`.

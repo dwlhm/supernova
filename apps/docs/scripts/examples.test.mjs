@@ -2,7 +2,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { compileExamples, exampleParent, flattenExampleImports, toUsageSnippet } from './examples.mjs';
 
-describe('composition examples (@supernova/docs)', () => {
+describe('composition examples (@komerce-design/docs)', () => {
   it('maps example names to their parent component', () => {
     assert.equal(exampleParent('StepperExample'), 'Stepper');
     assert.equal(exampleParent('Example'), undefined);
@@ -18,17 +18,17 @@ describe('composition examples (@supernova/docs)', () => {
     const vue = `<template>\n  <Stepper><StepperItem /></Stepper>\n</template>\n\n<script setup lang="ts">\nimport Stepper from "./Stepper.vue";\nimport StepperItem from "./StepperItem.vue";\n</script>\n`;
     assert.equal(
       toUsageSnippet('vue3', vue),
-      `<template>\n  <Stepper><StepperItem /></Stepper>\n</template>\n\n<script setup lang="ts">\nimport { Stepper, StepperItem } from '@supernova/design-system/vue3';\n</script>\n`
+      `<template>\n  <Stepper><StepperItem /></Stepper>\n</template>\n\n<script setup lang="ts">\nimport { Stepper, StepperItem } from '@komerce-design/vue3';\n</script>\n`
     );
 
     const react = `import * as React from "react";\nimport Stepper from "./Stepper";\n\nfunction StepperExample(props: any) {\n  return <Stepper />;\n}\n\nObject.assign(StepperExample, { Stepper });\n\nexport default StepperExample;\n`;
     const reactUsage = toUsageSnippet('react', react);
-    assert.match(reactUsage, /^import \{ Stepper \} from '@supernova\/design-system\/react';/);
+    assert.match(reactUsage, /^import \{ Stepper \} from '@komerce-design\/react';/);
     assert.doesNotMatch(reactUsage, /Object\.assign|props: any|from "\.\/Stepper"/);
 
     const angular = `import { Component } from "@angular/core";\nimport { StepperModule } from "./Stepper";\nimport { StepperItemModule } from "./StepperItem";\n@NgModule({\n  imports: [CommonModule, StepperModule, StepperItemModule],\n})\nexport class StepperExampleModule {}\n`;
     const angularUsage = toUsageSnippet('angular', angular);
-    assert.match(angularUsage, /^import \{ StepperModule, StepperItemModule \} from '@supernova\/design-system\/angular';/);
+    assert.match(angularUsage, /^import \{ StepperModule, StepperItemModule \} from '@komerce-design\/angular';/);
     assert.doesNotMatch(angularUsage, /from "\.\/Stepper/);
   });
 

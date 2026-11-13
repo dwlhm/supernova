@@ -98,13 +98,45 @@
       <svg class="w-3.5 h-3.5 shrink-0 text-foreground-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </div>
 
-    <!-- MetricCard -->
-    <div v-else-if="slug === 'metric-card'" class="w-44 p-2.5 rounded-lg border border-border-default bg-background-subtle flex flex-col gap-1">
+    <!-- Card -->
+    <div v-else-if="slug === 'card'" class="w-44 p-2.5 rounded-lg border border-border-default bg-background-subtle flex flex-col gap-1">
       <div class="flex items-center justify-between text-[10px] text-foreground-muted">
         <span>Revenue</span>
         <span class="text-emerald-500 font-semibold">+18.4%</span>
       </div>
       <div class="text-sm font-bold text-foreground-default">Rp 148.5M</div>
+    </div>
+
+    <!-- Stat -->
+    <div v-else-if="slug === 'stat'" class="flex items-center gap-3">
+      <div class="flex flex-col">
+        <span class="text-[10px] text-foreground-muted">User A</span>
+        <span class="text-sm font-bold text-foreground-default">2.45M</span>
+      </div>
+      <div class="h-6 w-px bg-border-default"></div>
+      <div class="flex flex-col">
+        <span class="text-[10px] text-foreground-muted">User B</span>
+        <span class="text-sm font-bold text-foreground-muted">1.80M</span>
+      </div>
+    </div>
+
+    <!-- Divider -->
+    <div v-else-if="slug === 'divider'" class="w-36 flex flex-col gap-2">
+      <div class="h-2 w-24 rounded bg-foreground-muted/20"></div>
+      <div class="h-px w-full bg-border-default"></div>
+      <div class="h-2 w-20 rounded bg-foreground-muted/20"></div>
+    </div>
+
+    <!-- ListItem -->
+    <div v-else-if="slug === 'list-item'" class="w-44 flex flex-col gap-1.5">
+      <div class="flex items-center justify-between text-[10px]">
+        <span class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-primary-default"></span>Organic</span>
+        <span class="font-semibold">5,420</span>
+      </div>
+      <div class="flex items-center justify-between text-[10px]">
+        <span class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-cyan-500"></span>Direct</span>
+        <span class="font-semibold">4,110</span>
+      </div>
     </div>
 
     <!-- Chart -->

@@ -13,9 +13,9 @@ import {
 } from '../dist/index.js';
 import { invokeRouter, waitForJobCompletion } from './helpers.js';
 
-describe('Service & HTTP Router End-to-End (@supernova/api)', () => {
+describe('Service & HTTP Router End-to-End (@komerce-design/api)', () => {
   it('handles health check, auth guard, extraction job, ZIP download, and incremental sync', async () => {
-    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'supernova-api-test-'));
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'komerce-api-test-'));
     const store = new MemStore();
     const author = new DevMockAuthor();
     const publishers = [new DownloadPublisher(store)];
@@ -177,7 +177,7 @@ describe('Service & HTTP Router End-to-End (@supernova/api)', () => {
         return 'komerce/ds';
       },
       async getPullRequestBranch() {
-        return 'supernova/ds';
+        return 'komerce-design/ds';
       },
       async getFileContent(_owner, _repo, filePath) {
         requestedPaths.push(filePath);
@@ -246,13 +246,13 @@ describe('Service & HTTP Router End-to-End (@supernova/api)', () => {
     assert.equal(accepted.accepted, true);
     await accepted.completion;
     assert.equal(comments.length, 1);
-    assert.match(comments[0], /Supernova successfully regenerated component \*\*Badge\*\*/);
+    assert.match(comments[0], /Komerce Design successfully regenerated component \*\*Badge\*\*/);
     assert.ok(requestedPaths.includes('src/components/Badge.lite.tsx'));
 
     const iconAccepted = svc.handleGitHubWebhook(
       'issue_comment',
       webhookEvent({
-        comment: { body: '/supernova regenerate IconTruckDelivery: adjust stroke', author_association: 'OWNER' },
+        comment: { body: '/komerce regenerate IconTruckDelivery: adjust stroke', author_association: 'OWNER' },
       })
     );
     assert.equal(iconAccepted.accepted, true);

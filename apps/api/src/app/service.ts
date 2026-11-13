@@ -28,6 +28,7 @@ export interface ServicePaths {
   extractionsDir: string;
   docsDir?: string;
   generatedDir?: string;
+  workspaceDir?: string;
 }
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -144,7 +145,6 @@ export class Service {
     if (this.paths.extractionsDir) {
       fs.mkdirSync(this.paths.extractionsDir, { recursive: true });
       const data = JSON.stringify(req, null, 2);
-      fs.writeFileSync(path.join(this.paths.extractionsDir, `${jobId}.json`), data, 'utf8');
       fs.writeFileSync(path.join(this.paths.extractionsDir, 'latest.json'), data, 'utf8');
     }
 
@@ -194,7 +194,11 @@ export class Service {
     ) {
       throw new DomainError('INVALID_PAYLOAD', 'sync document is empty');
     }
-    const plan = await calculateSyncPlan(this.store, req);
+    const localPub = this.publishers.get('local') as { workspaceDir?: string } | undefined;
+    const plan = await calculateSyncPlan(this.store, req, {
+      workspaceDir: this.paths.workspaceDir ?? localPub?.workspaceDir,
+      extractionsDir: this.paths.extractionsDir,
+    });
     await this.store.saveSyncPlan(plan);
     return plan;
   }
@@ -245,6 +249,7 @@ export class Service {
   }
 
   async executeJob(jobId: string): Promise<void> {
+    const localPub = this.publishers.get('local') as { workspaceDir?: string } | undefined;
     await executeExtractionJob(
       {
         store: this.store,
@@ -255,6 +260,7 @@ export class Service {
         concurrency: this.concurrency,
         docsDir: this.paths.docsDir,
         generatedDir: this.paths.generatedDir,
+        workspaceDir: this.paths.workspaceDir ?? localPub?.workspaceDir,
       },
       jobId
     );

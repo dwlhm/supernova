@@ -5,7 +5,7 @@ import type { JobStore } from '../store/store.js';
 import type { MitosisAuthor } from './author-runner.js';
 import { resolveComponentGroup } from './docs-writer.js';
 
-const RE_BOT_COMMAND = /^\s*\/supernova\s+regenerate\s+([^\s:]+)(?:\s*:\s*(.+))?\s*$/m;
+const RE_BOT_COMMAND = /^\s*\/(?:komerce(?:-design)?|supernova)\s+regenerate\s+([^\s:]+)(?:\s*:\s*(.+))?\s*$/m;
 
 const TRUSTED_ASSOCIATIONS = new Set(['OWNER', 'MEMBER', 'COLLABORATOR']);
 
@@ -99,7 +99,7 @@ export function processGitHubWebhook(
     const msg = err instanceof Error ? err.message : String(err);
     console.error(`[API] regenerate ${cmd.componentName} on PR #${cmd.prNumber} failed: ${msg}`);
     await prManager
-      .createComment(cmd.owner, cmd.repo, cmd.prNumber, `⚠️ Supernova failed to regenerate **${cmd.componentName}**:\n\`\`\`\n${msg}\n\`\`\``)
+      .createComment(cmd.owner, cmd.repo, cmd.prNumber, `⚠️ Komerce Design failed to regenerate **${cmd.componentName}**:\n\`\`\`\n${msg}\n\`\`\``)
       .catch((commentErr) => console.error('[API] failed to report webhook error on PR:', commentErr));
   });
   return { accepted: true, completion };
@@ -174,6 +174,6 @@ async function regenerateComponent(
     owner,
     repo,
     prNumber,
-    `✅ Supernova successfully regenerated component **${rawCompName}**.${noteSummary}\nCommit: \`${commitSha}\` on branch \`${branch}\`.`
+    `✅ Komerce Design successfully regenerated component **${rawCompName}**.${noteSummary}\nCommit: \`${commitSha}\` on branch \`${branch}\`.`
   );
 }

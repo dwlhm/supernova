@@ -19,11 +19,11 @@ export function toKebabCase(name: string): string {
 }
 
 /**
- * `spn-<name>` always; the bare `<name>` alias only when it is not a native element. A bare `button`/`table`
+ * `kd-<name>` always; the bare `<name>` alias only when it is not a native element. A bare `button`/`table`
  * selector would also match the component's own native `<button>`/`<table>` and recurse forever.
  */
 export function angularSelector(kebabName: string): string {
-  const prefixed = `spn-${kebabName}`;
+  const prefixed = `kd-${kebabName}`;
   return HTML_ELEMENTS.has(kebabName) ? prefixed : `${prefixed}, ${kebabName}`;
 }
 
@@ -39,7 +39,7 @@ function siblingImportNames(json: any): Set<string> {
 function tagSiblingNodes(node: any, siblings: Set<string>): void {
   if (!node || typeof node !== 'object') return;
   if (node['@type'] === '@builder.io/mitosis/node' && siblings.has(node.name)) {
-    node.meta = { ...node.meta, selector: `spn-${toKebabCase(node.name)}` };
+    node.meta = { ...node.meta, selector: `kd-${toKebabCase(node.name)}` };
   }
   for (const val of Object.values(node)) {
     if (Array.isArray(val)) val.forEach((child) => tagSiblingNodes(child, siblings));
@@ -49,7 +49,7 @@ function tagSiblingNodes(node: any, siblings: Set<string>): void {
 
 /**
  * Mitosis prints composed siblings as `<kebab-name>`, which for `Button`/`Table` is indistinguishable from the
- * native element. Tag every sibling node with its prefixed selector so the template uses `<spn-button>`.
+ * native element. Tag every sibling node with its prefixed selector so the template uses `<kd-button>`.
  */
 export function angularSiblingTagPlugin() {
   const pre = (json: any) => {

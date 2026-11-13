@@ -130,7 +130,7 @@ export interface components {
         /** @enum {string} */
         Framework: "mitosis" | "react" | "svelte" | "vue3" | "vue2" | "angular";
         /** @enum {string} */
-        PublisherType: "download" | "pull_request";
+        PublisherType: "local" | "download" | "pull_request";
         /** @enum {string} */
         JobStatus: "queued" | "authoring" | "compiling" | "publishing" | "succeeded" | "partially_succeeded" | "failed";
         /** @enum {string} */
@@ -424,6 +424,8 @@ export interface components {
             pullRequestUrl?: string;
             branchName?: string;
             commitSha?: string;
+            workspaceDir?: string;
+            filesWritten?: number;
         };
         JobResponse: {
             jobId: string;

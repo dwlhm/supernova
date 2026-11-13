@@ -1,14 +1,42 @@
 import ts from 'typescript';
 import { extractDefaultPropsFromSource } from './adapter-vue3.js';
 
+function extractTypeOnlyImportNames(source?: string): Set<string> {
+  const names = new Set<string>();
+  if (!source) return names;
+  const sf = ts.createSourceFile('comp.tsx', source, ts.ScriptTarget.ESNext, true, ts.ScriptKind.TSX);
+  for (const stmt of sf.statements) {
+    if (!ts.isImportDeclaration(stmt) || !stmt.importClause) continue;
+    const named = stmt.importClause.namedBindings;
+    if (!named || !ts.isNamedImports(named)) continue;
+    for (const el of named.elements) {
+      if (stmt.importClause.isTypeOnly || el.isTypeOnly) {
+        names.add(el.name.text);
+      }
+    }
+  }
+  return names;
+}
+
+function restoreTypeOnlyImports(code: string, typeOnlyNames: Set<string>): string {
+  if (typeOnlyNames.size === 0) return code;
+  return code.replace(
+    /import\s*\{([^}]+)\}\s*from\s*(['"][^'"]+['"])/g,
+    (_full, specList: string, mod: string) => {
+      const updated = specList.replace(/(?<!\btype\s+)\b([a-zA-Z_$][a-zA-Z0-9_$]*)\b/g, (tok) =>
+        typeOnlyNames.has(tok) ? `type ${tok}` : tok
+      );
+      return `import {${updated}} from ${mod}`;
+    }
+  );
+}
+
 export function extractPropsInterfaceInfo(codeOrSource: string): { interfaceName: string; keys: string[] } | null {
   const sf = ts.createSourceFile('comp.tsx', codeOrSource, ts.ScriptTarget.ESNext, true, ts.ScriptKind.TSX);
   let targetInterface: ts.InterfaceDeclaration | null = null;
   for (const stmt of sf.statements) {
-    if (ts.isInterfaceDeclaration(stmt)) {
-      if (!targetInterface || stmt.name.text.endsWith('Props')) {
-        targetInterface = stmt;
-      }
+    if (ts.isInterfaceDeclaration(stmt) && stmt.name.text.endsWith('Props')) {
+      targetInterface = stmt;
     }
   }
   if (!targetInterface) return null;
@@ -31,13 +59,18 @@ export function extractPropsInterfaceInfo(codeOrSource: string): { interfaceName
  * 3. Ensures reactive getter closures `$: foo = () => { ... }` reference local state variables at the top level.
  */
 export function adaptSvelteOutput(rawCode: string, source?: string): string {
-  let code = rawCode.replace(
-    /(export\s+interface\s+\w+Props\s*\{)([\s\S]*?)(\})/m,
-    (full, open: string, body: string, close: string) => {
-      const stripped = body.replace(/^\s*children\s*\?\s*:\s*any\s*;?\s*$/gm, '');
-      return stripped.trim().length > 0 ? `${open}${stripped}${close}` : full;
-    }
-  );
+  let code = restoreTypeOnlyImports(rawCode, extractTypeOnlyImportNames(source))
+    .replace(
+      /(?<!=)\{(icon|[a-zA-Z0-9_]+Icon)\}/g,
+      '{#if $1}<svelte:component this={$1} class="h-4 w-4 shrink-0" />{:else}<slot name="$1" />{/if}'
+    )
+    .replace(
+      /(export\s+interface\s+\w+Props\s*\{)([\s\S]*?)(\})/m,
+      (full, open: string, body: string, close: string) => {
+        const stripped = body.replace(/^\s*children\s*\?\s*:\s*any\s*;?\s*$/gm, '');
+        return stripped.trim().length > 0 ? `${open}${stripped}${close}` : full;
+      }
+    );
   const instanceScriptRegex = /(<script(?![^>]*context=["']module["'])[^>]*>)([\s\S]*?)(<\/script>)/;
   const scriptMatch = code.match(instanceScriptRegex);
   if (!scriptMatch) return code;
@@ -48,7 +81,12 @@ export function adaptSvelteOutput(rawCode: string, source?: string): string {
 
   let scriptBody = scriptMatch[2]!;
   if (/<slot\b/.test(code) && !/\binterface\s+\$\$Slots\b/.test(scriptBody)) {
-    scriptBody = `\n  interface $$Slots {\n    default: Record<string, never>;\n  }${scriptBody}`;
+    const slotNames = new Set<string>(['default']);
+    for (const m of code.matchAll(/<slot\s+[^>]*name=["']([a-zA-Z0-9_-]+)["']/g)) {
+      slotNames.add(m[1]!);
+    }
+    const slotLines = [...slotNames].map((s) => `    ${/^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(s) ? s : `'${s}'`}: Record<string, never>;`).join('\n');
+    scriptBody = `\n  interface $$Slots {\n${slotLines}\n  }${scriptBody}`;
     code = code.replace(instanceScriptRegex, (_m, open: string, _b: string, close: string) => `${open}${scriptBody}${close}`);
   }
   const exportedVars = new Set<string>();

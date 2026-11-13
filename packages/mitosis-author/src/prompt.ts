@@ -72,6 +72,9 @@ export function buildAuthorUserPrompt(req: PromptAuthorRequest): string {
 
   if (isBatch) {
     appendBatchComponentPrompts(parts, req.components!);
+    if (req.feedbackNotes) {
+      parts.push(`User Feedback / Review Notes for Regeneration:\n${req.feedbackNotes}\n`);
+    }
   } else if (req.componentName) {
     parts.push(`Please author the Mitosis component: ${req.componentName}\n`);
     if (req.componentSpec) {
@@ -100,7 +103,7 @@ export function buildAuthorUserPrompt(req: PromptAuthorRequest): string {
   const drafts = Object.entries(req.siblingDrafts ?? {});
   if (drafts.length > 0) {
     parts.push(
-      'Sibling Components From the Previous Attempt (they failed the gate together with the component above; fix them with targeted edits against this source instead of rewriting them):',
+      'Sibling Components From the Previous Attempt / Compound Family (apply targeted edits against this Existing Source whenever errors or feedback notes affect them instead of rewriting them):',
       ...drafts.map(([name, source]) => `#### ${name}\nExisting Source:\n${source}`),
       ''
     );
@@ -121,7 +124,7 @@ export function buildAuthorUserPrompt(req: PromptAuthorRequest): string {
 
   parts.push(
     `Engineering Workflow (Base-First AI Editing):
-1. Inspect the Base Component Source (from templates/ds-repo/src) provided above (or via readExistingComponent).
+1. Inspect the Base Component Source (from src/) provided above (or via readExistingComponent).
 2. Call readComponentDetails({ componentName }) to inspect the latest Figma Auto Layout, pre-compiled Tailwind blueprint, visible child hierarchy, and text defaults.
 3. Compare the Base Component Source against the Figma specification: preserve the base headless helpers (./utils), ARIA attributes, and callbacks, and EDIT the JSX structure, child elements (e.g. header close button, icons, slots), Tailwind token classes, dimensions/spacing/radius/shadows, and enum/boolean/size defaults to match the latest Figma design (Figma text/canvas content is never a default value; see the composition & data rules).
 4. Prefer calling editComponent({ componentName, edits: [{ oldText, newText }], group }) to apply targeted edits (which auto-compiles across all 6 targets and saves when valid), or testCompile + saveComponent for full rewrites.

@@ -66,53 +66,13 @@ export default function DemoList(props: DemoListProps) {
     const p2 = bindControllerProps({ checked: false }, state, setState);
     assert.strictEqual(p2.checked, true);
 
-    // Multi-argument onCheckedChange(rowId, checked) and onSelect(rowId, checked)
-    let forwardedArgs = null;
-    const p3 = bindControllerProps(
-      {
-        checked: false,
-        rows: [{ id: '1', selected: false }, { id: '2', selected: false }],
-        items: [{ id: 'a', checked: false }],
-        onCheckedChange: (id, chk) => { forwardedArgs = [id, chk]; },
-      },
-      state,
-      setState
-    );
-    p3.onCheckedChange('row-1', true);
-    assert.deepStrictEqual(forwardedArgs, ['row-1', true]);
-    p3.onRowSelect('1', true);
-    const p4 = bindControllerProps(
-      {
-        checked: false,
-        rows: [{ id: '1', selected: false }, { id: '2', selected: false }],
-        items: [{ id: 'a', checked: false }],
-      },
-      state,
-      setState
-    );
-    assert.strictEqual(p4.rows[0].selected, true);
-    p4.onSelectAll(true);
-    const p5 = bindControllerProps(
-      {
-        checked: false,
-        rows: [{ id: '1', selected: false }, { id: '2', selected: false }],
-        items: [{ id: 'a', checked: false }],
-      },
-      state,
-      setState
-    );
-    assert.strictEqual(p5.rows[1].selected, true);
-    p5.onToggle('a', true);
-    const p6 = bindControllerProps(
-      {
-        checked: false,
-        rows: [{ id: '1', selected: false }, { id: '2', selected: false }],
-        items: [{ id: 'a', checked: false }],
-      },
-      state,
-      setState
-    );
-    assert.strictEqual(p6.items[0].checked, true);
+    // Unchecking must stick and forward the single boolean (TableCheckboxBodyCell contract)
+    let forwarded = null;
+    const p3 = bindControllerProps({ checked: false, onCheckedChange: (c) => { forwarded = c; } }, state, setState);
+    p3.onCheckedChange(false);
+    assert.strictEqual(forwarded, false);
+    const p4 = bindControllerProps({ checked: false, onCheckedChange: (c) => { forwarded = c; } }, state, setState);
+    assert.strictEqual(p4.checked, false);
   });
 
   it('adaptSvelteOutput and adaptVue3Output preserve whole-object props and useDefaultProps for get*State(props)', async () => {
@@ -214,7 +174,7 @@ export default function MiniDatePicker(props: MiniDatePickerProps) {
     assert.ok(vue2Art.code.includes('props() {'));
 
     // Angular assertions: selector prefixed, @Input() backfilled, get props() present
-    assert.ok(angularArt.code.includes('selector: "spn-mini-date-picker, mini-date-picker"'));
+    assert.ok(angularArt.code.includes('selector: "kd-mini-date-picker, mini-date-picker"'));
     assert.ok(angularArt.code.includes('@Input() month: MiniDatePickerProps["month"] = defaultProps["month"];'));
     assert.ok(angularArt.code.includes('@Input() year: MiniDatePickerProps["year"] = defaultProps["year"];'));
     assert.ok(angularArt.code.includes('get props(): this {'));
@@ -249,7 +209,7 @@ export default function BadgeExample() {
       (await compileMitosis({ componentName, source, targets: ['angular'], checks: { lint: false } })).artifacts.find((a) => a.target === 'angular').code;
 
     const button = await angularOf('Button', `export default function Button(props: { children?: any }) { return <button type="button">{props.children}</button>; }`);
-    assert.match(button, /selector: "spn-button"/, 'no bare `button` alias that would capture its own native <button>');
+    assert.match(button, /selector: "kd-button"/, 'no bare `button` alias that would capture its own native <button>');
     assert.match(button, /<button\b/);
 
     const composite = await angularOf(
@@ -258,9 +218,9 @@ export default function BadgeExample() {
 import Badge from './Badge.lite';
 export default function Toolbar() { return <div><button type="button">native</button><Button>Save</Button><Badge>New</Badge></div>; }`
     );
-    assert.match(composite, /selector: "spn-toolbar, toolbar"/, 'non-native names keep the bare alias');
-    assert.match(composite, /<spn-button\b/);
-    assert.match(composite, /<spn-badge\b/);
+    assert.match(composite, /selector: "kd-toolbar, toolbar"/, 'non-native names keep the bare alias');
+    assert.match(composite, /<kd-button\b/);
+    assert.match(composite, /<kd-badge\b/);
     assert.strictEqual((composite.match(/<button\b/g) || []).length, 1, 'only the native button stays <button>');
   });
 
@@ -320,7 +280,7 @@ export default function Demo(props: DemoProps) {
     });
     assert.strictEqual(res.success, true, JSON.stringify(res.errors));
     const code = res.artifacts.find((a) => a.target === 'angular').code;
-    assert.match(code, /@Component\(\{\s*standalone: false, selector: "spn-demo, demo"/);
+    assert.match(code, /@Component\(\{\s*standalone: false, selector: "kd-demo, demo"/);
     const defaults = code.match(/const defaultProps: any = \{([\s\S]*?)\};/)[1];
     for (const key of ['label', 'src', 'className']) {
       assert.strictEqual(defaults.match(new RegExp(`\\b${key}:`, 'g')).length, 1, `${key} declared once`);
@@ -392,6 +352,128 @@ export default function Card(props: CardProps) {
     assert.ok(!angularArt.code.includes('@Input() children'));
     assert.ok(!angularArt.code.includes('*ngIf="children"'));
     assert.match(angularArt.code, /<ng-content><\/ng-content\s*>/);
-    assert.match(angularArt.code, /<spn-card-item\b/);
+    assert.match(angularArt.code, /<kd-card-item\b/);
+  });
+
+  it('adapts *Icon?: any props into dynamic component + slot rendering across all 5 targets', async () => {
+    const buttonSource = `
+import { useDefaultProps, Show } from '@builder.io/mitosis';
+import { cn, ICON_PATHS } from './utils';
+
+export interface ButtonProps {
+  disabled?: boolean;
+  showLeftIcon?: boolean;
+  showRightIcon?: boolean;
+  leftIcon?: any;
+  rightIcon?: any;
+  className?: string;
+  children?: any;
+  onClick?: () => void;
+}
+
+export default function Button(props: ButtonProps) {
+  useDefaultProps({
+    disabled: false,
+    showLeftIcon: false,
+    showRightIcon: false,
+    className: '',
+  });
+
+  return (
+    <button
+      type="button"
+      disabled={props.disabled}
+      class={cn(
+        props.disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer active:scale-[0.97]',
+        props.className
+      )}
+      onClick={() => !props.disabled && props.onClick && props.onClick()}
+    >
+      {props.leftIcon}
+      <Show when={props.showLeftIcon && !props.leftIcon}>
+        <svg aria-hidden="true" class="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d={ICON_PATHS.plus} stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </Show>
+      {props.children}
+      {props.rightIcon}
+      <Show when={props.showRightIcon && !props.rightIcon}>
+        <svg aria-hidden="true" class="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d={ICON_PATHS.arrowRight} stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </Show>
+    </button>
+  );
+}
+`;
+    const res = await compileMitosis({
+      componentName: 'Button',
+      source: buttonSource,
+      targets: ['react', 'vue3', 'svelte', 'vue2', 'angular'],
+      checks: { lint: true, types: true, targets: true, render: true },
+    });
+    assert.strictEqual(res.success, true, JSON.stringify(res.errors));
+
+    const reactArt = res.artifacts.find((a) => a.target === 'react');
+    const vue3Art = res.artifacts.find((a) => a.target === 'vue3');
+    const svelteArt = res.artifacts.find((a) => a.target === 'svelte');
+    const vue2Art = res.artifacts.find((a) => a.target === 'vue2');
+    const angularArt = res.artifacts.find((a) => a.target === 'angular');
+
+    // React: supports passing either ComponentType (e.g. Lucide icon component) or ReactNode
+    assert.ok(reactArt.code.includes('leftIcon?: React.ReactNode | React.ComponentType<any>'));
+    assert.ok(reactArt.code.includes('rightIcon?: React.ReactNode | React.ComponentType<any>'));
+    assert.ok(reactArt.code.includes('React.createElement(props.leftIcon'));
+    assert.ok(reactArt.code.includes('React.createElement(props.rightIcon'));
+
+    // Vue 3: dynamic <component :is="leftIcon"> + named <slot name="leftIcon" /> + defineSlots
+    assert.ok(vue3Art.code.includes('<component :is="leftIcon" v-if="leftIcon" class="h-4 w-4 shrink-0" /><slot v-else name="leftIcon" />'));
+    assert.ok(vue3Art.code.includes('<component :is="rightIcon" v-if="rightIcon" class="h-4 w-4 shrink-0" /><slot v-else name="rightIcon" />'));
+    assert.ok(vue3Art.code.includes('leftIcon?: () => any'));
+    assert.ok(vue3Art.code.includes('rightIcon?: () => any'));
+
+    // Svelte: <svelte:component this={leftIcon}> + named <slot name="leftIcon" /> + $$Slots
+    assert.ok(svelteArt.code.includes('<svelte:component this={leftIcon} class="h-4 w-4 shrink-0" />'));
+    assert.ok(svelteArt.code.includes('<slot name="leftIcon" />'));
+    assert.ok(svelteArt.code.includes('leftIcon: Record<string, never>'));
+    assert.ok(svelteArt.code.includes('rightIcon: Record<string, never>'));
+
+    // Vue 2: dynamic <component :is="leftIcon"> + named <slot name="leftIcon" />
+    assert.ok(vue2Art.code.includes('<component :is="leftIcon" v-if="leftIcon" class="h-4 w-4 shrink-0" /><slot v-else name="leftIcon" />'));
+    assert.ok(vue2Art.code.includes('<component :is="rightIcon" v-if="rightIcon" class="h-4 w-4 shrink-0" /><slot v-else name="rightIcon" />'));
+
+    // Angular: *ngComponentOutlet + content projection select="[leftIcon],[slot=leftIcon]"
+    assert.ok(angularArt.code.includes('*ngComponentOutlet="leftIcon"'));
+    assert.ok(angularArt.code.includes('*ngComponentOutlet="rightIcon"'));
+    assert.ok(angularArt.code.includes('select="[leftIcon],[slot=leftIcon]"'));
+    assert.ok(angularArt.code.includes('select="[rightIcon],[slot=rightIcon]"'));
+
+    // Also verify singular `icon` prop (used by FAB, Toggle, TabItem, CardHeader, TableEmpty, TopbarTrigger, Toast)
+    const fabRes = await compileMitosis({
+      componentName: 'FAB',
+      source: `import { useDefaultProps, Show } from '@builder.io/mitosis';
+import { cn, ICON_PATHS } from './utils';
+export interface FABProps { icon?: any; showIcon?: boolean; disabled?: boolean; children?: any; onClick?: () => void; }
+export default function FAB(props: FABProps) {
+  useDefaultProps({ showIcon: true, disabled: false });
+  return (
+    <button type="button" disabled={props.disabled} class={cn(props.disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer active:scale-[0.97]')} onClick={() => !props.disabled && props.onClick && props.onClick()}>
+      {props.icon}
+      <Show when={props.showIcon && !props.icon}>
+        <svg aria-hidden="true" class="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d={ICON_PATHS.plus} stroke-linecap="round" /></svg>
+      </Show>
+      {props.children}
+    </button>
+  );
+}`,
+      targets: ['react', 'vue3', 'svelte', 'vue2', 'angular'],
+      checks: { lint: true, types: true, targets: true, render: true },
+    });
+    assert.strictEqual(fabRes.success, true, JSON.stringify(fabRes.errors));
+    assert.ok(fabRes.artifacts.find((a) => a.target === 'react').code.includes('icon?: React.ReactNode | React.ComponentType<any>'));
+    assert.ok(fabRes.artifacts.find((a) => a.target === 'vue3').code.includes('<component :is="icon" v-if="icon" class="h-4 w-4 shrink-0" /><slot v-else name="icon" />'));
+    assert.ok(fabRes.artifacts.find((a) => a.target === 'svelte').code.includes('<svelte:component this={icon} class="h-4 w-4 shrink-0" />'));
+    assert.ok(fabRes.artifacts.find((a) => a.target === 'vue2').code.includes('<component :is="icon" v-if="icon" class="h-4 w-4 shrink-0" /><slot v-else name="icon" />'));
+    assert.ok(fabRes.artifacts.find((a) => a.target === 'angular').code.includes('*ngComponentOutlet="icon"'));
   });
 });

@@ -2,7 +2,7 @@
 
 export const EXAMPLE_SUFFIX = 'Example';
 
-const PACKAGE = '@supernova/design-system';
+const PACKAGE = '@komerce-design';
 const RELATIVE_IMPORT_RE = /^\s*import\s+(?:(\w+)|\{([^}]*)\})\s+from\s+["']\.{1,2}\/[^"']*["'];?\s*$/gm;
 
 /** Parent component of an example file name, e.g. `StepperExample` -> `Stepper`. */

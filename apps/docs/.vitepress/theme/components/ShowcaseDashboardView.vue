@@ -7,7 +7,7 @@
           Multi-Framework Live Showcase
         </h2>
         <p class="text-sm text-foreground-muted mt-1">
-          Explore production components generated from Figma across React, Vue 3, and Svelte.
+          Explore production components generated from Figma across React, Vue 3, Svelte, Vue 2, and Angular.
         </p>
       </div>
 
@@ -75,8 +75,8 @@
         <FrameworkPreviewCard name="Button" initial-framework="react" :default-props="{ variant: 'primary', children: 'React Primary', showLeftIcon: true }" />
         <FrameworkPreviewCard name="MetricCard" initial-framework="react" :default-props="{ label: 'Total Revenue', value: 'Rp 45.200.000', trendText: '+12.5%', showValue: true, showTrend: true }" />
         <FrameworkPreviewCard name="InputText" initial-framework="react" :default-props="{ label: 'Username', placeholder: 'Komerce Admin', showLeftIcon: true }" />
-        <FrameworkPreviewCard name="RadioButton" initial-framework="react" :default-props="{ label: 'Fast Delivery', checked: true }" />
-        <FrameworkPreviewCard name="ChartBar" initial-framework="react" :default-props="{ data: sampleChartData }" />
+        <FrameworkPreviewCard name="RadioButton" initial-framework="react" :default-props="{ children: 'Fast Delivery', checked: true }" />
+        <FrameworkPreviewCard name="Chart" initial-framework="react" />
       </div>
 
       <!-- Vue 3 Column -->
@@ -91,8 +91,8 @@
         <FrameworkPreviewCard name="Button" initial-framework="vue3" :default-props="{ variant: 'primary', children: 'Vue Primary', showLeftIcon: true }" />
         <FrameworkPreviewCard name="MetricCard" initial-framework="vue3" :default-props="{ label: 'Total Revenue', value: 'Rp 45.200.000', trendText: '+12.5%', showValue: true, showTrend: true }" />
         <FrameworkPreviewCard name="InputText" initial-framework="vue3" :default-props="{ label: 'Username', placeholder: 'Komerce Admin', showLeftIcon: true }" />
-        <FrameworkPreviewCard name="RadioButton" initial-framework="vue3" :default-props="{ label: 'Fast Delivery', checked: true }" />
-        <FrameworkPreviewCard name="ChartBar" initial-framework="vue3" :default-props="{ data: sampleChartData }" />
+        <FrameworkPreviewCard name="RadioButton" initial-framework="vue3" :default-props="{ children: 'Fast Delivery', checked: true }" />
+        <FrameworkPreviewCard name="Chart" initial-framework="vue3" />
       </div>
     </div>
 
@@ -100,42 +100,42 @@
     <div v-else class="flex flex-col gap-10">
       <section class="flex flex-col gap-4">
         <div class="flex items-center justify-between border-b border-border-default pb-2">
-          <h3 class="text-lg font-bold text-foreground-default">Actions &amp; Icons</h3>
-          <span class="text-xs text-foreground-muted">Button, FAB, IconTruckDelivery</span>
+          <h3 class="text-lg font-bold text-foreground-default">Buttons &amp; Selection</h3>
+          <span class="text-xs text-foreground-muted">Button, FAB, SwitchButton, ToggleGroup</span>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <FrameworkPreviewCard name="Button" :initial-framework="activeFramework" :default-props="{ variant: 'primary', children: 'Primary Action', showLeftIcon: true }" />
           <FrameworkPreviewCard name="Button" :initial-framework="activeFramework" :default-props="{ variant: 'secondary', children: 'Secondary Action', showRightIcon: true }" />
           <FrameworkPreviewCard name="FAB" :initial-framework="activeFramework" :default-props="{ children: 'New Order', size: 'extended' }" />
-          <FrameworkPreviewCard name="IconTruckDelivery" :initial-framework="activeFramework" :default-props="{ size: 36 }" />
+          <FrameworkPreviewCard name="SwitchButton" :initial-framework="activeFramework" :default-props="{ children: 'Instant Courier Auto-Dispatch', checked: true }" />
         </div>
       </section>
 
       <section class="flex flex-col gap-4">
         <div class="flex items-center justify-between border-b border-border-default pb-2">
-          <h3 class="text-lg font-bold text-foreground-default">Form Controls Studio</h3>
-          <span class="text-xs text-foreground-muted">InputText, Dropdown, Radio, Checkbox, Slider, OTP</span>
+          <h3 class="text-lg font-bold text-foreground-default">Form Controls &amp; Pickers</h3>
+          <span class="text-xs text-foreground-muted">InputText, InputDropdown, RadioButton, Checkbox, Slider, InputOTP</span>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <FrameworkPreviewCard name="InputText" :initial-framework="activeFramework" :default-props="{ label: 'Email Address', placeholder: 'admin@komerce.id', showLeftIcon: true }" />
-          <FrameworkPreviewCard name="InputDropdown" :initial-framework="activeFramework" :default-props="{ label: 'Courier Service', placeholder: 'Select Courier', showLeftIcon: true }" />
-          <FrameworkPreviewCard name="RadioButton" :initial-framework="activeFramework" :default-props="{ label: 'Cash on Delivery (COD)', checked: true }" />
-          <FrameworkPreviewCard name="Checkbox" :initial-framework="activeFramework" :default-props="{ label: 'Send WhatsApp notification', checked: true }" />
-          <FrameworkPreviewCard name="Slider" :initial-framework="activeFramework" :default-props="{ value: 65, min: 0, max: 100, showValue: true }" />
-          <FrameworkPreviewCard name="InputOTP" :initial-framework="activeFramework" :default-props="{ length: 6, value: '482' }" />
+          <FrameworkPreviewCard name="InputDropdown" :initial-framework="activeFramework" />
+          <FrameworkPreviewCard name="RadioButton" :initial-framework="activeFramework" :default-props="{ children: 'Cash on Delivery (COD)', checked: true }" />
+          <FrameworkPreviewCard name="Checkbox" :initial-framework="activeFramework" :default-props="{ children: 'Send WhatsApp notification', checked: true }" />
+          <FrameworkPreviewCard name="Slider" :initial-framework="activeFramework" :default-props="{ value: 65, min: 0, max: 100 }" />
+          <FrameworkPreviewCard name="InputOTP" :initial-framework="activeFramework" :default-props="{ length: 6, value: '482910' }" />
         </div>
       </section>
 
       <section class="flex flex-col gap-4">
         <div class="flex items-center justify-between border-b border-border-default pb-2">
-          <h3 class="text-lg font-bold text-foreground-default">Data Presentation &amp; Status</h3>
-          <span class="text-xs text-foreground-muted">MetricCard, Badge, Progressbar, Avatar, Table</span>
+          <h3 class="text-lg font-bold text-foreground-default">Data Presentation &amp; Feedback</h3>
+          <span class="text-xs text-foreground-muted">MetricCard, Progressbar, Badge, Avatar, Toast, Table</span>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <FrameworkPreviewCard name="MetricCard" :initial-framework="activeFramework" :default-props="{ label: 'Shipped Packages', value: '1,420', trendText: '+8.4%', showValue: true, showTrend: true }" />
+          <FrameworkPreviewCard name="MetricCard" :initial-framework="activeFramework" />
           <FrameworkPreviewCard name="Progressbar" :initial-framework="activeFramework" :default-props="{ value: 72, label: 'Shipment SLA', showLabel: true }" />
           <FrameworkPreviewCard name="Badge" :initial-framework="activeFramework" :default-props="{ children: 'Active Order', variant: 'success' }" />
-          <FrameworkPreviewCard name="Avatar" :initial-framework="activeFramework" :default-props="{ initialsText: 'DI', type: 'initials', size: 'regular', showStatus: true }" />
+          <FrameworkPreviewCard name="Toast" :initial-framework="activeFramework" :default-props="{ type: 'success', title: 'Order Synced', description: 'Tracking number assigned automatically.', showDescription: true, showAction: true, actionText: 'View', timestamp: 'Just now' }" />
         </div>
         <div>
           <FrameworkPreviewCard name="Table" :initial-framework="activeFramework" />
@@ -144,12 +144,15 @@
 
       <section class="flex flex-col gap-4">
         <div class="flex items-center justify-between border-b border-border-default pb-2">
-          <h3 class="text-lg font-bold text-foreground-default">Analytics &amp; Charts</h3>
-          <span class="text-xs text-foreground-muted">ChartBar, ChartLine with Figma Theme Tokens</span>
+          <h3 class="text-lg font-bold text-foreground-default">Analytics &amp; Interactive Flows</h3>
+          <span class="text-xs text-foreground-muted">Chart (12 Modes), Stepper, Tabs, BubbleChat</span>
+        </div>
+        <div>
+          <FrameworkPreviewCard name="Chart" :initial-framework="activeFramework" />
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <FrameworkPreviewCard name="ChartBar" :initial-framework="activeFramework" :default-props="{ data: sampleChartData, ariaLabel: 'Weekly Performance' }" />
-          <FrameworkPreviewCard name="ChartLine" :initial-framework="activeFramework" :default-props="{ data: sampleChartData, ariaLabel: 'Revenue Trend' }" />
+          <FrameworkPreviewCard name="Stepper" :initial-framework="activeFramework" />
+          <FrameworkPreviewCard name="BubbleChat" :initial-framework="activeFramework" />
         </div>
       </section>
     </div>

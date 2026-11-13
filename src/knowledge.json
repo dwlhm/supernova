@@ -1,0 +1,242 @@
+{
+  "version": 1,
+  "globalRules": [
+    "Figma Extraction JSON & Blueprint Fidelity: ALWAYS inspect and strictly follow the Figma extraction JSON (var/extractions/latest.json) and deterministic blueprint (pnpm komerce inspect <ComponentName>) for node hierarchy, variant childOrder, and Tailwind classes; never invent or replace visual indicator shapes that already exist in the Figma extraction.",
+    "Base-First Surgical Editing: Always preserve existing working interactive behavior, headless helpers (./utils), ARIA attributes, and callbacks when applying Figma visual updates; use targeted edits instead of rewriting existing components from scratch.",
+    "General Interactive UI Behavior: Interactive components must wire native DOM events (onClick, onInput, onChange, onKeyDown), respect disabled guards, and emit standard single-value preview callbacks (onClick, onCheckedChange, onPressedChange, onValueChange, onChange, onInput, onOpenChange, onClose, onPageChange).",
+    "Trigger-Wrapper Overlays (Tooltip): For overlay wrappers like Tooltip, {props.children} is the interactive trigger element and props.text is the floating tooltip bubble content.",
+    "Interactive Compound Examples: Every src/examples/<Name>Example.lite.tsx for an interactive compound component must use useStore so reviewers can click tabs, toggle buttons, click steps, and toggle table row/header checkboxes live in the documentation preview.",
+    "Typography & Font Fallbacks: Font-family tokens (--font-body, --font-headings) and components using font-body must include robust generic and system fallback font stacks (\"Plus Jakarta Sans\", -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif) and documentation previews must import the official Plus Jakarta Sans webfont to prevent browser serif/Times New Roman fallback when local fonts are absent.",
+    "Open & Consumer-Customizable Design (Anti-Closed Components) & Headless Controllers: NEVER build closed components with hardcoded/locked labels, hints, placeholders, icons, or narrow use-case preset types. Every visible text (label, timeLabel, yearGridTitle, hint, placeholder, searchPlaceholder, chooseText, replaceText, removeText, closeLabel, errorMessage, heading, description, actionText), icon (icon, leftIcon, rightIcon, leadingIcon, trailingIcon, sortIcon, prevIcon, nextIcon, separatorIcon, closeIcon), and behavioral dimension MUST be consumer-customizable via props/children. For state-dependent text props (such as hint and displayValue on DatePicker, hint on Input* components, displayValue on InputDropdown, fileCount on InputMultipleFileUpload, label/hint/formatValue on Slider, label on Progressbar, and formatTooltip/formatValue on Chart* components), support standard callback functions `string | ((value) => string)` instead of closed string-template DSLs. Never set non-empty default ariaLabel on components that render {props.children} (Checkbox, RadioButton, SwitchButton, Toggle) so screen readers read {props.children}; use `ariaLabel: ''` and `aria-label={props.ariaLabel || undefined}`. All 13 form controls must integrate plug-and-play with createFormController (bindField), Table/Pagination components must integrate with createTableController (bindHeaderSort, bindHeaderCheckbox, bindRow, bindRowCheckbox, bindPagination, bindSearch), and Tabs/ToggleGroup must wire handleGroupKeyDown for WAI-ARIA roving focus."
+  ],
+  "components": {
+    "Button": {
+      "rules": [
+        "Support customizable leftIcon?: any and rightIcon?: any so consumers can pass any icon component or element from their preferred icon library (e.g. lucide-react, lucide-vue-next, lucide-svelte, Vue 2 component, Angular component/projection) alongside showLeftIcon and showRightIcon.",
+        "Provide clear visual feedback for both click/active and disabled states: use transition-all duration-150, cursor-pointer active:scale-[0.97] with variant-specific hover:* and active:* semantic tokens when enabled, and opacity-50 cursor-not-allowed (plus disabled:opacity-50 disabled:cursor-not-allowed) without hover/active color bleed when disabled."
+      ],
+      "updatedAt": "2026-11-10T11:02:00.000Z"
+    },
+    "FAB": {
+      "rules": [
+        "Support customizable icon?: any alongside showIcon?: boolean (default true) so consumers can pass any icon component or element from their preferred icon library while falling back to the built-in plus icon.",
+        "Support placement?: 'inline' | 'top-left' | 'top-center' | 'top-right' | 'bottom-left' | 'bottom-center' | 'bottom-right' (default 'inline') for viewport-anchored floating action positioning (fixed z-40) alongside inline embedding.",
+        "Provide clear visual feedback for click/active and disabled states: use transition-all duration-150, cursor-pointer active:scale-[0.97] with variant-specific hover:*/active:* semantic tokens and shadow-md only when !props.disabled, and opacity-50 cursor-not-allowed disabled:opacity-50 disabled:cursor-not-allowed without disabled:pointer-events-none when disabled."
+      ],
+      "updatedAt": "2026-11-12T09:35:00.000Z"
+    },
+    "Toggle": {
+      "rules": [
+        "Toggle is used both standalone (<Toggle />) and inside <ToggleGroup> (<ToggleGroup><Toggle /><Toggle /></ToggleGroup>; there is no separate ToggleGroupItem component).",
+        "Support customizable icon?: any alongside showIcon?: boolean (default false), both onClick?: () => void and onPressedChange?: (pressed: boolean) => void, standard Tailwind v4 sizing (small: 'min-w-5 h-5', medium: 'min-w-6 h-6', large: 'min-w-9 h-9'), and active/disabled visual feedback (cursor-pointer active:scale-[0.97] when enabled, opacity-50 cursor-not-allowed when disabled)."
+      ],
+      "updatedAt": "2026-11-10T14:16:00.000Z"
+    },
+    "InputText": {
+      "rules": [
+        "Support customizable leftIcon?: any and rightIcon?: any alongside showLeftIcon and showRightIcon so consumers can pass custom icon components while preserving built-in fallback SVG icons.",
+        "InputText defaults required: false and showRightIcon: false (as well as showLeftIcon: false); custom leftIcon and rightIcon render directly when provided without requiring showLeftIcon or showRightIcon.",
+        "InputText in error state (error={true} or non-empty errorMessage) uses border-destructive-border and active ring-2 ring-focus-ring-error, colors left/right icons and helper/error text with text-destructive-foreground, always renders non-empty errorMessage even when showHint is false, renders a spinning loader icon when validating={true}, and supports centralized form binding via value, defaultValue, onValueChange, onChange, onBlur, and onFocus."
+      ],
+      "updatedAt": "2026-11-13T09:01:00.000Z"
+    },
+    "InputTextArea": {
+      "rules": [
+        "Support customizable leftIcon?: any and rightIcon?: any alongside showLeftIcon and showRightIcon so consumers can pass custom icon components while preserving built-in fallback SVG icons.",
+        "InputTextArea in error state uses border-destructive-border and active ring-2 ring-focus-ring-error, colors icons and helper/error text with text-destructive-foreground, always renders non-empty errorMessage even when showHint is false, and supports value, defaultValue, onValueChange, onChange, onBlur, and onFocus."
+      ],
+      "updatedAt": "2026-11-12T09:35:00.000Z"
+    },
+    "Tooltip": {
+      "rules": [
+        "Tooltip wraps {props.children} as the interactive trigger element and renders {props.text} inside the floating role=\"tooltip\" bubble. The trigger wrapper span must NEVER apply visual button styles (no border, background, or padding) so {props.children} renders unmodified.",
+        "Support trigger?: 'hover' | 'click' (default 'hover'), open?: boolean, and onOpenChange?: (open: boolean) => void via useStore so the tooltip opens on hover/focus in hover mode (unless open === false), toggles on click in click mode, and can be controlled via open.",
+        "Strictly follow the Figma extraction blueprint for Tooltip Container: inline-flex items-center justify-center gap-0.5 with flex-col (top), flex-col-reverse (bottom), flex-row (left), flex-row-reverse (right), rendering the rounded-lg bg-primary-default px-3 py-2 text-primary-foreground bubble and the circular dot indicator (Vector 1: h-1.5 w-1.5 shrink-0 rounded-full bg-primary-default)."
+      ],
+      "updatedAt": "2026-11-09T14:30:00.000Z"
+    },
+    "Table": {
+      "rules": [
+        "TableExample must compose TableCheckboxHeaderCell, TableCheckboxBodyCell, TableNoHeaderCell, TableNoBodyCell, TableHeaderCell (with sortable={true}, sortDirection, and onSort), TableCellValue, and TableEmpty with interactive row selection, column sorting, and Empty state toggle via useStore.",
+        "TableHeaderCell supports sortable?: boolean, sortDirection?: 'asc' | 'desc' | 'none', sortIcon?: any, and onSort?: () => void (compatible with table.bindHeaderSort(key) from createTableController), rendering aria-sort on <th> and an accessible <button> when sortable is true.",
+        "TableHeaderRow uses bg-background-muted and TableHeaderCell uses text-sm font-medium text-foreground-default matching the Figma Table blueprint. TableEmpty uses a 64px (h-16 w-16) rounded-full bg-background-muted icon container and standard Tailwind v4 font weights (font-semibold, font-normal, font-medium).",
+        "TableCellValue supports layout ('row' | 'stacked'), align ('left' | 'center' | 'right'), status ('none' | 'success' | 'warning' | 'destructive' | 'info'), secondaryText, badgeText, and imageSrc."
+      ],
+      "updatedAt": "2026-11-11T13:40:00.000Z"
+    },
+    "Tabs": {
+      "rules": [
+        "TabsExample must use useStore to track the active tab and update active state on TabItem onClick.",
+        "TabItem supports customizable icon?: any alongside showIcon?: boolean, disabled?: boolean, and active/disabled visual feedback."
+      ],
+      "updatedAt": "2026-11-10T13:55:00.000Z"
+    },
+    "ToggleGroup": {
+      "rules": [
+        "ToggleGroup directly composes <Toggle /> children (<ToggleGroup><Toggle /><Toggle /></ToggleGroup>) matching the Figma extraction hierarchy; never create a separate ToggleGroupItem component.",
+        "ToggleGroupExample must use useStore to toggle each child Toggle pressed state on onClick.",
+        "ToggleGroup applies segmented button child styling ([&_button]:rounded-none [&_button]:shadow-none [&>button:not(:last-child)]:border-r [&>button:not(:last-child)]:border-border-default [&>*:not(:last-child)>button]:border-r [&>*:not(:last-child)>button]:border-border-default) so standalone <Toggle /> components render seamlessly inside a group across all 5 frameworks including Angular."
+      ],
+      "updatedAt": "2026-11-10T14:16:00.000Z"
+    },
+    "Stepper": {
+      "rules": [
+        "Stepper supports orientation: 'horizontal' | 'vertical' | 'responsive'. On 'responsive' mode, it automatically switches to vertical on mobile (< md) and horizontal on desktop (>= md).",
+        "Stepper in horizontal mode wraps in overflow-x-auto with min-w-max on mobile to preserve layout, and StepperIndicator uses shrink-0 to prevent circular shape squashing.",
+        "StepperIndicator must use bg-success-subtle text-success-foreground for completed status, bg-primary-default text-primary-foreground (white text) for active status, and bg-background-muted text-foreground-muted for upcoming status.",
+        "StepperItem connector line must use bg-success-foreground for completed steps and bg-border-default otherwise. In horizontal orientation, the connector line must seamlessly join between circles using an absolute top-4 left-1/2 -translate-y-1/2 w-full h-0.5 line behind z-10 indicators, ensuring zero gap."
+      ],
+      "updatedAt": "2026-11-12T06:42:59.395Z"
+    },
+    "Toast": {
+      "rules": [
+        "Toast must match all 5 Figma type variants ('default' | 'success' | 'error' | 'warning' | 'info') with a 28px circular icon container (h-7 w-7 rounded-full p-1.5 text-foreground-on-accent) using solid semantic backgrounds (bg-foreground-subtle, bg-success-default, bg-destructive-default, bg-warning-default, bg-info-default) and matching semantic title colors.",
+        "Toast supports id?: string, placement?: 'inline' | 'top-left' | 'top-center' | 'top-right' | 'bottom-left' | 'bottom-center' | 'bottom-right' (default 'inline'), duration?: number (default 0, standalone auto-dismiss timer), pauseOnHover?: boolean (default true), draggable?: boolean (default true, mouse/pointer drag-to-dismiss via computeSwipeDisplacement/mergeDragStyle/startBagDrag/moveBagDrag/endBagDrag with dragX/dragY state and touch-none select-none), swipeThreshold?: number (default 88), inlineStyle?: Record<string, string>, and non-clipped {props.children} rendering alongside props.title.",
+        "ToastViewport is an open, composable floating region container (role=\"region\" aria-live=\"polite\") rendering {props.children} across all 6 FloatingPlacement positions ('top-left' | 'top-center' | 'top-right' | 'bottom-left' | 'bottom-center' | 'bottom-right', default 'top-right'), supporting id, inline, expanded, scrollable (default true), ariaLabel, inlineStyle, onMouseEnter, and onMouseLeave, automatically presenting a container card (rounded-2xl border border-border-default bg-background-default/95 p-3 shadow-xl backdrop-blur-md) when entering mode list toast (expanded=true).",
+        "ToastExample must use useStore with ToastViewport (inline, expanded, scrollable) and <For> over Toast items to demonstrate scrollable active toast lists, mouse/pointer drag-to-dismiss, and independent auto-dismiss timers live across all 5 frameworks."
+      ],
+      "updatedAt": "2026-11-12T10:40:00.000Z"
+    },
+    "Checkbox": {
+      "rules": [
+        "Support size ('small' | 'medium' | 'large' with rounded, rounded-md, rounded-lg), labelPosition ('left' | 'right'), checked, indeterminate, disabled, and {props.children} label."
+      ],
+      "updatedAt": "2026-11-10T10:15:00.000Z"
+    },
+    "RadioButton": {
+      "rules": [
+        "Support size ('small' | 'medium' | 'large'), labelPosition ('left' | 'right'), checked, disabled, and {props.children} label."
+      ],
+      "updatedAt": "2026-11-10T10:15:00.000Z"
+    },
+    "SwitchButton": {
+      "rules": [
+        "Support size ('small' | 'medium' | 'large'), labelPosition ('left' | 'right'), checked, disabled, and {props.children} label."
+      ],
+      "updatedAt": "2026-11-10T10:15:00.000Z"
+    },
+    "Spinner": {
+      "rules": [
+        "Support Figma size variants '12' | '16' | '24' | '32' (default '24') with h-3 w-3, h-4 w-4, h-6 w-6, h-8 w-8 and standard gap-2."
+      ],
+      "updatedAt": "2026-11-10T10:15:00.000Z"
+    },
+    "MenuItem": {
+      "rules": [
+        "Support label, active, expanded, disabled, showLabel, showLeadingIcon, leadingIcon?: any, showTrailingIcon, trailingIcon?: any, showBadge, badgeLabel, active/disabled visual feedback, and collapsible submenu {props.children} when expanded is true.",
+        "MenuItem uses bg-background-muted when active or hovered, text-foreground-default for label/icons, bg-primary-default text-foreground-inverse for badge, and rotates trailing chevron (rotate-90) strictly when props.expanded is true."
+      ],
+      "updatedAt": "2026-11-11T08:35:00.000Z"
+    },
+    "MainMenu": {
+      "rules": [
+        "Support active, disabled, showLabel, showLeadingIcon, leadingIcon?: any, showTrailingIcon, trailingIcon?: any, showBadge, badgeLabel, and active/disabled visual feedback.",
+        "MainMenu State=Default/Hover uses text-foreground-default, hover:bg-background-interactive, and badge bg-primary-default text-foreground-inverse; State=Active/Active-Hover uses bg-primary-default text-primary-foreground (without darkening to hover:bg-primary-hover), transition-colors, icons text-foreground-inverse ([&>svg]:text-current on button), and inverted badge bg-primary-foreground text-foreground-default.",
+        "MainMenu button uses justify-center so collapsed icon-only items (showLabel=false) stay horizontally centered."
+      ],
+      "updatedAt": "2026-11-11T08:26:00.000Z"
+    },
+    "Sidebar": {
+      "rules": [
+        "SidebarExample must use useStore to toggle expanded ('true' w-60 vs 'false' w-16 collapsed) and active MainMenu item selection."
+      ],
+      "updatedAt": "2026-11-10T10:15:00.000Z"
+    },
+    "Topbar": {
+      "rules": [
+        "TopbarExample must compose Topbar, TopbarTrigger, Breadcrumb + BreadcrumbItem, and TopbarContent with interactive state via useStore."
+      ],
+      "updatedAt": "2026-11-10T10:15:00.000Z"
+    },
+    "BubbleChat": {
+      "rules": [
+        "BubbleChat error state uses border-destructive-border bg-destructive-subtle text-foreground-default on the bubble and text-destructive-default on the BubbleChatFooter status text. BubbleChatFile uses gap-0.5 and BubbleChatMedia video play button uses p-1.5."
+      ],
+      "updatedAt": "2026-11-10T10:15:00.000Z"
+    },
+    "Breadcrumb": {
+      "rules": [
+        "BreadcrumbItem uses standard font-medium for current page and focus-visible:ring-focus-ring-primary. BreadcrumbExample uses useStore to toggle between collapsed BreadcrumbEllipsis and expanded items."
+      ],
+      "updatedAt": "2026-11-10T10:15:00.000Z"
+    },
+    "InputOTP": {
+      "rules": [
+        "InputOTP in error state applies border-destructive-border ring-2 ring-focus-ring-error on digit boxes and text-destructive-foreground on helper/error text, always renders non-empty errorMessage even when showHint is false, and supports onValueChange, onChange, and onBlur.",
+        "InputOTP digit container uses flex-wrap max-w-full gap-2 sm:gap-2.5 with shrink-0 h-9 w-9 sm:h-10 sm:w-10 and text-base sm:text-sm to prevent horizontal overflow and iOS Safari auto-zoom while maintaining clean responsive scaling."
+      ],
+      "updatedAt": "2026-11-12T06:55:16.550Z"
+    },
+    "InputFileInput": {
+      "rules": [
+        "InputFileInput in error state applies border-destructive-border ring-2 ring-focus-ring-error and text-destructive-foreground, and always renders non-empty errorMessage even when showHint is false.",
+        "InputFileInput reset lifecycle: clicking clear/remove button resets fileName to empty string, clears native input.value, calls onFileNameChange(''), onValueChange(''), onFilesChange([]), and onRemove?.(); getFileState strictly requires string fileName/value so removing a file hides the 'x' button and cleanly restores the placeholder."
+      ],
+      "updatedAt": "2026-11-12T07:38:00.000Z"
+    },
+    "InputFileDropZone": {
+      "rules": [
+        "InputFileDropZone supports state?: 'default' | 'focus' | 'filled' | 'error' | 'disabled', keeps border-dashed across all 5 states, uses border-primary-default ring-2 ring-focus-ring-primary in focus state, styles the Remove button in filled state with bg-destructive-background text-primary-foreground hover:bg-destructive-hover, and applies opacity-50 cursor-not-allowed on the root container when disabled.",
+        "InputFileDropZone in error state applies border-destructive-border ring-2 ring-focus-ring-error and text-destructive-foreground (never border-destructive-default or text-destructive-default), and always renders non-empty errorMessage even when showHint is false.",
+        "InputFileDropZone provides interactive drag & drop visual feedback (border-primary-default, bg-primary-subtle, ring-2 ring-focus-ring-primary on the dropzone and text-primary-default on the upload icon) driven by data-[dragging=true] via handleFileDragEnter, handleFileDragOver, handleFileDragLeave, and handleFileDropEvent helpers, and exposes isDragging and onDragStateChange props."
+      ],
+      "updatedAt": "2026-11-12T08:00:00.000Z"
+    },
+    "InputImageUploader": {
+      "rules": [
+        "InputImageUploader supports state?: 'default' | 'focus' | 'filled' | 'error' | 'disabled', keeps container border as border-border-default during focus/click (does not change card border color on focus-within/active button clicks), styles the Remove button in filled state with bg-destructive-background text-primary-foreground hover:bg-destructive-hover and Replace button with bg-secondary-default text-secondary-foreground, and renders Hugeicons imageUpload icon in empty preview.",
+        "InputImageUploader in error state applies border-destructive-border ring-2 ring-focus-ring-error and text-destructive-foreground, and always renders non-empty errorMessage even when showHint is false."
+      ],
+      "updatedAt": "2026-11-12T13:01:00.000Z"
+    },
+    "InputDropdown": {
+      "rules": [
+        "InputDropdown anchors its floating listbox popup (<div class=\"absolute left-0 top-full z-50 mt-1.5 ...\">) inside a dedicated <div class=\"relative w-full\"> wrapper around the trigger button and popup so the menu floats directly beneath the trigger button and overlays any hint/error text below it without shifting layout.",
+        "InputDropdownExample must use useStore and getDropdownOptions(options, searchQuery, value) with <For> to filter and select InputDropdownItem options interactively without handler boilerplate while forwarding state, error, errorMessage, and disabled props.",
+        "InputDropdown in error state applies border-destructive-border ring-2 ring-focus-ring-error, colors leading/trailing icons and helper/error text with text-destructive-foreground, and always renders non-empty errorMessage even when showHint is false."
+      ],
+      "updatedAt": "2026-11-10T15:52:00.000Z"
+    },
+    "InputMultipleFileUpload": {
+      "rules": [
+        "InputMultipleFileUploadExample must use useStore and demonstrate completed, uploading, and error item states with interactive removal while forwarding state, error, errorMessage, and disabled props.",
+        "InputMultipleFileUpload in error state applies border-destructive-border ring-2 ring-focus-ring-error and text-destructive-foreground (never border-destructive-default or text-destructive-default), and always renders non-empty errorMessage even when showHint is false."
+      ],
+      "updatedAt": "2026-11-10T15:12:00.000Z"
+    },
+    "Chart": {
+      "rules": [
+        "Chart family covers all 12 Figma visualization variants via dedicated stateless sub-components: ChartBar (single, grouped, and stacked via stacked?: boolean), ChartLine (line and area via area?: boolean), ChartPie (pie and donut via innerRadius?: number and centerLabel?: string), ChartHorizontalBar, ChartScatter, ChartRadar, ChartGauge, ChartFunnel, ChartWaterfall, ChartLegend, and ChartLegendItem.",
+        "ChartLegendItem supports interactive series-toggle props (interactive?: boolean default false, active?: boolean default true, disabled?: boolean default false, onClick?: () => void) with a single {props.children} projection (Angular single <ng-content> safe), keyboard accessibility (role=\"button\", tabIndex={0}, aria-pressed, Enter/Space activation), and muted/strikethrough styling when active={false}.",
+        "All chart geometry and percentages must be computed through pure SSR-safe helpers in ./utils (getChartBarState, getChartLineState, getChartPieState, getChartHorizontalBarState, getChartScatterState, getChartRadarState, getChartGaugeState, getChartFunnelState, getChartWaterfallState).",
+        "All Chart* visualization sub-components internally compose <Tooltip /> by default (showTooltip?: boolean default true, tooltipPosition?: 'top' | 'bottom' | 'left' | 'right' default 'top') using pre-computed tooltipText from getChart*State, while allowing consumers to customize tooltips and values via formatTooltip?: (ctx: ChartTooltipContext) => string, formatValue?: (value: number) => string, per-point tooltip?: string | ((ctx: ChartTooltipContext) => string), or disable tooltips via showTooltip={false}.",
+        "ChartExample must use useStore to allow interactive switching across all 12 chart types live in the documentation preview."
+      ],
+      "updatedAt": "2026-11-12T09:35:00.000Z"
+    },
+    "DatePicker": {
+      "rules": [
+        "Expose a general, composable DatePicker API via mode?: 'single' | 'range' | 'month' | 'year' (default 'single'), editable?: boolean (default false, renders text input supporting formatted dates and English/Indonesian natural-language expressions), customizable label?: string, and full createFormController (bindField) integration via id, name, value?: number | string, required, disabled, error, errorMessage, validating, onValueChange, and onBlur.",
+        "Declare selectedMonth?: number, selectedYear?: number, startMonth?: number, startYear?: number, endMonth?: number, endYear?: number, endValue?: number, hoverMonth?: number, hoverYear?: number, and hoverValue?: number in DatePickerProps and useDefaultProps so range selection, hover range preview, and viewport navigation work across all 5 frameworks.",
+        "Use semantic tokens (bg-input-default on trigger inputs/buttons, bg-background-default on calendar dialog, border-destructive-border ring-2 ring-focus-ring-error and text-destructive-foreground in error state) and clean widths: trigger width via props.editable ? 'w-60' : cva(props.mode, { single: 'w-48', range: 'w-60', month: 'w-48', year: 'w-48' }, 'w-48'), dialog widths (w-[250px] for single calendar, w-[287px] for year/month grid, w-max for dual-month range mode).",
+        "Decouple calendar viewport navigation (< / > month/year step and header dropdowns) from committed date/range selection (selectedYear, selectedMonth, startYear, startMonth, value, endYear, endMonth, endValue) so navigating months does not overwrite or shift the selected date/range; when value is 0 or '' in single-date mode, render placeholder text with text-foreground-muted and only highlight todayDay with isToday (not isSelected).",
+        "Anchor the floating calendar dialog (<div role=\"dialog\" class=\"absolute left-0 top-full z-50 mt-2 ... shadow-md\">) inside a <div class=\"relative inline-flex flex-col items-start\"> wrapper around the trigger row, and render the hint/error text directly below that relative wrapper so the floating calendar popup overlays any hint/description/error text without shifting layout. Always show non-empty errorMessage in text-destructive-foreground even when showHint is false; otherwise make resolvedHint and displayText customizable via callback functions or strings (`hint?: string | ((date: DatePickerFormatArg) => string)` and `displayValue?: string | ((date: DatePickerFormatArg) => string)`).",
+        "Support interactive month selection ('months' 3x4 grid) and year selection ('years' 3x3 grid 'Pilih Tahun' 2021-2029 inside a bordered rounded-lg inner card) triggered either by the Month/Year dropdown buttons in the calendar header or via mode='month' / mode='year'.",
+        "In mode='range', render two consecutive month panels side-by-side (e.g. June 2025 & July 2025), highlight range start/end cells with bg-primary-default text-primary-foreground and in-between range cells with bg-primary-subtle, and preview the candidate range live on hover (hoverYear, hoverMonth, hoverValue via onHoverDate) after the start date is clicked.",
+        "All calendar panels, outside-month leading/trailing days (text-foreground-muted), month/year grids, and natural-language inputs must be computed via getDatePickerState in ./utils and wired in bindControllerProps."
+      ],
+      "updatedAt": "2026-11-12T15:40:00.000Z"
+    },
+    "TimePicker": {
+      "rules": [
+        "Expose a dedicated, composable TimePicker API via format?: 'HH:mm' | 'HH:mm:ss' (default 'HH:mm'), editable?: boolean (default false, renders manual text input supporting 24h and 12h AM/PM typing alongside toggle button), use12Hours?: boolean (default false for 24h mode, true for 12h AM/PM mode), hourStep?: number (default 1), minuteStep?: number (default 1, generating pure 60 options 00..59 like Ant Design/Element Plus), secondStep?: number (default 1, generating pure 60 options 00..59 when format='HH:mm:ss'), customizable label?: string and hint?: string | ((time: TimePickerFormatArg) => string), and full createFormController (bindField) integration via id, name, value?: string, required, disabled, error, errorMessage, validating, onValueChange, and onBlur.",
+        "Use semantic tokens (bg-input-default, border-border-default, rounded-lg, text-foreground-default, ring-focus-ring-primary, and border-destructive-border ring-2 ring-focus-ring-error in error state) and a trigger width of props.editable ? 'w-48' : 'w-44'.",
+        "Render the popup time selector dialog (<div role=\"dialog\" class=\"absolute left-0 top-full z-50 mt-2 ...\">) with scrollable columns for Hour, Minute, optional Second, and optional AM/PM, styled with divide-x divide-border-subtle and accessible buttons.",
+        "Support keyboard Escape key to close the popup dialog, and close popup on minute selection while emitting onValueChange and onBlur.",
+        "Support bidirectional sync between manual text typing (onInputChange) and column clicking, validating and updating selectedHour/Minute/Second/Period and formatted value.",
+        "Provide TimePickerFormatArg callback support for dynamic hint formatting with { hour, minute, second, hour12, period, formatted, iso, hasValue }."
+      ],
+      "updatedAt": "2026-11-12T18:15:00.000Z"
+    }
+  }
+}

@@ -1,6 +1,7 @@
 packages:
   - "apps/*"
   - "packages/*"
+  - "library/*"
 allowBuilds:
   esbuild: true
   svelte-preprocess: false

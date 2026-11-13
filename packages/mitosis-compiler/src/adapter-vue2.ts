@@ -112,7 +112,12 @@ function normalizeVue2Template(code: string): string {
 export function adaptVue2Output(rawCode: string, source?: string): string {
   if (!rawCode) return rawCode;
 
-  let code = normalizeVue2Template(rawCode).replace(
+  let code = normalizeVue2Template(
+    rawCode.replace(
+      /\{\{\s*(icon|[a-zA-Z0-9_]+Icon)\s*\}\}/g,
+      '<component :is="$1" v-if="$1" class="h-4 w-4 shrink-0" /><slot v-else name="$1" />'
+    )
+  ).replace(
     /(export\s+interface\s+\w+Props\s*\{)([\s\S]*?)(\})/m,
     (full, open: string, body: string, close: string) => {
       const stripped = body.replace(/^\s*children\s*\?\s*:\s*any\s*;?\s*$/gm, '');

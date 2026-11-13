@@ -6,24 +6,24 @@
         <div>
           <div class="flex items-center gap-2.5 mb-2">
             <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-primary-default text-white shadow-2xs">
-              Supernova UI
+              Komerce Design
             </span>
             <span class="text-xs font-medium text-foreground-muted">
-              {{ allComponents.length }} Production Components
+              20 Component Groups ({{ allComponents.length }} Primary Components)
             </span>
           </div>
           <h1 class="text-2xl md:text-3xl font-extrabold text-foreground-default tracking-tight">
             Component Catalog
           </h1>
           <p class="text-sm text-foreground-muted mt-1.5 max-w-2xl leading-relaxed">
-            Explore universal design system components authored with Mitosis and compiled deterministically to React, Vue 3, and Svelte.
+            Explore universal design system components authored with Mitosis from Figma and compiled deterministically to React, Vue 3, Svelte, Vue 2, and Angular.
           </p>
         </div>
 
         <div class="flex flex-wrap items-center gap-2 self-start md:self-auto shrink-0">
           <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border-default bg-background-default text-xs font-medium text-foreground-default whitespace-nowrap shadow-2xs">
             <FrameworkIcon name="react" :size="14" />
-            <span>React 19</span>
+            <span>React</span>
           </span>
           <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border-default bg-background-default text-xs font-medium text-foreground-default whitespace-nowrap shadow-2xs">
             <FrameworkIcon name="vue3" :size="14" />
@@ -31,7 +31,15 @@
           </span>
           <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border-default bg-background-default text-xs font-medium text-foreground-default whitespace-nowrap shadow-2xs">
             <FrameworkIcon name="svelte" :size="14" />
-            <span>Svelte 4</span>
+            <span>Svelte</span>
+          </span>
+          <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border-default bg-background-default text-xs font-medium text-foreground-default whitespace-nowrap shadow-2xs">
+            <FrameworkIcon name="vue2" :size="14" />
+            <span>Vue 2</span>
+          </span>
+          <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border-default bg-background-default text-xs font-medium text-foreground-default whitespace-nowrap shadow-2xs">
+            <FrameworkIcon name="angular" :size="14" />
+            <span>Angular</span>
           </span>
         </div>
       </div>
@@ -146,16 +154,13 @@
               <span class="text-primary-default font-semibold inline-flex items-center gap-1 whitespace-nowrap shrink-0 group-hover:translate-x-0.5 transition-transform">
                 View Component &rarr;
               </span>
-              <div class="flex items-center gap-2 text-[11px] text-foreground-muted whitespace-nowrap shrink-0">
-                <span class="inline-flex items-center gap-1">
-                  <FrameworkIcon name="react" :size="11" /> React
-                </span>
-                <span class="inline-flex items-center gap-1">
-                  <FrameworkIcon name="vue3" :size="11" /> Vue
-                </span>
-                <span class="inline-flex items-center gap-1">
-                  <FrameworkIcon name="svelte" :size="11" /> Svelte
-                </span>
+              <div class="flex items-center gap-1.5 text-[11px] text-foreground-muted whitespace-nowrap shrink-0">
+                <FrameworkIcon name="react" :size="11" />
+                <FrameworkIcon name="vue3" :size="11" />
+                <FrameworkIcon name="svelte" :size="11" />
+                <FrameworkIcon name="vue2" :size="11" />
+                <FrameworkIcon name="angular" :size="11" />
+                <span class="ml-0.5 font-medium">5 targets</span>
               </div>
             </div>
           </a>

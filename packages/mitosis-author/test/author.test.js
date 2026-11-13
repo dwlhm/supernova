@@ -148,7 +148,7 @@ describe('Mitosis Author - Config & Environment Guards', () => {
       assert.equal(cfg.baseUrl, 'http://localhost:11434/v1');
       assert.equal(cfg.apiKey, 'test-key');
       assert.equal(cfg.model, 'gpt-4o-mini');
-      assert.equal(cfg.session, 'supernova');
+      assert.equal(cfg.session, 'komerce-design');
     } finally {
       if (oldBase) process.env.LLM_BASE_URL = oldBase;
       if (oldKey) process.env.LLM_API_KEY = oldKey;

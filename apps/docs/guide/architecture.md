@@ -1,37 +1,42 @@
 # Full-TypeScript Architecture
 
-The Supernova backend (`apps/api` — `@supernova/api`) is a 100% TypeScript / Node.js 22 service structured around clean domain and application boundaries with zero subprocess serialization overhead.
+Komerce Design (`apps/api` — `@komerce-design/api`) is a 100% TypeScript / Node.js 22 CLI and service structured around clean domain and application boundaries with zero database or subprocess serialization overhead.
 
 ## Module Boundaries
 
 Dependencies flow inward toward the domain and application layer:
 
-```
-[ Inbound HTTP / Webhooks ]       [ Core Application (`src/app/`) ]      [ In-Process Packages & Stores ]
-  HTTP Router (`src/http/`) ----> SupernovaService (`service.ts`)  ----> @supernova/mitosis-author
-  - /v1/extractions               JobRunner & AuthorRunner               - Deterministic Blueprint
-  - /v1/syncs/*                   Incremental Diff (`sync.ts`)           - OpenAI Agent & Tooling
-  - /v1/jobs/{id}/events (SSE)    AST Docgen (`docgen-ast.ts`)
-  - /v1/webhooks/github           Token Resolver (`tokens.ts`)     ----> @supernova/mitosis-compiler
-                                                                         - AST Normalizer (`normalize.ts`)
-                                                                         - Linter & SSR Render Gate
-                                                                   ----> Store (`src/store/`)
-                                                                         - MemStore / SQLite (`node:sqlite`)
-                                                                   ----> Publishers (`src/publisher/`)
-                                                                         - Download ZIP Publisher
-                                                                         - GitHub PR Publisher
+```text
+[ Local CLI / Inbound HTTP ]       [ Core Application (`src/app/`) ]      [ In-Process Packages & Workspace ]
+  CLI (`cli.ts`, `local-runner.ts`) -> Service (`service.ts`)            ----> @komerce-design/mitosis-author
+  - `komerce sync [file.json]`         JobRunner & AuthorRunner               - Deterministic Blueprint (`blueprint.ts`)
+  - `komerce regen <Comp> <notes>`     Local Regen (`regenerate.ts`)          - Agy CLI & OpenAI Agent
+  - `komerce listen` (127.0.0.1)       Incremental Diff (`sync.ts`)
+  HTTP Router (`src/http/`)            AST Docgen (`docgen-ast.ts`)     ----> @komerce-design/mitosis-compiler
+  - /v1/extractions, /v1/syncs/*       Token Resolver (`tokens.ts`)           - AST Normalizer & Typecheck Gate
+  - /v1/jobs/{id}/events (SSE)                                                - 5-Target Framework Adapters
+                                                                        ----> Store (`src/store/`)
+                                                                              - In-Memory Store (`mem-store.ts`) + Disk (`src/*`)
+                                                                        ----> Publishers (`src/publisher/`)
+                                                                              - LocalWorkspacePublisher (`src/*` & `library/*`)
+                                                                              - Download ZIP & Optional GitHub PR Publisher
 ```
 
+### Workspace Source & Output Layout
+- `src/{components,icons,tokens,examples}`: Single source of truth for universal `.lite.tsx` components, headless `core-*.ts` / `utils.ts`, and semantic design tokens.
+- `library/{tokens,react,vue3,svelte,vue2,angular}`: Standalone npm workspace packages (`@komerce-design/*`) compiled from `src/*` by `scripts/compile-library.mjs`.
+
 ### Domain Layer (`apps/api/src/domain/`)
-- `models.ts`: Pure entity types (`Job`, `FigmaComponentSpec`, `CompiledArtifact`, `SyncPlan`, `ComponentTaskState`) and component name normalization (`normalizeComponentName`, `camelToKebab`).
-- `artifact-path.ts`: Single source of truth mapping artifacts (`mitosis`, `tokens`, `docs`, framework outputs) to repository paths while excluding raw Figma extraction payloads from Git trees.
+- `models.ts`: Pure entity types (`Job`, `FigmaComponentSpec`, `CompiledArtifact`, `SyncPlan`, `PublisherType`) and component name normalization (`normalizeComponentName`, `camelToKebab`).
+- `artifact-path.ts`: Single source of truth mapping artifacts (`mitosis`, `tokens`, `docs`) to repository paths (`src/components`, `src/icons`, `src/examples`, `src/tokens`, `docs/components`, `docs/tokens.md`).
 
 ### Application Layer (`apps/api/src/app/`)
 - `service.ts` & `job-runner.ts`: Orchestrates extraction jobs, incremental sync plans (`calculateSyncPlan`), concurrent component authoring, and publisher invocation.
-- `author-runner.ts`: Stateful cross-attempt repair loop passing `repairErrors` and `partialComponents` into `@supernova/mitosis-author` and verifying output via `@supernova/mitosis-compiler`.
+- `regenerate.ts`: In-process single-component regeneration (`regenerateComponentLocal`) reading local `src/` sources and `var/extractions/latest.json`, writing updated `.lite.tsx` and docs directly to disk, and recompiling `library/*`.
+- `author-runner.ts`: Stateful cross-attempt repair loop passing `repairErrors` and `partialComponents` into `@komerce-design/mitosis-author` and verifying output via `@komerce-design/mitosis-compiler`.
 - `tokens.ts` & `docgen.ts` / `docgen-ast.ts`: Generates Tailwind v4 `@theme` (`theme.css`), CSS custom properties (`tokens.css`), and AST-driven Markdown documentation.
-- `webhook.ts`: Handles `/supernova regenerate <Component>: <notes>` comments on GitHub Pull Requests.
 
 ### Storage & Publishers (`apps/api/src/{store,publisher}/`)
-- `sqlite-store.ts` & `mem-store.ts`: Persists jobs, artifacts, ZIP bundles, and incremental component/token snapshots using Node.js 22 native `node:sqlite` (`DatabaseSync`).
-- `github-publisher.ts` & `download-publisher.ts`: Publishes multi-framework ZIP archives or commits universal `.lite.tsx` sources, tokens, and docs to GitHub Pull Requests.
+- `mem-store.ts`: Lightweight in-memory job and artifact store paired with direct filesystem inspection of `src/*` and `var/extractions/latest.json` (zero SQLite database required).
+- `local-publisher.ts`: Writes universal `.lite.tsx` sources, tokens, and docs directly to the local working tree and invokes `scripts/compile-library.mjs`.
+- `download-publisher.ts` & `github-publisher.ts`: Optional ZIP bundle and remote GitHub Pull Request publishers.

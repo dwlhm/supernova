@@ -4,6 +4,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount, watch } from 'vue';
+import { ICON_PATHS } from '../preview/utils';
 
 const props = defineProps<{
   component: any;
@@ -17,16 +18,51 @@ type Subscription = { unsubscribe: () => void };
 const containerRef = ref<HTMLElement | null>(null);
 let app: any = null;
 let componentRef: any = null;
+let angularCore: any = null;
 let subscriptions: Subscription[] = [];
 /** Text projected into the component's `<ng-content>`. */
 let contentNode: Text | null = null;
 /** Bumped on every mount/unmount so a slow async mount never outlives a newer one. */
 let generation = 0;
+const angularIconCache = new Map<string, any>();
 
 /** Angular is linked at build time (see `angularLinkerPlugin` in config.mts) and loaded only for this tab. */
 async function loadAngular() {
   const [core, browser] = await Promise.all([import('@angular/core'), import('@angular/platform-browser')]);
+  angularCore = core;
   return { core, browser };
+}
+
+function getAngularIconComponent(iconKey: string): any {
+  const pathData = iconKey ? ICON_PATHS[iconKey] : undefined;
+  if (!pathData || !angularCore) return undefined;
+  if (angularIconCache.has(iconKey)) return angularIconCache.get(iconKey);
+  const core = angularCore;
+  class PreviewIconComponent {
+    static ɵfac = () => new PreviewIconComponent();
+    static ɵcmp = core.ɵɵdefineComponent({
+      type: PreviewIconComponent,
+      selectors: [['kd-preview-icon']],
+      standalone: true,
+      decls: 2,
+      vars: 0,
+      consts: [
+        ['aria-hidden', 'true', 'viewBox', '0 0 24 24', 'fill', 'none', 'stroke', 'currentColor', 'stroke-width', '1.5', 1, 'h-4', 'w-4', 'shrink-0'],
+        ['stroke-linecap', 'round', 'stroke-linejoin', 'round', 'd', pathData],
+      ],
+      template: function PreviewIcon_Template(rf: number) {
+        if (rf & 1) {
+          core.ɵɵnamespaceSVG();
+          core.ɵɵelementStart(0, 'svg', 0);
+          core.ɵɵelement(1, 'path', 1);
+          core.ɵɵelementEnd();
+        }
+      },
+      styles: ['[_nghost-%COMP%] { display: contents; }'],
+    });
+  }
+  angularIconCache.set(iconKey, PreviewIconComponent);
+  return PreviewIconComponent;
 }
 
 /** Inputs go through `setInput`; function props subscribe to the matching `@Output()` EventEmitter. */
@@ -39,7 +75,9 @@ function applyProps(next: Record<string, any> = {}) {
     if (def.outputs && key in def.outputs && typeof value === 'function') {
       subscriptions.push(componentRef.instance[key].subscribe(value));
     } else if (def.inputs && key in def.inputs) {
-      componentRef.setInput(key, value);
+      const resolvedValue =
+        (key === 'icon' || key.endsWith('Icon')) && typeof value === 'string' ? getAngularIconComponent(value) : value;
+      componentRef.setInput(key, resolvedValue);
     }
   }
   componentRef.changeDetectorRef.detectChanges();

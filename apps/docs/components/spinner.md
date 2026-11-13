@@ -28,6 +28,22 @@ An indeterminate loading indicator that communicates an ongoing process when pro
 
 | Prop | Type | Default | Options |
 | :--- | :--- | :--- | :--- |
-| `size` | `'12' \| '16' \| '24' \| '32'` | `'12'` | 12, 16, 24, 32 |
-| `label` | `string` | `'Loading'` | - |
+| `size` | `'12' \| '16' \| '24' \| '32'` | `'24'` | 12, 16, 24, 32 |
+| `ariaLabel` | `string` | `'Loading'` | - |
 | `className` | `string` | `''` | - |
+
+## Design Tokens & Color Customization
+
+`Spinner` consumes canonical Figma semantic color tokens. You can customize its colors either by passing semantic/brand utility classes via `className` or by rebinding the underlying CSS custom properties (`--color-*`) on the component or a parent wrapper:
+
+| Tailwind Token Class | CSS Variable | UI Role |
+| :--- | :--- | :--- |
+| `text-primary-default` | `--color-primary-default` | Text / Foreground color |
+
+```tsx
+// 1. Direct token override via className
+<Spinner className="bg-brand-kompack-primary text-primary-foreground" />
+
+// 2. Scoped CSS variable token rebinding (updates all internal elements using that token)
+<Spinner className="[--color-primary-default:var(--color-brand-komship-primary)]" />
+```

@@ -26,9 +26,30 @@ Tooltip provides brief contextual information about a UI element without interru
 
 | Prop | Type | Default | Options |
 | :--- | :--- | :--- | :--- |
-| `text` | `string` | `''` | - |
-| `textContent` | `string` | `''` | - |
+| `text` | `string` | `'Label'` | - |
 | `position` | `'top' \| 'bottom' \| 'left' \| 'right'` | `'top'` | top, bottom, left, right |
+| `trigger` | `'hover' \| 'click'` | `'hover'` | hover, click |
+| `open` | `boolean` | `-` | - |
+| `onOpenChange` | `(open: boolean) => void` | `-` | - |
 | `id` | `string` | `'tooltip'` | - |
+| `contentClassName` | `string` | `''` | - |
+| `dotClassName` | `string` | `''` | - |
 | `className` | `string` | `''` | - |
 | `children` | `ReactNode \| Slot \| ng-content` | `-` | - |
+
+## Design Tokens & Color Customization
+
+`Tooltip` consumes canonical Figma semantic color tokens. You can customize its colors either by passing semantic/brand utility classes via `contentClassName` or by rebinding the underlying CSS custom properties (`--color-*`) on the component or a parent wrapper:
+
+| Tailwind Token Class | CSS Variable | UI Role |
+| :--- | :--- | :--- |
+| `bg-primary-default` | `--color-primary-default` | Background / Surface fill |
+| `text-primary-foreground` | `--color-primary-foreground` | Text / Foreground color |
+
+```tsx
+// 1. Direct token override via contentClassName
+<Tooltip contentClassName="bg-brand-kompack-primary text-primary-foreground" />
+
+// 2. Scoped CSS variable token rebinding (updates all internal elements using that token)
+<Tooltip contentClassName="[--color-primary-default:var(--color-brand-komship-primary)]" />
+```

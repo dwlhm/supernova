@@ -13,3 +13,5 @@ export * from './adapter-svelte.js';
 export * from './adapter-vue2.js';
 export * from './adapter-angular.js';
 export * from './utils-source.js';
+export * from './runtime-react.js';
+export * from './runtime-vue3.js';

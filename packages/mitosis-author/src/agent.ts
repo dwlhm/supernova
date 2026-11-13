@@ -5,7 +5,7 @@ import {
   normalizeMitosisSource,
   type CompiledArtifact,
   type TargetFramework,
-} from '@supernova/mitosis-compiler';
+} from '@komerce-design/mitosis-compiler';
 import { getAuthorConfig, getAuthorModel } from './config.js';
 import { runAgyAuthor } from './agy-runner.js';
 import {
@@ -56,8 +56,12 @@ const DEFAULT_TARGETS: TargetFramework[] = [
   'mitosis', 'react', 'svelte', 'vue3', 'vue2', 'angular',
 ];
 
-function resolvePreferredBaseSource(provided: string | undefined, compName: string): string | undefined {
-  const baseline = loadBaselineComponentSource(compName);
+function resolvePreferredBaseSource(
+  provided: string | undefined,
+  compName: string,
+  workspaceDir?: string
+): string | undefined {
+  const baseline = loadBaselineComponentSource(compName, workspaceDir);
   if (!provided) return baseline;
   if (baseline && /-(?:components|primitive)-|rounded-rounded-/.test(provided)) {
     return baseline;
@@ -72,7 +76,7 @@ function collectContextMaps(req: AuthorAgentRequest) {
 
   if (req.componentName) {
     requestedNames.push(req.componentName);
-    const baseline = resolvePreferredBaseSource(req.existingSource, req.componentName);
+    const baseline = resolvePreferredBaseSource(req.existingSource, req.componentName, req.workspaceDir);
     if (baseline) {
       existingSources[req.componentName] = baseline;
       req.existingSource = baseline;
@@ -84,7 +88,7 @@ function collectContextMaps(req: AuthorAgentRequest) {
       const cName = item.componentName || item.name;
       if (!cName) continue;
       if (!requestedNames.includes(cName)) requestedNames.push(cName);
-      const baseline = resolvePreferredBaseSource(item.existingSource || req.existingSource, cName);
+      const baseline = resolvePreferredBaseSource(item.existingSource || req.existingSource, cName, req.workspaceDir);
       if (baseline) {
         existingSources[cName] = baseline;
         item.existingSource = baseline;
@@ -127,12 +131,16 @@ function recoverMissingComponents(
 }
 
 /** A compound session (container + sibling components) must ship a compilable `<Name>Example`. */
-function missingExampleErrors(primary: string | undefined, groups: Record<string, ComponentGroup>): string[] {
+function missingExampleErrors(
+  primary: string | undefined,
+  groups: Record<string, ComponentGroup>,
+  existingDrafts?: Record<string, string>
+): string[] {
   if (!primary) return [];
   const published = Object.keys(groups).filter((name) => groups[name] !== 'examples');
   if (published.length < 2) return [];
   const example = `${primary}Example`;
-  if (groups[example] === 'examples') return [];
+  if (groups[example] === 'examples' || Boolean(existingDrafts?.[example])) return [];
   return [`[${primary}][example] Compound component "${primary}" must include "${example}" (group "examples") composing ${published.join(', ')} as children.`];
 }
 
@@ -155,7 +163,7 @@ export async function runAuthorAgent(
         req.componentName ||
         (req.components?.[0] && (req.components[0].componentName || req.components[0].name));
       const rawSource = req.existingSource || req.components?.[0]?.existingSource;
-      const source = compName ? resolvePreferredBaseSource(rawSource, compName) : rawSource;
+      const source = compName ? resolvePreferredBaseSource(rawSource, compName, req.workspaceDir) : rawSource;
       if (compName && source) {
         components[compName] = normalizeMitosisSource(source, compName);
         componentGroups[compName] = 'components';
@@ -241,7 +249,7 @@ export async function runAuthorAgent(
     const artifacts: CompiledArtifact[] = [];
     const compileErrors: string[] = [];
 
-    const siblingSources = loadAllBaselineSiblings({ ...req.siblingSources, ...components });
+    const siblingSources = loadAllBaselineSiblings({ ...req.siblingSources, ...components }, req.workspaceDir);
     for (const [name, source] of Object.entries(components)) {
       const compileRes = await compileMitosis({
         componentName: name, source, targets, allowedClasses: req.tokenClasses,
@@ -254,7 +262,7 @@ export async function runAuthorAgent(
       }
     }
 
-    compileErrors.push(...missingExampleErrors(req.componentName, componentGroups));
+    compileErrors.push(...missingExampleErrors(req.componentName, componentGroups, req.siblingDrafts));
 
     // Any failing source fails the session: siblings import each other, so a partial set is unusable.
     if (compileErrors.length > 0) {

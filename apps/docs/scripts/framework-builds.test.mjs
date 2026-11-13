@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { vue2SfcToModule, withDependents } from './framework-builds.mjs';
 import { renderRegistry } from './registry.mjs';
 
-describe('secondary framework preview builds (@supernova/docs)', () => {
+describe('secondary framework preview builds (@komerce-design/docs)', () => {
   it('propagates a failure to every component that transitively imports it', () => {
     const sources = new Map([
       ['Badge', 'export default {}'],

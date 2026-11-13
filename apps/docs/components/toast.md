@@ -26,15 +26,78 @@ A brief, non-intrusive notification that communicates the status of an action or
 
 | Prop | Type | Default | Options |
 | :--- | :--- | :--- | :--- |
+| `children` | `ReactNode \| Slot \| ng-content` | `-` | - |
+| `id` | `string` | `''` | - |
+| `open` | `boolean` | `true` | - |
 | `type` | `'default' \| 'success' \| 'error' \| 'warning' \| 'info'` | `'default'` | default, success, error, warning, info |
-| `title` | `string` | `'Toast Text'` | - |
-| `description` | `string` | `'Toast description text here'` | - |
+| `placement` | `'inline' \| 'top-left' \| 'top-center' \| 'top-right' \| 'bottom-left' \| 'bottom-center' \| 'bottom-right'` | `'inline'` | inline, top-left, top-center, top-right, bottom-left, bottom-center, bottom-right |
+| `title` | `string` | `''` | - |
+| `description` | `string` | `''` | - |
 | `showDescription` | `boolean` | `false` | - |
 | `actionText` | `string` | `'Undo'` | - |
 | `showAction` | `boolean` | `false` | - |
 | `showClose` | `boolean` | `false` | - |
-| `timestamp` | `string` | `'11.29.45 AM'` | - |
+| `closeLabel` | `string` | `'Dismiss notification'` | - |
+| `closeIcon` | `Component \| ReactNode \| Slot` | `-` | - |
+| `timestamp` | `string` | `''` | - |
 | `showTimestamp` | `boolean` | `true` | - |
+| `duration` | `number` | `0` | - |
+| `pauseOnHover` | `boolean` | `true` | - |
+| `draggable` | `boolean` | `true` | - |
+| `swipeThreshold` | `number` | `88` | - |
+| `icon` | `Component \| ReactNode \| Slot` | `-` | - |
+| `inlineStyle` | `Record<string, string>` | `-` | - |
 | `className` | `string` | `''` | - |
 | `onAction` | `() => void` | `-` | - |
 | `onClose` | `() => void` | `-` | - |
+
+### `ToastViewport`
+
+| Prop | Type | Default | Options |
+| :--- | :--- | :--- | :--- |
+| `children` | `ReactNode \| Slot \| ng-content` | `-` | - |
+| `id` | `string` | `-` | - |
+| `placement` | `'top-left' \| 'top-center' \| 'top-right' \| 'bottom-left' \| 'bottom-center' \| 'bottom-right'` | `'top-right'` | top-left, top-center, top-right, bottom-left, bottom-center, bottom-right |
+| `inline` | `boolean` | `false` | - |
+| `expanded` | `boolean` | `false` | - |
+| `scrollable` | `boolean` | `true` | - |
+| `ariaLabel` | `string` | `'Notifications'` | - |
+| `inlineStyle` | `Record<string, string>` | `-` | - |
+| `className` | `string` | `''` | - |
+| `onMouseEnter` | `() => void` | `-` | - |
+| `onMouseLeave` | `() => void` | `-` | - |
+
+## Design Tokens & Color Customization
+
+`Toast` consumes canonical Figma semantic color tokens. You can customize its colors either by passing semantic/brand utility classes via `className` or by rebinding the underlying CSS custom properties (`--color-*`) on the component or a parent wrapper:
+
+| Tailwind Token Class | CSS Variable | UI Role |
+| :--- | :--- | :--- |
+| `bg-background-default` | `--color-background-default` | Background / Surface fill |
+| `bg-background-interactive` | `--color-background-interactive` | Background / Surface fill |
+| `bg-background-muted` | `--color-background-muted` | Background / Surface fill |
+| `bg-destructive-default` | `--color-destructive-default` | Background / Surface fill |
+| `bg-foreground-subtle` | `--color-foreground-subtle` | Background / Surface fill |
+| `bg-info-default` | `--color-info-default` | Background / Surface fill |
+| `bg-secondary-default` | `--color-secondary-default` | Background / Surface fill |
+| `bg-secondary-hover` | `--color-secondary-hover` | Background / Surface fill |
+| `bg-success-default` | `--color-success-default` | Background / Surface fill |
+| `bg-warning-default` | `--color-warning-default` | Background / Surface fill |
+| `border-border-default` | `--color-border-default` | Border / Divider stroke |
+| `ring-focus-ring-primary` | `--color-focus-ring-primary` | Focus ring highlight |
+| `text-destructive-default` | `--color-destructive-default` | Text / Foreground color |
+| `text-foreground-default` | `--color-foreground-default` | Text / Foreground color |
+| `text-foreground-muted` | `--color-foreground-muted` | Text / Foreground color |
+| `text-foreground-on-accent` | `--color-foreground-on-accent` | Text / Foreground color |
+| `text-info-default` | `--color-info-default` | Text / Foreground color |
+| `text-secondary-foreground` | `--color-secondary-foreground` | Text / Foreground color |
+| `text-success-default` | `--color-success-default` | Text / Foreground color |
+| `text-warning-default` | `--color-warning-default` | Text / Foreground color |
+
+```tsx
+// 1. Direct token override via className
+<Toast className="bg-brand-kompack-primary text-primary-foreground" />
+
+// 2. Scoped CSS variable token rebinding (updates all internal elements using that token)
+<Toast className="[--color-primary-default:var(--color-brand-komship-primary)]" />
+```

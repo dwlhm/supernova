@@ -1,5 +1,5 @@
 import { spawn } from 'node:child_process';
-import { normalizeMitosisSource } from '@supernova/mitosis-compiler';
+import { normalizeMitosisSource } from '@komerce-design/mitosis-compiler';
 import type { AuthorConfig } from './config.js';
 import { buildAuthorUserPrompt, type PromptAuthorRequest } from './prompt.js';
 import { COMPOSITION_RULES } from './system-prompt.js';
@@ -135,9 +135,9 @@ export function buildAgyAuthorPrompt(
   sections.push(
     '',
     'OUTPUT FORMAT (SINGLE-TURN RAW JSON ONLY — ZERO TOOL CALLS):',
-    '- Prefer targeted "edits": [{ "oldText": "...", "newText": "..." }] against Existing Source and OMIT "source".',
-    '- If Existing Source already matches the Figma blueprint with zero errors, return "edits": [] and OMIT "source".',
-    '- New sibling components (e.g. "<Name>Item") and examples ("<Name>Example", group "examples") have no Existing Source: return their full "source".',
+    '- Base-First Surgical Editing (CRITICAL): Whenever Existing Source is provided above (for the primary component, any sibling "<Name>Item"/"<Name>*" in Sibling Components, or "<Name>Example" in group "examples"), ALWAYS return targeted "edits": [{ "oldText": "...", "newText": "..." }] against that Existing Source and OMIT "source". Preserve existing interactive behavior, callbacks, and Project Knowledge Rules.',
+    '- If an Existing Source already matches the Figma blueprint and Project Knowledge Rules with zero errors, return "edits": [] and OMIT "source".',
+    '- Only return full "source" when creating a brand-new component/sibling/example that has NO Existing Source above, or when its UI/business flow was fundamentally redesigned.',
     '{ "components": [{ "componentName": "...", "group": "components" | "icons" | "examples", "edits": [{ "oldText": "...", "newText": "..." }], "source": "...", "curatedDescription": "..." }], "newTokens": [] }'
   );
   return sections.join('\n');

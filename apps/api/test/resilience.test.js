@@ -31,7 +31,7 @@ async function waitTerminal(svc, jobId) {
   throw new Error('job never reached a terminal state');
 }
 
-describe('Job lifecycle resilience (@supernova/api)', () => {
+describe('Job lifecycle resilience (@komerce-design/api)', () => {
   it('drives a job to failed instead of crashing when an unexpected error escapes the runner', async () => {
     // docsDir points below a regular file, so writing token CSS throws ENOTDIR mid-job.
     const { svc, tmpDir } = makeService({
@@ -78,7 +78,7 @@ describe('Job lifecycle resilience (@supernova/api)', () => {
   });
 });
 
-describe('HTTP hardening (@supernova/api)', () => {
+describe('HTTP hardening (@komerce-design/api)', () => {
   it('rejects webhooks fail-closed, bad signatures, oversized and malformed bodies', async () => {
     const { svc, tmpDir } = makeService();
     const open = createRouter(svc, { apiToken: 't' });
@@ -121,7 +121,7 @@ describe('HTTP hardening (@supernova/api)', () => {
   });
 });
 
-describe('GitHubPublisher (@supernova/api)', () => {
+describe('GitHubPublisher (@komerce-design/api)', () => {
   async function withGitHub(handler, fn) {
     const calls = [];
     const server = http.createServer(async (req, res) => {

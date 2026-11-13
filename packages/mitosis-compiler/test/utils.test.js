@@ -10,6 +10,8 @@ import {
   paginateTableRows,
   filterTableRows,
   getVirtualWindow,
+  getSelectionState,
+  toggleSelection,
   scaleLinear,
   scaleBand,
   getSmoothBezierPath,
@@ -17,6 +19,17 @@ import {
   getPieSlices,
   utilsModule,
   compileMitosis,
+  handleFileDragEnter,
+  handleFileDragOver,
+  handleFileDragLeave,
+  handleFileDropEvent,
+  clampZoomRange,
+  zoomRangeAt,
+  panZoomRange,
+  sliceChartWindow,
+  getNearestPointIndex,
+  getChartTooltipAnchor,
+  getSvgTooltipAnchor,
 } from '../dist/index.js';
 
 describe('1. cn (class names merging)', () => {
@@ -698,5 +711,192 @@ describe('15. utilsModule synchronization and exports', () => {
 
     assert.strictEqual(result.success, true);
     assert.deepStrictEqual(result.errors, []);
+  });
+});
+
+describe('16. getSelectionState / toggleSelection', () => {
+  it('derives header state from the visible ids only', () => {
+    assert.deepStrictEqual(getSelectionState([], ['a']), { checked: false, indeterminate: false, count: 0 });
+    assert.deepStrictEqual(getSelectionState(['a', 'b'], []), { checked: false, indeterminate: false, count: 0 });
+    assert.deepStrictEqual(getSelectionState(['a', 'b'], ['b', 'z']), { checked: false, indeterminate: true, count: 1 });
+    assert.deepStrictEqual(getSelectionState(['a', 'b', 'a'], ['a', 'b']), { checked: true, indeterminate: false, count: 2 });
+  });
+
+  it('tolerates missing arrays', () => {
+    assert.deepStrictEqual(getSelectionState(undefined, undefined), { checked: false, indeterminate: false, count: 0 });
+    assert.deepStrictEqual(toggleSelection(undefined, ['a'], true), ['a']);
+    assert.deepStrictEqual(toggleSelection(['a'], undefined, false), ['a']);
+  });
+
+  it('adds and removes ids without duplicates or touching other pages', () => {
+    const selected = ['x'];
+    assert.deepStrictEqual(toggleSelection(selected, ['a', 'a', 'x'], true), ['x', 'a']);
+    assert.deepStrictEqual(toggleSelection(['x', 'a', 'b'], ['a', 'missing'], false), ['x', 'b']);
+    assert.deepStrictEqual(selected, ['x']);
+  });
+});
+
+describe('17. drag & drop file helpers', () => {
+  function createMockElement() {
+    const attrs = new Map();
+    return {
+      _dragDepth: 0,
+      setAttribute(name, val) {
+        attrs.set(name, String(val));
+      },
+      removeAttribute(name) {
+        attrs.delete(name);
+      },
+      getAttribute(name) {
+        return attrs.get(name);
+      },
+      hasAttribute(name) {
+        return attrs.has(name);
+      },
+    };
+  }
+
+  it('handleFileDragEnter tracks depth, sets data-dragging, and calls onDragStateChange', () => {
+    const el = createMockElement();
+    let defaultPrevented = false;
+    let dragActiveState = null;
+    const ev = {
+      preventDefault() { defaultPrevented = true; },
+      currentTarget: el,
+    };
+
+    handleFileDragEnter(ev, (state) => { dragActiveState = state; });
+
+    assert.strictEqual(defaultPrevented, true);
+    assert.strictEqual(el._dragDepth, 1);
+    assert.strictEqual(el.getAttribute('data-dragging'), 'true');
+    assert.strictEqual(dragActiveState, true);
+
+    // Nested child enter should increment depth but not double-call onDragStateChange
+    dragActiveState = null;
+    handleFileDragEnter(ev, (state) => { dragActiveState = state; });
+    assert.strictEqual(el._dragDepth, 2);
+    assert.strictEqual(dragActiveState, null);
+  });
+
+  it('handleFileDragLeave decrements depth and cleans up data-dragging when depth reaches 0', () => {
+    const el = createMockElement();
+    el._dragDepth = 2;
+    el.setAttribute('data-dragging', 'true');
+    let dragActiveState = null;
+    const ev = {
+      preventDefault() {},
+      currentTarget: el,
+    };
+
+    // First leave: depth from 2 to 1 (still inside parent container)
+    handleFileDragLeave(ev, (state) => { dragActiveState = state; });
+    assert.strictEqual(el._dragDepth, 1);
+    assert.strictEqual(el.hasAttribute('data-dragging'), true);
+    assert.strictEqual(dragActiveState, null);
+
+    // Second leave: depth from 1 to 0 (exited component)
+    handleFileDragLeave(ev, (state) => { dragActiveState = state; });
+    assert.strictEqual(el._dragDepth, 0);
+    assert.strictEqual(el.hasAttribute('data-dragging'), false);
+    assert.strictEqual(dragActiveState, false);
+
+    // Further leaves stay clamped at 0
+    handleFileDragLeave(ev, (state) => { dragActiveState = state; });
+    assert.strictEqual(el._dragDepth, 0);
+  });
+
+  it('handleFileDragOver prevents default to allow drop', () => {
+    let prevented = false;
+    handleFileDragOver({ preventDefault() { prevented = true; } });
+    assert.strictEqual(prevented, true);
+  });
+
+  it('handleFileDropEvent resets depth, removes data-dragging, and extracts files', () => {
+    const el = createMockElement();
+    el._dragDepth = 3;
+    el.setAttribute('data-dragging', 'true');
+    let dragActiveState = null;
+    let fileName = '';
+    let fileList = [];
+
+    const mockFile = { name: 'document-test.pdf', type: 'application/pdf' };
+    const ev = {
+      preventDefault() {},
+      currentTarget: el,
+      dataTransfer: {
+        files: [mockFile],
+      },
+    };
+
+    const res = handleFileDropEvent(
+      ev,
+      (name) => { fileName = name; },
+      (files) => { fileList = files; },
+      (state) => { dragActiveState = state; }
+    );
+
+    assert.strictEqual(el._dragDepth, 0);
+    assert.strictEqual(el.hasAttribute('data-dragging'), false);
+    assert.strictEqual(dragActiveState, false);
+    assert.strictEqual(fileName, 'document-test.pdf');
+    assert.strictEqual(fileList.length, 1);
+    assert.strictEqual(res.firstFileName, 'document-test.pdf');
+  });
+});
+
+describe('18. chart zoom, pan & crosshair helpers', () => {
+  it('clampZoomRange handles inverted, out-of-bounds, and degenerate ranges', () => {
+    assert.deepStrictEqual(clampZoomRange(undefined, 0), [0, 0]);
+    assert.deepStrictEqual(clampZoomRange([8, 2], 10, 2), [2, 8]);
+    assert.deepStrictEqual(clampZoomRange([-5, 99], 10, 2), [0, 10]);
+    assert.deepStrictEqual(clampZoomRange([4, 4], 10, 3), [3, 6]);
+  });
+
+  it('zoomRangeAt zooms in/out around anchorRatio and respects minSpan', () => {
+    const zoomedIn = zoomRangeAt([0, 10], 0.6, 0.5, 10, 3);
+    assert.ok(zoomedIn[1] - zoomedIn[0] < 10);
+    assert.ok(zoomedIn[1] - zoomedIn[0] >= 3);
+
+    const minClamped = zoomRangeAt([2, 5], 0.1, 0.5, 10, 3);
+    assert.strictEqual(minClamped[1] - minClamped[0], 3);
+
+    const zoomedOut = zoomRangeAt(minClamped, 1.5, 0.5, 10, 3);
+    assert.ok(zoomedOut[1] - zoomedOut[0] > 3);
+  });
+
+  it('panZoomRange shifts window within bounds without changing span', () => {
+    assert.deepStrictEqual(panZoomRange([2, 6], 2, 10), [4, 8]);
+    assert.deepStrictEqual(panZoomRange([2, 6], 99, 10), [6, 10]);
+    assert.deepStrictEqual(panZoomRange([2, 6], -99, 10), [0, 4]);
+  });
+
+  it('sliceChartWindow returns sliced copy without mutating source', () => {
+    const items = ['a', 'b', 'c', 'd', 'e'];
+    assert.deepStrictEqual(sliceChartWindow(items, [1, 4]), ['b', 'c', 'd']);
+    assert.deepStrictEqual(sliceChartWindow(items, undefined), items);
+    assert.strictEqual(items.length, 5);
+  });
+
+  it('getNearestPointIndex clamps ratio and handles empty/single counts', () => {
+    assert.strictEqual(getNearestPointIndex(0.5, 0), -1);
+    assert.strictEqual(getNearestPointIndex(0.5, 1), 0);
+    assert.strictEqual(getNearestPointIndex(-1, 5), 0);
+    assert.strictEqual(getNearestPointIndex(2, 5), 4);
+    assert.strictEqual(getNearestPointIndex(0.5, 5), 2);
+  });
+
+  it('getChartTooltipAnchor and getSvgTooltipAnchor compute floating tooltip positions safely', () => {
+    assert.deepStrictEqual(getChartTooltipAnchor('Test', null, null), {
+      open: false, text: '', x: 0, y: 0, left: '0px', top: '0px',
+    });
+    const target = { getBoundingClientRect: () => ({ left: 120, top: 80, width: 20, height: 40 }) };
+    const container = { getBoundingClientRect: () => ({ left: 100, top: 50, width: 300, height: 200 }) };
+    assert.deepStrictEqual(getChartTooltipAnchor('Sen: 45', target, container, 8), {
+      open: true, text: 'Sen: 45', x: 30, y: 22, left: '30px', top: '22px',
+    });
+    assert.deepStrictEqual(getSvgTooltipAnchor('Rab: 58', 180, 75, 360, 150, 10), {
+      open: true, text: 'Rab: 58', x: 180, y: 75, left: '50%', top: 'calc(50% - 10px)',
+    });
   });
 });

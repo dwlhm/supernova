@@ -79,7 +79,7 @@ function buildBackfilledInputs(
 }
 
 /**
- * Prefixes the selector (`spn-badge, badge`; native names like `button` stay `spn-button` only) and declares
+ * Prefixes the selector (`kd-badge, badge`; native names like `button` stay `kd-button` only) and declares
  * `standalone: false`: the classic generator
  * declares components in an NgModule, which Angular 19+ rejects for (default) standalone components.
  */
@@ -87,7 +87,7 @@ function normalizeAngularComponentMeta(code: string): string {
   return code.replace(
     /@Component\(\s*\{([\s\S]*?)selector\s*:\s*["']([^"']+)["']/m,
     (_full, prefix: string, selector: string) => {
-      const sel = selector.startsWith('spn-') ? selector : angularSelector(selector);
+      const sel = selector.startsWith('kd-') ? selector : angularSelector(selector);
       const standalone = /\bstandalone\s*:/.test(prefix) ? '' : 'standalone: false, ';
       return `@Component({${prefix}${standalone}selector: "${sel}"`;
     }
@@ -147,7 +147,7 @@ function templateGlobalMembers(code: string): string {
  * 1. Backfills missing `@Input()` declarations from `<Name>Props` and `useDefaultProps`
  *    for components where props are passed as whole objects to headless helpers (e.g. `getTableState(props)`).
  * 2. Backfills any missing values into `const defaultProps = { ... }`.
- * 3. Normalizes component selector to include the `spn-` prefix (e.g. `spn-button, button`) and
+ * 3. Normalizes component selector to include the `kd-` prefix (e.g. `kd-button, button`) and
  *    declares `standalone: false` so NgModule declarations compile on Angular 19+.
  * 4. Synthesizes `get props(): this { return this; }` (typed, so generic helpers keep input types) when templates reference `props`.
  * 5. Rewrites `event` to `$event` in output bindings and exposes JS globals used by the template.
@@ -157,6 +157,10 @@ export function adaptAngularOutput(rawCode: string, source?: string): string {
   if (!rawCode) return rawCode;
 
   let code = normalizeBooleanAttributes(normalizeTemplateEvents(normalizeAngularComponentMeta(rawCode)))
+    .replace(
+      /\{\{\s*(icon|[a-zA-Z0-9_]+Icon)\s*\}\}/g,
+      '<ng-container *ngIf="$1"><ng-container *ngComponentOutlet="$1"></ng-container></ng-container><ng-content select="[$1],[slot=$1]"></ng-content>'
+    )
     .replace(
       /(export\s+interface\s+\w+Props\s*\{)([\s\S]*?)(\})/m,
       (full, open: string, body: string, close: string) => {
@@ -213,6 +217,12 @@ export function adaptAngularOutput(rawCode: string, source?: string): string {
     }
     if (extraMembers) {
       code = code.slice(0, insertIdx) + extraMembers + code.slice(insertIdx);
+    }
+    if (inputAdditions && !/\bimport\s*\{[^}]*\bInput\b[^}]*\}\s*from\s*["']@angular\/core["']/.test(code)) {
+      code = code.replace(
+        /import\s*\{([^}]*)\bComponent\b([^}]*)\}\s*from\s*["']@angular\/core["']/,
+        'import {$1Component, Input$2} from "@angular/core"'
+      );
     }
   }
 

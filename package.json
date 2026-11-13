@@ -1,13 +1,15 @@
 {
-  "name": "supernova",
+  "name": "komerce-design",
   "private": true,
   "packageManager": "pnpm@10.34.5",
   "engines": {
     "node": ">=22"
   },
   "scripts": {
-    "build": "pnpm -r --if-present build",
-    "test": "pnpm -r --if-present test",
+    "build": "pnpm -r --if-present build && node scripts/compile-library.mjs",
+    "compile:library": "node scripts/compile-library.mjs",
+    "komerce": "node apps/api/dist/cli.js",
+    "test": "pnpm -r --if-present test && node --test scripts/compile-library.test.mjs",
     "typecheck": "pnpm -r --if-present typecheck"
   },
   "dependencies": {

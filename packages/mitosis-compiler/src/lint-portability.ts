@@ -98,7 +98,7 @@ function lintCallbackArity(sf: ts.SourceFile, lineOf: LineOf): CompileError[] {
         lintError(
           LINT_RULES.singleArgCallback,
           lineOf(member.getStart(sf)),
-          `Callback "${member.name?.getText(sf)}" takes ${count} parameters; Angular outputs emit one value. Pass a single object instead, e.g. (event: { rowId: string; checked: boolean }) => void.`
+          `Callback "${member.name?.getText(sf)}" takes ${count} parameters; Angular outputs emit one value. Pass a single object instead, e.g. (event: { key: string; direction: 'asc' | 'desc' }) => void.`
         )
       );
     }

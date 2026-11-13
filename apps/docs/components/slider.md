@@ -34,8 +34,44 @@ A slider allows users to select a single value from a defined range by moving a 
 | `min` | `number` | `0` | - |
 | `max` | `number` | `100` | - |
 | `step` | `number` | `1` | - |
-| `disabled` | `boolean` | `false` | - |
-| `label` | `string` | `'Slider'` | - |
+| `label` | `string \| ((value: number) => string)` | `''` | - |
+| `showLabel` | `boolean` | `true` | - |
 | `showValue` | `boolean` | `false` | - |
+| `formatValue` | `(value: number) => string` | `-` | - |
+| `hint` | `string \| ((value: number) => string)` | `''` | - |
+| `showHint` | `boolean` | `true` | - |
+| `required` | `boolean` | `false` | - |
+| `error` | `boolean` | `false` | - |
+| `errorMessage` | `string` | `''` | - |
+| `validating` | `boolean` | `false` | - |
+| `disabled` | `boolean` | `false` | - |
+| `ariaLabel` | `string` | `'Slider'` | - |
+| `trackClassName` | `string` | `''` | - |
+| `indicatorClassName` | `string` | `''` | - |
 | `className` | `string` | `''` | - |
 | `onValueChange` | `(value: number) => void` | `-` | - |
+| `onBlur` | `(event: unknown) => void` | `-` | - |
+
+## Design Tokens & Color Customization
+
+`Slider` consumes canonical Figma semantic color tokens. You can customize its colors either by passing semantic/brand utility classes via `indicatorClassName` or by rebinding the underlying CSS custom properties (`--color-*`) on the component or a parent wrapper:
+
+| Tailwind Token Class | CSS Variable | UI Role |
+| :--- | :--- | :--- |
+| `bg-background-default` | `--color-background-default` | Background / Surface fill |
+| `bg-background-muted` | `--color-background-muted` | Background / Surface fill |
+| `bg-primary-default` | `--color-primary-default` | Background / Surface fill |
+| `border-primary-default` | `--color-primary-default` | Border / Divider stroke |
+| `ring-focus-ring-primary` | `--color-focus-ring-primary` | Focus ring highlight |
+| `text-destructive-default` | `--color-destructive-default` | Text / Foreground color |
+| `text-destructive-foreground` | `--color-destructive-foreground` | Text / Foreground color |
+| `text-foreground-default` | `--color-foreground-default` | Text / Foreground color |
+| `text-foreground-muted` | `--color-foreground-muted` | Text / Foreground color |
+
+```tsx
+// 1. Direct token override via indicatorClassName
+<Slider indicatorClassName="bg-brand-kompack-primary text-primary-foreground" />
+
+// 2. Scoped CSS variable token rebinding (updates all internal elements using that token)
+<Slider indicatorClassName="[--color-primary-default:var(--color-brand-komship-primary)]" />
+```

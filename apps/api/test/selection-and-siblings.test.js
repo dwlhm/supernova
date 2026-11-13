@@ -44,7 +44,7 @@ async function waitTerminal(svc, jobId) {
   throw new Error('job never reached a terminal state');
 }
 
-describe('selectedComponents & derived siblings (@supernova/api)', () => {
+describe('selectedComponents & derived siblings (@komerce-design/api)', () => {
   it('rejects selected names that are not components of the document', async () => {
     const { svc, cleanup } = makeService(recordingAuthor());
     await assert.rejects(
@@ -99,7 +99,7 @@ describe('selectedComponents & derived siblings (@supernova/api)', () => {
   });
 });
 
-describe('repair loop (@supernova/api)', () => {
+describe('repair loop (@komerce-design/api)', () => {
   it('passes failed sibling drafts to the next attempt', async () => {
     const calls = [];
     const author = {

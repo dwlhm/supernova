@@ -16,7 +16,7 @@ export interface RegistryComponentMeta {
 }
 
 const REGISTRY_BOOLEAN_PROP_RE =
-  /^(show[A-Z]|disabled$|active$|checked$|expanded$|open$|pressed$|destructive$|indeterminate$|area$|required$)/;
+  /^(show[A-Z]|disabled$|active$|checked$|expanded$|open$|pressed$|destructive$|indeterminate$|area$|range$|stacked$|required$)/;
 
 export function extractPropsFromLiteSource(sourceCode?: string): ExtractedPropMeta[] {
   if (!sourceCode || !sourceCode.trim()) return [];
@@ -57,7 +57,12 @@ export function extractPropsFromLiteSource(sourceCode?: string): ExtractedPropMe
         if (ts.isPropertySignature(member) && member.name) {
           const name = member.name.getText(sf).replace(/^['"]|['"]$/g, '');
           const rawType = member.type ? member.type.getText(sf).replace(/\s+/g, ' ').trim() : 'any';
-          const typeText = name === 'children' && rawType === 'any' ? 'ReactNode | Slot | ng-content' : rawType;
+          const typeText =
+            name === 'children' && rawType === 'any'
+              ? 'ReactNode | Slot | ng-content'
+              : (name === 'icon' || /Icon$/.test(name)) && rawType === 'any'
+                ? 'Component | ReactNode | Slot'
+                : rawType;
           const required = !member.questionToken;
           props.push({
             name,
@@ -103,6 +108,11 @@ export function extractRegistryMetaFromLiteSource(
   }
   const counts = Object.values(variants).map((v) => v.length);
   const totalVariants = counts.length > 0 ? counts.reduce((acc, c) => acc * c, 1) : 0;
+  for (const prop of extractPropsFromLiteSource(sourceCode)) {
+    if (/^(icon|leftIcon|rightIcon|leadingIcon|trailingIcon)$/.test(prop.name)) {
+      variants[prop.name] = ['default', 'plus', 'check', 'search', 'truck', 'star', 'settings'];
+    }
+  }
   return { name, group, variants, booleans, totalVariants };
 }
 

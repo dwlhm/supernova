@@ -20,8 +20,9 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, h, markRaw } from 'vue';
 import type { PreviewFramework } from '../preview/registry';
+import { ICON_PATHS } from '../preview/utils';
 import AngularHost from './AngularHost.vue';
 import ReactHost from './ReactHost.vue';
 import SvelteHost from './SvelteHost.vue';
@@ -44,10 +45,34 @@ const compProps = defineProps<{
 
 const host = computed(() => HOSTS[compProps.framework]);
 
+function createVue3Icon(pathData: string) {
+  return markRaw((p: Record<string, any>) =>
+    h(
+      'svg',
+      {
+        'aria-hidden': 'true',
+        class: p?.class || 'h-4 w-4 shrink-0',
+        viewBox: '0 0 24 24',
+        fill: 'none',
+        stroke: 'currentColor',
+        'stroke-width': '1.5',
+      },
+      [h('path', { d: pathData, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' })]
+    )
+  );
+}
+
 /** A string `children` fixture is text content: slot/projection per framework, never an attribute. */
 const content = computed(() => (typeof compProps.props?.children === 'string' ? compProps.props.children : undefined));
 const rest = computed(() => {
   const { children: _children, ...others } = compProps.props ?? {};
+  if (!host.value) {
+    for (const [k, v] of Object.entries(others)) {
+      if ((k === 'icon' || k.endsWith('Icon')) && typeof v === 'string') {
+        others[k] = v && ICON_PATHS[v] ? createVue3Icon(ICON_PATHS[v]!) : undefined;
+      }
+    }
+  }
   return others;
 });
 

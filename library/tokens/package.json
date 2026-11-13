@@ -1,0 +1,17 @@
+{
+  "name": "@komerce-design/tokens",
+  "version": "0.1.0",
+  "description": "Komerce Design System semantic tokens (CSS variables, Tailwind v4 theme, TypeScript constants)",
+  "type": "module",
+  "main": "./dist/tokens.ts",
+  "types": "./dist/tokens.ts",
+  "exports": {
+    ".": "./dist/tokens.ts",
+    "./tokens.json": "./dist/tokens.json",
+    "./tokens.css": "./dist/tokens.css",
+    "./theme.css": "./dist/theme.css"
+  },
+  "files": [
+    "dist"
+  ]
+}

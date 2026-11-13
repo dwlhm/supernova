@@ -14,15 +14,16 @@ import {
   type Run,
   type Task,
 } from '../domain/models.js';
-import { GROUP_COMPONENTS, normalizeGroup } from '../domain/artifact-path.js';
+import { GROUP_COMPONENTS, GROUP_EXAMPLES, normalizeGroup } from '../domain/artifact-path.js';
+import { buildComponentKnowledgeNotes } from '../domain/knowledge-base.js';
 import type { ArtifactPublisher } from '../publisher/download-publisher.js';
 import type { JobStore } from '../store/store.js';
 import type { AuthorResult, MitosisAuthor } from './author-runner.js';
 import { resolveComponentGroup } from './docs-writer.js';
 import { failJob, finalizeJobArtifacts } from './job-finalize.js';
 import type { EventBroker } from './events.js';
+import { collectFamilySources, readWorkspaceComponentSource } from './regenerate.js';
 import {
-  buildDarkTokensBlock,
   extractTailwindUtilityClasses,
   generateThemeCSS,
   generateTokensCSS,
@@ -39,6 +40,7 @@ export interface JobRunnerContext {
   concurrency: number;
   docsDir?: string;
   generatedDir?: string;
+  workspaceDir?: string;
 }
 
 async function saveTokenArtifacts(ctx: JobRunnerContext, jobId: string, resolved: FigmaToken[]): Promise<void> {
@@ -55,8 +57,7 @@ async function saveTokenArtifacts(ctx: JobRunnerContext, jobId: string, resolved
     const tokensThemeDir = path.join(ctx.docsDir, '.vitepress', 'theme', 'tokens');
     fs.mkdirSync(tokensThemeDir, { recursive: true });
     fs.writeFileSync(path.join(tokensThemeDir, 'theme.css'), themeCSS, 'utf8');
-    const darkBlock = buildDarkTokensBlock(tokensCSS);
-    fs.writeFileSync(path.join(tokensThemeDir, 'tokens.css'), `${tokensCSS}\n${darkBlock}\n`, 'utf8');
+    fs.writeFileSync(path.join(tokensThemeDir, 'tokens.css'), tokensCSS, 'utf8');
   }
 }
 
@@ -82,6 +83,8 @@ interface ComponentTaskInput {
   isUnchanged: boolean;
   forceAuthor: boolean;
   existingSource: string;
+  initialSiblingDrafts?: Record<string, string>;
+  feedbackNotes?: string;
 }
 
 async function publishTask(ctx: JobRunnerContext, job: Job, runId: string, task: Task, progress: Omit<ComponentProgress, 'name'>, error?: string) {
@@ -100,22 +103,31 @@ function recordAuthored(acc: JobAccumulator, compName: string, compGroup: string
   if (!res.components[compName]) return;
   for (const [name, source] of Object.entries(res.components)) {
     if (name === compName || !source) continue;
+    const defaultGrp = name.endsWith('Example') ? GROUP_EXAMPLES : GROUP_COMPONENTS;
     acc.authoredComponents[name] = source;
-    acc.componentGroups[name] = normalizeGroup(res.componentGroups[name]) || GROUP_COMPONENTS;
+    acc.componentGroups[name] = normalizeGroup(res.componentGroups[name]) || defaultGrp;
     acc.derivedFrom[name] = compName;
   }
 }
 
-/** Re-emits stored siblings of parents that succeeded without re-authoring them (e.g. compile-only runs). */
-function carryDerivedSiblings(existing: Record<string, ComponentSnapshot>, acc: JobAccumulator): void {
+/** Re-emits stored siblings of parents that succeeded without re-authoring them (e.g. compile-only runs), preferring live workspace files over SQLite snapshots. */
+function carryDerivedSiblings(
+  existing: Record<string, ComponentSnapshot>,
+  acc: JobAccumulator,
+  workspaceDir?: string
+): void {
   for (const [name, snap] of Object.entries(existing)) {
     const parent = snap.derivedFrom;
-    if (!parent || !snap.sourceCode || acc.authoredComponents[name] || !acc.authoredComponents[parent]) continue;
-    const group = normalizeGroup(snap.group) || GROUP_COMPONENTS;
-    acc.authoredComponents[name] = snap.sourceCode;
-    acc.componentGroups[name] = group;
+    if (!parent || acc.authoredComponents[name] || !acc.authoredComponents[parent]) continue;
+    const preferredGroup = normalizeGroup(snap.group) || (name.endsWith('Example') ? GROUP_EXAMPLES : GROUP_COMPONENTS);
+    const resolved = workspaceDir
+      ? readWorkspaceComponentSource(workspaceDir, name, preferredGroup, snap.sourceCode || '')
+      : { source: snap.sourceCode || '', group: preferredGroup };
+    if (!resolved.source) continue;
+    acc.authoredComponents[name] = resolved.source;
+    acc.componentGroups[name] = resolved.group;
     acc.derivedFrom[name] = parent;
-    acc.artifacts.push({ target: 'mitosis', fileName: `${name}.lite.tsx`, group, code: snap.sourceCode });
+    acc.artifacts.push({ target: 'mitosis', fileName: `${name}.lite.tsx`, group: resolved.group, code: resolved.source });
   }
 }
 
@@ -131,13 +143,18 @@ async function runSingleComponentTask(
   let lastErr: Error | undefined;
   let currentSource = input.existingSource;
   let repairErrors: string[] | undefined;
-  let siblingDrafts: Record<string, string> | undefined;
+  let siblingDrafts: Record<string, string> | undefined =
+    input.initialSiblingDrafts && Object.keys(input.initialSiblingDrafts).length > 0
+      ? input.initialSiblingDrafts
+      : undefined;
   for (let attempt = 1; attempt <= task.maxAttempts; attempt++) {
     task.attemptCount = attempt;
     try {
       const res = await ctx.author.authorDesignSystem({
-        componentName: compName, components: [spec], tokens: inputs.resolvedTokens, tokenClasses: inputs.tokenClasses,
+        componentName: compName, components: [spec], tokens: job.document.tokens?.length ? job.document.tokens : inputs.resolvedTokens, tokenClasses: inputs.tokenClasses,
         existingSource: currentSource, repairErrors, siblingDrafts, targets: job.targets,
+        ...(input.feedbackNotes ? { feedbackNotes: input.feedbackNotes } : {}),
+        ...(ctx.workspaceDir ? { workspaceDir: ctx.workspaceDir } : {}),
         siblingSources: { ...inputs.siblingSources, ...acc.authoredComponents },
         compileOnly: input.isUnchanged && !input.forceAuthor && Boolean(currentSource) && attempt === 1,
       });
@@ -156,7 +173,9 @@ async function runSingleComponentTask(
       repairErrors = [lastErr.message];
       const { [compName]: draft, ...siblings } = (err?.partialComponents ?? {}) as Record<string, string>;
       if (draft) currentSource = draft;
-      siblingDrafts = Object.keys(siblings).length > 0 ? siblings : undefined;
+      if (Object.keys(siblings).length > 0) {
+        siblingDrafts = { ...(siblingDrafts ?? {}), ...siblings };
+      }
     }
   }
 
@@ -205,9 +224,13 @@ async function runExtractionJob(ctx: JobRunnerContext, jobId: string, state: { r
 
   const docName = job.documentName || job.document.name || 'Design System';
   const existingComps = await ctx.store.getComponentSnapshots(docName);
-  const siblingSources = Object.fromEntries(
+  const snapshotSiblingSources = Object.fromEntries(
     Object.entries(existingComps).flatMap(([name, snap]) => (snap.sourceCode ? [[name, snap.sourceCode]] : []))
   );
+  const diskSiblings = ctx.workspaceDir
+    ? collectFamilySources(ctx.workspaceDir, '', '', existingComps).siblingSources
+    : {};
+  const siblingSources = { ...snapshotSiblingSources, ...diskSiblings };
   const inputs: RunInputs = { resolvedTokens, tokenClasses, siblingSources };
   const acc: JobAccumulator = { authoredComponents: {}, componentGroups: {}, derivedFrom: {}, artifacts: [] };
   const selected = new Set(job.selectedComponents || []);
@@ -218,18 +241,31 @@ async function runExtractionJob(ctx: JobRunnerContext, jobId: string, state: { r
     while (queue.length > 0) {
       const item = queue.shift();
       if (!item) break;
-      const prev = existingComps[item.task.componentName];
+      const compName = item.task.componentName;
+      const prev = existingComps[compName];
+      const preferredGrp = resolveComponentGroup(undefined, compName, item.spec);
+      const existingSource = ctx.workspaceDir
+        ? readWorkspaceComponentSource(ctx.workspaceDir, compName, preferredGrp, prev?.sourceCode || '').source
+        : prev?.sourceCode || '';
+      const initialSiblingDrafts = ctx.workspaceDir
+        ? collectFamilySources(ctx.workspaceDir, compName, existingSource, existingComps).siblingDrafts
+        : undefined;
+      const feedbackNotes = ctx.workspaceDir
+        ? buildComponentKnowledgeNotes(ctx.workspaceDir, compName, Object.keys(initialSiblingDrafts ?? {}))
+        : undefined;
       const ok = await runSingleComponentTask(ctx, job, runId, {
         ...item,
         isUnchanged: prev?.contentHash === hashComponentSpec(item.spec),
-        forceAuthor: selected.has(item.task.componentName),
-        existingSource: prev?.sourceCode || '',
+        forceAuthor: selected.has(compName),
+        existingSource,
+        initialSiblingDrafts,
+        feedbackNotes,
       }, inputs, acc);
       if (ok) successCount++;
     }
   });
   await Promise.all(workers);
-  carryDerivedSiblings(existingComps, acc);
+  carryDerivedSiblings(existingComps, acc, ctx.workspaceDir);
 
   if (successCount === 0) {
     await failJob(ctx, jobId, run, 'authoring', 'all component authoring tasks failed');

@@ -16,14 +16,13 @@ export interface Config {
   extractionsDir: string;
   docsDir: string;
   generatedDir: string;
-  databasePath: string;
   github: GitHubConfig;
 }
 
 export class MissingApiTokenError extends Error {
   constructor() {
     super(
-      'API_TOKEN is required; set SUPERNOVA_INSECURE_NO_AUTH=true to run without auth in local development'
+      'API_TOKEN is required; set KOMERCE_INSECURE_NO_AUTH=true to run without auth in local development'
     );
     this.name = 'MissingApiTokenError';
   }
@@ -82,12 +81,13 @@ export function loadConfig(
   const cfg: Config = {
     port: env('PORT', '8080'),
     apiToken: env('API_TOKEN', ''),
-    insecureNoAuth: env('SUPERNOVA_INSECURE_NO_AUTH', '') === 'true',
-    devMockLLM: env('SUPERNOVA_DEV_MOCK_LLM', '') === 'true',
+    insecureNoAuth:
+      env('KOMERCE_INSECURE_NO_AUTH', env('SUPERNOVA_INSECURE_NO_AUTH', '')) === 'true',
+    devMockLLM:
+      env('KOMERCE_DEV_MOCK_LLM', env('SUPERNOVA_DEV_MOCK_LLM', '')) === 'true',
     extractionsDir: absPath(env('EXTRACTIONS_DIR', fromRoot('var/extractions'))),
     docsDir: absPath(env('APPS_DOCS_DIR', '')),
     generatedDir: absPath(env('GENERATED_DIR', '')),
-    databasePath: absPath(env('DATABASE_PATH', fromRoot('var/supernova.db'))),
     github: {
       token: env('GITHUB_TOKEN', ''),
       repo: env('GITHUB_REPO', ''),

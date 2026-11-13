@@ -10,10 +10,9 @@ import {
   hashTokens,
   buildPullRequestBody,
   MemStore,
-  SqliteStore,
 } from '../dist/index.js';
 
-describe('Domain Contracts & ArtifactPath (@supernova/api)', () => {
+describe('Domain Contracts & ArtifactPath (@komerce-design/api)', () => {
   it('maps published targets to canonical repository paths and rejects unsafe traversal or preview targets', () => {
     assert.equal(
       artifactPath({ target: 'mitosis', fileName: 'Button.lite.tsx', code: '', group: 'components' }),
@@ -103,10 +102,9 @@ describe('Domain Contracts & ArtifactPath (@supernova/api)', () => {
   });
 });
 
-describe('MemStore & SqliteStore (node:sqlite) (@supernova/api)', () => {
+describe('MemStore (@komerce-design/api)', () => {
   for (const [label, createStore] of [
     ['MemStore', () => new MemStore()],
-    ['SqliteStore (:memory:)', () => new SqliteStore(':memory:')],
   ]) {
     it(`${label} lists jobs by status and resolves the latest job publishing a branch`, async () => {
       const store = createStore();

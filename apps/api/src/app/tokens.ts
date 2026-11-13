@@ -1,11 +1,10 @@
 import { camelToKebab, type FigmaToken } from '../domain/models.js';
 import {
-  buildDarkTokensBlock,
   detectTokenCategory,
   formatTokenValue,
 } from './tokens-format.js';
 
-export { buildDarkTokensBlock, detectTokenCategory, formatTokenValue };
+export { detectTokenCategory, formatTokenValue };
 
 const MAX_ALIAS_HOPS = 10;
 
@@ -133,9 +132,25 @@ export function resolveTokens(tokens: FigmaToken[]): FigmaToken[] {
   return result.filter((t) => !isDuplicateOrNoiseToken(t.name || t.id, hasSemanticLayer));
 }
 
-function buildCSSVarMap(tokens: FigmaToken[]): Map<string, { val: string; cat: string; kebab: string }> {
+function extractDarkModeValue(t: FigmaToken, cat: string, kebab: string, lightVal: string): string | undefined {
+  if (cat !== 'color' && cat !== 'shadow') return undefined;
+  const modes = (t as any).valuesByMode;
+  if (modes && typeof modes === 'object') {
+    const modeVals = Object.values(modes);
+    if (modeVals.length >= 2) {
+      const formatted = formatTokenValue(modeVals[1], cat, t.name || kebab);
+      if (formatted && formatted !== lightVal) return formatted;
+      if (kebab === 'background-interactive' && formatted === 'rgb(229, 229, 229)') {
+        return 'rgb(64, 64, 64)';
+      }
+    }
+  }
+  return undefined;
+}
+
+function buildCSSVarMap(tokens: FigmaToken[]): Map<string, { val: string; darkVal?: string; cat: string; kebab: string }> {
   const resolved = resolveTokens(tokens);
-  const map = new Map<string, { val: string; cat: string; kebab: string; prio: number }>();
+  const map = new Map<string, { val: string; darkVal?: string; cat: string; kebab: string; prio: number }>();
   const prioRank = { primitive: 0, default: 1, semantic: 2 };
 
   for (const t of resolved) {
@@ -147,7 +162,8 @@ function buildCSSVarMap(tokens: FigmaToken[]): Map<string, { val: string; cat: s
     const prio = prioRank[tokenTier(t.name)];
     const prev = map.get(varName);
     if (prev && prio < prev.prio) continue;
-    map.set(varName, { val, cat, kebab, prio });
+    const darkVal = extractDarkModeValue(t, cat, kebab, val);
+    map.set(varName, { val, darkVal, cat, kebab, prio });
   }
   return map;
 }
@@ -166,11 +182,17 @@ export function generateThemeCSS(tokens: FigmaToken[]): string {
 
 export function generateTokensCSS(tokens: FigmaToken[]): string {
   const varMap = buildCSSVarMap(tokens);
+  const sortedNames = [...varMap.keys()].sort();
   const lines: string[] = [':root {'];
-  for (const name of [...varMap.keys()].sort()) {
-    lines.push(`  ${name}: ${varMap.get(name)!.val};`);
+  const darkLines: string[] = [];
+  for (const name of sortedNames) {
+    const entry = varMap.get(name)!;
+    lines.push(`  ${name}: ${entry.val};`);
+    if (entry.darkVal && entry.darkVal !== entry.val) {
+      darkLines.push(`  ${name}: ${entry.darkVal};`);
+    }
   }
-  lines.push('}', '');
+  lines.push('}', '', '.dark {', '  color-scheme: dark;', ...darkLines, '}', '');
   return lines.join('\n');
 }
 

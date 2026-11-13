@@ -1,5 +1,5 @@
 import * as crypto from 'node:crypto';
-import { getUtilsSource } from '@supernova/mitosis-compiler';
+import { getUtilsSource } from '@komerce-design/mitosis-compiler';
 import { normalizeGroup } from '../domain/artifact-path.js';
 import {
   hashComponentSpec,

@@ -1,10 +1,15 @@
 import * as crypto from 'node:crypto';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
+import { GROUP_COMPONENTS, GROUP_EXAMPLES, GROUP_ICONS } from '../domain/artifact-path.js';
 import {
   hashComponentSpec,
   hashTokens,
   normalizeComponentName,
   type ComponentDiff,
+  type ComponentSnapshot,
   type FigmaComponentSpec,
+  type FigmaDocument,
   type FigmaToken,
   type Framework,
   type PublisherType,
@@ -13,6 +18,65 @@ import {
   type TokenDiff,
 } from '../domain/models.js';
 import type { JobStore } from '../store/store.js';
+import { loadLatestExtractionDoc } from './regenerate.js';
+
+export interface SyncPlanContext {
+  workspaceDir?: string;
+  extractionsDir?: string;
+}
+
+export function loadWorkspaceDiskSnapshots(
+  docName: string,
+  workspaceDir?: string,
+  prevExtractionDoc?: FigmaDocument
+): Record<string, ComponentSnapshot> {
+  const out: Record<string, ComponentSnapshot> = {};
+  if (!workspaceDir) return out;
+
+  const prevSpecs = new Map<string, FigmaComponentSpec>();
+  for (const spec of prevExtractionDoc?.components || []) {
+    prevSpecs.set(normalizeComponentName(spec.name), spec);
+  }
+  const sortedPrimaryNames = [...prevSpecs.keys()].sort((a, b) => b.length - a.length);
+
+  for (const grp of [GROUP_COMPONENTS, GROUP_ICONS, GROUP_EXAMPLES] as const) {
+    const dir = path.join(workspaceDir, 'src', grp);
+    if (!fs.existsSync(dir)) continue;
+    for (const file of fs.readdirSync(dir)) {
+      if (!file.endsWith('.lite.tsx')) continue;
+      const name = file.slice(0, -'.lite.tsx'.length);
+      const sourceCode = fs.readFileSync(path.join(dir, file), 'utf8');
+      const spec = prevSpecs.get(name);
+      let derivedFrom: string | undefined;
+      if (!spec) {
+        if (grp === GROUP_EXAMPLES && name.endsWith('Example')) {
+          derivedFrom = name.slice(0, -'Example'.length);
+        } else {
+          for (const primary of sortedPrimaryNames) {
+            if (name !== primary && name.startsWith(primary)) {
+              derivedFrom = primary;
+              break;
+            }
+          }
+          if (!derivedFrom && (name === 'TabItem' || name === 'MenuItem')) {
+            derivedFrom = name === 'TabItem' ? 'Tabs' : 'MainMenu';
+          }
+        }
+      }
+      out[name] = {
+        documentName: docName,
+        componentName: name,
+        sourceCode,
+        updatedAt: '',
+        contentHash: spec ? hashComponentSpec(spec) : '',
+        ...(spec ? { spec } : {}),
+        ...(derivedFrom ? { derivedFrom } : {}),
+        group: grp,
+      };
+    }
+  }
+  return out;
+}
 
 function computeTokenDiff(prevTokens: FigmaToken[], currTokens: FigmaToken[], prevHash: string): TokenDiff {
   const currHash = hashTokens(currTokens);
@@ -58,14 +122,19 @@ function computeTokenDiff(prevTokens: FigmaToken[], currTokens: FigmaToken[], pr
 
 export async function calculateSyncPlan(
   store: JobStore,
-  req: SyncRequest
+  req: SyncRequest,
+  ctx?: SyncPlanContext
 ): Promise<SyncPlan> {
   const docName = req.document.name || 'Design System';
   const prevSnap = await store.getLatestSnapshot(docName);
-  const existingComps = await store.getComponentSnapshots(docName);
+  const storeComps = await store.getComponentSnapshots(docName);
+  const prevExtractionDoc = loadLatestExtractionDoc(ctx?.extractionsDir);
+  const diskComps = loadWorkspaceDiskSnapshots(docName, ctx?.workspaceDir, prevExtractionDoc);
+  const existingComps: Record<string, ComponentSnapshot> = { ...diskComps, ...storeComps };
 
-  const prevTokens = prevSnap?.tokens || [];
-  const prevTokensHash = prevSnap?.tokensHash || '';
+  const prevTokens = prevSnap?.tokens || prevExtractionDoc?.tokens || [];
+  const prevTokensHash =
+    prevSnap?.tokensHash || (prevTokens.length > 0 ? hashTokens(prevTokens) : '');
   const tokenDiff = computeTokenDiff(prevTokens, req.document.tokens || [], prevTokensHash);
 
   const incomingMap = new Map<string, FigmaComponentSpec>();

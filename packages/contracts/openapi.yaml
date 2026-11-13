@@ -1,6 +1,6 @@
 openapi: 3.0.3
 info:
-  title: Supernova Extraction & Compilation API
+  title: Komerce Design Extraction & Compilation API
   version: 1.0.0
   description: API for extracting Figma designs and compiling multi-framework components.
 
@@ -239,6 +239,7 @@ components:
     PublisherType:
       type: string
       enum:
+        - local
         - download
         - pull_request
 
@@ -891,6 +892,10 @@ components:
           type: string
         commitSha:
           type: string
+        workspaceDir:
+          type: string
+        filesWritten:
+          type: integer
 
     JobResponse:
       type: object

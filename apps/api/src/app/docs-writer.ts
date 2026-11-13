@@ -1,28 +1,23 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import { getUtilsSource } from '@supernova/mitosis-compiler';
-import {
-  artifactPath,
-  GROUP_COMPONENTS,
-  GROUP_EXAMPLES,
-  GROUP_ICONS,
-  normalizeGroup,
-  validFileName,
-} from '../domain/artifact-path.js';
-import {
-  camelToKebab,
-  DomainError,
-  normalizeComponentName,
-  type CompiledArtifact,
-  type FigmaComponentSpec,
-  type Job,
-} from '../domain/models.js';
+import { getUtilsSource } from '@komerce-design/mitosis-compiler';
+import { artifactPath, GROUP_COMPONENTS, GROUP_EXAMPLES, GROUP_ICONS, normalizeGroup, validFileName } from '../domain/artifact-path.js';
+import { camelToKebab, DomainError, normalizeComponentName, type CompiledArtifact, type FigmaComponentSpec, type Job } from '../domain/models.js';
 import { extractRegistryMetaFromLiteSource, type RegistryComponentMeta } from './docgen-ast.js';
-import {
-  generateComponentDoc,
-  generateComponentsIndexDoc,
-  generateTokensDoc,
-} from './docgen.js';
+import { generateComponentDoc, generateComponentsIndexDoc, generateTokensDoc } from './docgen.js';
+
+const COMPOUND_PARENTS = [
+  'InputMultipleFileUpload', 'InputDropdown', 'ToggleGroup', 'Breadcrumb', 'BubbleChat',
+  'Card', 'Chart', 'Topbar', 'Sidebar', 'Stepper', 'Table', 'Toast',
+] as const;
+
+export function inferCompoundParent(compName: string): string | undefined {
+  if (compName === 'TabItem') return 'Tabs';
+  for (const parent of COMPOUND_PARENTS) {
+    if (compName !== parent && compName.startsWith(parent)) return parent;
+  }
+  return undefined;
+}
 
 export function resolveComponentGroup(
   rawGroup: string | undefined,
@@ -31,12 +26,8 @@ export function resolveComponentGroup(
 ): string {
   const norm = normalizeGroup(rawGroup);
   if (norm) return norm;
-  if (compSpec?.pageName && compSpec.pageName.toLowerCase() === GROUP_ICONS) {
-    return GROUP_ICONS;
-  }
-  if (compName.toLowerCase().includes('icon')) {
-    return GROUP_ICONS;
-  }
+  if (compSpec?.pageName && compSpec.pageName.toLowerCase() === GROUP_ICONS) return GROUP_ICONS;
+  if (compName.toLowerCase().includes('icon')) return GROUP_ICONS;
   return GROUP_COMPONENTS;
 }
 
@@ -48,9 +39,18 @@ function siblingSourcesOf(
   groups: Record<string, string>
 ): Record<string, string> {
   return Object.fromEntries(
-    Object.entries(derivedFrom)
-      .filter(([name, owner]) => owner === parent && groups[name] !== GROUP_EXAMPLES && authoredComponents[name])
-      .map(([name]) => [name, authoredComponents[name]!])
+    Object.entries(authoredComponents)
+      .filter(
+        ([name, code]) =>
+          Boolean(code) &&
+          name !== parent &&
+          groups[name] !== GROUP_EXAMPLES &&
+          !name.endsWith('Example') &&
+          (derivedFrom[name] === parent ||
+            inferCompoundParent(name) === parent ||
+            (parent === 'ToggleGroup' && name === 'Toggle'))
+      )
+      .map(([name, code]) => [name, code])
   );
 }
 
@@ -61,13 +61,18 @@ export function buildDocArtifacts(
   groups: Record<string, string> = {}
 ): CompiledArtifact[] {
   const tokensDoc = generateTokensDoc(job.document.tokens || []);
-  const indexDoc = generateComponentsIndexDoc(job.document.components || []);
+  const primaryComponents = (job.document.components || []).filter((comp) => {
+    const compName = normalizeComponentName(comp.name);
+    const grp = groups[compName] || resolveComponentGroup(undefined, compName, comp);
+    return grp === GROUP_COMPONENTS && !derivedFrom[compName] && !inferCompoundParent(compName);
+  });
+  const indexDoc = generateComponentsIndexDoc(primaryComponents);
   const docArtifacts: CompiledArtifact[] = [
     { target: 'docs', fileName: 'tokens.md', group: 'docs', code: tokensDoc },
     { target: 'docs', fileName: 'index.md', group: 'docs', code: indexDoc },
   ];
 
-  for (const comp of job.document.components || []) {
+  for (const comp of primaryComponents) {
     const compName = normalizeComponentName(comp.name);
     const kebabName = camelToKebab(compName);
     const sourceCode = authoredComponents[compName];
@@ -140,15 +145,8 @@ export function syncDocsDirectory(
   fs.mkdirSync(compDir, { recursive: true });
 
   for (const art of docArtifacts) {
-    const targetPath =
-      art.fileName === 'tokens.md'
-        ? path.join(docsDir, 'tokens.md')
-        : path.join(compDir, art.fileName);
-    if (
-      art.fileName === 'index.md' &&
-      fs.existsSync(targetPath) &&
-      fs.readFileSync(targetPath, 'utf8').includes('<ComponentCatalog')
-    ) {
+    const targetPath = art.fileName === 'tokens.md' ? path.join(docsDir, 'tokens.md') : path.join(compDir, art.fileName);
+    if (art.fileName === 'index.md' && fs.existsSync(targetPath) && fs.readFileSync(targetPath, 'utf8').includes('<ComponentCatalog')) {
       continue;
     }
     fs.writeFileSync(targetPath, art.code, 'utf8');
@@ -177,17 +175,9 @@ export function syncDocsDirectory(
   }
 
   const sortedNames = [...componentNames].sort();
-  const metaMap = buildComponentMetadataMap(
-    job.document.components || [],
-    componentGroups,
-    authoredComponents,
-    existingMeta
-  );
+  const metaMap = buildComponentMetadataMap(job.document.components || [], componentGroups, authoredComponents, existingMeta);
   const loaderEntries = sortedNames
-    .map(
-      (name) =>
-        `  '${name}': { vue3: () => import('./vue3/${name}.vue'), react: () => import('./react/${name}.tsx'), svelte: () => import('./svelte/${name}.svelte') },`
-    )
+    .map((name) => `  '${name}': { vue3: () => import('./vue3/${name}.vue'), react: () => import('./react/${name}.tsx'), svelte: () => import('./svelte/${name}.svelte') },`)
     .join('\n');
 
   const regContent = `// Auto-generated component registry for VitePress Multi-Framework Preview
@@ -215,10 +205,7 @@ export const componentMetadata: Record<string, ComponentMeta> = ${JSON.stringify
   fs.writeFileSync(registryPath, regContent, 'utf8');
 }
 
-export function syncGeneratedDirectory(
-  generatedDir: string,
-  artifacts: CompiledArtifact[]
-): void {
+export function syncGeneratedDirectory(generatedDir: string, artifacts: CompiledArtifact[]): void {
   if (!generatedDir) return;
   for (const art of artifacts) {
     let relPath: string;

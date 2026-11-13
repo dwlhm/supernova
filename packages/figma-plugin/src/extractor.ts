@@ -7,7 +7,7 @@ import type {
   FigmaEffect,
   FigmaLayout,
   FigmaPaint,
-} from '@supernova/contracts';
+} from '@komerce-design/contracts';
 
 /**
  * Converts a Figma RGB/RGBA color object to standard rgba string.

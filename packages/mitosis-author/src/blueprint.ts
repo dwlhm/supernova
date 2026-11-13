@@ -79,7 +79,9 @@ function toCamelPropName(rawKey: string): string {
   const words = withoutHash.replace(/^[^\p{L}\p{N}]+/gu, '').trim().split(/[^a-zA-Z0-9]+/).filter(Boolean);
   if (words.length === 0) return '';
   const camel = words.map((w, i) => (i === 0 ? w.charAt(0).toLowerCase() + w.slice(1) : w.charAt(0).toUpperCase() + w.slice(1))).join('');
-  return camel === 'class' ? 'className' : camel;
+  if (camel === 'class') return 'className';
+  if (camel === 'textContent') return 'text';
+  return camel;
 }
 
 const VISUAL_STATE_NAMES = new Set(['state', 'interaction', 'hover', 'focused', 'pressed']);
@@ -172,6 +174,7 @@ function normalizeStatePath(path: string): string {
 function buildMultiVariantSynthesis(
   variants: any[],
   defaultTarget: any,
+  baseTailwindClasses: string[],
   baseHierarchy: BlueprintNodeSummary[],
   tokenIndex: Map<string, string>
 ): { variantDiffs: Record<string, VariantDiffSummary>; stateStyles: Record<string, string[]> } {
@@ -189,6 +192,8 @@ function buildMultiVariantSynthesis(
   for (const v of variants) {
     if (!v?.name || v === defaultTarget || !Array.isArray(v.children)) continue;
     if (/\b(?:state|interaction)\s*=\s*(?:hover|hovered|focus|focused|pressed|active)\b/i.test(v.name)) continue;
+    const vRoot = computeNodeTailwindClasses(v, tokenIndex);
+    const rootChanged = vRoot.length > 0 && vRoot.join(' ') !== baseTailwindClasses.join(' ');
     const h = buildHierarchy(v.children, tokenIndex, 4);
     const flat = flattenHierarchyMap(h);
     const changedNodes: Record<string, string[]> = {};
@@ -206,8 +211,9 @@ function buildMultiVariantSynthesis(
       }
     }
     const orderDiffs = flat.orders.filter((o) => !baseFlat.orders.includes(o));
-    if (Object.keys(changedNodes).length > 0 || orderDiffs.length > 0) {
+    if (rootChanged || Object.keys(changedNodes).length > 0 || orderDiffs.length > 0) {
       variantDiffs[v.name] = {
+        ...(rootChanged ? { rootClasses: vRoot } : {}),
         ...(orderDiffs.length > 0 ? { childOrder: orderDiffs } : {}),
         ...(Object.keys(changedNodes).length > 0 ? { changedNodes } : {}),
       };
@@ -239,22 +245,24 @@ export function buildComponentBlueprint(componentName: string, spec: any, rawTok
   const variants = extractVariantNodes(spec, rootNode);
   const defaultTarget = variants.length > 0 ? variants[0] : rootNode;
 
+  const baseTailwindClasses = computeNodeTailwindClasses(defaultTarget, tokenIndex);
   const variantTailwindMap: Record<string, string[]> = {};
   const variantHierarchies: Record<string, BlueprintNodeSummary[]> = {};
-  for (const v of variants.slice(0, 12)) {
+  for (const v of variants) {
     if (!v?.name) continue;
+    if (/\b(?:state|interaction)\s*=\s*(?:hover|hovered|focus|focused|pressed|active)\b/i.test(v.name)) continue;
     variantTailwindMap[v.name] = computeNodeTailwindClasses(v, tokenIndex);
-    if (v !== defaultTarget && Array.isArray(v.children) && v.children.length > 0) {
+    if (v !== defaultTarget && Array.isArray(v.children) && v.children.length > 0 && Object.keys(variantHierarchies).length < 24) {
       variantHierarchies[v.name] = buildHierarchy(v.children, tokenIndex, 4);
     }
   }
   const composedComponents = collectComposedInstances(rootNode);
   const hierarchy = buildHierarchy(defaultTarget?.children || [], tokenIndex);
-  const { variantDiffs, stateStyles } = buildMultiVariantSynthesis(variants, defaultTarget, hierarchy, tokenIndex);
+  const { variantDiffs, stateStyles } = buildMultiVariantSynthesis(variants, defaultTarget, baseTailwindClasses, hierarchy, tokenIndex);
 
   return {
     componentName,
-    baseTailwindClasses: computeNodeTailwindClasses(defaultTarget, tokenIndex),
+    baseTailwindClasses,
     canonicalProps: extractCanonicalProps(rawProps),
     ...(composedComponents.length > 0 ? { composedComponents } : {}),
     variantTailwindMap,

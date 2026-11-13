@@ -51,7 +51,9 @@ export function clearFileInputEvent(
   event: unknown,
   onFileNameChange?: (name: string) => void,
   onFilesChange?: (files: unknown[]) => void,
-  onClear?: () => void
+  onClear?: () => void,
+  onPreviewChange?: (url: string) => void,
+  onValueChange?: (val: string) => void
 ): void {
   const ev = event as {
     preventDefault?: () => void;
@@ -68,5 +70,78 @@ export function clearFileInputEvent(
   }
   onFileNameChange?.('');
   onFilesChange?.([]);
+  onPreviewChange?.('');
+  onValueChange?.('');
   onClear?.();
 }
+
+export function handleFileDragEnter(
+  event: unknown,
+  onDragStateChange?: (dragging: boolean) => void
+): void {
+  const ev = event as {
+    preventDefault?: () => void;
+    currentTarget?: {
+      _dragDepth?: number;
+      setAttribute?: (name: string, value: string) => void;
+    };
+  };
+  ev?.preventDefault?.();
+  const el = ev?.currentTarget;
+  if (!el) return;
+  el._dragDepth = (el._dragDepth || 0) + 1;
+  if (el._dragDepth === 1) {
+    el.setAttribute?.('data-dragging', 'true');
+    onDragStateChange?.(true);
+  }
+}
+
+export function handleFileDragOver(event: unknown): void {
+  const ev = event as { preventDefault?: () => void };
+  ev?.preventDefault?.();
+}
+
+export function handleFileDragLeave(
+  event: unknown,
+  onDragStateChange?: (dragging: boolean) => void
+): void {
+  const ev = event as {
+    preventDefault?: () => void;
+    currentTarget?: {
+      _dragDepth?: number;
+      removeAttribute?: (name: string) => void;
+    };
+  };
+  ev?.preventDefault?.();
+  const el = ev?.currentTarget;
+  if (!el) return;
+  el._dragDepth = Math.max(0, (el._dragDepth || 0) - 1);
+  if (el._dragDepth === 0) {
+    el.removeAttribute?.('data-dragging');
+    onDragStateChange?.(false);
+  }
+}
+
+export function handleFileDropEvent(
+  event: unknown,
+  onFileNameChange?: (name: string) => void,
+  onFilesChange?: (files: unknown[]) => void,
+  onDragStateChange?: (dragging: boolean) => void
+): ExtractedFileResult {
+  const ev = event as {
+    preventDefault?: () => void;
+    currentTarget?: {
+      _dragDepth?: number;
+      removeAttribute?: (name: string) => void;
+    };
+  };
+  ev?.preventDefault?.();
+  const el = ev?.currentTarget;
+  if (el) {
+    el._dragDepth = 0;
+    el.removeAttribute?.('data-dragging');
+    onDragStateChange?.(false);
+  }
+  return handleFileSelectEvent(event, onFileNameChange, onFilesChange);
+}
+

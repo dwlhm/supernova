@@ -6,7 +6,7 @@ import {
   compileMitosis,
   normalizeMitosisSource,
   COMPONENT_NAME_PATTERN,
-} from '@supernova/mitosis-compiler';
+} from '@komerce-design/mitosis-compiler';
 import {
   executeReadComponentDetails,
   findFileRecursive,
@@ -164,7 +164,7 @@ export function createAuthorTools(context: AuthorToolContext) {
       },
     }),
     editComponent: tool({
-      description: 'Apply targeted search-and-replace edits to the base Mitosis component (.lite.tsx) from templates/ds-repo/src to align it with the latest Figma specification, auto-compile across all 6 targets, and save if valid',
+      description: 'Apply targeted search-and-replace edits to the base Mitosis component (.lite.tsx) from src/ to align it with the latest Figma specification, auto-compile across all 6 targets, and save if valid',
       parameters: z.object({
         componentName: nameSchema.describe('The name of the component, e.g. AlertDialog'),
         edits: z

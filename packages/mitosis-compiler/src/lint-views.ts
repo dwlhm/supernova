@@ -199,7 +199,7 @@ function isTypeAny(before: string, after: string): boolean {
 }
 
 function isChildrenMember(bare: string, index: number, before: string, after: string): boolean {
-  if (!/(?:^|[{;,\n])\s*(?:readonly\s+)?children\s*\??\s*:\s*$/.test(before)) return false;
+  if (!/(?:^|[{;,\n])\s*(?:readonly\s+)?(?:children|icon|[a-zA-Z0-9_]+Icon)\s*\??\s*:\s*$/.test(before)) return false;
   if (!/^\s*(?:[;,}\n]|$)/.test(after)) return false;
   return enclosingOpener(bare, index) === '{';
 }

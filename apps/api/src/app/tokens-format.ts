@@ -78,6 +78,8 @@ function isPxDimensionToken(name?: string, category?: string): boolean {
   return /(font-size|line-height|letter-spacing)/i.test(name);
 }
 
+const FALLBACK_FONT_STACK = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+
 function normalizeOpacityNumeric(n: number): string {
   if (n > 1 && n <= 100) return String(Number((n / 100).toFixed(4)));
   return String(Number(n.toFixed(4)));
@@ -99,6 +101,13 @@ export function formatTokenValue(val: unknown, category?: string, tokenName?: st
       const n = Number(s);
       if (isOpacityTokenName(tokenName, category)) return normalizeOpacityNumeric(n);
       if (isPxDimensionToken(tokenName, category) && n !== 0) return formatRoundedPx(n);
+    }
+    if (category === 'font' && (/(font-family|family|headings?$|body$)/i.test(tokenName || '') || s.includes('Sans') || s.includes('Serif') || s.includes('Mono'))) {
+      const quoteWrapped = s.includes(' ') && !s.startsWith('"') && !s.startsWith("'") ? `"${s}"` : s;
+      if (!s.includes(',')) {
+        return `${quoteWrapped}, ${FALLBACK_FONT_STACK}`;
+      }
+      return s;
     }
     return s;
   }
@@ -122,61 +131,12 @@ export function formatTokenValue(val: unknown, category?: string, tokenName?: st
     const shadowStr = formatSingleShadow(obj);
     if (shadowStr) return shadowStr;
     if (typeof obj.fontFamily === 'string') {
-      return obj.fontSize ? `${obj.fontSize}px "${obj.fontFamily}"` : `"${obj.fontFamily}"`;
+      const fam = obj.fontFamily.trim();
+      const quoteWrapped = fam.includes(' ') && !fam.startsWith('"') && !fam.startsWith("'") ? `"${fam}"` : fam;
+      const fullFamily = fam.includes(',') ? fam : `${quoteWrapped}, ${FALLBACK_FONT_STACK}`;
+      return obj.fontSize ? `${obj.fontSize}px ${fullFamily}` : fullFamily;
     }
     return JSON.stringify(obj);
   }
   return String(val);
-}
-
-function isDarkMatch(val: string, candidates: string[]): boolean {
-  const norm = val.toLowerCase().replace(/\s+/g, '');
-  return candidates.some((c) => norm === c.toLowerCase().replace(/\s+/g, ''));
-}
-
-const SEMANTIC_DARK_OVERRIDES: Record<string, string> = {
-  '--color-background-default': '#202127',
-  '--color-background-subtle': '#25262c',
-  '--color-background-muted': '#2b2b30',
-  '--color-background-interactive': '#34363c',
-  '--color-secondary-default': '#2b2b30',
-  '--color-secondary-hover': '#34363c',
-  '--color-secondary-foreground': '#f3f4f6',
-  '--color-accent-default': '#2b2b30',
-  '--color-foreground-default': '#f3f4f6',
-  '--color-foreground-muted': '#9ca3af',
-  '--color-foreground-subtle': '#9ca3af',
-  '--color-border-default': '#3c3f44',
-  '--color-border-subtle': '#2e3035',
-};
-
-export function buildDarkTokensBlock(css: string): string {
-  const lines = ['.dark {'];
-  for (const [varName, darkVal] of Object.entries(SEMANTIC_DARK_OVERRIDES)) {
-    if (css.includes(`${varName}:`)) lines.push(`  ${varName}: ${darkVal};`);
-  }
-  const re = /(--color-components-[a-z0-9-]+):\s*([^;]+);/g;
-  let m: RegExpExecArray | null;
-  while ((m = re.exec(css)) !== null) {
-    const name = m[1]!;
-    const val = m[2]!.trim();
-    const isInk = /(foreground|text|fill|stroke|label|title|heading|value|icon|wordmark|nav|current-page)/.test(name);
-    const isColoredBadge = /badge-(primary|success|warning|info|destructive)/.test(name);
-    const isSurface = /(background|surface)/.test(name) && !/(thumb|status|indicator|primary|destructive|accent)/.test(name);
-    const isBorder = /(border|divider|grid-line)/.test(name) && !/(error|focus|selected|active)/.test(name);
-
-    if (isInk && !isColoredBadge && isDarkMatch(val, ['rgb(10, 10, 10)', 'rgb(15, 14, 15)', 'rgb(23, 23, 23)', '#0a0a0a', '#0f0e0f', '#171717'])) {
-      lines.push(`  ${name}: #f3f4f6;`);
-    } else if (isInk && !isColoredBadge && isDarkMatch(val, ['rgb(115, 115, 115)', 'rgb(82, 82, 82)', '#737373', '#525252'])) {
-      lines.push(`  ${name}: #9ca3af;`);
-    } else if (isSurface && isDarkMatch(val, ['rgb(255, 255, 255)', '#ffffff'])) {
-      lines.push(`  ${name}: #202127;`);
-    } else if (isSurface && isDarkMatch(val, ['rgb(245, 245, 245)', 'rgb(250, 250, 250)', 'rgb(229, 229, 229)', '#f5f5f5', '#fafafa', '#e5e5e5'])) {
-      lines.push(`  ${name}: #2b2b30;`);
-    } else if (isBorder && isDarkMatch(val, ['rgb(229, 229, 229)', 'rgb(245, 245, 245)', '#e5e5f5', '#e5e5e5', '#f5f5f5'])) {
-      lines.push(`  ${name}: #3c3f44;`);
-    }
-  }
-  lines.push('}');
-  return lines.join('\n');
 }

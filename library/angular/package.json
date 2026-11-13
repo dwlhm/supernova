@@ -1,0 +1,23 @@
+{
+  "name": "@komerce-design/angular",
+  "version": "0.1.0",
+  "description": "Komerce Design System — Angular components",
+  "type": "module",
+  "main": "./dist/index.ts",
+  "types": "./dist/index.ts",
+  "exports": {
+    ".": "./dist/index.ts",
+    "./*": "./dist/*"
+  },
+  "files": [
+    "dist"
+  ],
+  "dependencies": {
+    "clsx": "^2.1.1",
+    "tailwind-merge": "^3.0.2"
+  },
+  "peerDependencies": {
+    "@angular/common": ">=16.0.0",
+    "@angular/core": ">=16.0.0"
+  }
+}

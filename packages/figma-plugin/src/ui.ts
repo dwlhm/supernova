@@ -1,6 +1,7 @@
-import type { FigmaDocument, SyncRequest, SyncPlanResponse, ApplySyncRequest, ExtractionResponse, JobResponse, JobEvent, Framework } from '@supernova/contracts';
+import type { FigmaDocument, SyncRequest, SyncPlanResponse, ApplySyncRequest, ExtractionResponse, JobResponse, JobEvent, Framework } from '@komerce-design/contracts';
 
 const startBtn = document.getElementById('startBtn') as HTMLButtonElement;
+const exportJsonBtn = document.getElementById('exportJsonBtn') as HTMLButtonElement | null;
 const rescanBtn = document.getElementById('rescanBtn') as HTMLButtonElement;
 const scanStatusIndicator = document.getElementById('scanStatusIndicator') as HTMLDivElement;
 const scanSpinner = document.getElementById('scanSpinner') as HTMLSpanElement;
@@ -66,9 +67,12 @@ function setScanningState(scanning: boolean, message?: string) {
 function updateStartButtonState() {
   if (isScanning) {
     startBtn.disabled = true;
+    if (exportJsonBtn) exportJsonBtn.disabled = true;
     return;
   }
-  startBtn.disabled = !scannedDocument || selectedComponentIds.size === 0;
+  const disabled = !scannedDocument || selectedComponentIds.size === 0;
+  startBtn.disabled = disabled;
+  if (exportJsonBtn) exportJsonBtn.disabled = disabled;
 }
 
 function updateSelectedCountDisplay() {
@@ -287,6 +291,29 @@ rescanBtn.addEventListener('click', () => {
   parent.postMessage({ pluginMessage: { type: 'rescan' } }, '*');
 });
 
+exportJsonBtn?.addEventListener('click', () => {
+  if (!scannedDocument || selectedComponentIds.size === 0) {
+    notifyPlugin('Please select at least one component to export.', true);
+    return;
+  }
+  const filteredComponents = scannedDocument.components.filter((c) => selectedComponentIds.has(c.id));
+  const exportDocument: FigmaDocument = {
+    ...scannedDocument,
+    components: filteredComponents,
+  };
+  const blob = new Blob([JSON.stringify({ document: exportDocument }, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  const slug = (exportDocument.name || 'figma-extraction').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'figma-extraction';
+  link.href = url;
+  link.download = `${slug}.json`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+  notifyPlugin(`Exported ${filteredComponents.length} components to ${slug}.json`);
+});
+
 startBtn.addEventListener('click', async () => {
   if (!scannedDocument) {
     notifyPlugin('No document has been scanned yet.', true);
@@ -388,7 +415,7 @@ async function computeSyncPlan(data: {
   const payload: SyncRequest = {
     document,
     targets: ['mitosis' as Framework],
-    publishers: ['pull_request'],
+    publishers: ['local'],
   };
 
   const headers: Record<string, string> = {
@@ -453,7 +480,7 @@ function renderPlanPanel(plan: SyncPlanResponse) {
   }
 
   applyPlanBtn.disabled = false;
-  applyPlanBtn.textContent = 'Create / Update PR ↗';
+  applyPlanBtn.textContent = 'Apply Sync to Workspace';
 }
 
 async function applySyncPlan(data: {
@@ -463,7 +490,7 @@ async function applySyncPlan(data: {
 }) {
   const { syncId, backendUrl, apiToken } = data;
   const payload: ApplySyncRequest = {
-    publishers: ['pull_request'],
+    publishers: ['local'],
     targets: ['mitosis' as Framework],
   };
 
@@ -581,17 +608,17 @@ async function handleJobEvent(
     statusBadge.textContent = ev.status || 'succeeded';
     statusBadge.className = 'status-badge badge-succeeded';
     statusMessage.textContent = partial
-      ? `PR published with failures (${ev.error || 'some components failed'})`
-      : 'PR Published Successfully!';
+      ? `Synced to workspace with failures (${ev.error || 'some components failed'})`
+      : 'Synced to Local Workspace!';
     applyPlanBtn.disabled = false;
-    applyPlanBtn.textContent = 'Create / Update PR ↗';
+    applyPlanBtn.textContent = 'Apply Sync to Workspace';
     await fetchFinalJobStatus(backendUrl, jobId, apiToken);
   } else if (ev.eventType === 'job_failed') {
     statusBadge.textContent = 'failed';
     statusBadge.className = 'status-badge badge-failed';
     statusMessage.textContent = ev.error || 'Job execution failed';
     applyPlanBtn.disabled = false;
-    applyPlanBtn.textContent = 'Create / Update PR ↗';
+    applyPlanBtn.textContent = 'Apply Sync to Workspace';
     if (ev.error) {
       errorArea.textContent = ev.error;
       errorArea.style.display = 'block';
@@ -630,22 +657,27 @@ async function fetchFinalJobStatus(backendUrl: string, jobId: string, apiToken?:
     if (!res.ok) return;
 
     const job: JobResponse = await res.json();
-    if ((job.status === 'succeeded' || job.status === 'partially_succeeded') && job.publishResults?.pullRequestUrl) {
-      actionArea.innerHTML = '';
-      actionArea.style.display = 'flex';
+    if (job.status === 'succeeded' || job.status === 'partially_succeeded') {
+      if (job.publishResults?.workspaceDir) {
+        notifyPlugin(`Synced ${job.publishResults.filesWritten ?? 0} files to ${job.publishResults.workspaceDir}`);
+      }
+      if (job.publishResults?.pullRequestUrl) {
+        actionArea.innerHTML = '';
+        actionArea.style.display = 'flex';
 
-      const prLink = document.createElement('a');
-      prLink.className = 'link-btn';
-      prLink.href = job.publishResults.pullRequestUrl;
-      prLink.target = '_blank';
-      prLink.style.background = '#18a0fb';
-      prLink.style.color = '#ffffff';
-      prLink.style.padding = '9px 14px';
-      prLink.style.fontWeight = '600';
-      prLink.textContent = 'Open Pull Request on GitHub ↗';
-      actionArea.appendChild(prLink);
+        const prLink = document.createElement('a');
+        prLink.className = 'link-btn';
+        prLink.href = job.publishResults.pullRequestUrl;
+        prLink.target = '_blank';
+        prLink.style.background = '#18a0fb';
+        prLink.style.color = '#ffffff';
+        prLink.style.padding = '9px 14px';
+        prLink.style.fontWeight = '600';
+        prLink.textContent = 'Open Pull Request on GitHub ↗';
+        actionArea.appendChild(prLink);
 
-      notifyPlugin(`PR ready: ${job.publishResults.pullRequestUrl}`);
+        notifyPlugin(`PR ready: ${job.publishResults.pullRequestUrl}`);
+      }
     }
   } catch (e) {
     console.error('Failed to fetch final job status:', e);

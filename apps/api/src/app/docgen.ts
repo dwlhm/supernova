@@ -5,6 +5,12 @@ import {
   type FigmaToken,
 } from '../domain/models.js';
 import { extractPropsFromLiteSource, formatDescriptionSections } from './docgen-ast.js';
+import {
+  CHART_USAGE_AND_UTILS_DOC,
+  DATE_PICKER_HEADLESS_DOC,
+  TABLE_HEADLESS_DOC,
+} from './docgen-chart.js';
+import { generateComponentTokensSection, generateVisualTokensPage } from './docgen-tokens.js';
 import { formatTokenValue, resolveTokens, tokenCSSVarName } from './tokens.js';
 
 interface DocPropRow {
@@ -107,9 +113,21 @@ export function generateComponentDoc(comp: FigmaComponentSpec, sourceCode?: stri
   }
 
   lines.push('## Live Preview & Usage', '', `<ComponentPreview name="${compName}" />`, '');
+  if (compName === 'Chart') {
+    lines.push(CHART_USAGE_AND_UTILS_DOC.trimEnd(), '');
+  } else if (compName === 'Table') {
+    lines.push(TABLE_HEADLESS_DOC.trimEnd(), '');
+  } else if (compName === 'DatePicker') {
+    lines.push(DATE_PICKER_HEADLESS_DOC.trimEnd(), '');
+  }
   lines.push('## Props & Variants', '', ...propsTable(rows));
   for (const [name, source] of Object.entries(siblings).sort(([a], [b]) => a.localeCompare(b))) {
     lines.push(`### \`${name}\``, '', ...propsTable(astPropRows(source)));
+  }
+
+  const tokensSection = generateComponentTokensSection(compName, sourceCode, siblings);
+  if (tokensSection) {
+    lines.push(tokensSection.trimEnd(), '');
   }
 
   return lines.join('\n');
@@ -140,16 +158,12 @@ export function generateComponentsIndexDoc(components: FigmaComponentSpec[]): st
 
 export function generateTokensDoc(tokens: FigmaToken[]): string {
   const resolved = resolveTokens(tokens);
-  const lines: string[] = [
-    '# Design Tokens Reference',
-    '',
-    'Comprehensive reference of design tokens extracted from Figma.',
-    '',
-  ];
   if (resolved.length === 0) {
-    lines.push('No design tokens defined.', '');
-    return lines.join('\n');
+    return ['# Design Tokens Reference', '', 'No design tokens defined.', ''].join('\n');
   }
+
+  const lines: string[] = [generateVisualTokensPage(resolved).trimEnd(), ''];
+  lines.push('<details>', '<summary>Lihat Tabel Referensi Lengkap CSS Variables</summary>', '');
 
   const byType = new Map<string, FigmaToken[]>();
   for (const t of resolved) {
@@ -162,18 +176,18 @@ export function generateTokensDoc(tokens: FigmaToken[]): string {
   for (const typeKey of [...byType.keys()].sort()) {
     const group = (byType.get(typeKey) || []).sort((a, b) => a.name.localeCompare(b.name));
     lines.push(
-      `## ${typeKey.charAt(0).toUpperCase() + typeKey.slice(1)}`,
+      `### ${typeKey.charAt(0).toUpperCase() + typeKey.slice(1)}`,
       '',
-      '| Token Name | CSS Variable | Value | Description |',
-      '| :--- | :--- | :--- | :--- |'
+      '| Token Name | CSS Variable | Value |',
+      '| :--- | :--- | :--- |'
     );
     for (const t of group) {
       const cssVar = tokenCSSVarName(t);
       const valStr = formatTokenValue(t.value, t.type, t.name);
-      const desc = t.description || '-';
-      lines.push(`| \`${t.name}\` | \`${cssVar}\` | \`${valStr}\` | ${desc} |`);
+      lines.push(`| \`${t.name}\` | \`${cssVar}\` | \`${valStr}\` |`);
     }
     lines.push('');
   }
+  lines.push('</details>', '');
   return lines.join('\n');
 }

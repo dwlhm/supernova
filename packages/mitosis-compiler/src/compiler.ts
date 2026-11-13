@@ -60,6 +60,14 @@ const SVG_KEBAB_TO_CAMEL: Record<string, string> = {
   rowspan: 'rowSpan',
 };
 
+function normalizeEventBindingCode(code: string): string {
+  const trimmed = code.trim();
+  if (!trimmed.endsWith(';')) return code;
+  const withoutTrailing = trimmed.replace(/;+\s*$/, '');
+  if (!withoutTrailing.includes(';')) return withoutTrailing;
+  return `{ ${trimmed} }`;
+}
+
 function transformAstAttrs(node: any, attrMap: Record<string, string>) {
   if (!node || typeof node !== 'object') return;
   if (node['@type'] === '@builder.io/mitosis/node') {
@@ -71,6 +79,13 @@ function transformAstAttrs(node: any, attrMap: Record<string, string>) {
       if (node.bindings && fromAttr in node.bindings) {
         node.bindings[toAttr] = node.bindings[fromAttr];
         delete node.bindings[fromAttr];
+      }
+    }
+    if (node.bindings && typeof node.name === 'string' && /^[A-Z]/.test(node.name)) {
+      for (const [key, binding] of Object.entries<any>(node.bindings)) {
+        if (/^on[A-Z]/.test(key) && binding && typeof binding.code === 'string') {
+          binding.code = normalizeEventBindingCode(binding.code);
+        }
       }
     }
   }
@@ -85,8 +100,14 @@ function createSvgAttrPlugin(attrMap: Record<string, string>) {
     transformAstAttrs(json, attrMap);
     return json;
   };
-  const plugin = () => ({ json: { pre: runPre } });
+  const runPreCode = (code: string) =>
+    code.replace(
+      /(\bon[A-Z]\w*=\{\([^)]*\)\s*=>)\s*(?!\{)([^}]+?);(\s*\})/g,
+      (_m, prefix: string, body: string, suffix: string) => `${prefix} { ${body.trim()}; }${suffix}`
+    );
+  const plugin = () => ({ json: { pre: runPre }, code: { pre: runPreCode } });
   plugin.json = { pre: runPre };
+  plugin.code = { pre: runPreCode };
   return plugin as any;
 }
 

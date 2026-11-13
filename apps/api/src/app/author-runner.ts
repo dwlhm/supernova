@@ -1,11 +1,11 @@
 import {
   runAuthorAgent,
   type DiscoveredToken,
-} from '@supernova/mitosis-author';
+} from '@komerce-design/mitosis-author';
 import {
   compileMitosis,
   type TargetFramework,
-} from '@supernova/mitosis-compiler';
+} from '@komerce-design/mitosis-compiler';
 import {
   normalizeComponentName,
   type CompiledArtifact,

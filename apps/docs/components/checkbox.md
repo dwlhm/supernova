@@ -32,11 +32,40 @@ A checkbox lets users select or clear one or more independent options. It suppor
 | `indeterminate` | `boolean` | `false` | - |
 | `disabled` | `boolean` | `false` | - |
 | `required` | `boolean` | `false` | - |
+| `error` | `boolean` | `false` | - |
+| `errorMessage` | `string` | `''` | - |
+| `validating` | `boolean` | `false` | - |
 | `size` | `'small' \| 'medium' \| 'large'` | `'medium'` | small, medium, large |
-| `label` | `string` | `'Label'` | - |
+| `labelPosition` | `'left' \| 'right'` | `'right'` | left, right |
 | `leftLabel` | `boolean` | `false` | - |
 | `rightLabel` | `boolean` | `false` | - |
 | `name` | `string` | `'checkbox'` | - |
 | `value` | `string` | `''` | - |
+| `ariaLabel` | `string` | `''` | - |
+| `children` | `ReactNode \| Slot \| ng-content` | `-` | - |
 | `className` | `string` | `''` | - |
 | `onCheckedChange` | `(checked: boolean) => void` | `-` | - |
+| `onValueChange` | `(checked: boolean) => void` | `-` | - |
+| `onBlur` | `(event: unknown) => void` | `-` | - |
+
+## Design Tokens & Color Customization
+
+`Checkbox` consumes canonical Figma semantic color tokens. You can customize its colors either by passing semantic/brand utility classes via `className` or by rebinding the underlying CSS custom properties (`--color-*`) on the component or a parent wrapper:
+
+| Tailwind Token Class | CSS Variable | UI Role |
+| :--- | :--- | :--- |
+| `bg-background-default` | `--color-background-default` | Background / Surface fill |
+| `bg-primary-default` | `--color-primary-default` | Background / Surface fill |
+| `border-border-default` | `--color-border-default` | Border / Divider stroke |
+| `border-primary-default` | `--color-primary-default` | Border / Divider stroke |
+| `ring-focus-ring-primary` | `--color-focus-ring-primary` | Focus ring highlight |
+| `text-foreground-default` | `--color-foreground-default` | Text / Foreground color |
+| `text-primary-foreground` | `--color-primary-foreground` | Text / Foreground color |
+
+```tsx
+// 1. Direct token override via className
+<Checkbox className="bg-brand-kompack-primary text-primary-foreground" />
+
+// 2. Scoped CSS variable token rebinding (updates all internal elements using that token)
+<Checkbox className="[--color-primary-default:var(--color-brand-komship-primary)]" />
+```

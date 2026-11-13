@@ -1,8 +1,8 @@
 {
-  "name": "@supernova/docs",
+  "name": "@komerce-design/docs",
   "version": "0.1.0",
   "private": true,
-  "description": "Documentation for the Supernova Multi-Framework Design System Pipeline",
+  "description": "Documentation for the Komerce Design System Multi-Framework Pipeline",
   "scripts": {
     "predev": "node scripts/compile-docs-components.mjs",
     "dev": "vitepress dev .",
@@ -28,7 +28,7 @@
     "@angular/compiler": "22.2.4",
     "@angular/compiler-cli": "22.2.4",
     "@babel/core": "8.0.1",
-    "@supernova/mitosis-compiler": "workspace:*",
+    "@komerce-design/mitosis-compiler": "workspace:*",
     "@tailwindcss/vite": "^4.0.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",

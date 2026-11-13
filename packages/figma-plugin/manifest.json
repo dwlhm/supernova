@@ -1,6 +1,6 @@
 {
-  "name": "Extractor",
-  "id": "supernova-design-system-extractor",
+  "name": "Komerce Design Extractor",
+  "id": "komerce-design-system-extractor",
   "api": "1.0.0",
   "main": "dist/code.js",
   "ui": "dist/ui.html",
@@ -10,6 +10,6 @@
     "devAllowedDomains": [
       "http://localhost:8080"
     ],
-    "reasoning": "Sends extracted tokens and components to the Supernova API. Add the production API origin to allowedDomains before publishing."
+    "reasoning": "Sends extracted tokens and components to the Komerce Design API. Add the production API origin to allowedDomains before publishing."
   }
 }

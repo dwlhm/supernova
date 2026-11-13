@@ -28,10 +28,13 @@ export function getBreadcrumbState(props: { items?: CrumbItem[]; type?: string; 
   return rows;
 }
 
-export function getPaginationState(currentPage = 1, totalPages = 1) {
+export function getPaginationState(currentPage = 1, totalPages = 1, getPageAriaLabel?: (page: number) => string) {
   const total = totalPages > 0 ? totalPages : 1;
   const current = Math.min(Math.max(1, currentPage || 1), total);
-  const entries = getPaginationEntries(current, total);
+  const entries = getPaginationEntries(current, total).map((e) => ({
+    ...e,
+    ariaLabel: e.isEllipsis ? undefined : (typeof getPageAriaLabel === 'function' ? getPageAriaLabel(e.page) : `Page ${e.label}`),
+  }));
   return { current, total, canPrev: current > 1, canNext: current < total, entries };
 }
 
@@ -46,9 +49,10 @@ export function getStepperStepState(index: number, current = 1, total = 0) {
   };
 }
 
-export function getProgressState(value = 0) {
+export function getProgressState(value = 0, label?: string | ((percentage: number) => string)) {
   const percentage = Math.min(100, Math.max(0, value || 0));
-  return { percentage, barStyle: { width: `${percentage}%` } };
+  const resolvedLabel = typeof label === 'function' ? label(percentage) : (label ?? 'Progress');
+  return { percentage, barStyle: { width: `${percentage}%` }, resolvedLabel };
 }
 
 export function getAvatarState(props: { showStatus?: boolean; status?: string; alt?: string; initialsText?: string }) {

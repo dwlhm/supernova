@@ -42,7 +42,6 @@ export function vue2SfcToModule(source, filename, { parse, compileTemplate }) {
 
 export async function buildVue2Preview(sfcs, outDir) {
   const compiler = await import('vue2/compiler-sfc');
-  await fs.rm(outDir, { recursive: true, force: true });
   await fs.mkdir(outDir, { recursive: true });
   const errors = {};
   const modules = new Map();
@@ -116,7 +115,6 @@ export async function buildAngularPreview(sources, { workDir, outDir, utilsSourc
   const emitErrors = diagnosticsByComponent(ngc, emit.diagnostics, srcDir);
   for (const n of healthy) if (emitErrors[n]) errors[n] = emitErrors[n];
 
-  await fs.rm(outDir, { recursive: true, force: true });
   await fs.mkdir(outDir, { recursive: true });
   const built = new Set();
   for (const name of healthy.filter((n) => !errors[n])) {

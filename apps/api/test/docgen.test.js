@@ -6,7 +6,7 @@ import {
   generateTokensDoc,
 } from '../dist/index.js';
 
-describe('AST-Driven Documentation Generator (@supernova/api)', () => {
+describe('AST-Driven Documentation Generator (@komerce-design/api)', () => {
   it('extracts TypeScript Props interface and useDefaultProps from authored .lite.tsx source and formats description sections', () => {
     const spec = {
       id: '1:1',

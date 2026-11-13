@@ -28,20 +28,52 @@ Bubble Chat displays a message inside a conversation thread. It supports incomin
 | Prop | Type | Default | Options |
 | :--- | :--- | :--- | :--- |
 | `direction` | `'incoming' \| 'outgoing'` | `'incoming'` | incoming, outgoing |
-| `type` | `'text' \| 'file' \| 'image' \| 'video'` | `'text'` | text, file, image, video |
-| `messageState` | `'default' \| 'error'` | `'default'` | default, error |
-| `text` | `string` | `'Message'` | - |
-| `customText` | `string` | `'Additional information'` | - |
-| `showCustomText` | `boolean` | `false` | - |
-| `showTime` | `boolean` | `true` | - |
-| `showStatus` | `boolean` | `false` | - |
-| `timeText` | `string` | `'10:24 AM'` | - |
-| `statusText` | `string` | `'Received'` | - |
-| `errorStatusText` | `string` | `'Failed to send'` | - |
-| `fileName` | `string` | `'document.pdf'` | - |
-| `fileMeta` | `string` | `'2.4 MB'` | - |
-| `imageName` | `string` | `'image.jpg'` | - |
-| `imageMeta` | `string` | `'3.4 MB'` | - |
-| `videoName` | `string` | `'video.mp4'` | - |
-| `videoMeta` | `string` | `'24.8 MB • 01:08'` | - |
+| `state` | `'default' \| 'error'` | `'default'` | default, error |
+| `children` | `ReactNode \| Slot \| ng-content` | `-` | - |
 | `className` | `string` | `''` | - |
+
+### `BubbleChatFile`
+
+| Prop | Type | Default | Options |
+| :--- | :--- | :--- | :--- |
+| `children` | `ReactNode \| Slot \| ng-content` | `-` | - |
+| `className` | `string` | `''` | - |
+
+### `BubbleChatFooter`
+
+| Prop | Type | Default | Options |
+| :--- | :--- | :--- | :--- |
+| `align` | `'end' \| 'between'` | `'end'` | end, between |
+| `children` | `ReactNode \| Slot \| ng-content` | `-` | - |
+| `className` | `string` | `''` | - |
+
+### `BubbleChatMedia`
+
+| Prop | Type | Default | Options |
+| :--- | :--- | :--- | :--- |
+| `kind` | `'image' \| 'video'` | `'image'` | image, video |
+| `children` | `ReactNode \| Slot \| ng-content` | `-` | - |
+| `className` | `string` | `''` | - |
+
+## Design Tokens & Color Customization
+
+`BubbleChat` consumes canonical Figma semantic color tokens. You can customize its colors either by passing semantic/brand utility classes via `className` or by rebinding the underlying CSS custom properties (`--color-*`) on the component or a parent wrapper:
+
+| Tailwind Token Class | CSS Variable | UI Role |
+| :--- | :--- | :--- |
+| `bg-background-default` | `--color-background-default` | Background / Surface fill |
+| `bg-background-muted` | `--color-background-muted` | Background / Surface fill |
+| `bg-background-subtle` | `--color-background-subtle` | Background / Surface fill |
+| `bg-destructive-subtle` | `--color-destructive-subtle` | Background / Surface fill |
+| `border-border-default` | `--color-border-default` | Border / Divider stroke |
+| `border-destructive-border` | `--color-destructive-border` | Border / Divider stroke |
+| `text-foreground-default` | `--color-foreground-default` | Text / Foreground color |
+| `text-foreground-muted` | `--color-foreground-muted` | Text / Foreground color |
+
+```tsx
+// 1. Direct token override via className
+<BubbleChat className="bg-brand-kompack-primary text-primary-foreground" />
+
+// 2. Scoped CSS variable token rebinding (updates all internal elements using that token)
+<BubbleChat className="[--color-primary-default:var(--color-brand-komship-primary)]" />
+```

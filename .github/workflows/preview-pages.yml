@@ -37,7 +37,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build compiler package
-        run: pnpm --filter @supernova/mitosis-compiler build
+        run: pnpm --filter @komerce-design/mitosis-compiler build
 
       - name: Compute Preview Base & Destination
         id: meta
@@ -80,7 +80,7 @@ jobs:
           script: |
             const fs = require('fs');
             const path = require('path');
-            const marker = '<!-- supernova-ui-preview-comment -->';
+            const marker = '<!-- komerce-design-ui-preview-comment -->';
             const previewUrl = process.env.PREVIEW_URL;
             const sha = context.payload.pull_request.head.sha.slice(0, 7);
             const branch = context.payload.pull_request.head.ref;
@@ -115,7 +115,7 @@ jobs:
 
             const body = [
               marker,
-              '### 🚀 Supernova Live UI Preview Ready!',
+              '### 🚀 Komerce Design Live UI Preview Ready!',
               '',
               `Komponen Mitosis pada PR ini (\`${sha}\`) telah dikompilasi ke **React**, **Vue 3**, dan **Svelte** serta di-deploy ke GitHub Pages:`,
               '',
@@ -133,7 +133,7 @@ jobs:
                     '',
                   ]
                 : []),
-              '> 💡 *Tip: Gunakan komentar `/supernova regenerate <NamaKomponen>: <catatan>` di PR ini untuk merevisi komponen secara otomatis.*'
+              '> 💡 *Tip: Gunakan komentar `/komerce regenerate <NamaKomponen>: <catatan>` di PR ini untuk merevisi komponen secara otomatis.*'
             ].join('\n');
 
             const issue_number = context.issue.number;

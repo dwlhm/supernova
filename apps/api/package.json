@@ -1,11 +1,11 @@
 {
-  "name": "@supernova/api",
+  "name": "@komerce-design/api",
   "version": "1.0.0",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "bin": {
-    "supernova-api": "dist/cli.js"
+    "komerce-design-api": "dist/cli.js"
   },
   "scripts": {
     "build": "tsc",
@@ -14,9 +14,9 @@
     "start": "node dist/cli.js"
   },
   "dependencies": {
-    "@supernova/contracts": "workspace:*",
-    "@supernova/mitosis-author": "workspace:*",
-    "@supernova/mitosis-compiler": "workspace:*",
+    "@komerce-design/contracts": "workspace:*",
+    "@komerce-design/mitosis-author": "workspace:*",
+    "@komerce-design/mitosis-compiler": "workspace:*",
     "typescript": "^5.8.2"
   },
   "devDependencies": {

@@ -24,21 +24,21 @@ has_lite_components() {
   [ -e "${1:-}" ]
 }
 
-# Sync remote supernova/* PR branches created via GitHub API (allow force-updated PR refs)
-git fetch --quiet origin '+refs/heads/supernova/*:refs/remotes/origin/supernova/*' 2>/dev/null || true
+# Sync remote komerce-design/* PR branches created via GitHub API (allow force-updated PR refs)
+git fetch --quiet origin '+refs/heads/komerce-design/*:refs/remotes/origin/komerce-design/*' 2>/dev/null || true
 
-# Auto-detect latest supernova/* PR branch if not specified
+# Auto-detect latest komerce-design/* PR branch if not specified
 if [ -z "${BRANCH}" ]; then
   # Check if current working tree already has src/components/*.lite.tsx
   if has_lite_components "${REPO_ROOT}/src/components"; then
     echo -e "${GREEN}✓ Detected active PR components in working directory (${REPO_ROOT}/src/components).${NC}"
     export DS_REPO_DIR="${REPO_ROOT}"
   else
-    # Find most recent supernova/* branch locally or in origin
-    BRANCH=$(git for-each-ref --sort=-committerdate --format='%(refname:short)' refs/remotes/origin/supernova/ refs/heads/supernova/ | head -n 1 || true)
+    # Find most recent komerce-design/* branch locally or in origin
+    BRANCH=$(git for-each-ref --sort=-committerdate --format='%(refname:short)' refs/remotes/origin/komerce-design/ refs/heads/komerce-design/ | head -n 1 || true)
     if [ -z "${BRANCH}" ]; then
-      echo -e "${YELLOW}⚠ No supernova/* PR branch found in git. Falling back to templates/ds-repo.${NC}"
-      export DS_REPO_DIR="${REPO_ROOT}/templates/ds-repo"
+      echo -e "${YELLOW}⚠ No komerce-design/* PR branch found in git. Falling back to root src/.${NC}"
+      export DS_REPO_DIR="${REPO_ROOT}"
     fi
   fi
 fi
@@ -70,26 +70,21 @@ if [ -n "${BRANCH}" ] && [ -z "${DS_REPO_DIR:-}" ]; then
     fi
   fi
 
-  DOCS_BACKUP_DIR="$(mktemp -d "${TMPDIR:-/tmp}/supernova-docs-backup.XXXXXX")"
+  DOCS_BACKUP_DIR="$(mktemp -d "${TMPDIR:-/tmp}/komerce-docs-backup.XXXXXX")"
   cp -R "${REPO_ROOT}/apps/docs/components" "${DOCS_BACKUP_DIR}/components"
   cp "${REPO_ROOT}/apps/docs/tokens.md" "${DOCS_BACKUP_DIR}/tokens.md"
 
-  TMP_EXTRACT_DIR="$(mktemp -d "${TMPDIR:-/tmp}/supernova-pr-preview.XXXXXX")"
+  TMP_EXTRACT_DIR="$(mktemp -d "${TMPDIR:-/tmp}/komerce-pr-preview.XXXXXX")"
   echo -e "${BOLD}${BLUE}📦 Extracting PR branch '${BRANCH}' into temporary workspace...${NC}"
   git archive "${BRANCH}" | tar -x -C "${TMP_EXTRACT_DIR}"
 
   if ! has_lite_components "${TMP_EXTRACT_DIR}/src/components"; then
-    echo -e "${YELLOW}⚠ Branch '${BRANCH}' has no src/components/*.lite.tsx at root; checking templates/ds-repo...${NC}"
-    if has_lite_components "${TMP_EXTRACT_DIR}/templates/ds-repo/src/components"; then
-      export DS_REPO_DIR="${TMP_EXTRACT_DIR}/templates/ds-repo"
-    else
-      echo -e "${RED}❌ No .lite.tsx components found in '${BRANCH}'.${NC}"
-      exit 1
-    fi
+    echo -e "${RED}❌ No src/components/*.lite.tsx components found in '${BRANCH}'.${NC}"
+    exit 1
   else
-    # Backfill any baseline subcomponents (e.g. TableCellInput) not directly emitted into src/components
-    if has_lite_components "${REPO_ROOT}/templates/ds-repo/src/components"; then
-      for base_file in "${REPO_ROOT}/templates/ds-repo/src/components/"*.lite.tsx; do
+    # Backfill any baseline subcomponents from root src/components
+    if has_lite_components "${REPO_ROOT}/src/components"; then
+      for base_file in "${REPO_ROOT}/src/components/"*.lite.tsx; do
         base_name="$(basename "${base_file}")"
         if [ ! -e "${TMP_EXTRACT_DIR}/src/components/${base_name}" ]; then
           cp "${base_file}" "${TMP_EXTRACT_DIR}/src/components/${base_name}"

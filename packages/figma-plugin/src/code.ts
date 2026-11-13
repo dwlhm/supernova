@@ -1,4 +1,4 @@
-import type { FigmaDocument, FigmaToken, FigmaComponentSpec, FigmaSceneNode, FigmaPaint } from '@supernova/contracts';
+import type { FigmaDocument, FigmaToken, FigmaComponentSpec, FigmaSceneNode, FigmaPaint } from '@komerce-design/contracts';
 import {
   extractLayout,
   formatVariableToken,

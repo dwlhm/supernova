@@ -33,5 +33,28 @@ A circular identity component used to represent a person, account, or entity. It
 | `initialsText` | `string` | `'AB'` | - |
 | `src` | `string` | `''` | - |
 | `alt` | `string` | `''` | - |
+| `icon` | `Component \| ReactNode \| Slot` | `-` | - |
 | `status` | `'online' \| 'offline' \| 'busy' \| 'away'` | `'online'` | online, offline, busy, away |
 | `className` | `string` | `''` | - |
+
+## Design Tokens & Color Customization
+
+`Avatar` consumes canonical Figma semantic color tokens. You can customize its colors either by passing semantic/brand utility classes via `className` or by rebinding the underlying CSS custom properties (`--color-*`) on the component or a parent wrapper:
+
+| Tailwind Token Class | CSS Variable | UI Role |
+| :--- | :--- | :--- |
+| `bg-background-interactive` | `--color-background-interactive` | Background / Surface fill |
+| `bg-background-muted` | `--color-background-muted` | Background / Surface fill |
+| `bg-destructive-default` | `--color-destructive-default` | Background / Surface fill |
+| `bg-success-default` | `--color-success-default` | Background / Surface fill |
+| `bg-warning-default` | `--color-warning-default` | Background / Surface fill |
+| `border-background-default` | `--color-background-default` | Border / Divider stroke |
+| `text-foreground-subtle` | `--color-foreground-subtle` | Text / Foreground color |
+
+```tsx
+// 1. Direct token override via className
+<Avatar className="bg-brand-kompack-primary text-primary-foreground" />
+
+// 2. Scoped CSS variable token rebinding (updates all internal elements using that token)
+<Avatar className="[--color-primary-default:var(--color-brand-komship-primary)]" />
+```

@@ -24,22 +24,17 @@ const GITHUB_REQUEST_TIMEOUT_MS = 30_000;
 
 const SCAFFOLD_REL_PATHS = [
   'package.json',
-  'tsconfig.json',
+  'tsconfig.base.json',
   'README.md',
-  '.changeset/config.json',
-  '.changeset/README.md',
-  '.github/workflows/ci.yml',
-  '.github/workflows/release.yml',
-  'scripts/compile.mjs',
+  'scripts/compile-library.mjs',
 ];
 
 function loadDefaultScaffolding(): Record<string, string> {
   const root = findRepoRoot(process.cwd());
   const out: Record<string, string> = {};
   if (!root) return out;
-  const tplRoot = path.join(root, 'templates', 'ds-repo');
   for (const rel of SCAFFOLD_REL_PATHS) {
-    const abs = path.join(tplRoot, rel);
+    const abs = path.join(root, rel);
     if (fs.existsSync(abs)) {
       out[rel] = fs.readFileSync(abs, 'utf8');
     }
@@ -178,10 +173,10 @@ export class GitHubPublisher implements ArtifactPublisher, PullRequestManager {
     }
 
     const docSlug = camelToKebab(normalizeComponentName(job.documentName)) || 'sync';
-    const branchName = job.options?.branchName || `supernova/${docSlug}`;
+    const branchName = job.options?.branchName || `komerce-design/${docSlug}`;
     const commitMsg = job.options?.prTitle || `feat(design-system): sync components from Figma [${job.id}]`;
 
-    // Stack on the existing PR branch so review commits (incl. `/supernova regenerate`) survive re-syncs.
+    // Stack on the existing PR branch so review commits (incl. `/komerce-design regenerate`) survive re-syncs.
     const branchSHA = await this.branchHead(owner, repoName, branchName);
     const commitSHA = await this.commitTree(owner, repoName, branchSHA ?? baseSHA, treeEntries, commitMsg);
     if (branchSHA) {
@@ -196,7 +191,7 @@ export class GitHubPublisher implements ArtifactPublisher, PullRequestManager {
     if (!prURL) {
       const created = await this.requestOK('create pull request', 'POST', `/repos/${owner}/${repoName}/pulls`, {
         title: commitMsg, head: branchName, base: baseBranch,
-        body: `Automated PR created by Supernova Figma sync for job \`${job.id}\`.`,
+        body: `Automated PR created by Komerce Design Figma sync for job \`${job.id}\`.`,
       });
       prURL = created.html_url;
       prNumber = created.number;

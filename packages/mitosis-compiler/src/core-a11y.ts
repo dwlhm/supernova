@@ -72,3 +72,151 @@ export function focusSiblingInput(event: unknown, offset: number): void {
     focusElementSafely(inputs[idx + offset]);
   }
 }
+
+const FOCUSABLE_SELECTOR =
+  'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
+export interface A11yElement {
+  focus?: () => void;
+  contains?: (node: any) => boolean;
+  querySelector?: (selector: string) => A11yElement | null;
+  querySelectorAll?: (selector: string) => ArrayLike<A11yElement>;
+  addEventListener?: (type: string, listener: (event: any) => void, capture?: boolean) => void;
+  removeEventListener?: (type: string, listener: (event: any) => void, capture?: boolean) => void;
+  hasAttribute?: (name: string) => boolean;
+  getAttribute?: (name: string) => string | null;
+}
+
+export interface A11yKeyboardEvent {
+  key: string;
+  shiftKey?: boolean;
+  preventDefault?: () => void;
+}
+
+interface A11yDocument {
+  activeElement?: A11yElement | null;
+  addEventListener?: (type: string, listener: (event: any) => void, capture?: boolean) => void;
+  removeEventListener?: (type: string, listener: (event: any) => void, capture?: boolean) => void;
+}
+
+function getDoc(): A11yDocument | undefined {
+  return (globalThis as { document?: A11yDocument }).document;
+}
+
+function getFocusableElements(container: A11yElement): A11yElement[] {
+  if (typeof container.querySelectorAll !== 'function') return [];
+  return Array.from(container.querySelectorAll(FOCUSABLE_SELECTOR)).filter(
+    (el) => !el.hasAttribute?.('disabled') && el.getAttribute?.('aria-hidden') !== 'true'
+  );
+}
+
+/**
+ * Traps Tab/Shift+Tab focus within `container` and restores focus to the
+ * previously active element when the returned cleanup function is called.
+ */
+export function createFocusTrap(container: A11yElement | null | undefined): () => void {
+  const doc = getDoc();
+  if (!container || !doc) return () => {};
+  const previouslyFocused = doc.activeElement ?? null;
+  const initialFocusable = getFocusableElements(container);
+  if (initialFocusable.length > 0) {
+    if (!container.contains?.(doc.activeElement)) {
+      focusElementSafely(initialFocusable[0]);
+    }
+  } else {
+    focusElementSafely(container);
+  }
+
+  const onKeyDown = (event: A11yKeyboardEvent) => {
+    if (event.key !== 'Tab') return;
+    const focusable = getFocusableElements(container);
+    if (focusable.length === 0) {
+      event.preventDefault?.();
+      focusElementSafely(container);
+      return;
+    }
+    const first = focusable[0]!;
+    const last = focusable[focusable.length - 1]!;
+    const active = doc.activeElement ?? null;
+    if (event.shiftKey) {
+      if (active === first || !container.contains?.(active)) {
+        event.preventDefault?.();
+        focusElementSafely(last);
+      }
+    } else if (active === last || !container.contains?.(active)) {
+      event.preventDefault?.();
+      focusElementSafely(first);
+    }
+  };
+
+  container.addEventListener?.('keydown', onKeyDown);
+  return () => {
+    container.removeEventListener?.('keydown', onKeyDown);
+    focusElementSafely(previouslyFocused);
+  };
+}
+
+/**
+ * Registers a document-level mousedown listener that invokes `onOutsideClick`
+ * when a pointer interaction occurs outside `element`.
+ */
+export function registerClickOutside(
+  element: A11yElement | null | undefined,
+  onOutsideClick: () => void
+): () => void {
+  const doc = getDoc();
+  if (!element || !doc?.addEventListener) return () => {};
+  const handleMouseDown = (event: { target?: unknown }) => {
+    const target = event?.target ?? null;
+    if (!target || !element.contains?.(target)) {
+      onOutsideClick();
+    }
+  };
+  doc.addEventListener('mousedown', handleMouseDown, true);
+  return () => {
+    doc.removeEventListener?.('mousedown', handleMouseDown, true);
+  };
+}
+
+/**
+ * Handles ArrowUp/ArrowDown/Home/End/Escape keyboard navigation for dropdown
+ * triggers and `[role="listbox"]` options.
+ */
+export function handleDropdownKeyDown(
+  event: A11yKeyboardEvent,
+  container: A11yElement | null | undefined,
+  isOpen: boolean,
+  onOpenChange?: (open: boolean) => void
+): void {
+  if (!container) return;
+  const key = event.key;
+  if (key === 'Escape' && isOpen) {
+    event.preventDefault?.();
+    onOpenChange?.(false);
+    focusElementSafely(container.querySelector?.('[aria-haspopup="listbox"]'));
+    return;
+  }
+  if (key !== 'ArrowDown' && key !== 'ArrowUp' && key !== 'Home' && key !== 'End') return;
+  if (!isOpen) {
+    if (key === 'ArrowDown' || key === 'ArrowUp') {
+      event.preventDefault?.();
+      onOpenChange?.(true);
+    }
+    return;
+  }
+  const listbox = container.querySelector?.('[role="listbox"]');
+  if (!listbox || typeof listbox.querySelectorAll !== 'function') return;
+  const options = Array.from(
+    listbox.querySelectorAll('[role="option"]:not([aria-disabled="true"]), button:not([disabled])')
+  );
+  if (options.length === 0) return;
+  const doc = getDoc();
+  const active = doc?.activeElement ?? null;
+  const currentIdx = active ? options.indexOf(active) : -1;
+  const baseIdx = currentIdx >= 0 ? currentIdx : key === 'ArrowUp' || key === 'End' ? 0 : -1;
+  const nextIdx = getNextRovingIndex(key, baseIdx, options.length);
+  if (nextIdx >= 0 && options[nextIdx]) {
+    event.preventDefault?.();
+    focusElementSafely(options[nextIdx]);
+  }
+}

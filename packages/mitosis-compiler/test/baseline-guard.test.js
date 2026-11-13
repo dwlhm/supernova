@@ -5,8 +5,8 @@ import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { compileMitosis, lintSource } from '../dist/index.js';
 
-// The template is the base every authoring run edits from; a source that fails the gate here would be re-taught to the LLM.
-const SRC = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../templates/ds-repo/src');
+// Root src/ is the base every authoring run edits from; a source that fails the gate here would be re-taught to the LLM.
+const SRC = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../src');
 
 const sources = Object.fromEntries(
   ['components', 'icons', 'examples'].flatMap((group) => {
@@ -19,7 +19,7 @@ const sources = Object.fromEntries(
   })
 );
 
-describe('templates/ds-repo baseline guard', () => {
+describe('root src/ baseline guard', () => {
   it('has baseline sources to guard', () => {
     assert.ok(Object.keys(sources).length > 40);
   });

@@ -46,7 +46,7 @@ function resolveAgyModel(): string {
 
 export function getAuthorConfig(): AuthorConfig {
   const provider = parseProvider(process.env.LLM_PROVIDER);
-  const session = process.env.OPENCODE_SESSION?.trim() || 'supernova';
+  const session = process.env.OPENCODE_SESSION?.trim() || 'komerce-design';
   const agyBin = process.env.AGY_BIN?.trim() || 'agy';
   const timeoutMs = parseDuration(process.env.LLM_TIMEOUT?.trim() || DEFAULT_TIMEOUT);
 

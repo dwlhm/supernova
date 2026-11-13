@@ -25,6 +25,26 @@ A horizontal progress bar that communicates how much of an ongoing process has b
 | Prop | Type | Default | Options |
 | :--- | :--- | :--- | :--- |
 | `value` | `number` | `0` | - |
-| `label` | `string` | `'Progress'` | - |
+| `label` | `string \| ((percentage: number) => string)` | `'Progress'` | - |
 | `showLabel` | `boolean` | `false` | - |
+| `trackClassName` | `string` | `''` | - |
+| `indicatorClassName` | `string` | `''` | - |
 | `className` | `string` | `''` | - |
+
+## Design Tokens & Color Customization
+
+`Progressbar` consumes canonical Figma semantic color tokens. You can customize its colors either by passing semantic/brand utility classes via `indicatorClassName` or by rebinding the underlying CSS custom properties (`--color-*`) on the component or a parent wrapper:
+
+| Tailwind Token Class | CSS Variable | UI Role |
+| :--- | :--- | :--- |
+| `bg-background-muted` | `--color-background-muted` | Background / Surface fill |
+| `bg-primary-default` | `--color-primary-default` | Background / Surface fill |
+| `text-foreground-muted` | `--color-foreground-muted` | Text / Foreground color |
+
+```tsx
+// 1. Direct token override via indicatorClassName
+<Progressbar indicatorClassName="bg-brand-kompack-primary text-primary-foreground" />
+
+// 2. Scoped CSS variable token rebinding (updates all internal elements using that token)
+<Progressbar indicatorClassName="[--color-primary-default:var(--color-brand-komship-primary)]" />
+```

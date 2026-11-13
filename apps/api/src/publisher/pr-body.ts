@@ -43,7 +43,7 @@ export function buildPullRequestBody(params: PullRequestBodyParams): string {
   );
 
   return [
-    `## 🚀 Supernova Design System Sync — ${job.documentName || 'Design System'}`,
+    `## 🚀 Komerce Design System Sync — ${job.documentName || 'Design System'}`,
     '',
     `Automated Pull Request generated from Figma extraction job \`${job.id}\` (commit [\`${shortSha}\`](${repoBase}/commit/${commitSha})).`,
     '',
@@ -68,6 +68,6 @@ export function buildPullRequestBody(params: PullRequestBodyParams): string {
     `- [\`src/tokens/tokens.css\`](${repoBase}/blob/${branchName}/src/tokens/tokens.css) — Root CSS custom properties`,
     `- [\`src/tokens/tokens.ts\`](${repoBase}/blob/${branchName}/src/tokens/tokens.ts) — Typed TypeScript token dictionary`,
     '',
-    '> 💡 **AI Regeneration via PR Comment**: Tulis komentar `/supernova regenerate <NamaKomponen>: <instruksi revisi>` di PR ini untuk meregenerasi komponen tertentu secara otomatis.',
+    '> 💡 **AI Regeneration via PR Comment**: Tulis komentar `/komerce-design regenerate <NamaKomponen>: <instruksi revisi>` di PR ini untuk meregenerasi komponen tertentu secara otomatis.',
   ].join('\n');
 }

@@ -2,26 +2,27 @@
 layout: home
 
 hero:
-  name: "Supernova"
-  text: "Figma to Multi-Framework Pipeline"
-  tagline: "Extract entire Figma documents, author headless Mitosis components via LLM, and compile to React, Svelte, Vue 3, Vue 2, and Angular."
+  name: "Komerce Design"
+  text: "Multi-Framework Design System & Headless Engine"
+  tagline: "Komponen UI siap pakai, headless controllers (Form, Table, Chart, Overlay), dan design tokens langsung dari Figma untuk React, Vue 3, Svelte, Vue 2, dan Angular."
   actions:
     - theme: brand
-      text: Get Started
-      link: /guide/overview
+      text: Quick Start
+      link: /guide/getting-started
     - theme: alt
-      text: Architecture
-      link: /guide/architecture
+      text: Component Catalog
+      link: /components/
+    - theme: alt
+      text: Multi-Framework Showcase
+      link: /showcase
 
 features:
-  - title: Whole Document Extraction
-    details: Custom Figma plugin using loadAllPagesAsync() traverses every page, collecting design tokens (variables, paint styles, text styles) and component sets.
-  - title: Full-TypeScript In-Process Engine
-    details: Pure Node.js 22 & TypeScript backend directly importing @supernova/mitosis-author and @supernova/mitosis-compiler with zero subprocess serialization overhead and built-in node:sqlite persistence.
-  - title: LLM Mitosis Authoring & Repair Loop
-    details: OpenAI-compatible authoring client (Ollama, OpenAI, vLLM) with structured output and automated compiler feedback repair loop.
-  - title: 5 Target Frameworks
-    details: Compiles single-source Mitosis .lite.tsx components simultaneously to React, Svelte, Vue 3, Vue 2, and Angular.
-  - title: Dual Publishers
-    details: Download complete multi-framework zip bundles directly from the plugin or create automated GitHub Pull Requests.
+  - title: 5 Framework dari Satu Sumber
+    details: Paket terpisah dan idiomatik untuk React, Vue 3, Svelte, Vue 2, dan Angular (@komerce-design/*) dengan perilaku dan tampilan identik.
+  - title: Headless Controllers & Engine
+    details: Gunakan komponen UI siap pakai, hubungkan createFormController / createTableController / createOverlayController, atau bangun custom UI sendiri dengan getChart*State & primitif SVG.
+  - title: Semantic Design Tokens & Dark Mode
+    details: Token warna, sub-brand Komerce, tipografi, radius, dan shadow diekstrak langsung dari Figma ke CSS variables & Tailwind v4 (@komerce-design/tokens).
+  - title: Local-First Figma Pipeline
+    details: Untuk kontributor design system, tersedia CLI lokal (`pnpm komerce sync`, `regen`, `build`) dan Figma plugin tanpa ketergantungan server atau database.
 ---

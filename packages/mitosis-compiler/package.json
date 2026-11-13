@@ -1,5 +1,5 @@
 {
-  "name": "@supernova/mitosis-compiler",
+  "name": "@komerce-design/mitosis-compiler",
   "version": "0.1.0",
   "type": "module",
   "bin": "./dist/cli.js",

@@ -12,7 +12,7 @@ const __dirname = path.dirname(__filename);
 // Root paths
 const docsRoot = path.resolve(__dirname, '..');
 const repoRoot = path.resolve(docsRoot, '../..');
-const templateRoot = path.resolve(repoRoot, 'templates/ds-repo');
+const templateRoot = repoRoot;
 
 const LEGACY_COMPONENT_NAME_MAP = {
   FileInput: 'InputFileInput',
@@ -60,7 +60,7 @@ const targetTokensDir = path.resolve(docsRoot, '.vitepress/theme/tokens');
 
 async function loadCompiler() {
   try {
-    return await import('@supernova/mitosis-compiler');
+    return await import('@komerce-design/mitosis-compiler');
   } catch {
     const fallbackPath = path.resolve(repoRoot, 'packages/mitosis-compiler/dist/index.js');
     return await import(fallbackPath);
@@ -110,7 +110,7 @@ async function collectFromRoot(rootDir) {
 
 async function getLiteComponentFiles(dsRepoRoot) {
   const byName = new Map();
-  // Always seed from templates/ds-repo baseline so partial PR branches never miss core components
+  // Always seed from root src/ baseline so partial PR branches never miss core components
   for (const entry of await collectFromRoot(templateRoot)) {
     byName.set(entry.name, entry);
   }
@@ -129,9 +129,9 @@ function extractMetadataFromSource(name, group, source) {
   const interfaceMatch = source.match(/export\s+interface\s+\w+Props\s*\{([\s\S]*?)\}/);
   if (interfaceMatch) {
     const body = interfaceMatch[1];
-    const propRegex = /^\s*([a-zA-Z0-9_]+)\??\s*:\s*([^;\n]+);/gm;
-    let match;
-    while ((match = propRegex.exec(body)) !== null) {
+    for (const rawStmt of body.split(/[;\n]+/)) {
+      const match = rawStmt.match(/^\s*([a-zA-Z0-9_]+)\??\s*:\s*(.+)$/);
+      if (!match) continue;
       const propName = match[1];
       const propType = match[2].trim();
       if (propName === 'target' || propName === 'role' || propName === 'ariaHidden') continue;
@@ -139,7 +139,7 @@ function extractMetadataFromSource(name, group, source) {
         hasErrorMessageProp = true;
       }
       if (propType === 'boolean') {
-        if (/^(show[A-Z]|disabled$|active$|checked$|expanded$|open$|pressed$|destructive$|indeterminate$|area$|required$)/.test(propName)) {
+        if (/^(show[A-Z]|disabled$|active$|checked$|expanded$|open$|pressed$|destructive$|indeterminate$|area$|range$|stacked$|required$)/.test(propName)) {
           booleans.push(propName);
         }
       } else if (propType.includes("'") || propType.includes('"')) {
@@ -155,10 +155,20 @@ function extractMetadataFromSource(name, group, source) {
     }
   }
   if (hasErrorMessageProp) {
+    delete variants.state;
     variants.previewState = ['default', 'filled', 'focus', 'error', 'disabled'];
   }
   const counts = Object.values(variants).map((v) => v.length);
   const totalVariants = counts.length > 0 ? counts.reduce((acc, c) => acc * c, 1) : 0;
+  if (interfaceMatch) {
+    const body = interfaceMatch[1];
+    for (const rawStmt of body.split(/[;\n]+/)) {
+      const match = rawStmt.match(/^\s*([a-zA-Z0-9_]+)\??\s*:\s*(.+)$/);
+      if (match && /^(icon|leftIcon|rightIcon|leadingIcon|trailingIcon)$/.test(match[1])) {
+        variants[match[1]] = ['default', 'plus', 'check', 'search', 'truck', 'star', 'settings'];
+      }
+    }
+  }
   return {
     name,
     group,
@@ -200,34 +210,6 @@ function normalizeTokenCssValues(css) {
   });
 }
 
-function buildDarkTokensBlock(css) {
-  const lines = ['.dark {'];
-  const re = /(--color-components-[a-z0-9-]+):\s*([^;]+);/g;
-  let m;
-  while ((m = re.exec(css)) !== null) {
-    const [, name, rawVal] = m;
-    const val = rawVal.trim();
-    const isInk = /(foreground|text|fill|stroke|label|title|heading|value|icon|wordmark|nav|current-page)/.test(name);
-    const isColoredBadge = /badge-(primary|success|warning|info|destructive)/.test(name);
-    const isSurface = /(background|surface)/.test(name) && !/(thumb|status|indicator|primary|destructive|accent)/.test(name);
-    const isBorder = /(border|divider|grid-line)/.test(name) && !/(error|focus|selected|active)/.test(name);
-
-    if (isInk && !isColoredBadge && (val === 'rgb(10, 10, 10)' || val === 'rgb(15, 14, 15)' || val === 'rgb(23, 23, 23)')) {
-      lines.push(`  ${name}: #f3f4f6;`);
-    } else if (isInk && !isColoredBadge && (val === 'rgb(115, 115, 115)' || val === 'rgb(82, 82, 82)')) {
-      lines.push(`  ${name}: #9ca3af;`);
-    } else if (isSurface && val === 'rgb(255, 255, 255)') {
-      lines.push(`  ${name}: #202127;`);
-    } else if (isSurface && (val === 'rgb(245, 245, 245)' || val === 'rgb(250, 250, 250)' || val === 'rgb(229, 229, 229)')) {
-      lines.push(`  ${name}: #2b2b30;`);
-    } else if (isBorder && (val === 'rgb(229, 229, 229)' || val === 'rgb(245, 245, 245)')) {
-      lines.push(`  ${name}: #3c3f44;`);
-    }
-  }
-  lines.push('}');
-  return lines.join('\n');
-}
-
 function sanitizeSyncedMarkdown(md) {
   return md
     .replace(/^(# [^\n]+\n+)\s*Description:?\s*\n+/i, '$1')
@@ -261,7 +243,7 @@ async function syncGeneratedDocs(dsRepoRoot) {
       const content = await fs.readFile(path.join(srcCompDocsDir, file), 'utf-8');
       // Only sync AST-generated docs (prevent legacy Go-generated PR docs with raw #nodeId from overwriting)
       if (
-        (content.includes('<ComponentPreview') || content.includes('<FrameworkPreview') || content.includes('@supernova/design-system')) &&
+        (content.includes('<ComponentPreview') || content.includes('<FrameworkPreview') || content.includes('@komerce-design')) &&
         !content.includes('No configurable properties defined.') &&
         !/#\d+:\d+/.test(content)
       ) {
@@ -312,9 +294,8 @@ async function main() {
 
   const { compileMitosis, getUtilsSource } = await loadCompiler();
 
-  // Ensure clean target directories exist
+  // Ensure target directories exist (overwrite in-place so live Vite dev server never sees missing files)
   for (const dir of [targetVue3Dir, targetReactDir, targetSvelteDir]) {
-    await fs.rm(dir, { recursive: true, force: true });
     await fs.mkdir(dir, { recursive: true });
   }
   await fs.mkdir(path.dirname(targetUtilsFile), { recursive: true });
@@ -375,36 +356,20 @@ async function main() {
   const secondary = await buildSecondaryFrameworks(utilsContent);
   console.log('[compile-docs-components] Wrote canonical utils.ts into .vitepress/theme/preview/utils.ts.');
 
-  // Copy tokens (with normalized opacity/font-weight/px values) and append deterministic dark-mode overrides
+  // Copy canonical tokens (theme.css and tokens.css with Figma :root + .dark blocks)
   const rawThemeCss = await fs.readFile(path.join(tokensSrcDir, 'theme.css'), 'utf-8');
   await fs.writeFile(path.join(targetTokensDir, 'theme.css'), normalizeTokenCssValues(rawThemeCss), 'utf-8');
   const rawTokensCss = normalizeTokenCssValues(await fs.readFile(path.join(tokensSrcDir, 'tokens.css'), 'utf-8'));
-  const darkOverrides = buildDarkTokensBlock(rawTokensCss);
-  await fs.writeFile(path.join(targetTokensDir, 'tokens.css'), `${rawTokensCss}\n${darkOverrides}\n`, 'utf-8');
-  console.log('[compile-docs-components] Copied theme.css and tokens.css (with dark overrides) into .vitepress/theme/tokens/.');
+  await fs.writeFile(path.join(targetTokensDir, 'tokens.css'), rawTokensCss, 'utf-8');
+  console.log('[compile-docs-components] Copied theme.css and tokens.css into .vitepress/theme/tokens/.');
 
   // Sync generated markdown docs if present in dsRepoRoot/docs
   await syncGeneratedDocs(dsRepoRoot);
 
-  // Read metadata files for totalVariants while keeping AST-extracted variants/booleans authoritative
+  // Extract metadata (variants, booleans, totalVariants) directly from the authored .lite.tsx AST
   const metaMap = {};
   for (const { name, group } of componentEntries) {
-    const metaPath = path.join(componentsSrcDir, `${name}.meta.json`);
-    const sourceMeta = extractMetadataFromSource(name, group, sourceByName[name] || '');
-    try {
-      const metaContent = await fs.readFile(metaPath, 'utf-8');
-      const parsed = JSON.parse(metaContent);
-      metaMap[name] = {
-        ...parsed,
-        name,
-        group: parsed.group || group,
-        variants: sourceMeta.variants,
-        booleans: sourceMeta.booleans,
-        totalVariants: parsed.totalVariants || sourceMeta.totalVariants,
-      };
-    } catch {
-      metaMap[name] = sourceMeta;
-    }
+    metaMap[name] = extractMetadataFromSource(name, group, sourceByName[name] || '');
   }
 
   const registryContent = renderRegistry({
