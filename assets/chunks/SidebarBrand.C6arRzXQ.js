@@ -1,0 +1,1 @@
+import{j as t}from"./jsx-runtime.BjG_zV1W.js";import{a}from"./theme.CMj9otVT.js";import"./framework.CbUgrr79.js";function s(e){return e={expanded:!0,className:"",...e},t.jsx("div",{className:a("flex w-full flex-row items-center gap-2",e.expanded?"justify-start px-2 py-4":"justify-center px-2 pt-4 pb-2",e.className),children:e.children})}export{s as default};

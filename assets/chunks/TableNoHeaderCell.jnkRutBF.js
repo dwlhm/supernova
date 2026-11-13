@@ -1,0 +1,1 @@
+import{j as t}from"./jsx-runtime.BjG_zV1W.js";import{a}from"./theme.CMj9otVT.js";import"./framework.CbUgrr79.js";function c(e){return e={className:"",...e},t.jsx("th",{scope:"col",className:a("w-12 whitespace-nowrap bg-background-muted px-4 py-3 text-center text-sm font-medium text-foreground-default",e.className),children:e.children})}export{c as default};

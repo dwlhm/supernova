@@ -1,0 +1,1 @@
+import{a as r}from"./theme.CMj9otVT.js";import{d as s,o,c as t,n,k as l,r as c}from"./framework.CbUgrr79.js";const f=s({__name:"TableHeaderRow",props:{className:{default:""}},setup(e){return(a,d)=>(o(),t("tr",{class:n(l(r)("border-b border-border-default bg-background-muted",e.className))},[c(a.$slots,"default")],2))}});export{f as _};
